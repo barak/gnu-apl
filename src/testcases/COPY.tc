@@ -15,21 +15,23 @@ CLEAR WS
 
 VAR1←'V1'
 VAR2←'V2'
+VAR3←1 (2 3)
 
-)WSID xxx
+)WSID COPY_tc
 WAS CLEAR WS
 
-)DUMP xxx
+)DUMP COPY_tc
 ³
 
 )CLEAR
 CLEAR WS
 
-)COPY xxx.apl FUN1 VAR2
+⍝ selective COPY. Make sure that only FUN1, VAR2 and VAR3 are being copies
+)COPY COPY_tc.apl FUN1 VAR2 VAR3
 DUMPED ³
 
 )VARS
-VAR2
+VAR2    VAR3
 
 )FNS
 FUN1
@@ -37,13 +39,11 @@ FUN1
 VAR2
 V2
 
+VAR3
+ 1  2 3 
+
 FUN1 4
 1
-
-)DROP xxx
-³
-
-
 
 
 ⍝ ==================================

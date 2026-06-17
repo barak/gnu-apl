@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 
 #include "Common.hh"
 #include "Command.hh"
-#include "DiffOut.hh"
 #include "InputFile.hh"
 #include "LineInput.hh"
 #include "Output.hh"
@@ -44,8 +43,10 @@ int Output::color_CERR_background = 8;
 int Output::color_UERR_foreground = 5;
 int Output::color_UERR_background = 8;
 
+int Output::output_column = 0;
+
 /// a filebuf for CERR
-ErrOut CERR_filebuf;
+ErrOut_filebuf CERR_filebuf;
 
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
@@ -53,7 +54,7 @@ DiffOut UERR_filebuf(true);
 // Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
 #ifndef apl_TARGET_ANDROID
 
-CinOut CIN_filebuf;
+CinOut_filebuf CIN_filebuf;
 CIN_ostream CIN;
 
 ostream COUT(&DOUT_filebuf);
@@ -66,26 +67,26 @@ extern ostream & get_CERR();
 ostream & get_CERR()
 {
    if (UserPreferences::uprefs.output_to_cout)
-      return ErrOut::used ? CERR : cout;
+      return ErrOut_filebuf::used ? CERR : cout;
    else
-      return ErrOut::used ? CERR : cerr;
+      return ErrOut_filebuf::used ? CERR : cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
 
-/// CSI sequence for ANSI/VT100 escape sequences (ESC [)
+/// CSI sequence for ANSI/VT100 terminals (ESC [)
 #define CSI "\x1B["
 
-/// VT100 escape sequence to change to cin color
+/// VT100 escape sequence to change to the CIN color
 char Output::color_CIN[MAX_ESC_LEN] = CSI "0;30;47m";
 
-/// VT100 escape sequence to change to cout color
+/// VT100 escape sequence to change to the COUT color
 char Output::color_COUT[MAX_ESC_LEN] = CSI "0;39;49m";
 
-/// VT100 escape sequence to change to cerr color
+/// VT100 escape sequence to change to the CERR color
 char Output::color_CERR[MAX_ESC_LEN] = CSI "0;35;49m";
 
-/// VT100 escape sequence to change to uerr color
+/// VT100 escape sequence to change to the UERR color
 char Output::color_UERR[MAX_ESC_LEN] = CSI "0;35;49m";
 
 /// VT100 escape sequence to reset colors to their default
@@ -120,7 +121,7 @@ char Output::ESC_Delete_1     [MAX_ESC_LEN] = CSI "3;" "\0" "~";   ///< Key Del
 
 //----------------------------------------------------------------------------
 int
-CinOut::overflow(int c)
+CinOut_filebuf::overflow(int c)
 {
 PERFORMANCE_START(cerr_perf)
    if (!InputFile::echo_current_file())   return 0;
@@ -129,17 +130,23 @@ PERFORMANCE_START(cerr_perf)
    cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
    return 0;
 }
 //----------------------------------------------------------------------------
 int
-ErrOut::overflow(int c)
+ErrOut_filebuf::overflow(int c)
 {
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
    if (UserPreferences::uprefs.output_to_cout)   cout << char(c);
    else                                          cerr << char(c);
+
+   if      (c == '\n')            Output::output_column = 0;
+   else if ((c & 0xC0) != 0x80)   ++Output::output_column;   // unless subsequent UTF
+
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
@@ -194,13 +201,9 @@ Output::set_color_mode(Output::ColorMode mode)
    switch(color_mode)
       {
         case COLM_INPUT:  cerr << color_CIN  << clear_EOL;   break;
-
         case COLM_OUTPUT: cout << color_COUT << clear_EOL;   break;
-
         case COLM_ERROR:  cerr << color_CERR << clear_EOL;   break;
-
         case COLM_UERROR: cout << color_UERR << clear_EOL;   break;
-
         default: break;
       }
 }

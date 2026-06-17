@@ -191,18 +191,27 @@ INDEX ERROR+
 
       ⍝ Regression
       ⍝
-      A ← 'ZIPPITY' 'DOO' 'DAH'
-      (ϵA[2]) ← 0
+      A ← 'ZIPPITY' 'DOO' 'DAH'   ⍝ 3 strings
+      (ϵA[2]) ← 0                 ⍝ set all chars of 'DOO' to (integer) 0
       A
  ZIPPITY  0 0 0  DAH 
 
-      A ← 3 4⍴'ZIPPITY' 'DOO' 'DAH'
-      (ϵA[1 2;2 3])←1
+      ⊢ A ← 3 4⍴'ZIPPITY' 'DOO' 'DAH'   ⍝ A 3×4 matrix of the 3 strings
+ ZIPPITY DOO     DAH     ZIPPITY 
+ DOO     DAH     ZIPPITY DOO     
+ DAH     ZIPPITY DOO     DAH     
+
+      ⊢ A[1 2;2 3]             ⍝ rows 1 and 2, cols 2 and 3 of A
+ DOO DAH     
+ DAH ZIPPITY 
+
+      (ϵA[1 2;2 3])←1          ⍝ set all 16 chars to (integer) 1
       A
  ZIPPITY  1 1 1    1 1 1          ZIPPITY 
  DOO      1 1 1    1 1 1 1 1 1 1  DOO     
  DAH      ZIPPITY  DOO            DAH     
-      (ϵA[1 2;2 3])←⍳16
+
+      (ϵA[1 2;2 3])←⍳16        ⍝ set all 16 chars to (integer) ⍳16
       A
  ZIPPITY  1 2 3    4 5 6                 ZIPPITY 
  DOO      7 8 9    10 11 12 13 14 15 16  DOO     
@@ -213,4 +222,21 @@ OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
+
+      ⍝ Regression (APL Wiki, 9.12.2025).
+      ⍝
+∇Z←(LO oper RO) B
+ Z←RO B
+∇
+
+∇Z←(LO opex RO) [X] B
+ Z←RO (⎕NC 'X') B
+∇
+     1 oper 'xyz' [2] 3
+y 3
+
+      1 opex 'xyz' [2] 3
+y 0 3
+
+
 

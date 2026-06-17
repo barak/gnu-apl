@@ -68,24 +68,28 @@ void scalar_value_to_el( ostream &out, Value_P value )
                                           << cell.get_real_value() << " "
                                           << cell.get_imag_value() << ")";
     else if(cell.is_character_cell()) out << "(:unicode "
-                                          << (int)cell.get_char_value() << ")";
+                                          << int(cell.get_char_value()) << ")";
     else out << "(:unknown)";
 }
 
 static void apl_value_to_el( ostream &out, Value_P value );
 
-static void output_onelevel( ostream &out, Value_P value, int level, int start, int end )
+//---------------------------------------------------------------------------
+static void
+output_onelevel(ostream &out, Value_P value, int level, int start, int end)
 {
     const Shape &shape = value->get_shape();
     int size = shape.get_shape_item( level );
     out << "(";
-    if( level < shape.get_rank() - 1 ) {
-        int step = (end - start) / size;
-        for( int i = start ; i < end ; i += step ) {
-            if( i > start ) out << " ";
-            output_onelevel( out, value, level + 1, i, i + step );
-        }
-    }
+    if (level < int(shape.get_rank() - 1))
+       {
+         int step = (end - start) / size;
+         for (int i = start ; i < end ; i += step )
+             {
+              if (i > start)   out << " ";
+              output_onelevel(out, value, level + 1, i, i + step);
+             }
+       }
     else {
         for( int i = start ; i < end ; i++ ) {
             if( i > start ) out << " ";

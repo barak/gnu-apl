@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,16 +31,73 @@ Quad_FFT   Quad_FFT::fun;
 
 bool Quad_FFT::system_wisdom_loaded = false;
 
-#if defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
+#if apl_FFT
 
 #include <fftw3.h>
 #include "ComplexCell.hh"
 
+const FunctionGroup::function_info Quad_FFT::subfunction_infos[] =
+{
+#define fftdef(N, fun, comm) { N, #fun, "", comm, -1 },
+
+  fftdef(-15,flat_top_window       ,"no FFT; Z is B × flat-top window"        )
+  fftdef(-14,blackman_nuttal_window,"no FFT; Z is B × Blackman-Nuttal window" )
+  fftdef(-13,blackman_harris_window, "no FFT; Z is B × Blackman-Harris window" )
+  fftdef(-12,blackman_window       ,"no FFT; Z is B × Blackman window"        )
+  fftdef(-11,hamming_window        ,"no FFT; Z is B × Hamming window"         )
+  fftdef(-10,hann_window           ,"no FFT; Z is B × Hann window"            )
+  fftdef( -1,inverse_fft           ,"Z is the inverse FFT of B"               )
+  fftdef(  0,fft                   ,"Z is FFT without window; same as ⎕FFT B" )
+  fftdef( 10,fft_hann              ,"Z is FFT with Hann window"               )
+  fftdef( 11,fft_hamming           ,"Z is FFT with Hamming window"            )
+  fftdef( 12,fft_blackman          ,"Z is FFT with Blackman window"           )
+  fftdef( 13,fft_blackman_harris   ,"Z is FFT with Blackman-Harris window"    )
+  fftdef( 14,fft_blackman_nuttal   ,"Z is FFT with Blackman-Nuttal window"    )
+  fftdef( 15,fft_flat_top          ,"Z is FFT with flat-top window"           )
+};
+
+//----------------------------------------------------------------------------
+Quad_FFT::Quad_FFT()
+      : QuadFunction(TOK_Quad_FFT)
+{
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕FFT");
+
+   system_wisdom_loaded = false;
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_fun_syntax(ostream & out,
+                           const function_info & info) const
+{
+const sRank axis = info.axis;
+   out << "    Z ← ";
+   if      (axis < -9)   out << "¯"  << -axis;
+   else if (axis <  0)   out << " ¯" << -axis;
+   else if (axis < 10)   out << "  " <<   axis;
+   else                  out << " "  <<   axis;
+   out<< " ⎕FFT B   ⍝ " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_map_syntax(ostream & out,
+                           const function_info & info) const
+{
+char NN[10];   SPRINTF(NN, "%3d", int(info.axis));
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
+
+   out << "    " << NN << " ⎕FFT  ←→  ⎕FFT['" << name << "']"
+       << blanks << "  ←→  ⎕FFT." << name << endl;
+}
 //----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
-   return do_fft(FFTW_FORWARD, B, 0);
+   if (B->element_count())   return do_fft(FFTW_FORWARD, B, 0);
+   if (B->is_str0())         return list_functions(CERR);
+   if (B->is_zilde())        return list_mappings(CERR);
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 void
@@ -236,11 +293,20 @@ Value_P Z(B->get_shape(), LOC);
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
-   if (A->get_rank() > 1)         RANK_ERROR;
-   if (A->element_count() != 1)   LENGTH_ERROR;
-
-const APL_Integer what = A->get_cfirst().get_int_value();
-   switch(what)
+  return do_eval_AorX_B(*A, B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::eval_XB(Value_P X, Value_P B) const
+{
+  return do_eval_AorX_B(*X, B);
+}
+//----------------------------------------------------------------------------
+Token
+Quad_FFT::do_eval_AorX_B(const Value & A_or_X, Value_P B) const
+{
+const sAxis subfunction = value_to_subfun(A_or_X);
+   switch(subfunction)
       {
         case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
         case  14: return do_fft(FFTW_FORWARD, B, &blackman_nuttall_window);
@@ -260,26 +326,7 @@ const APL_Integer what = A->get_cfirst().get_int_value();
         case -15: return do_window(B, &flat_top);
       }
 
-   MORE_ERROR() << "Invalid mode A (= " << what
-        << ") of A ⎕FFT B. Valid modes are:\n"
-"    A=¯15: no FFT, return (B × Flat-Top window)\n"
-"    A=¯14: no FFT, return (B × Blackman-Nuttal window)\n"
-"    A=¯13: no FFT, return (B × Blackman-Harris window)\n"
-"    A=¯12: no FFT, return (B × Blackman window)\n"
-"    A=¯11: no FFT, return (B × Hamming window)\n"
-"    A=¯10: no FFT, return (B × Hann window)\n"
-"\n"
-"    A=¯1: inverse FFT\n"
-"    A=0:  forward FFT (no window) of B\n"
-"\n"
-"    A=10: forward FFT(B × Hann window)\n"
-"    A=11: forward FFT(B × Hamming window)\n"
-"    A=12: forward FFT(B × Blackman window)\n"
-"    A=13: forward FFT(B × Blackman-Harris window)\n"
-"    A=14: forward FFT(B × Blackman-Nuttal window)\n"
-"    A=15: forward FFT(B × Flat-Top window)\n";
-
-   DOMAIN_ERROR;
+   bad_subfun_number_ERROR(subfunction);
 }
 //----------------------------------------------------------------------------
 void
@@ -304,14 +351,38 @@ ShapeItem rlen = 1;
          rlen *= axis_len;
        }
 }
+//----------------------------------------------------------------------------
 
-#else
+#else   // not apl_FFT
 
-extern Token missing_files(const char * qfun,  const char ** libs,
-                           const char ** hdrs, const char ** pkgs);
+//----------------------------------------------------------------------------
+Quad_FFT::Quad_FFT()
+   : QuadFunction(TOK_Quad_FFT)
+{
+   system_wisdom_loaded = false;
+}
+//----------------------------------------------------------------------------
 
-Token Quad_FFT::eval_AB(Value_P A, Value_P B) const { return eval_B(B); }
+Token Quad_FFT::eval_AB(Value_P A, Value_P B) const 
+{
+   return eval_B(B);
+}
+//----------------------------------------------------------------------------
 
+Token Quad_FFT::eval_XB(Value_P A, Value_P B) const 
+{
+   return eval_B(B);
+}
+void
+Quad_FFT::print_fun_syntax(ostream & out, const function_info & info) const
+{
+}
+//----------------------------------------------------------------------------
+void
+Quad_FFT::print_map_syntax(ostream & out, const function_info & info) const
+{
+}
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
@@ -322,5 +393,5 @@ const char * pkgs[] = { "libfftw3-dev", 0 };
    return missing_files("⎕FFT", libs, hdrs, pkgs);
 }
 
-#endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
+#endif // (not) apl_FFT
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,15 +60,15 @@ Nabla::Nabla(const UCS_string & cmd)
 void
 Nabla::throw_edit_error(const char * why)
 {
+UCS_string command = first_command;
+   if (trailing_nabla)   command << UNI_NABLA;
+
    COUT << "DEFN ERROR+" << endl
-        << "      " << first_command << endl
-        << "      " << UCS_string(first_command.size() - 1, UNI_SPACE)
+        << "      " << command << endl
+        << "      " << UCS_string(command.size() - 1, UNI_SPACE)
         << "^" << endl;
 
-   if (Workspace::more_error().size() == 0)
-      {
-        MORE_ERROR() << why;
-      }
+   if (Workspace::more_error().size() == 0)   MORE_ERROR() << why;
 
    Error::throw_define_error(fun_header, first_command, why);
 }
@@ -78,10 +78,13 @@ Nabla::edit()
 {
    if (const char * error = start())
       {
-        Log(LOG_verbose_error)   if (Workspace::more_error().size() == 0)
+        Log(LOG_verbose_error)
            {
-             UERR << "Bad ∇-open '" << first_command
-                  << "' : '" << error << "'" << endl;
+             if (Workspace::more_error().size() == 0)
+                {
+                  UERR << "Bad ∇-open '" << first_command
+                       << "' : '" << error << "'" << endl;
+                }
            }
         throw_edit_error(error);
       }
@@ -141,8 +144,7 @@ try_again:
 UCS_string fun_text;
    loop(l, lines.size())
       {
-        fun_text.append(lines[l].text);
-        fun_text.append(UNI_LF);
+        fun_text << lines[l].text << UNI_LF;
       }
 
    // maybe copy function into the history
@@ -157,27 +159,26 @@ UCS_string fun_text;
         // the last history line (which contained some ∇foo ...)
         //
         {
-          UCS_string line_0(UTF8_string("    "));
-          line_0.append(UNI_NABLA);
-          line_0.append(lines[0].text);
+          UCS_string line_0(U"    ");
+          line_0 << UNI_NABLA << lines[0].text;
           line_0.remove_trailing_whitespaces();
           LineInput::replace_history_line(line_0);
         }
 
         for (size_t l = 1; l < lines.size(); ++l)
             {
-              UCS_string line_l(UTF8_string("["));
-              line_l.append_number(l);
-              line_l.append_UTF8("]  ");
-              while (line_l.size() < 6)   line_l.append(UNI_SPACE);
-              line_l.append(lines[l].text);
+              UCS_string line_l;
+              line_l << UNI_L_BRACK << l << UNI_R_BRACK
+                     << UNI_SPACE << UNI_SPACE;
+              while (line_l.size() < 6)   line_l << UNI_SPACE;
+              line_l << lines[l].text;
               line_l.remove_trailing_whitespaces();
 
               LineInput::add_history_line(line_l);
            }
 
-        UCS_string line_N(UTF8_string("   "));
-        line_N.append(UNI_NABLA);
+        UCS_string line_N(U"   ");
+        line_N << UNI_NABLA;
         LineInput::add_history_line(line_N);
       }
 
@@ -186,8 +187,10 @@ char creator[APL_PATH_MAX+20];
    SPRINTF(creator, "%s:%d", InputFile::current_filename(), defn_line_no)
 const UTF8_string creator_utf8(creator);
 
-UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
-                                        LOC, creator_utf8, true);
+UserFunction * ufun = UserFunction::fix(fun_text, error_line,
+                                        /* keep_existing */ false,
+                                        LOC, creator_utf8,
+                                        /* tolerant */  true);
 
    if (ufun == 0)   // UserFunction::fix() failed
       {
@@ -220,7 +223,7 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
                   << error_line << "] ..., or \n"
                      "    delete the faulty line with:    [∆"
                   << error_line << "], or\n"
-                     "    cancel editing entirely with:   [→]∇.";
+                     "    cancel editing entirely with:   [→]∇.\n";
            }
         do_close = false;
         goto try_again;
@@ -234,8 +237,8 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
 
    // set stop and trace vectors
    //
-std::basic_string<Function_Line> stop_vec;
-std::basic_string<Function_Line> trace_vec;
+std::vector<Function_Line> stop_vec;
+std::vector<Function_Line> trace_vec;
    loop(l, lines.size())
        {
          if (lines[l].stop_flag)    stop_vec.push_back(Function_Line(l));
@@ -244,25 +247,50 @@ std::basic_string<Function_Line> trace_vec;
 
    ufun->set_trace_stop(stop_vec,  true);
    ufun->set_trace_stop(trace_vec, false);
+
+   // set_trace_stop() calls parse_body(), so we have to redo optimizations
+   //
+   ufun->optimize_labels();
+   ufun->optimize_label_vectors();
+   ufun->compute_if_else_targets();
 }
 //----------------------------------------------------------------------------
 const char *
 Nabla::start()
 {
-   // cmd should be something like:
+   /* This function parses member 'first_command', which is the line with
+      which the ∇-editor was started. There are 4 valid cases:
+
+      1a. ... FUN[X]   where X is an axis (and therefore FUN is new)
+      1b. ... FUN ...  where FUN is new
+      1c. ... FUN ...  where FUN exists, but in script
+      2.  ... FUN ...  where FUN exists
+
+      Cases 1a. and 1b. create a new function.
+      Case  1c. overwrites an existing function.
+      Case  2.  starts editing of an existing function.
+
+      start() returns 0 on success or a short error description on failure.
+    */
+
+   // skip (and remember) trailing ∇ (if any)
    //
-   // ∇FUN
-   // ∇FUN[⎕]
-   // ∇FUN[⎕]∇
-   // etc.
-   //
+   first_command.remove_trailing_whitespaces();
+   trailing_nabla = false;
+   if (first_command.back() == UNI_NABLA)
+      {
+        first_command.pop_back();
+        trailing_nabla = true;
+        do_close = true;
+      }
+
 UCS_string::iterator c(first_command);
 
-   // skip leading spaces
+   // skip any leading spaces
    //
    c.skip_white();
 
-   // skip leading nabla.
+   // skip the leading nabla. This should always succeed.
    //
    if (c.has_more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
 
@@ -270,50 +298,85 @@ UCS_string::iterator c(first_command);
    //
    c.skip_white();
 
-   // function header.
+   // function header... Copy anything, but stop at '[' (if present).
    //
    while (c.has_more() && c.lookup() != UNI_L_BRACK)
-         fun_header.append(c.next());
+         fun_header << c.next();
+   c.skip_white();
 
-   /* at this point there could be an axis specification [X] that
-      could be confused with an operation like [⎕]. We take the first char
-      after the [ to decide if there is an axis or a ∇-operation like [⎕].
+   /* at this point there could be an axis specification [X] or
+      a ∇-operation like [⎕] or [N]...
 
       For example:
 
-          ∇FOO[X] B : [ starts axis
-          ∇FOO[⎕]   : [ starts ∇operation [⎕] (display)
+          ∇FOO[X] B   : the '[' starts an axis specification
+          ∇FOO[⎕]     : the '[' starts a ∇-operation [⎕] (display)
+          ∇FOO[2] ⍴B  : the '[' starts a ∇-operation [2] (change line 2)
+
+      We first handle (and rule out) the axis case
     */
-   if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
+   if (c.has_more()              &&
+       c.lookup() == UNI_L_BRACK &&
+       is_axis(c.rest()))
       {
-        c.next();   // the [
-        c.skip_white();
-        if (c.has_more() && Avec::is_first_symbol_char(c.lookup()))   // axis
+        /* new function header, i.e. not a ∇-command. Restore the symbol name
+           name left of [ ]. The possible cases are
+
+                 FOO [...]
+               A FOO [...]
+             (LO)FOO [...]
+           A (LO)FOO [...]
+
+           move backwards, skipping the whitespace between FOO and [...]
+         */
+        size_t end = c.get_pos();
+        while (end && first_command[end - 1] == UNI_SPACE)   --end;
+        size_t pos = end;
+        while (pos && Avec::is_symbol_char(first_command[pos-1]))   --pos;
+        const UCS_string function_name(first_command, pos, end - pos);
+        fun_symbol = Workspace::lookup_symbol(function_name);
+
+        /* Copy the rest to fun_header. After that, fun_header is
+           the entire first_command, but with its leading and
+           trailing ∇s (and whitespaces) removed.
+         */
+        while (c.has_more())   fun_header << c.next();
+        if (InputFile::running_script())   // case 1a.
            {
-             fun_header.append(UNI_L_BRACK);   //  copy the [
-             while (c.has_more() && c.lookup() != UNI_L_BRACK)
-                   fun_header.append(c.next());
-           }
-        else                                                      // ∇-command
-           {
-             c.un_next();
+             if (const char * loc = open_new_function())   return loc;
+             return 0;
            }
       }
 
-UserFunction_header hdr(fun_header, false);
-   if (hdr.get_error())
-      {
-         static char cc[200];
-         SPRINTF(cc, "Bad function header: %s", hdr.get_error_info());
-         return cc;
-      }
+   /* at this point fun_header is either:
 
-   fun_symbol = Workspace::lookup_symbol(hdr.get_name());
-   Assert(fun_symbol);
+      (a) the entire header of a new function, or else
+      (b) (only) the function name of a supposedly existing function. In
+          this case c.rest() shall be empty or an ∇-command.
+
+      The name of the function to be edited could be anywhere in 'fun_header'.
+      We therefore parse 'fun_header' into 'hdr' and then fetch the name from
+      'hdr'.
+    */
+bool hdr_has_vars;
+   {
+     const UserFunction_header hdr(fun_header, /* macro= */ false);
+     if (hdr.get_error())
+        {
+           static char cc[200];
+           SPRINTF(cc, "Bad function header: %s", hdr.get_error_info());
+           return cc;
+        }
+
+     hdr_has_vars = hdr.has_vars();
+     fun_symbol = Workspace::lookup_symbol(hdr.get_name());
+     Assert(fun_symbol);
+   }
 
    if (fun_header.size() == 0)   return "no function name";
 
-   // optional operation
+   // optional ∇-operation. The case where '[' starts a header was already
+   // handled above.
    //
    if (c.has_more() && c.lookup() == UNI_L_BRACK)
       {
@@ -322,7 +385,7 @@ UserFunction_header hdr(fun_header, false);
         do
           {
             if (!c.has_more())   return "no ] in ∇-command";
-            oper.append(cc = c.next());
+            oper << (cc = c.next());
           } while (cc != UNI_R_BRACK);
 
         if (const char * loc = parse_oper(oper, true))   return loc;   // error
@@ -331,67 +394,100 @@ UserFunction_header hdr(fun_header, false);
    switch(fun_symbol->get_NC())
       {
         case NC_UNUSED_USER_NAME:   // open a new function
-             function_existed = false;
+             // this is the case where a new function or operator shall be
+             // defined, and the new function or operator has no axis.
+             //
              modified = true;
              {
                // a new function must not have a command
                //
                if (ecmd != ECMD_NOP)   return "∇-command in new function";
 
-               const char * open_loc = open_new_function();
-               if (open_loc)   return open_loc;
+               // case 1b.
+               if (const char * loc = open_new_function())   return loc;
              }
              break;
 
         case NC_FUNCTION:
-        case NC_OPERATOR:   // open an existing function
-             function_existed = true;
+        case NC_OPERATOR:           // open an existing function
              if (InputFile::running_script())   // script
                 {
-                  const char * open_loc = open_new_function();
-                  if (open_loc)   return open_loc;
+                  // case 1c.
+                  if (const char * loc = open_new_function())   return loc;
                   break;   // continue below
                 }
 
-             // interactive
-             {
-               if (hdr.has_vars())
-                  {
-                       // an existing function was opened with a header that
-                       // contains more than the function name.
-                       //
-                       return "attempt to ∇-open existing function with "
-                              "new function header";
-                  }
+             // interactive.
+             //
+             // case 2.
+             if (const char * loc =
+                       open_existing_function(fun_symbol->get_name()))
+                return loc;
 
-               const char * open_loc = open_existing_function();
-               if (open_loc)   return open_loc;
-             }
+             if (hdr_has_vars)
+                {
+                  // an existing function was opened with a header that
+                  // contains more than the function name.
+                  //
+                  return "attempt to ∇-open existing function with "
+                              "a new function header";
+                }
+
              break;
 
         default:
-             return "attempt to ∇-open a variable at " LOC;
+             return "attempt to ∇-open a non-function at " LOC;
       }
 
    // at this point the (new or existing) function was successfully opened.
-   // That means that at least the header is present (lines.size() > 0)
+   // That means that at least the header was present (lines.size() > 0)
 
    // immediate close (only show command is allowed here),
    // e.g. ∇fun[⎕]∇
    //
-   if (c.has_more() && c.lookup() == UNI_NABLA)
+   if (ecmd == ECMD_EDIT && c.has_more())
       {
+        /* For example:  ∇FOO[1]123∇
+
+           We have parsed ∇FOO[1] and c.rest() is the line to be replaced,
+           optionally followed by a closing ∇. We copy c.rest() into
+           current_text and then 
+         */
+         while (c.has_more())   current_text << c.next();
+         execute_oper();
+         return 0;   // OK
+      }
+
+   if (c.has_more())
+      {
+        if (ecmd == ECMD_NOP)    return 0;
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
            UERR << "execute_oper() failed at " << loc << endl;
-        do_close = true;
-        return 0;
+        return 0;   // OK
       }
 
    if (const char * loc = execute_oper())
       UERR << "execute_oper() failed at " << loc << endl;
 
    return 0;   // no error
+}
+//----------------------------------------------------------------------------
+bool
+Nabla::is_axis(const UCS_string & ucs)
+{
+   // ucs was checked to start with with '['. Return true iff the '['
+   // is the start of an axis specification such as [ Name ]
+   //
+UCS_string::iterator c(ucs);
+   Assert(c.has_more() && c.lookup() == UNI_L_BRACK);   // [
+   c.next();   // skip '['
+   c.skip_white();
+   if (!c.has_more())                           return false;    // not an axis
+   if (!Avec::is_first_symbol_char(c.next()))   return false;    // not an axis
+   while (c.has_more() && Avec::is_symbol_char(c.lookup()))   c.next();
+   c.skip_white();
+   return c.has_more() && c.lookup() == UNI_R_BRACK;
 }
 //----------------------------------------------------------------------------
 const char *
@@ -440,7 +536,7 @@ UCS_string text = oper;
         ecmd = ECMD_EDIT;
         edit_from = current_line;
         current_text = text;
-//      for (; c.has_more(); cc = c.next())   current_text.append(cc);
+//      for (; c.has_more(); cc = c.next())   current_text <<cc;
         return 0;
       }
 
@@ -487,10 +583,9 @@ command_loop:
                  return "Bad ∇-command";
       }
 
-   // don't allow delete or escape in the first command
+   // don't allow escape in the first command
    if (initial)
       {
-        if (ecmd == ECMD_DELETE)   return "Bad initial ∇-command ∆";
         if (ecmd == ECMD_ESCAPE)   return "Bad initial ∇-command →";
       }
 
@@ -542,34 +637,34 @@ again:
                   return 0;
 
              case UNI_DOUBLE_QUOTE:  // "
-                  current_text.append(cc);
+                  current_text << cc;
                   for (;;)
                       {
                         if (!c.has_more())   // premature end of input
                            {
-                             current_text.append(UNI_DOUBLE_QUOTE);
+                             current_text << UNI_DOUBLE_QUOTE;
                              return 0;
                            }
                         cc = c.next();
 
-                        current_text.append(cc);
+                        current_text << cc;
                         if (cc == UNI_DOUBLE_QUOTE)   break; // string end
                         if (cc == UNI_BACKSLASH)      // \x
                            {
                              if (!c.has_more())   // premature end of input
                                 {
-                                  current_text.append(UNI_BACKSLASH);
-                                  current_text.append(UNI_DOUBLE_QUOTE);
+                                  current_text << UNI_BACKSLASH
+                                               << UNI_DOUBLE_QUOTE;
                                   return 0;
                                 }
                              cc = c.next();
-                             current_text.append(cc);
+                             current_text << cc;
                            }
                       }
                   break;
 
              case UNI_SINGLE_QUOTE:    // '
-                  current_text.append(cc);
+                  current_text << cc;
                   for (;;)
                       {
                         // no need to care for ''. Since we only copy, we can
@@ -578,17 +673,17 @@ again:
                         //
                         if (!c.has_more())   // premature end of input
                            {
-                             current_text.append(UNI_SINGLE_QUOTE);
+                             current_text << UNI_SINGLE_QUOTE;
                              return 0;
                            }
                         cc = c.next();
-                        current_text.append(cc);
+                        current_text << cc;
                         if (cc == UNI_SINGLE_QUOTE)      break;   // string end
                       }
                   break;
 
              default:
-                current_text.append(cc);
+                current_text << cc;
            }
       }
 
@@ -610,7 +705,7 @@ LineLabel ret(0);
       {
         c.next();   // eat the .
         while (c.has_more() && Avec::is_digit(c.lookup()))
-              ret.ln_minor.append(c.next());
+              ret.ln_minor << c.next();
       }
 
    return ret;
@@ -620,20 +715,28 @@ const char *
 Nabla::open_new_function()
 {
    Log(LOG_nabla)
-      UERR << "creating new function '" << fun_symbol->get_name() 
-           << "' with header '" << fun_header << "'" << endl;
+      UERR << "creating new function with header '"
+           << fun_header << "'" << endl;
 
+   // check for lambda
+   //
+   if (fun_header.contains(UNI_LAMBDA))
+       {
+         CERR << "\n*** WARNING: trying to edit a lambda? Don't!***" << endl;
+       }
+
+   function_existed = false;
    lines.push_back(FunLine(0, fun_header));
    return 0;
 }
 //----------------------------------------------------------------------------
 const char *
-Nabla::open_existing_function()
+Nabla::open_existing_function(const UCS_string & name)
 {
    Log(LOG_nabla)
-      UERR << "opening existing function '" << fun_symbol->get_name()
-           << "'" << endl;
+      UERR << "opening existing function '" << name << "'" << endl;
 
+   function_existed = true;
    if (const char * why = fun_symbol->cant_be_defined())   return why;
 
    // this function must only be called when editing functions interactively
@@ -822,7 +925,7 @@ Nabla::execute_edit()
    //
    if (current_text.size() == 0)   // empty line (we MAY need it)
       {
-        if (!UserPreferences::uprefs.multi_line_strings_3)
+        if (!UserPreferences::uprefs.new_multi_line_strings)
            return 0;   // we do not
         if (out_of_order)
            return 0;   // we do not;
@@ -882,32 +985,35 @@ const char *
 Nabla::edit_body_line()
 {
 UCS_string parse_text = current_text;   // a copy that can be modified.
-   if (UserPreferences::uprefs.multi_line_strings_3)
+   if (UserPreferences::uprefs.new_multi_line_strings)
       {
         // figure the multi-line status from all lines before current_line
-        bool multi = false;
+        Multiline_status multi = MLS_APL_text;
         loop(i, lines.size())
             {
               if (current_line == lines[i].label)   break;   // line replace
               if (current_line <  lines[i].label)   break;   // after current
-              if (-1 == lines[i].text.multi_pos(multi))   continue;
-              multi = ! multi;
+              if (-1 != lines[i].text.multi_pos())
+                 {
+                   if (multi <= MLS_APL_text)   multi = MLS_Inside_multi;
+                   else                         multi = MLS_APL_text;
+                 }
             }
 
-        if (multi)   // line belongs to a multi-line string (incl. """ or »»»)
+        if (multi >= MLS_Start_of_multi)   // line belongs to a multi-line
            {
              parse_text.clear();
            }
        else          // APL code outside multi-line strings (or start of one)
            {
-             const int pos = parse_text.multi_pos(multi);
+             const int pos = parse_text.multi_pos();
              if (pos != -1)   // start of multi-line string (""" or «««)
                 {
                   // for the sole purpose of parsing: replace the start of the
                   // multi-line string (""" or »»») with the empty string ''.
                   //
                   parse_text.resize(pos);
-                  parse_text.append_ASCII("''");
+                  parse_text << UNI_SINGLE_QUOTE << UNI_SINGLE_QUOTE;
                 }
            }
       }
@@ -918,7 +1024,8 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
         Token_string in;
 
         ErrorCode ec = parser.parse(parse_text, in, true);
-        if (ec == E_NO_STRING_END && UserPreferences::uprefs.multi_line_strings)
+        if ((ec == E_NO_STRING_END) &&
+            UserPreferences::uprefs.old_multi_line_strings)
            {
              ec = E_NO_ERROR;
              Workspace::more_error().clear();
@@ -978,7 +1085,7 @@ Nabla::execute_escape()
    // the user has entered [→].
    //
    // Note that fun_symbol and fun_symbol->get_function() may both be valid
-   // even though the function is "fresh". We use function_existed imstead.
+   // even though the function is "fresh". We use function_existed instead.
    //
    lines.clear();
 
@@ -1029,33 +1136,29 @@ Nabla::FunLine::print(ostream & out) const
 void
 LineLabel::print(ostream & out) const
 {
-UCS_string ucs(UTF8_string("["));
-   ucs.append_number(ln_major);
-   if (ln_minor.size())
-      {
-        ucs.append_UTF8(".");
-        ucs.append(ln_minor);
-      }
-   ucs.append_UTF8("]");
+UCS_string ucs;
+   ucs << UNI_L_BRACK << ln_major;
+   if (ln_minor.size())   ucs << UNI_FULLSTOP << ln_minor;
+   ucs << UNI_R_BRACK; 
 
-   while (ucs.size() < 5)   ucs.append_UTF8(" ");
+   while (ucs.size() < 5)   ucs << UNI_SPACE;
    out << ucs;
 }
 //----------------------------------------------------------------------------
 UCS_string
 LineLabel::print_prompt(int min_size) const
 {
-UCS_string ret(UTF8_string("["));
-   ret.append_number(ln_major);
+UCS_string ret;
+   ret << UNI_L_BRACK << ln_major;
 
    if (ln_minor.size())
       {
-        ret.append(Unicode('.'));
-        loop(s, ln_minor.size())   ret.append(Unicode(char(ln_minor[s])));
+        ret << UNI_FULLSTOP;
+        loop(s, ln_minor.size())   ret << Unicode(char(ln_minor[s]));
       }
 
-   ret.append_UTF8("] ");
-   while (ret.size() < min_size)   ret.append(UNI_SPACE);
+   ret << UNI_R_BRACK << UNI_SPACE;
+   while (ret.ssize() < min_size)   ret << UNI_SPACE;
    return ret;
 }
 //----------------------------------------------------------------------------
@@ -1072,13 +1175,13 @@ LineLabel::next()
    //
 const Unicode cc = ln_minor[ln_minor.size() - 1];
    if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
-   else                     ln_minor.append(UNI_1);
+   else                     ln_minor << UNI_1;
 }
 //----------------------------------------------------------------------------
 void
 LineLabel::insert()
 {
-   ln_minor.append(UNI_1);
+   ln_minor << UNI_1;
 }
 //----------------------------------------------------------------------------
 bool
@@ -1105,9 +1208,7 @@ UCS_string
 Nabla::FunLine::get_label_and_text() const
 {
 UCS_string ret = label.print_prompt(6);
-   ret.append(text);
-
-   return ret;
+   return ret << text;
 }
 //----------------------------------------------------------------------------
 UCS_string

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 //----------------------------------------------------------------------------
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
-     safe_execution_count(_par ? _par->safe_execution_count : 0),
+     safe_execution_depth(_par ? _par->safe_execution_depth : 0),
      level(_par ? 1 + _par->get_level() : 0),
      error(E_NO_ERROR, LOC),
      current_stack(*this, exec->get_body()),
@@ -152,14 +152,14 @@ StateIndicator::function_name() const
         case PM_STATEMENT_LIST:
              {
                UCS_string ret;
-               ret.append(UNI_DIAMOND);
+               ret << UNI_DIAMOND;
                return ret;
              }
 
         case PM_EXECUTE:
              {
                UCS_string ret;
-               ret.append(UNI_EXECUTE);
+               ret << UNI_EXECUTE;
                return ret;
              }
       }
@@ -173,7 +173,7 @@ StateIndicator::print(ostream & out) const
 {
    out << "Depth:      " << level                << endl;
    out << "Exec:       " << executable           << endl;
-   out << "Safe exec:  " << safe_execution_count << endl;
+   out << "Safe exec:  " << safe_execution_depth << endl;
 
    Assert(executable);
 
@@ -472,7 +472,7 @@ StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 
   // collect SI entries in reverse order...
    //
-std::basic_string<const StateIndicator *> stack;
+std::vector<const StateIndicator *> stack;
 
    for (const StateIndicator * si = Workspace::SI_top();
         si; si = si->get_parent())
@@ -550,7 +550,7 @@ const TokenTag tag = result.get_tag();
 Value_P B(result.get_apl_val());
    Assert(+B);
 
-   // print values, but not TOK_APL_VALUE2 (comited value)
+   // print values, but not TOK_APL_VALUE2 (aka. commited value)
    //
 bool print_value = result.get_Class() == TC_VALUE && tag != TOK_APL_VALUE2;
 

@@ -1,8 +1,3 @@
-
-//  Keyboard setup for the Dyalog APL keyboard by Blake McBride (blake1024@gmail.com)
-//  for use with xkbcomp
-//  See file ../WASD/apl.xkb.txt for full documentation
-
 xkb_keymap {
 xkb_keycodes "evdev+aliases(qwerty)" {
     minimum = 8;
@@ -251,6 +246,8 @@ xkb_keycodes "evdev+aliases(qwerty)" {
     <I251> = 251;
     <I252> = 252;
     <I253> = 253;
+    <I254> = 254;
+    <I255> = 255;
     indicator 1 = "Caps Lock";
     indicator 2 = "Num Lock";
     indicator 3 = "Scroll Lock";
@@ -270,6 +267,45 @@ xkb_keycodes "evdev+aliases(qwerty)" {
     alias <HZTG> = <TLDE>;
     alias <LMTA> = <LWIN>;
     alias <RMTA> = <RWIN>;
+    alias <OUTP> = <I235>;
+    alias <KITG> = <I236>;
+    alias <KIDN> = <I237>;
+    alias <KIUP> = <I238>;
+    alias <I121> = <MUTE>;
+    alias <I122> = <VOL->;
+    alias <I123> = <VOL+>;
+    alias <I124> = <POWR>;
+    alias <I125> = <KPEQ>;
+    alias <I127> = <PAUS>;
+    alias <I130> = <HNGL>;
+    alias <I131> = <HJCV>;
+    alias <I132> = <AE13>;
+    alias <I133> = <LWIN>;
+    alias <I134> = <RWIN>;
+    alias <I135> = <COMP>;
+    alias <I136> = <STOP>;
+    alias <I137> = <AGAI>;
+    alias <I138> = <PROP>;
+    alias <I139> = <UNDO>;
+    alias <I140> = <FRNT>;
+    alias <I141> = <COPY>;
+    alias <I142> = <OPEN>;
+    alias <I143> = <PAST>;
+    alias <I144> = <FIND>;
+    alias <I145> =  <CUT>;
+    alias <I146> = <HELP>;
+    alias <I191> = <FK13>;
+    alias <I192> = <FK14>;
+    alias <I193> = <FK15>;
+    alias <I194> = <FK16>;
+    alias <I195> = <FK17>;
+    alias <I196> = <FK18>;
+    alias <I197> = <FK19>;
+    alias <I198> = <FK20>;
+    alias <I199> = <FK21>;
+    alias <I200> = <FK22>;
+    alias <I201> = <FK23>;
+    alias <I202> = <FK24>;
     alias <ALGR> = <RALT>;
     alias <KPPT> = <I129>;
     alias <LatQ> = <AD01>;
@@ -323,7 +359,6 @@ xkb_types "complete" {
     };
     type "KEYPAD" {
         modifiers= Shift+NumLock;
-        map[Shift]= Level2;
         map[NumLock]= Level2;
         level_name[Level1]= "Base";
         level_name[Level2]= "Number";
@@ -333,6 +368,12 @@ xkb_types "complete" {
         map[Shift+Alt]= Level2;
         level_name[Level1]= "Base";
         level_name[Level2]= "Shift+Alt";
+    };
+    type "PC_SUPER_LEVEL2" {
+        modifiers= Mod4;
+        map[Mod4]= Level2;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Super";
     };
     type "PC_CONTROL_LEVEL2" {
         modifiers= Control;
@@ -461,6 +502,90 @@ xkb_types "complete" {
         level_name[Level7]= "X Alt Base";
         level_name[Level8]= "X Shift Alt";
     };
+    type "EIGHT_LEVEL_LEVEL_FIVE_LOCK" {
+        modifiers= Shift+Lock+NumLock+LevelThree+LevelFive;
+        map[Shift]= Level2;
+        map[LevelThree]= Level3;
+        map[Shift+LevelThree]= Level4;
+        map[LevelFive]= Level5;
+        map[Shift+LevelFive]= Level6;
+        preserve[Shift+LevelFive]= Shift;
+        map[LevelThree+LevelFive]= Level7;
+        map[Shift+LevelThree+LevelFive]= Level8;
+        map[NumLock]= Level5;
+        map[Shift+NumLock]= Level6;
+        preserve[Shift+NumLock]= Shift;
+        map[NumLock+LevelThree]= Level7;
+        map[Shift+NumLock+LevelThree]= Level8;
+        map[Shift+NumLock+LevelFive]= Level2;
+        map[NumLock+LevelThree+LevelFive]= Level3;
+        map[Shift+NumLock+LevelThree+LevelFive]= Level4;
+        map[Shift+Lock]= Level2;
+        map[Lock+LevelThree]= Level3;
+        map[Shift+Lock+LevelThree]= Level4;
+        map[Lock+LevelFive]= Level5;
+        map[Shift+Lock+LevelFive]= Level6;
+        preserve[Shift+Lock+LevelFive]= Shift;
+        map[Lock+LevelThree+LevelFive]= Level7;
+        map[Shift+Lock+LevelThree+LevelFive]= Level8;
+        map[Lock+NumLock]= Level5;
+        map[Shift+Lock+NumLock]= Level6;
+        preserve[Shift+Lock+NumLock]= Shift;
+        map[Lock+NumLock+LevelThree]= Level7;
+        map[Shift+Lock+NumLock+LevelThree]= Level8;
+        map[Shift+Lock+NumLock+LevelFive]= Level2;
+        map[Lock+NumLock+LevelThree+LevelFive]= Level3;
+        map[Shift+Lock+NumLock+LevelThree+LevelFive]= Level4;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Shift";
+        level_name[Level3]= "Alt Base";
+        level_name[Level4]= "Shift Alt";
+        level_name[Level5]= "X";
+        level_name[Level6]= "X Shift";
+        level_name[Level7]= "X Alt Base";
+        level_name[Level8]= "X Shift Alt";
+    };
+    type "EIGHT_LEVEL_ALPHABETIC_LEVEL_FIVE_LOCK" {
+        modifiers= Shift+Lock+NumLock+LevelThree+LevelFive;
+        map[Shift]= Level2;
+        map[LevelThree]= Level3;
+        map[Shift+LevelThree]= Level4;
+        map[LevelFive]= Level5;
+        map[Shift+LevelFive]= Level6;
+        preserve[Shift+LevelFive]= Shift;
+        map[LevelThree+LevelFive]= Level7;
+        map[Shift+LevelThree+LevelFive]= Level8;
+        map[NumLock]= Level5;
+        map[Shift+NumLock]= Level6;
+        preserve[Shift+NumLock]= Shift;
+        map[NumLock+LevelThree]= Level7;
+        map[Shift+NumLock+LevelThree]= Level8;
+        map[Shift+NumLock+LevelFive]= Level2;
+        map[NumLock+LevelThree+LevelFive]= Level3;
+        map[Shift+NumLock+LevelThree+LevelFive]= Level4;
+        map[Lock]= Level2;
+        map[Lock+LevelThree]= Level3;
+        map[Shift+Lock+LevelThree]= Level4;
+        map[Lock+LevelFive]= Level5;
+        map[Shift+Lock+LevelFive]= Level6;
+        map[Lock+LevelThree+LevelFive]= Level7;
+        map[Shift+Lock+LevelThree+LevelFive]= Level8;
+        map[Lock+NumLock]= Level5;
+        map[Shift+Lock+NumLock]= Level6;
+        map[Lock+NumLock+LevelThree]= Level7;
+        map[Shift+Lock+NumLock+LevelThree]= Level8;
+        map[Lock+NumLock+LevelFive]= Level2;
+        map[Lock+NumLock+LevelThree+LevelFive]= Level4;
+        map[Shift+Lock+NumLock+LevelThree+LevelFive]= Level3;
+        level_name[Level1]= "Base";
+        level_name[Level2]= "Shift";
+        level_name[Level3]= "Alt Base";
+        level_name[Level4]= "Shift Alt";
+        level_name[Level5]= "X";
+        level_name[Level6]= "X Shift";
+        level_name[Level7]= "X Alt Base";
+        level_name[Level8]= "X Shift Alt";
+    };
     type "EIGHT_LEVEL_SEMIALPHABETIC" {
         modifiers= Shift+Lock+LevelThree+LevelFive;
         map[Shift]= Level2;
@@ -475,14 +600,14 @@ xkb_types "complete" {
         map[Shift+LevelFive]= Level6;
         map[Lock+LevelFive]= Level6;
         preserve[Lock+LevelFive]= Lock;
+        map[Shift+Lock+LevelFive]= Level6;
+        preserve[Shift+Lock+LevelFive]= Lock;
         map[LevelThree+LevelFive]= Level7;
         map[Shift+LevelThree+LevelFive]= Level8;
         map[Lock+LevelThree+LevelFive]= Level7;
         preserve[Lock+LevelThree+LevelFive]= Lock;
         map[Shift+Lock+LevelThree+LevelFive]= Level8;
         preserve[Shift+Lock+LevelThree+LevelFive]= Lock;
-        map[Shift+Lock+LevelFive]= Level1;
-        preserve[Shift+Lock+LevelFive]= Lock;
         level_name[Level1]= "Base";
         level_name[Level2]= "Shift";
         level_name[Level3]= "Alt Base";
@@ -599,7 +724,7 @@ xkb_types "complete" {
     };
 };
 
-xkb_compatibility "complete+ledscroll(group_lock)" {
+xkb_compatibility "complete" {
 
     virtual_modifiers NumLock,Alt,LevelThree,LAlt,RAlt,RControl,LControl,ScrollLock,LevelFive,AltGr,Meta,Super,Hyper;
 
@@ -616,9 +741,6 @@ xkb_compatibility "complete+ledscroll(group_lock)" {
     interpret Num_Lock+AnyOf(all) {
         virtualModifier= NumLock;
         action= LockMods(modifiers=NumLock);
-    };
-    interpret ISO_Lock+AnyOf(all) {
-        action= ISOLock(modifiers=modMapMods,affect=all);
     };
     interpret ISO_Level3_Shift+AnyOf(all) {
         virtualModifier= LevelThree;
@@ -678,10 +800,12 @@ xkb_compatibility "complete+ledscroll(group_lock)" {
     };
     interpret ISO_Level5_Latch+AnyOf(all) {
         virtualModifier= LevelFive;
+        useModMapMods=level1;
         action= LatchMods(modifiers=LevelFive,clearLocks,latchToLock);
     };
     interpret ISO_Level5_Lock+AnyOf(all) {
         virtualModifier= LevelFive;
+        useModMapMods=level1;
         action= LockMods(modifiers=LevelFive);
     };
     interpret Mode_switch+AnyOfOrNone(all) {
@@ -978,67 +1102,67 @@ xkb_compatibility "complete+ledscroll(group_lock)" {
     interpret Shift_L+AnyOfOrNone(all) {
         action= SetMods(modifiers=Shift,clearLocks);
     };
-    interpret XF86_Switch_VT_1+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_1+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=1,!same);
     };
-    interpret XF86_Switch_VT_2+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_2+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=2,!same);
     };
-    interpret XF86_Switch_VT_3+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_3+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=3,!same);
     };
-    interpret XF86_Switch_VT_4+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_4+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=4,!same);
     };
-    interpret XF86_Switch_VT_5+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_5+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=5,!same);
     };
-    interpret XF86_Switch_VT_6+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_6+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=6,!same);
     };
-    interpret XF86_Switch_VT_7+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_7+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=7,!same);
     };
-    interpret XF86_Switch_VT_8+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_8+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=8,!same);
     };
-    interpret XF86_Switch_VT_9+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_9+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=9,!same);
     };
-    interpret XF86_Switch_VT_10+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_10+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=10,!same);
     };
-    interpret XF86_Switch_VT_11+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_11+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=11,!same);
     };
-    interpret XF86_Switch_VT_12+AnyOfOrNone(all) {
+    interpret XF86Switch_VT_12+AnyOfOrNone(all) {
         repeat= True;
         action= SwitchScreen(screen=12,!same);
     };
-    interpret 0x1008fe25+AnyOfOrNone(all) {
+    interpret XF86LogGrabInfo+AnyOfOrNone(all) {
         repeat= True;
         action= Private(type=0x86,data[0]=0x50,data[1]=0x72,data[2]=0x47,data[3]=0x72,data[4]=0x62,data[5]=0x73,data[6]=0x00);
     };
-    interpret 0x1008fe24+AnyOfOrNone(all) {
+    interpret XF86LogWindowTree+AnyOfOrNone(all) {
         repeat= True;
         action= Private(type=0x86,data[0]=0x50,data[1]=0x72,data[2]=0x57,data[3]=0x69,data[4]=0x6e,data[5]=0x73,data[6]=0x00);
     };
-    interpret XF86_Next_VMode+AnyOfOrNone(all) {
+    interpret XF86Next_VMode+AnyOfOrNone(all) {
         repeat= True;
         action= Private(type=0x86,data[0]=0x2b,data[1]=0x56,data[2]=0x4d,data[3]=0x6f,data[4]=0x64,data[5]=0x65,data[6]=0x00);
     };
-    interpret XF86_Prev_VMode+AnyOfOrNone(all) {
+    interpret XF86Prev_VMode+AnyOfOrNone(all) {
         repeat= True;
         action= Private(type=0x86,data[0]=0x2d,data[1]=0x56,data[2]=0x4d,data[3]=0x6f,data[4]=0x64,data[5]=0x65,data[6]=0x00);
     };
@@ -1074,7 +1198,8 @@ xkb_compatibility "complete+ledscroll(group_lock)" {
         modifiers= NumLock;
     };
     indicator "Scroll Lock" {
-        groups= 0xfe;
+        whichModState= locked;
+        modifiers= ScrollLock;
     };
     indicator "Shift Lock" {
         !allowExplicit;
@@ -1091,313 +1216,127 @@ xkb_compatibility "complete+ledscroll(group_lock)" {
     };
 };
 
-xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
+xkb_symbols "pc+us+apl:2+inet(evdev)+group(switch)+group(lswitch)" {
 
     name[group1]="English (US)";
     name[group2]="APL";
 
-    key  <ESC> {         [          Escape ] };
-    key <AE01> {
-        symbols[Group1]= [               1,          exclam ],
-        symbols[Group2]= [       diaeresis,      U2336 ]
+    # jsa...
+    #
+    key  <ESC> {                             [       Escape                 ]                         };
+    key <AE01> {                             [            1, exclam         ], [   U00A8, U2336     ] };
+    key <AE02> {                             [            2, at             ], [   U00AF, U236B     ] };
+    key <AE03> {                             [            3, numbersign     ], [    less, U2352     ] };
+    key <AE04> {                             [            4, dollar         ], [   U2264, U234B     ] };
+    key <AE05> {                             [            5, percent        ], [   equal, U233D     ] };
+    key <AE06> {                             [            6, asciicircum    ], [   U2265, U2349     ] };
+    key <AE07> {                             [            7, ampersand      ], [ greater, U2296     ] };
+    key <AE08> {                             [            8, asterisk       ], [   U2260, U235F     ] };
+    key <AE09> {                             [            9, parenleft      ], [   U2228, U2371     ] };
+    key <AE10> {                             [            0, parenright     ], [   U2227, U2372     ] };
+    key <AE11> {                             [        minus, underscore     ], [   U00D7, exclam    ] };
+    key <AE12> {                             [        equal, plus           ], [   U00F7, U2339     ] };
+    key <BKSP> {                             [    BackSpace, BackSpace      ], [ NoSymbol, NoSymbol ] };
+
+    key  <TAB> {                             [          Tab, ISO_Left_Tab ]                         };
+    key <AD01> { type[group1]= "ALPHABETIC", [            q, Q            ], [ question           ] };
+    key <AD02> { type[group1]= "ALPHABETIC", [            w, W            ], [ U2375, U2379       ] };
+    key <AD03> { type[group1]= "ALPHABETIC", [            e, E            ], [ U2208, U22F8       ] };
+    key <AD04> { type[group1]= "ALPHABETIC", [            r, R            ], [ U2374              ] };
+    key <AD05> { type[group1]= "ALPHABETIC", [            t, T            ], [ U223C, U2368       ] };
+    key <AD06> { type[group1]= "ALPHABETIC", [            y, Y            ], [ U2191, U00A5       ] };
+    key <AD07> { type[group1]= "ALPHABETIC", [            u, U            ], [ U2193              ] };
+    key <AD08> { type[group1]= "ALPHABETIC", [            i, I            ], [ U2373, U2378       ] };
+    key <AD09> { type[group1]= "ALPHABETIC", [            o, O            ], [ U25CB, U2365       ] };
+    key <AD10> { type[group1]= "ALPHABETIC", [            p, P            ], [ U22C6, U2363       ] };
+    key <AD11> { type[group1]= "ALPHABETIC", [  bracketleft, braceleft    ], [ U2190, U235E       ] };
+    key <AD12> { type[group1]= "ALPHABETIC", [ bracketright, braceright   ], [ U2192, U236C     ] };
+    key <RTRN> {                             [       Return ] };
+
+    key <LCTL> {                             [    Control_L ] };
+    key <AC01> { type[group1]= "ALPHABETIC", [            a, A            ], [ U237A, U2376       ] };
+    key <AC02> { type[group1]= "ALPHABETIC", [            s, S            ], [ U2308              ] };
+    key <AC03> { type[group1]= "ALPHABETIC", [            d, D            ], [ U230A              ] };
+    key <AC04> { type[group1]= "ALPHABETIC", [            f, F            ], [ underscore         ] };
+    key <AC05> { type[group1]= "ALPHABETIC", [            g, G            ], [ U2207              ] };
+    key <AC06> { type[group1]= "ALPHABETIC", [            h, H            ], [ U2206, U2359       ] };
+    key <AC07> { type[group1]= "ALPHABETIC", [            j, J            ], [ U2218, U2364       ] };
+    key <AC08> { type[group1]= "ALPHABETIC", [            k, K            ], [ U03BB              ] };
+    key <AC09> { type[group1]= "ALPHABETIC", [            l, L            ], [ U2395, U2337       ] };
+    key <AC10> {                             [    semicolon, colon        ], [ U234E, U2261       ] };
+    key <AC11> {                             [    apostrophe, quotedbl    ], [ U2355, U2262       ] };
+
+    key <TLDE> {                             [         grave, asciitilde  ], [ U25CA              ] };
+    key <LFSH> {                             [       Shift_L              ]                         };
+    key <BKSL> {                             [     backslash, bar         ], [ U22A2, U22A3 ]       };
+
+
+    key <AB01> { type[group1]= "ALPHABETIC", [            z, Z            ], [ U2282              ] };
+    key <AB02> { type[group1]= "ALPHABETIC", [            x, X            ], [ U2283, U03C7       ] };
+    key <AB03> { type[group1]= "ALPHABETIC", [            c, C            ], [ U2229, U00A2       ] };
+    key <AB04> { type[group1]= "ALPHABETIC", [            v, V            ], [ U222A              ] };
+    key <AB05> { type[group1]= "ALPHABETIC", [            b, B            ], [ U22A5              ] };
+    key <AB06> { type[group1]= "ALPHABETIC", [            n, N            ], [ U22A4              ] };
+    key <AB07> { type[group1]= "ALPHABETIC", [            m, M            ], [ U2223, U03BC       ] };
+    key <AB08> {                             [        comma, less         ], [ U235D, U236A       ] };
+    key <AB09> {                             [       period, greater      ], [ U2340, U2359       ] };
+    key <AB10> {                             [        slash, question     ], [ U233F, U2360       ] };
+
+    key <RTSH> {                             [      Shift_R               ]                         };
+    key <KPMU> { type= "CTRL+ALT",           [  KP_Multiply, KP_Multiply, KP_Multiply, KP_Multiply, XF86ClearGrab ]
     };
-    key <AE02> {
-        symbols[Group1]= [               2,              at ],
-        symbols[Group2]= [          macron, U236B ]
-    };
-    key <AE03> {
-        symbols[Group1]= [               3,      numbersign ],
-        symbols[Group2]= [            less, U2352 ]
-    };
-    key <AE04> {
-        symbols[Group1]= [               4,          dollar ],
-        symbols[Group2]= [           U2264,            U234B ]
-    };
-    key <AE05> {
-        symbols[Group1]= [               5,         percent ],
-        symbols[Group2]= [           equal, U233D ]
-    };
-    key <AE06> {
-        symbols[Group1]= [               6,     asciicircum ],
-        symbols[Group2]= [           U2265, U2349 ]
-    };
-    key <AE07> {
-        symbols[Group1]= [               7,       ampersand ],
-        symbols[Group2]= [         greater, U2296 ]
-    };
-    key <AE08> {
-        symbols[Group1]= [               8,        asterisk ],
-        symbols[Group2]= [           U2260,           U235F ]
-    };
-    key <AE09> {
-        symbols[Group1]= [               9,       parenleft ],
-        symbols[Group2]= [           U2228,           U2371 ]
-    };
-    key <AE10> {
-        symbols[Group1]= [               0,      parenright ],
-        symbols[Group2]= [           U2227,           U2372 ]
-    };
-    key <AE11> {
-        symbols[Group1]= [           minus,      underscore ],
-        symbols[Group2]= [        multiply,           exclamdown ]
-    };
-    key <AE12> {
-        symbols[Group1]= [           equal,            plus ],
-        symbols[Group2]= [        division,           U2339 ]
-    };
-    key <BKSP> {         [       BackSpace,       BackSpace ] };
-    key  <TAB> {         [             Tab,    ISO_Left_Tab ] };
-    key <AD01> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               q,               Q ],
-        symbols[Group2]= [        question,    questiondown ]
-    };
-    key <AD02> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               w,               W ],
-        symbols[Group2]= [           U2375,           U2379 ]
-    };
-    key <AD03> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               e,               E ],
-        symbols[Group2]= [           U220A,           U2377 ]
-    };
-    key <AD04> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               r,               R ],
-        symbols[Group2]= [           U2374 ]
-    };
-    key <AD05> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               t,               T ],
-        symbols[Group2]= [      asciitilde,           U2368 ]
-    };
-    key <AD06> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               y,               Y ],
-        symbols[Group2]= [           U2191, U00A5 ]
-    };
-    key <AD07> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               u,               U ],
-        symbols[Group2]= [           U2193 ]
-    };
-    key <AD08> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               i,               I ],
-        symbols[Group2]= [           U2373,           U2378 ]
-    };
-    key <AD09> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               o,               O ],
-        symbols[Group2]= [           U25CB,           U2365 ]
-    };
-    key <AD10> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               p,               P ],
-        symbols[Group2]= [        asterisk,           U2363 ]
-    };
-    key <AD11> {
-        symbols[Group1]= [     bracketleft,       braceleft ],
-        symbols[Group2]= [           U2190, U235E ]
-    };
-    key <AD12> {
-        symbols[Group1]= [    bracketright,      braceright ],
-        symbols[Group2]= [           U2192, U236C ]
-    };
-    key <RTRN> {         [          Return ] };
-    key <LCTL> {         [       Control_L ] };
-    key <AC01> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               a,               A ],
-        symbols[Group2]= [           U237A,           U2376 ]
-    };
-    key <AC02> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               s,               S ],
-        symbols[Group2]= [           U2308 ]
-    };
-    key <AC03> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               d,               D ],
-        symbols[Group2]= [           U230A ]
-    };
-    key <AC04> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               f,               F ],
-        symbols[Group2]= [      underscore,           U236B ]
-    };
-    key <AC05> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               g,               G ],
-        symbols[Group2]= [           U2207,           U2352 ]
-    };
-    key <AC06> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               h,               H ],
-        symbols[Group2]= [           U2206,           U2359 ]
-    };
-    key <AC07> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               j,               J ],
-        symbols[Group2]= [           U2218,           U2364 ]
-    };
-    key <AC08> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               k,               K ],
-        symbols[Group2]= [      apostrophe,           U2338 ]
-    };
-    key <AC09> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               l,               L ],
-        symbols[Group2]= [           U2395,           U2337 ]
-    };
-    key <AC10> {
-        symbols[Group1]= [       semicolon,           colon ],
-        symbols[Group2]= [           U234E, U2261 ]
-    };
-    key <AC11> {
-        symbols[Group1]= [      apostrophe,        quotedbl ],
-        symbols[Group2]= [           U2355, U2262 ]
-    };
-    key <TLDE> {
-        symbols[Group1]= [           grave,      asciitilde ],
-        symbols[Group2]= [           U22C4 ]
-    };
-    key <LFSH> {         [         Shift_L ] };
-    key <BKSL> {
-        symbols[Group1]= [       backslash,             bar ],
-        symbols[Group2]= [           U22A2,           U22A3 ]
-    };
-    key <AB01> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               z,               Z ],
-        symbols[Group2]= [           U2282 ]
-    };
-    key <AB02> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               x,               X ],
-        symbols[Group2]= [           U2283, U03C7 ]
-    };
-    key <AB03> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               c,               C ],
-        symbols[Group2]= [           U2229,           U00A2 ]
-    };
-    key <AB04> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               v,               V ],
-        symbols[Group2]= [           U222A ]
-    };
-    key <AB05> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               b,               B ],
-        symbols[Group2]= [           U22A5,           U00A3 ]
-    };
-    key <AB06> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               n,               N ],
-        symbols[Group2]= [           U22A4,           U2355 ]
-    };
-    key <AB07> {
-        type[group1]= "ALPHABETIC",
-        symbols[Group1]= [               m,               M ],
-        symbols[Group2]= [             bar,           U2336 ]
-    };
-    key <AB08> {
-        symbols[Group1]= [           comma,            less ],
-        symbols[Group2]= [           U235D,           U236A ]
-    };
-    key <AB09> {
-        symbols[Group1]= [          period,         greater ],
-        symbols[Group2]= [           U2340,           U2359 ]
-    };
-    key <AB10> {
-        symbols[Group1]= [           slash,        question ],
-        symbols[Group2]= [           U233F,           U2360 ]
-    };
-    key <RTSH> {         [         Shift_R ] };
-    key <KPMU> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [     KP_Multiply,     KP_Multiply,     KP_Multiply,     KP_Multiply,  XF86_ClearGrab ]
-    };
-    key <LALT> {         [           Alt_L,          Meta_L ] };
-    key <SPCE> {         [           space ] };
-    key <CAPS> {         [       Caps_Lock ] };
-    key <FK01> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F1,              F1,              F1,              F1, XF86_Switch_VT_1 ]
-    };
-    key <FK02> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F2,              F2,              F2,              F2, XF86_Switch_VT_2 ]
-    };
-    key <FK03> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F3,              F3,              F3,              F3, XF86_Switch_VT_3 ]
-    };
-    key <FK04> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F4,              F4,              F4,              F4, XF86_Switch_VT_4 ]
-    };
-    key <FK05> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F5,              F5,              F5,              F5, XF86_Switch_VT_5 ]
-    };
-    key <FK06> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F6,              F6,              F6,              F6, XF86_Switch_VT_6 ]
-    };
-    key <FK07> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F7,              F7,              F7,              F7, XF86_Switch_VT_7 ]
-    };
-    key <FK08> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F8,              F8,              F8,              F8, XF86_Switch_VT_8 ]
-    };
-    key <FK09> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [              F9,              F9,              F9,              F9, XF86_Switch_VT_9 ]
-    };
-    key <FK10> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [             F10,             F10,             F10,             F10, XF86_Switch_VT_10 ]
-    };
-    key <NMLK> {         [        Num_Lock ] };
-    key <SCLK> {         [     Scroll_Lock ] };
-    key  <KP7> {         [         KP_Home,            KP_7 ] };
-    key  <KP8> {         [           KP_Up,            KP_8 ] };
-    key  <KP9> {         [        KP_Prior,            KP_9 ] };
-    key <KPSU> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [     KP_Subtract,     KP_Subtract,     KP_Subtract,     KP_Subtract, XF86_Prev_VMode ]
-    };
-    key  <KP4> {         [         KP_Left,            KP_4 ] };
-    key  <KP5> {         [        KP_Begin,            KP_5 ] };
-    key  <KP6> {         [        KP_Right,            KP_6 ] };
-    key <KPAD> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [          KP_Add,          KP_Add,          KP_Add,          KP_Add, XF86_Next_VMode ]
-    };
-    key  <KP1> {         [          KP_End,            KP_1 ] };
-    key  <KP2> {         [         KP_Down,            KP_2 ] };
-    key  <KP3> {         [         KP_Next,            KP_3 ] };
-    key  <KP0> {         [       KP_Insert,            KP_0 ] };
-    key <KPDL> {         [       KP_Delete,      KP_Decimal ] };
-    key <LVL3> {         [ ISO_Level3_Shift ] };
-    key <LSGT> {
-        type= "FOUR_LEVEL",
-        symbols[Group1]= [            less,         greater,             bar,       brokenbar ]
-    };
-    key <FK11> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [             F11,             F11,             F11,             F11, XF86_Switch_VT_11 ]
-    };
-    key <FK12> {
-        type= "CTRL+ALT",
-        symbols[Group1]= [             F12,             F12,             F12,             F12, XF86_Switch_VT_12 ]
-    };
+    key <LALT> {         [     Mode_switch,       Multi_key               ]                         };
+    key <SPCE> { type= "PC_SUPER_LEVEL2",    [        space, ISO_Next_Group ]                       };
+    key <CAPS> {                             [ NoSymbol                   ]                         };
+
+    key <FK01> { type= "CTRL+ALT",           [            F, 1            ], [ U2552, U2553       ] };
+    key <FK02> { type= "CTRL+ALT",           [            F, 2            ], [ U2564, U2565       ] };
+    key <FK03> { type= "CTRL+ALT",           [            F, 3            ], [ U2555, U2556       ] };
+    key <FK04> { type= "CTRL+ALT",           [            F, 4            ], [ U255E, U255F       ] };
+    key <FK05> { type= "CTRL+ALT",           [            F, 5            ], [ U256A, U256B       ] };
+    key <FK06> { type= "CTRL+ALT",           [            F, 6            ], [ U2561, U2562       ] };
+    key <FK07> { type= "CTRL+ALT",           [            F, 7            ], [ U2558, U2559       ] };
+    key <FK08> { type= "CTRL+ALT",           [            F, 8            ], [ U2567, U2568       ] };
+    key <FK09> { type= "CTRL+ALT",           [            F, 9            ], [ U255B, U255C       ] };
+    key <FK10> { type= "CTRL+ALT",           [          F10, F10, F10, F10, XF86Switch_VT_10      ] };
+    key <FK11> { type= "CTRL+ALT",           [          F11, F11, F11, F11, XF86Switch_VT_11      ] };
+    key <FK12> { type= "CTRL+ALT",           [          F12, F12, F12, F12, XF86Switch_VT_12      ] };
+    key <NMLK> {                             [     Num_Lock               ]                         };
+    key <SCLK> {                             [  Scroll_Lock               ]                         };
+    key  <KP7> {                             [        U00E4, U00C4        ], [ U250C, U2554       ] };
+    key  <KP8> {                             [        U00F6, U00D6        ], [ U252C, U2566       ] };
+    key  <KP9> {                             [        U00FC, U00DC        ], [ U2510, U2557       ] };
+    key <KPSU> {                             [        minus, minus        ], [ U2500, U2550       ] };
+    key  <KP4> {                             [        U00DF, U1E9E        ], [ U251C, U2560       ] };
+    key  <KP5> {                             [        U20AC, U20AC        ], [ U253C, U256C       ] };
+    key  <KP6> {                             [        U00A7, U00A7        ], [ U2524, U2563       ] };
+    key <KPAD> {                             [         plus, plus         ], [ U2502, U2551       ] };
+    key  <KP1> {                             [        U00A2, U00A2        ], [ U2514, U255A       ] };
+    key  <KP2> {                             [        U00A3, U00A2        ], [ U2534, U2569       ] };
+    key  <KP3> {                             [        U00AB, U00BB        ], [ U2518, U255D       ] };
+    key  <KP0> {                             [    KP_Insert, KP_0         ]                         };
+    key <KPDL> {                             [    KP_Delete, KP_Decimal   ]                         };
+    key <LVL3> {                             [   ISO_Level3_Shift         ]                         };
+    key <LSGT> { type[group1]= "FOUR_LEVEL",
+                 symbols[Group1]=            [         less, greater, bar, brokenbar ],
+                 symbols[Group2]=            [        U22A2, U22A3 ]                                };
+    key <AB11> {         [ NoSymbol        ] };   # jsa
+    key <JPCM> {         [ NoSymbol        ] };   # jsa
+    key <I120> {         [ NoSymbol        ] };   # jsa
+    key <AE13> {         [ NoSymbol        ] };   # jsa
+    key <I149> {         [ NoSymbol        ] };   # jsa
+    key <I154> {         [ NoSymbol        ] };   # jsa
+    key <I168> {         [ NoSymbol        ] };   # jsa
+    key <I178> {         [ NoSymbol        ] };   # jsa
+    key <I183> {         [ NoSymbol        ] };   # jsa
+    key <I184> {         [ NoSymbol        ] };   # jsa
+    key <FK19> {         [ NoSymbol        ] };   # jsa
+    key <FK24> {         [ NoSymbol        ] };   # jsa
+    key <I217> {         [ NoSymbol        ] };   # jsa
+    key <I219> {         [ NoSymbol        ] };   # jsa
+    key <I222> {         [ NoSymbol        ] };   # jsa
+    key <I230> {         [ NoSymbol        ] };   # jsa
+    key <I248> {         [ NoSymbol        ] };   # jsa
     key <KATA> {         [        Katakana ] };
     key <HIRA> {         [        Hiragana ] };
     key <HENK> {         [     Henkan_Mode ] };
@@ -1407,7 +1346,7 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <RCTL> {         [       Control_R ] };
     key <KPDV> {
         type= "CTRL+ALT",
-        symbols[Group1]= [       KP_Divide,       KP_Divide,       KP_Divide,       KP_Divide,     XF86_Ungrab ]
+        symbols[Group1]= [       KP_Divide,       KP_Divide,       KP_Divide,       KP_Divide,      XF86Ungrab ]
     };
     key <PRSC> {
         type= "PC_ALT_LEVEL2",
@@ -1451,7 +1390,7 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <UNDO> {         [            Undo ] };
     key <FRNT> {         [        SunFront ] };
     key <COPY> {         [        XF86Copy ] };
-    key <OPEN> {         [         SunOpen ] };
+    key <OPEN> {         [        XF86Open ] };
     key <PAST> {         [       XF86Paste ] };
     key <FIND> {         [            Find ] };
     key  <CUT> {         [         XF86Cut ] };
@@ -1468,14 +1407,15 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <I158> {         [         XF86WWW ] };
     key <I159> {         [         XF86DOS ] };
     key <I160> {         [ XF86ScreenSaver ] };
-    key <I162> {         [ XF86RotateWindows ] };
+    key <I161> {         [ XF86RotateWindows ] };
+    key <I162> {         [    XF86TaskPane ] };
     key <I163> {         [        XF86Mail ] };
     key <I164> {         [   XF86Favorites ] };
     key <I165> {         [  XF86MyComputer ] };
     key <I166> {         [        XF86Back ] };
     key <I167> {         [     XF86Forward ] };
     key <I169> {         [       XF86Eject ] };
-    key <I170> {         [       XF86Eject,       XF86Eject ] };
+    key <I170> {         [       XF86Eject ] };
     key <I171> {         [   XF86AudioNext ] };
     key <I172> {         [   XF86AudioPlay,  XF86AudioPause ] };
     key <I173> {         [   XF86AudioPrev ] };
@@ -1499,9 +1439,10 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <FK16> {         [     XF86Launch7 ] };
     key <FK17> {         [     XF86Launch8 ] };
     key <FK18> {         [     XF86Launch9 ] };
+    key <FK20> {         [ XF86AudioMicMute ] };
     key <FK21> {         [ XF86TouchpadToggle ] };
-    key <FK22> {         [      0x1008ffb0 ] };
-    key <FK23> {         [      0x1008ffb1 ] };
+    key <FK22> {         [  XF86TouchpadOn ] };
+    key <FK23> {         [ XF86TouchpadOff ] };
     key <MDSW> {         [     Mode_switch ] };
     key  <ALT> {         [        NoSymbol,           Alt_L ] };
     key <META> {         [        NoSymbol,          Meta_L ] };
@@ -1518,6 +1459,7 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <I216> {         [ XF86AudioForward ] };
     key <I218> {         [           Print ] };
     key <I220> {         [      XF86WebCam ] };
+    key <I221> {         [ XF86AudioPreset ] };
     key <I223> {         [        XF86Mail ] };
     key <I224> {         [   XF86Messenger ] };
     key <I225> {         [      XF86Search ] };
@@ -1541,10 +1483,17 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     key <I244> {         [     XF86Battery ] };
     key <I245> {         [   XF86Bluetooth ] };
     key <I246> {         [        XF86WLAN ] };
+    key <I247> {         [         XF86UWB ] };
+    key <I249> {         [  XF86Next_VMode ] };
+    key <I250> {         [  XF86Prev_VMode ] };
+    key <I251> {         [ XF86MonBrightnessCycle ] };
+    key <I252> {         [ XF86BrightnessAuto ] };
+    key <I253> {         [  XF86DisplayOff ] };
+    key <I254> {         [        XF86WWAN ] };
+    key <I255> {         [      XF86RFKill ] };
     modifier_map Control { <LCTL> };
     modifier_map Shift { <LFSH> };
     modifier_map Shift { <RTSH> };
-    modifier_map Mod1 { <LALT> };
     modifier_map Lock { <CAPS> };
     modifier_map Mod2 { <NMLK> };
     modifier_map Mod5 { <LVL3> };
@@ -1552,6 +1501,7 @@ xkb_symbols "pc+us+apl(sax):2+inet(evdev)+group(switch)" {
     modifier_map Mod4 { <LWIN> };
     modifier_map Mod4 { <RWIN> };
     modifier_map Mod5 { <MDSW> };
+    modifier_map Mod1 { <ALT> };
     modifier_map Mod1 { <META> };
     modifier_map Mod4 { <SUPR> };
     modifier_map Mod4 { <HYPR> };
@@ -1568,7 +1518,7 @@ xkb_geometry "pc(pc105)" {
     baseColor=   "white";
     labelColor=  "black";
     xfont=       "-*-helvetica-medium-r-normal--*-120-*-*-*-*-iso8859-1";
-    description= "Generic 105";
+    description= "Generic 105-key PC";
 
     shape "NORM" {
         corner= 1,

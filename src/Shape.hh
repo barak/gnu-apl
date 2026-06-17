@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -89,11 +89,11 @@ public:
    Shape abs() const;
 
    /// return a shape with the upper \b cnt dimensions of this shape
-   Shape high_shape(uRank cnt) const
+   Shape frame_shape(uRank cnt) const
       { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
 
    /// return a shape with the lower \b cnt dimensions of this shape
-   Shape low_shape(uRank cnt) const
+   Shape chunk_shape(uRank cnt) const
       { Assert(cnt <= get_rank());
         return Shape(cnt, rho + (get_rank() - cnt)); }
 
@@ -178,7 +178,7 @@ public:
    /// possibly expand rank and increase axes so that B fits into this shape
    void expand(const Shape & B);
 
-   /// return a shape like \b this, but with a new dimension of length len
+   /// return a shape like \b this, but with a new axis of length len
    /// inserted so that Shape[axis] == len in the returned shape.
    Shape insert_axis(sAxis axis, ShapeItem len) const;
 
@@ -258,7 +258,8 @@ public:
    /// the inverse of \b ravel_pos()
    Shape offset_to_index(ShapeItem offset, int quad_io) const;
 
-   /// return true if shapes this and other differ only by axes of length 1
+   /// return \b true if shapes \b this and \b other differ only by axes 
+   ///of length 1
    bool conforms_to(const Shape & other) const;
 
 protected:

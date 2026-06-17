@@ -28,17 +28,19 @@
 
 #include <sstream>
 
-void SystemFnCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
+void
+SystemFnCommand::run_command(NetworkConnection &conn,
+                             const vector<string> &args)
 {
-    stringstream out;
+stringstream sout;
 
-#define cmd_def(NAME, CMD, ARG, HINT) out << NAME << "\n";
+#define cmd_def(NAME, _CMD, _ARG, _HINT)   sout << NAME << "\n";
 #include "../Command.def"
 
     loop(i, Workspace::get_user_commands().size()) {
-        out << Workspace::get_user_commands()[i].prefix << endl;
+        sout << Workspace::get_user_commands()[i].prefix << endl;
     }
 
-    out << END_TAG << "\n";
-    conn.write_string_to_fd( out.str() );
+    sout << END_TAG << "\n";
+    conn.write_string_to_fd( sout.str() );
 }

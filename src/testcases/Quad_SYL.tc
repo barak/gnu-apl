@@ -6,6 +6,8 @@ CLEAR WS
 
       ⎕IO←1
 
+]NEXTFILE
+
 ⍝ SI limit ----------------------------------
 
       )CHECK
@@ -117,13 +119,13 @@ OK      - no duplicate parents
       ⍝
       )SIC
 
-      ⎕SYL[2;2]←300
+      ⎕SYL[2;2]←600
       ⎕SYL[2;2]
-300
+600
 
-      ⎕SYL[2]←200
+      ⎕SYL[2]←400
       ⎕SYL[2;2]
-200
+400
 
       0 FOO 0
  A FOO B with B: 0 
@@ -144,7 +146,7 @@ OK      - no duplicate parents
  A FOO B with B: 15 
  A FOO B with B: 16 
 INTERRUPT+
-FOO[1]  'A FOO B with B:' B
+FOO[2]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
         ^
 
       )MORE
@@ -174,7 +176,6 @@ the system limit on the APL value count (as set in ⎕SYL[2;2]) was reached
 
       100 FOO 0
  A FOO B with B: 0 
- A FOO B with B: 1 
 INTERRUPT+
 FOO[2]  C←D←E←F←G←H←I←J←K←L←(A,A)⍴42
         ^

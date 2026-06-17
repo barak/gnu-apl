@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include <iostream>
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "Common.hh"
 
@@ -35,30 +36,27 @@ using namespace std;
 class UCS_string;
 class Value;
 
-//----------------------------------------------------------------------------
+//============================================================================
 /// one byte (= 7-bit character !) of an ASCII string
 typedef char ASCII;
 
-/// one byte (not character !( of a UTF8 encoded Unicode (RFC 3629) string
-typedef uint8_t UTF8;
-
-//----------------------------------------------------------------------------
+//============================================================================
 /// frequently used cast to const UTF8 *
 inline const UTF8 *
 utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 /// frequently used cast to UTF8 *
 inline UTF8 *
 utf8P(ASCII * cp)
 {
   return reinterpret_cast<UTF8 *>(cp);
 }
-//----------------------------------------------------------------------------
+//============================================================================
 /// an UTF8 encoded Unicode (RFC 3629) string
-class UTF8_string : public std::basic_string<UTF8>
+class UTF8_string : public std::string
 {
 public:
    /// constructor: empty UTF8_string
@@ -82,23 +80,9 @@ public:
    /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
 
-   /// return true iff \b this is equal to \b other
-   bool operator ==(const UTF8_string & other) const
-      {
-        if (size() != other.size())   return false;
-        loop(c, size())   if (at(c) != other.at(c))   return false;
-        return true;
-      }
-
-   /// return \b this string as a 0-terminated C string
-   const char * c_str() const
-      { return reinterpret_cast<const char *>
-                               (std::basic_string<UTF8>::c_str()); }
-
-   /// prevent basic_string::erase() with its dangerous default value for
-   /// the number of erased character.
+   /// erase one item at \b pos
    void erase(size_t pos)
-      { basic_string<UTF8>::erase(pos, 1); }
+      { std::string::erase(begin() + pos); }
 
    /// return the last byte in this string
    UTF8 back() const
@@ -108,16 +92,13 @@ public:
    void pop_back()
       { Assert(size());   resize(size() - 1); }
 
-   /// append a 0-terminated C string
-   void append_ASCII(const char * ascii)
-      { while (*ascii)   *this += *ascii++; }
+   /// append a (0-terminated) C string
+   UTF8_string & operator <<(const char * ascii)
+      { while (*ascii)   *this += *ascii++;   return *this; }
 
    /// append the UTF8_string \b suffix
-   void append_UTF8(const UTF8_string & suffix)
-      { loop(s, suffix.size())   *this += suffix[s]; }
-
-   /// display bytes in this UTF string
-   ostream & dump_hex(ostream & out, int max_bytes) const;
+   UTF8_string & operator <<(const UTF8_string & suffix)
+      { loop(s, suffix.size())   *this += suffix[s];   return *this; }
 
    /// return true iff string ends with ext (usually a file name extension)
    bool ends_with(const char * ext) const;
@@ -128,7 +109,6 @@ public:
    /// skip over < ... > and expand &lt; and friends
    int un_HTML(int in_HTML);
 
-
    /// essentially strtol(this, 0, 10)
    uint64_t long_value() const;
 
@@ -137,7 +117,7 @@ public:
    /// if the exponent shall be increased (because 1.0 -> 0.1)
    bool round_0_1();
 
-   /// convert the first char in UTF8-encoded string to Unicode,
+   /// convert the first char(s) in UTF8-encoded string to Unicode,
    /// setting len to the number of bytes in the UTF8 encoding of the char
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
@@ -147,6 +127,19 @@ public:
 
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
+
+   /// display bytes in \b utf
+   static void dump_hex(ostream & out, const UTF8 * utf, int size,
+                        int max_bytes);
+
+};
+//============================================================================
+class UTF8_string_vector : public std::vector<UTF8_string>
+{
+public:
+   /// constructor: from string with lines separated by \n. The lines
+   /// will be the items of the vector (with any \r or \n removed).
+   UTF8_string_vector(const char * lines);
 };
 //============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream

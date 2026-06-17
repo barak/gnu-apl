@@ -26,14 +26,14 @@
 
 //-----------------------------------------------------------------------------
 static PostgresConnection *
-create_postgres_connection(Value_P B)
+create_postgres_connection(const Value & B)
 {
-    if( !B->is_char_string() ) {
+    if( !B.is_char_string() ) {
         MORE_ERROR() << "Argument must be a single string";
         DOMAIN_ERROR;
     }
 
-     const UTF8_string B_utf(B->get_UCS_ravel());
+     const UTF8_string B_utf(B.get_UCS_ravel());
     string connect_args = B_utf.c_str();
 
     const char * keywords[] = { "dbname", NULL };
@@ -62,9 +62,9 @@ create_postgres_connection(Value_P B)
 }
 //-----------------------------------------------------------------------------
 Connection *
-PostgresProvider::open_database( Value_P B )
+PostgresProvider::open_database(const Value & B)
 {
-    Connection *connection = create_postgres_connection( B );
+Connection * connection = create_postgres_connection(B);
     return connection;
 }
 //-----------------------------------------------------------------------------

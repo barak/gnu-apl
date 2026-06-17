@@ -736,8 +736,7 @@ static const gchar *
 I2S(gint i)
 {
 static gchar buffer[40];
-unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld",
-                            static_cast<long>(i));
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld", long(i));
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
    buffer[len] = 0;   // just in case
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -98,13 +98,26 @@ public:
             || (uni <= UNI_F && uni >= UNI_A)
             || (uni <= UNI_f && uni >= UNI_a); }
 
-   /// Return \b true iff \b av is a digit or a space
+   /// return \b true if \b uni is (uppercase) alphabetic
+   static bool is_A_to_Z(Unicode uni)
+      { return uni >= UNI_A && uni <= UNI_Z; }
+
+   /// Return \b true iff \b uni is a digit or a space
    static bool is_digit_or_space(Unicode uni)
       { return is_digit(uni) || is_white(uni); }
 
+   /// Return \b true iff \b uni is one of the various DIAMOND characters
+   static bool is_DIAMOND(Unicode uni)
+      { return uni == UNI_DIAMOND ||   // ◊ = 0x25CA
+               uni == 0x2B25      ||   // ⬥
+               uni == 0x2B26      ||   // ⬦
+               uni == 0x2B27; }
+
    /// return \b true iff \b av is a number char (digit, .)
    static bool is_number(Unicode uni)
-      { return is_digit(uni) || (uni == UNI_OVERBAR); }
+      { return is_digit(uni)       ||
+               (uni == UNI_OVERBAR ||
+               (uni == UNI_FULLSTOP)); }
 
    /// map possibly non-standard APL character to its standard character
    static Unicode make_standard(Unicode uni);
@@ -174,8 +187,8 @@ protected:
    /// a Unicode and its position in the ⎕AV of IBM APL2
    struct Unicode_to_IBM_codepoint
       {
-         uint32_t uni;   ///< the Unicode
-         uint32_t cp;    ///< the IBM char for uni
+         uint32_t    uni;   ///< the Unicode
+         int quad_av_pos;   ///< the IBM char for uni
       };
 
    /// Various character attributes.
@@ -199,8 +212,11 @@ protected:
    /// (through char_def() or char_uni() macros)
    static void check_file(const char * filename);
 
-   /// compare the unicodes of two entries ua and u2 in \b inverse_IBM_quad_AV
-   static int compare_uni(const void * u1, const void * u2);
+   /// compare Unicpde \b key with the Unicode in \b map.
+   static int compare_uni(const uint32_t & key,
+                          const Unicode_to_IBM_codepoint & map,
+                          const void *)
+      { return key - map.uni; }
 };
 
 #endif // __AVEC_HH_DEFINED__

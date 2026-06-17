@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,31 +29,38 @@
 #include "Value.hh"
 
 size_t N;
-basic_string<int> Quad_RVAL::desired_ranks;
+vector<int> Quad_RVAL::desired_ranks;
 Shape       Quad_RVAL::desired_shape;
-basic_string<int> Quad_RVAL::desired_types;
+vector<int> Quad_RVAL::desired_types;
 int         Quad_RVAL::desired_maxdepth;
 char        Quad_RVAL::state[256];
-size_t      Quad_RVAL::N;
+size_t      Quad_RVAL::N = 256;
 
-#if HAVE_LIBC
-random_data Quad_RVAL::rdata;
-#endif
+const FunctionGroup::function_info Quad_RVAL::subfunction_infos[] =
+{
+#define rvaldef(N, fun, comm_2) { N, #fun, "", comm_2, -1 },
+  rvaldef(0, state, "get (B=⍬) or set (B≠⍬) the random number generator state" )
+  rvaldef(1, rank,  "set the rank of subsequently returned random values"      )
+  rvaldef(2, shape, "set he shape of subsequently returned random values"      )
+  rvaldef(3, type,  "set the data type of subsequently returned random values" )
+  rvaldef(4, depth, "set the depth of subsequently returned random values"     )
+};
 
 Quad_RVAL  Quad_RVAL::fun;
 
 // ⎕RVAL depends on glibc, so we use it only in development mode
 
-#if HAVE_LIBC
-
 //----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕RVAL");
+
    N = 8;
    desired_maxdepth = 4;
    memset(state, 0, sizeof(state));
-   initstate_r(1, state, N, &rdata);
+   initstate(1, state, N);
 
    while (desired_shape.get_rank() < MAX_RANK)
          desired_shape.add_shape_item(1);
@@ -67,35 +74,47 @@ Quad_RVAL::Quad_RVAL()
    desired_types.push_back(0);   // no nested
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::do_eval_B(const Value & B, int depth)
+Token
+Quad_RVAL::eval_B(Value_P B) const
 {
-   if (B.get_rank() != 1)
+   if (B->is_str0())    return list_functions(CERR);
+   if (B->is_zilde())   return list_mappings(CERR);
+   if (B->is_empty())   DOMAIN_ERROR;
+   if (B->get_rank() > 1)
       {
-        MORE_ERROR() << "1≠⍴⍴B in in ⎕RVAL B";
+        MORE_ERROR() << "⎕RVAL B: expecting 1 < ⍴⍴B.";
         RANK_ERROR;
       }
 
-const ShapeItem ec_B = B.element_count();
-   if (ec_B > 4)
+   return Token(TOK_APL_VALUE1, do_eval_B(*B, 0));
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::do_eval_B(const Value & B, int depth) const
+{
+ShapeItem len_B = B.element_count();
+
+   if (len_B > 4)
       {
         MORE_ERROR() << "monadic ⎕RVAL B expects at most 4 properties B←"
                         "(rank, (shape), (type), and maxdepth)";
         LENGTH_ERROR;
       }
 
-   // save properties values so that we can restore them
+   if (B.is_scalar())   len_B = 1;   // pretend that B is a vector
+
+   // save properties so that we can restore them
    //
-basic_string<int> old_desired_ranks = desired_ranks;
-Shape old_desired_shape = desired_shape;
-basic_string<int> old_desired_types = desired_types;
-int old_desired_maxdepth = desired_maxdepth;
+vector<int> old_desired_ranks    = desired_ranks;
+Shape       old_desired_shape    = desired_shape;
+vector<int> old_desired_types    = desired_types;
+int         old_desired_maxdepth = desired_maxdepth;
 bool need_restore = false;
 
    try {
          need_restore = true;   // since something was changed
 
-         if (ec_B >= 1)   // rank: scalar or enclosed vector (distribution)
+         if (len_B >= 2)   // rank: scalar or enclosed vector (distribution)
             {
               const Cell & cell = B.get_cfirst();
               if (cell.is_pointer_cell())
@@ -109,7 +128,7 @@ bool need_restore = false;
                  }
             }
 
-         if (ec_B >= 2)   // shape: scalar or enclosed vector
+         if (len_B >= 2)   // shape: scalar or enclosed vector
             {
               const Cell & cell = B.get_cravel(1);
               if (cell.is_pointer_cell())
@@ -123,10 +142,10 @@ bool need_restore = false;
                  }
             }
 
-         if (ec_B >= 3)   // type: always enclosed vector (distribution)
+         if (len_B >= 3)   // type: always enclosed vector (distribution)
             do_eval_AB(3, *B.get_cravel(2).get_pointer_value());
 
-         if (ec_B >= 4)   // maxdepth: scalar or 1-element vector
+         if (len_B >= 4)   // maxdepth: scalar or 1-element vector
             {
               const Cell & cell = B.get_cravel(3);
               if (cell.is_pointer_cell())   // maxdepth as 1-element vector
@@ -149,13 +168,21 @@ bool need_restore = false;
         throw;
       }
 
+   Log(LOG_Quad_RVAL)
+      {
+        CERR << "⎕RVAL B:" << endl << "desired_ranks:   ";
+        loop(r, desired_ranks.size())   CERR << " " << desired_ranks[r];
+        CERR << endl << "desired_shape:    " << desired_shape << endl;
+        CERR << "desired_types:   ";
+        loop(t, desired_types.size())   CERR << " " << desired_types[t];
+        CERR << endl << "desired_maxdepth: " << desired_maxdepth << endl;
+      }
+
 const sRank rank = choose_integer(desired_ranks);
 Shape shape;
-
-
    for (sRank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
-         basic_string<int> vsh_r;
+         vector<int> vsh_r;
          vsh_r.push_back(desired_shape.get_shape_item(r));
          const int sh_r = choose_integer(vsh_r);
          shape.add_shape_item(sh_r);
@@ -197,29 +224,22 @@ const ShapeItem ec = Z->element_count();
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
-   // A shall be a scalar int (function number)
+const sAxis subfunction = value_to_subfun(*A);
 
-   if (!A->is_scalar())
-      {
-        MORE_ERROR() << "non-scalar A in A ⎕RVAL B";
-        RANK_ERROR;
-      }
-   if (!A->is_int_scalar())
-      {
-        MORE_ERROR() << "non-integer A in A ⎕RVAL B";
-        DOMAIN_ERROR;
-      }
-
-Value_P Z = do_eval_AB(A->get_cfirst().get_int_value(), *B);
+Value_P Z = do_eval_AB(subfunction, *B);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::do_eval_AB(int A, const Value & B)
+Token
+Quad_RVAL::eval_XB(Value_P X, Value_P B) const
 {
-const int function = A;
-
-   switch(function)
+   return eval_AB(X, B);
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_RVAL::do_eval_AB(int subfunction, const Value & B)
+{
+   switch(subfunction)
       {
         case 0: return generator_state(B);
         case 1: return result_rank(B);
@@ -228,22 +248,22 @@ const int function = A;
         case 4: return result_maxdepth(B);
       }
 
-   MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
-   DOMAIN_ERROR;
+   fun.bad_subfun_number_ERROR(subfunction);
 }
 //----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::generator_state(const Value & B)
 {
    // expect an empty, 8, 16, 32, 64, 128, or 256 byte integer vector
+   //
    if (B.get_rank() != 1)   RANK_ERROR;
 
 const ShapeItem new_N = B.element_count();
    if (new_N !=   0 && new_N !=   8 && new_N !=  32 &&
        new_N !=  64 && new_N != 128 && new_N != 256)
       {
-        MORE_ERROR() << "bad new_N in generator_state()";
-        DOMAIN_ERROR;
+        MORE_ERROR() << "bad new_N (aka. ⍴B) in generator_state()";
+        LENGTH_ERROR;
       }
 
    // always return the previous state
@@ -271,10 +291,26 @@ Value_P Z(N, LOC);
             {
                state[b] = B.get_cravel(b).get_int_value();
             }
-         setstate_r(state, &rdata);
+         setstate(state);
       }
 
    return Z;
+}
+//----------------------------------------------------------------------------
+void Quad_RVAL::print_fun_syntax(ostream & out,
+                                 const function_info & info) const
+{
+   out << "    ⎕RVAL[" << info.axis << "] B   ⍝ " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void Quad_RVAL::print_map_syntax(ostream & out,
+                                 const function_info & info) const
+{
+const char * name = info.function_name;
+const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
+
+   out << "   ⎕RVAL[" << info.axis << "]  ←→  ⎕RVAL['" << name << "']"
+       << blanks << "  ←→  ⎕RVAL." << name << endl;
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -283,7 +319,7 @@ Quad_RVAL::result_rank(const Value & B)
    // B is a single rank or a distribution of ranks 0, 1, ...
    if (B.get_rank() > 1)   RANK_ERROR;
 
-   // always return the previous rank
+   // result Z is the current rank
    //
 Value_P Z(desired_ranks.size(), LOC);
    loop(z, desired_ranks.size())   Z->next_ravel_Int(desired_ranks[z]);
@@ -306,7 +342,7 @@ Value_P Z(desired_ranks.size(), LOC);
       }
    else if (B.element_count())   // distribution of ranks
       {
-        basic_string<int>new_ranks;
+        vector<int>new_ranks;
         loop(b, B.element_count())
             {
               const int rank_b = B.get_cravel(b).get_int_value();
@@ -322,7 +358,14 @@ Value_P Z(desired_ranks.size(), LOC);
         desired_ranks = new_ranks;
       }
 
-   return Z;
+   Log(LOG_Quad_RVAL)
+      {
+        CERR << "set desired_ranks to";
+        loop(j, desired_ranks.size())   CERR << " " << desired_ranks[j];
+        CERR << endl;
+      }
+
+   return Z;   // previous rank
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -333,14 +376,14 @@ Quad_RVAL::result_shape(const Value & B)
 const ShapeItem len_B = B.element_count();
    if (len_B > MAX_RANK)   LENGTH_ERROR;   // to many shape items
 
-   // always return the previous shape
+   // result Z is the current shape limits
    //
 Value_P Z(MAX_RANK, LOC);
    loop(r, MAX_RANK)
        Z->next_ravel_Int(desired_shape.get_shape_item(r));
    Z->check_value(LOC);
 
-   if (len_B)   // set the current shape
+   if (len_B)   // len_B > 0: set the current shape
       {
         Shape new_shape;
 
@@ -352,8 +395,8 @@ Value_P Z(MAX_RANK, LOC);
         else                 // vector B: prepend 1s as needed
            {
              // fill leading dimensions with 1
-             while (new_shape.get_rank() < MAX_RANK - len_B)
-                   new_shape.add_shape_item(1);
+             //
+             loop(b, MAX_RANK - len_B)   new_shape.add_shape_item(1);
 
              // fill lower dimensions with B
               loop(b, len_B)
@@ -361,6 +404,16 @@ Value_P Z(MAX_RANK, LOC);
            }
 
         desired_shape = new_shape;
+      }
+
+   Log(LOG_Quad_RVAL)
+      {
+        CERR << "set desired_shape to";
+        loop(j, desired_shape.get_rank())
+            {
+              CERR << " " << desired_shape.get_shape_item(j);
+            }
+        CERR << endl;
       }
 
    return Z;
@@ -379,7 +432,9 @@ Quad_RVAL::result_type(const Value & B)
         "probabilities for types CHAR INT REAL COMPLEX or NESTED respectively)";
           RANK_ERROR;
       }
-   if (B.element_count() > 5)
+
+const ShapeItem len_B = B.element_count();
+   if (len_B > 5)
       {
         MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
         "should be a vector of up to 5 integers (the\nrelative "
@@ -387,15 +442,15 @@ Quad_RVAL::result_type(const Value & B)
           LENGTH_ERROR;
       }
 
-   // always return the previous types
+   // result Z is the current types
    //
 Value_P Z(desired_types.size(), LOC);
    loop(z, desired_types.size())   Z->next_ravel_Int(desired_types[z]);
    Z->check_value(LOC);
 
-   if (B.element_count())   // distribution of depths
+   if (len_B)   // len_B > 0: distribution of depths
       {
-        basic_string<int>new_types;
+        vector<int>new_types;
         bool B_has_simple = false;
         loop(b, B.element_count())
             {
@@ -422,6 +477,18 @@ Value_P Z(desired_types.size(), LOC);
 
         while (new_types.size() < 5)    new_types.push_back(0);   // make 5=⍴Z
         desired_types = new_types;
+
+        Log(LOG_Quad_RVAL)
+           {
+             CERR << "set desired_types to";
+             const char * types[] = { "char", "int", "float",
+                                      "complex", "nested" };
+             loop(j, desired_types.size())
+                 {
+                   CERR << " " << types[j] << "=" << desired_types[j];
+                 }
+             CERR << endl;
+           }
       }
 
    return Z;
@@ -433,6 +500,8 @@ Quad_RVAL::result_maxdepth(const Value & B)
    if (B.get_rank() > 1)        RANK_ERROR;
    if (B.element_count() > 1)   LENGTH_ERROR;
 
+   // result Z is the current max. depth
+   //
 Value_P Z = IntScalar(desired_maxdepth, LOC);
 
    if (B.element_count())   // set the desired maxdepth
@@ -444,30 +513,49 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
              DOMAIN_ERROR;
            }
         desired_maxdepth = mxd;
+
+        Log(LOG_Quad_RVAL)
+           {
+             CERR << "set desired_maxdepth to" << desired_maxdepth << endl;
+           }
       }
 
    return Z;   // previous desired_maxdepth
 }
 //----------------------------------------------------------------------------
 int
-Quad_RVAL::choose_integer(const basic_string<int> & dist)
+Quad_RVAL::choose_integer(const vector<int> & dist)
 {
-const int n = dist.size();
-   Assert(n > 0);
+const int dist_len = dist.size();
+   Assert(dist_len > 0);
 
-   if (n == 1)   // fixed value or equal distribution 0, 1, ... n
+   /* a distribution with a single value N shall mean:
+
+       N > 0: fixed value N
+       N < 0: equal distribution 0..N-1
+    */
+    if (dist_len == 1)   // fixed value or equal distribution 0, 1, ... n
       {
         const int desired = dist[0];
         if (desired >= 0)   return desired;   // fixed value
         const int rand = rand17();
-        return rand % (1 - desired);   // = 0... desired
+        return rand % (1 - desired);          // = 0... desired
       }
 
-   // dist is a distribution
+   // dist is a distribution...
+
+   // 1. compute the sum of the weights.
+   //    The weights should be reasonably small (sum ≤ 0xFFFF).
    //
 int sum = 0;
    for (size_t d = 0; d < dist.size(); ++d)   sum += dist[d];
-   const int rand = (rand17() & 0xFFFF) % sum;
+
+   // 2. pick a random number 0...sum
+   //
+const int rand = (rand17() & 0xFFFF) % sum;
+
+   // 3. return the index of rand in +\dist
+   //
    sum = 0;
    for (size_t d = 0; d < dist.size(); ++d)
        {
@@ -495,40 +583,54 @@ const int64_t rnd = rand17()
    Z.next_ravel_Int(rnd);
 }
 //----------------------------------------------------------------------------
+double
+Quad_RVAL::random_ieee()
+{
+union { double f;
+        char bytes[8];
+      } u;
+   do {
+        const int64_t rand64 = rand17()
+                             ^ (rand17() << 16)
+                             ^ (rand17() << 32)
+                             ^ (rand17() << 48);
+        
+        enum { BIAS     = 1023,          // IEEE
+               EXPO     = 0 + BIAS,      // 2^0
+               EXPO_LSB = EXPO & 0x0F,   // 0..15
+               EXPO_MSB = EXPO >> 4      // 0..15
+             };
+
+        u.bytes[7] = EXPO_MSB;                // SIGN + and exponent MSBs
+        u.bytes[6] = (EXPO_LSB << 4)          // exponent LSBs
+                   | (rand64 >> 56 & 0x0F);   // 52 bit fraction MSBs
+        u.bytes[5] = rand64 >> 40;            // 52 bit fraction
+        u.bytes[4] = rand64 >> 32;            // 52 bit fraction
+        u.bytes[3] = rand64 >> 24;            // 52 bit fraction
+        u.bytes[2] = rand64 >> 16;            // 52 bit fraction
+        u.bytes[1] = rand64 >>  8;            // 52 bit fraction
+        u.bytes[0] = rand64 >>  0;            // 52 bit fraction LSBs
+      } while (!isnormal(u.f));
+
+   // at this point: 1.0 < u.f < 2.0
+   //
+   return u.f - 1.0;
+}
+//----------------------------------------------------------------------------
 void
 Quad_RVAL::random_float(Value & Z)
 {
-union { uint64_t i; double f; } u;
-   do {
-        u.i = rand17() | rand17() << 17 | rand17() << 34;
-        u.i &= 0x000FFFFFFFFFFFFFULL;
-        u.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u.f));
-
-   Z.next_ravel_Float(u.f);
+   Z.next_ravel_Float(random_ieee());
 }
 //----------------------------------------------------------------------------
 void
 Quad_RVAL::random_complex(Value & Z)
 {
-union { int64_t i; double f; } u1, u2;
-   do {
-        u1.i = rand17() | rand17() << 17 | rand17() << 34;
-        u1.i &= 0x000FFFFFFFFFFFFFULL;
-        u1.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u1.f));
-
-   do {
-        u2.i = rand17() | rand17() << 17 | rand17() << 34;
-        u2.i &= 0x000FFFFFFFFFFFFFULL;
-        u2.i |= 0x3FE0000000000000ULL;
-      } while (!isnormal(u2.f));
-
-   Z.next_ravel_Complex(u1.f - 1.0, u2.f - 1.0);
+   Z.next_ravel_Complex(random_ieee(), random_ieee());
 }
 //----------------------------------------------------------------------------
 void
-Quad_RVAL::random_nested(Value & Z, const Value & B, int depth)
+Quad_RVAL::random_nested(Value & Z, const Value & B, int depth) const
 {
 Value_P Zsub;
 
@@ -541,44 +643,11 @@ Value_P Zsub;
 uint64_t
 Quad_RVAL::rand17()
 {
-int32_t rnd;
-   if (random_r(&rdata, &rnd))   FIXME;
+const int32_t rnd = random();
 
    // the lower bits are less random, so we xor the upper 16 bits into
    // the lower 16 bits and return them.
    return (rnd ^ (rnd >> 16)) & 0x1FFFF;
 }
 //----------------------------------------------------------------------------
-
-#else    // not HAVE_LIBC
-
-//----------------------------------------------------------------------------
-Quad_RVAL::Quad_RVAL()
-   : QuadFunction(TOK_Quad_RVAL)
-{
-   N = 8;
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_RVAL::do_eval_B(const Value & B, int depth)
-{
-    MORE_ERROR() <<
-"⎕RVAL is only available on platforms that have glibc.\n"
-"Your platform is lacking initstate_r() (and probably others).";
-
-   SYNTAX_ERROR;
-   return Value_P();
-}
-//----------------------------------------------------------------------------
-Token
-Quad_RVAL::eval_AB(Value_P A, Value_P B) const
-{
-    MORE_ERROR() <<
-"⎕RVAL is only available on platforms that have glibc.\n"
-"Your platform is lacking initstate_r() (and probably others).";
-
-   SYNTAX_ERROR;
-   return Token();
-}
-//----------------------------------------------------------------------------
-#endif   // HAVE_LIBC
+// EOF

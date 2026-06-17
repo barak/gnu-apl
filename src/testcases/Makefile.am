@@ -4,6 +4,7 @@
 # put them into apl-x.x.tar.gz, but don't install them.
 #
 dist_noinst_DATA =                              \
+		0000_OBSOLETE_TESTCASES                 \
         AAA0_Global_Settings.tc                 \
         AAA1.tc                                 \
         AAA2.tc                                 \
@@ -89,6 +90,7 @@ dist_noinst_DATA =                              \
         Minimum.tc                              \
         Multiply.tc                             \
         MultiLineStrings.tc                     \
+        MultiLineLiterals.tc                    \
         Nabla.tc                                \
         NativeFunctions.tc                      \
         NaturalLogarithm.tc                     \
@@ -105,6 +107,7 @@ dist_noinst_DATA =                              \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
         PiTimes.tc                              \
+        Polynomials.tc                          \
         Power.tc                                \
         Quad_AF.tc                              \
         Quad_AI.tc                              \
@@ -250,6 +253,9 @@ dist_noinst_DATA =                              \
         ZZ58_Regression.tc                      \
         ZZ59_Regression.tc                      \
         ZZ60_Regression.tc                      \
+        ZZ61_Regression.tc                      \
+        ZZ62_Regression.tc                      \
+        ZZ63_Regression.tc                      \
         ZZZ0_Standard_08x.tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \

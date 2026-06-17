@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -53,10 +53,9 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
              const Unicode uni = ucs[t];
              switch (uni)
                 {
-                  case UNI_CR:                         break;
-                  case UNI_LF: text.push_back(line);
-                                     line.clear();           break;
-                  default:           line.append(uni);
+                  case UNI_CR:                                         break;
+                  case UNI_LF: text.push_back(line);   line.clear();   break;
+                  default:     line << uni;
                }
            }
 
@@ -91,8 +90,8 @@ ShapeItem last_semi = -1;
 
    if (last_semi != -1)
       {
-        for (ShapeItem t = last_semi; t < lambda_text.size(); ++t)
-            header.append(lambda_text[t]);
+        for (ShapeItem t = last_semi; t < lambda_text.ssize(); ++t)
+            header << lambda_text[t];
         text.push_back(header);
 
         UCS_string new_text(lambda_text);
@@ -171,11 +170,17 @@ Executable::parse_body_line(Function_Line line, const Token_string & input,
 ShapeItem idx = 0;
 const ShapeItem end = input.size();
 
+   Log(LOG_UserFunction__set_line)
+      {
+        CERR << "[input line " << line << "]: ";
+        input.print(CERR, false);
+      }
+
    // handle label (if any)
    //
-   if (get_parse_mode() == PM_FUNCTION &&   // defined function, and
-       end > 1                         &&   // at least 2 token, and
-       input[1].get_tag() == TOK_COLON &&   // second token is :, and
+   if (get_parse_mode() == PM_FUNCTION &&   // defined function
+       end >= 2                        &&   // at least 2 tokens
+       input[1].get_tag() == TOK_COLON &&   // second token is :
        input[0].get_tag() == TOK_SYMBOL)    // first token is (label-) name
       {
         Token tok_sym = input[0];   // get the label symbol
@@ -184,21 +189,6 @@ const ShapeItem end = input.size();
         UserFunction * ufun = get_exec_ufun();
         Assert(ufun);
         ufun->add_label(tok_sym.get_sym_ptr(), line);
-      }
-
-   // each →→ ←→ and →→ bind to the statement left of it,
-   // which must therefore not be empty.
-   //
-   if (idx < end && input[idx].is_COND())
-      {
-        CERR << "NOTE: Invalid ";
-        if      (input[idx].get_tag() == TOK_IF_THEN)   CERR << "→→";
-        else if (input[idx].get_tag() == TOK_IF_ELSE)   CERR << "←→";
-        else if (input[idx].get_tag() == TOK_IF_END)    CERR << "←←";
-
-        CERR << " at start of line " << line << endl;
-        if (tolerant)   return E_SYNTAX_ERROR;
-        else            SYNTAX_ERROR;
       }
 
    /*
@@ -221,13 +211,14 @@ Token_string output;   // in reverse order
    while (idx < end)   // loop over one line
       {
         // 1. determine the number of token (excluding ◊) in the statement
-        //    that starts at idx
+        //    that starts at idx. The END token may be missing and in that case
+        //    TOK_END is appended.
         //
         ShapeItem stat_len = 0;   // statement length, not counting ◊
         int diamond_len    = 0;   // ◊ length (if any)
         TokenTag tag_end   = TOK_END;
         int64_t tr         = trace ? 1 : 0;
-        loop(t, end - idx)   // loop over one statement
+        loop(t, end - idx)   // loop over one statement, starting at input[idx]
             {
               const Token & tok = input[idx + t];
               const TokenTag tag = tok.get_tag();
@@ -252,7 +243,7 @@ Token_string output;   // in reverse order
                         CERR << "Line " << line << endl
                              << "Offending token: (tag > TC_MAX_PERM) "
                              << tag << " " << tok << "\nStatement: ";
-                        loop(t, input.size())   CERR << "`" << input[t] << "  ";
+                        input.print(CERR, /* details */ 0);
                         CERR << endl;
                       }
 
@@ -309,7 +300,7 @@ Token_string output;   // in reverse order
 
    Log(LOG_UserFunction__set_line)
       {
-        CERR << "[final line " << line << "] ";
+        CERR << "[final line " << line << "]: ";
         output.print(CERR, false);
       }
 
@@ -320,6 +311,23 @@ Token_string output;   // in reverse order
 bool
 Executable::compute_if_else_targets()
 {
+   /*
+      This function recursively matches corresponding TOK_IF_XXX token and
+      sets their int values to the pc of their companion. In a single sided
+      IF (i.e. without ELSE):
+
+      the intval of the TOK_IF_THEN token is the PC after the TOK_IF_END.
+
+      In a double sided IF/ELSE:
+
+      the intval of the TOK_IF_THEN token is the PC after the TOK_IF_ELSE.
+      the intval of the TOK_IF_ELSE token is the PC after the TOK_IF_END.
+
+      In Prefix::reduce_END_B__() these intvals are used to quickly jump over
+      the then resp. else clauses. All TOK_IF_XXX (as well as ◊ and \n)
+      belong to token class TC_END and are essentially ◊ tokens with this
+      additional jump information.
+    */
    Log(LOG_IfElse)
       {
          CERR << "initial body at " << LOC ":" << endl;
@@ -332,8 +340,9 @@ Function_PC2 cause_PC(Function_PC_invalid, Function_PC_invalid);
 
 vector<conditional> conditionals;
 
-   for (Function_PC pc = Function_PC_0; pc < body.size(); ++pc)
+   loop(b, body.size())
        {
+         const Function_PC pc = Function_PC(b);
          switch(body[pc].get_tag())
             {
               case TOK_IF_THEN:   // →→ (always allowed).
@@ -341,16 +350,24 @@ vector<conditional> conditionals;
                       CERR << "SEE →→ (then)  at [" << pc << "]" << endl;
           
                    {
-                     const conditional cond = { pc, Function_PC(-2) };
+                     const conditional cond(pc);
                      conditionals.push_back(cond);
                    }
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                     CERR << "\n*** WARNING: TC_END before TOK_IF_THEN" << endl;
-                   continue;
+                   Log(LOG_IfElse)
+                      {
+                        if (pc && body[pc-1].get_Class() == TC_END)
+                           {
+                             CERR << "\n*** WARNING: TC_END before TOK_IF_THEN"
+                                  << endl;
+                           }
+                      }
+                   continue;   // loop(b, body.size())
           
               case TOK_IF_ELSE:   // ←→
                    Log(LOG_IfElse)
-                      CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+                      {
+                        CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+                      }
           
                    if (conditionals.size() == 0)
                       {
@@ -359,6 +376,7 @@ vector<conditional> conditionals;
                         cause_PC.low = pc;
                         goto error;
                       }
+
                    if (conditionals.back().if_ELSE >= 0)
                       {
                         cause = "duplicate ←→ (aka. duplicate ELSE)";
@@ -367,14 +385,23 @@ vector<conditional> conditionals;
                         cause_PC.high = pc;
                         goto error;
                       }
+
                    conditionals.back().if_ELSE = pc;
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                     CERR << "\n*** WARNING: TC_END before TOK_IF_ELSE" << endl;
-                   continue;
+                   Log(LOG_IfElse)
+                      {
+                         if ( pc && body[pc-1].get_Class() == TC_END)
+                            {
+                              CERR << "\n*** WARNING: TC_END before TOK_IF_ELSE"
+                                   << endl;
+                            }
+                      }
+                   continue;   // loop(b, body.size())
           
               case TOK_IF_END:    // ←←
                    Log(LOG_IfElse)
-                      CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+                      {
+                        CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+                      }
           
                    if (conditionals.size() == 0)
                       {
@@ -394,12 +421,12 @@ vector<conditional> conditionals;
                             << "\n └── endif: " << pc
                             << endl;
           
-                     if (cond.if_ELSE  == (cond.if_THEN + 1))   // empty THEN
+                     if (cond.if_ELSE == (cond.if_THEN + 1))   // empty THEN
                         {
                           cause = "empty →→ ... ←→ (aka. empty THEN)";
-                        cause_line = get_line(pc);
-                        cause_PC.low = pc - 1;
-                        cause_PC.high = pc;
+                          cause_line = get_line(pc);
+                          cause_PC.low = pc - 1;
+                          cause_PC.high = pc;
                           goto error;
                         }
           
@@ -422,18 +449,33 @@ vector<conditional> conditionals;
                           body[cond.if_THEN].set_int_val(cond.if_ELSE + 1);
                           body[cond.if_ELSE].set_int_val(pc + 1);
                         }
+
+                     Log(LOG_IfElse)
+                        {
+                          conditionals.back().print(CERR, conditionals.size(),
+                                                    body);
+                        }
                      conditionals.pop_back();
                    }
-                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
-                    CERR << "\n*** WARNING: TC_END before TOK_IF_END" << endl;
-          
-                   continue;
+
+                   Log(LOG_IfElse)
+                      {
+                         if (pc && body[pc-1].get_Class() == TC_END)
+                            {
+                              CERR << "\n*** WARNING: TC_END before TOK_IF_END"
+                                   << endl;
+                            }
+                       }
+                   continue;   // loop(b, body.size())
           
               default:
-                   continue;
+                   continue;   // loop(b, body.size())
             }
        }
 
+   // at this point, all conditionals shoud have been processed.
+   // If not, complain.
+   //
    if (conditionals.size())
       {
         cause = "→→ without ←← (aka. IF without ENDIF)";
@@ -451,8 +493,7 @@ vector<conditional> conditionals;
 
 error:
    MORE_ERROR() << cause;
-   CERR <<  cause << ". First observed on line ["
-        << cause_line << "]";
+   CERR <<  cause << ". First observed on line [" << cause_line << "]";
    if (cause_PC.low  != Function_PC_invalid)   CERR << ", PC=" << cause_PC.low;
    if (cause_PC.high != Function_PC_invalid)   CERR << "-" << cause_PC.high;
 
@@ -464,6 +505,28 @@ error:
         print_token(CERR, 3);
       }
    return true;
+}
+//----------------------------------------------------------------------------
+void
+Executable::conditional::print(ostream & out, int level,
+                               const Token_string & body) const
+{
+int endif_PC;
+   out << "COND[" << level << "] IF ... THEN@PC=" << if_THEN;
+   Assert1(body[if_THEN].get_tag() == TOK_IF_THEN);
+   if (if_ELSE < 0)   // single sided if/endif
+      {
+        endif_PC = body[if_THEN].get_int_val() - 1;
+      }
+   else               // double sided if/else/endif
+      {
+        out << " ELSE@PC=" << if_ELSE;
+        Assert1(body[if_ELSE].get_tag() == TOK_IF_ELSE);
+        endif_PC = body[if_ELSE].get_int_val() - 1;
+      }
+
+   Assert1(body[endif_PC].get_tag() == TOK_IF_END);
+   out << " ENDIF@PC=" << endif_PC << endl;
 }
 //----------------------------------------------------------------------------
 Token
@@ -536,7 +599,7 @@ int stats_before = 0;
        }
 
 int tidx = 0;
-   while(tidx < line_txt.size())
+   while(tidx < line_txt.ssize())
       {
         if (stats_before == 0)   break;
         if ( Avec::is_diamond(line_txt[tidx++])   // ◊ xxx
@@ -548,10 +611,10 @@ int tidx = 0;
    while (line_txt[tidx] == ' ')   ++tidx;
 
 UCS_string ret;
-   while (tidx < line_txt.size())
+   while (tidx < line_txt.ssize())
       {
         if (Avec::is_diamond(line_txt[tidx]))    break;
-        ret.append(line_txt[tidx++]);
+        ret << line_txt[tidx++];
       }
 
    // skip trailing spaces
@@ -564,7 +627,7 @@ UCS_string ret;
 VoidCount
 Executable::remove_TOK_VOID()
 {
-   return Parser::remove_TOK_VOID(body);
+   return body.remove_TOK_VOID();
 }
 //----------------------------------------------------------------------------
 void
@@ -592,7 +655,50 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
    // for value errors we point to the failed symbol itself.
    //
    if (error.get_error_code() == E_VALUE_ERROR)
-      body_from_to.low = body_from_to.high;
+      {
+        body_from_to.low = body_from_to.high;
+      }
+   else if (error.get_error_code() == E_ATTENTION)
+      {
+        /* E_ATTENTION is typically raised at the end of the line, i.e. when
+           attention_raised was checked and not when attention_raised was
+           raised. We use attention_range instead.
+         */
+        if (InterruptContext::get_attention_range().low != Function_PC_invalid)
+           {
+             body_from_to = InterruptContext::get_attention_range();
+           }
+        else
+           {
+             const StateIndicator * si = Workspace::SI_top();
+             const Prefix & prefix = si->get_prefix();
+             const Function_PC pc(prefix.get_PC() - 1);
+             body_from_to.low  = pc;
+             body_from_to.high = pc;
+           }
+      }
+   else if (error.get_error_code() == E_INTERRUPT)
+      {
+        /* E_INTERRUPT may be raised when interrupt_raised was checked (and
+           not when interrupt_raised was raised). We use interrupt_range
+           instead.
+
+           Note that E_INTERRUPT may also be raised synchronously, e.g.
+           when a system limit was hit.
+         */
+        if (InterruptContext::get_interrupt_range().low != Function_PC_invalid)
+           {
+             body_from_to = InterruptContext::get_interrupt_range();
+           }
+        else
+           {
+             const StateIndicator * si = Workspace::SI_top();
+             const Prefix & prefix = si->get_prefix();
+             const Function_PC pc(prefix.get_PC() - 1);
+             body_from_to.low  = pc;
+             body_from_to.high = pc;
+           }
+      }
 
    Log(LOG_prefix__location_info)
       {
@@ -610,6 +716,9 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
 
 Function_PC start = get_statement_start(body_from_to.low);
 Function_PC end = get_statement_end(body_from_to.high);
+
+   if (body_from_to.low == -1)    body_from_to.low = start;
+   if (body_from_to.high == -1)   body_from_to.high = end;
 
    Assert(start   <= body_from_to.low);
    Assert(body_from_to.low  <= body_from_to.high);
@@ -658,13 +767,14 @@ bool optimized = false;
 
        before_ranges should be:  0 1 2 2 2 3
    */
-basic_string<int>ranges_before;   ranges_before.reserve(stat_before.size());
+vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
 
    for (Function_PC PC_before = Function_PC_0, PC_after  = Function_PC_0;
-        int(ranges_before.size()) < stat_before.size();
+        int(ranges_before.size()) < stat_before.ssize();
           ++PC_before, ++PC_after) 
       {
-        if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
+        if (PC_after < stat_after.ssize() &&
+             stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
            {
              // optimized value. Only set in
              // Parser::optimize_short_primitives() to replace
@@ -719,7 +829,8 @@ Executable::set_error_info(Error & error,
 
       IOW: a Value B can never be wrong.
     */
-   if (failed_statement[range.low].get_Class() == TC_VALUE)
+   if (range.low < Function_PC(failed_statement.size()) &&
+       failed_statement[range.low].get_Class() == TC_VALUE)
       {
          ++range.low;
       }
@@ -812,7 +923,7 @@ int statement = 0;
    //
    if (get_parse_mode() != PM_FUNCTION)   line = 0;
 
-   Assert(line <= text.size());
+   Assert(line <= text.ssize());
 const UCS_string & failed_line = text[line];
 
    // extract the failed statement text from the failed_line
@@ -823,10 +934,12 @@ UCS_string failed_statement;
 
      loop(f, failed_line.size())
          {
-           if (failed_line[f] == UNI_DIAMOND)   { ++l;   continue; }
+           if (Avec::is_DIAMOND(failed_line[f]))
+              { ++l;   continue; }
+
            if (l > statement)   break;      // subsequent line
            if (l < statement)   continue;   // previous line
-           failed_statement += failed_line[f];
+           failed_statement << failed_line[f];
          }
    }
 
@@ -935,7 +1048,7 @@ Executable::setup_lambdas()
    //
    reverse_each_statement(body);
 
-int lambda_num = 0;
+Lambda_number lambda_num = LAMBDA_NUM_0;
    loop(b, body.size())
        {
          if (body[b].get_tag() != TOK_L_CURLY)   continue;   // not {
@@ -946,11 +1059,11 @@ int lambda_num = 0;
              {
                switch(body[b1].get_tag())
                   {
-                    case TOK_L_CURLY:
+                    case TOK_L_CURLY:   // opening {
                          ++curly_level;
                          continue;
 
-                    case TOK_R_CURLY:
+                    case TOK_R_CURLY:   // closing }
                          if (0 == --curly_level)
                             {
                               end = b1;
@@ -963,7 +1076,8 @@ int lambda_num = 0;
                   }
              }
          Assert(end != -1);
-         b = setup_one_lambda(b, end, ++lambda_num);
+         lambda_num = Lambda_number(lambda_num + 1);
+         b = setup_one_lambda(b, end, lambda_num);
        }
 
    // redo the token reversion of the body so that the body token and the
@@ -976,7 +1090,8 @@ int lambda_num = 0;
 }
 //----------------------------------------------------------------------------
 ShapeItem
-Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
+Executable::setup_one_lambda(ShapeItem b, ShapeItem bend,
+                             Lambda_number lambda_num)
 {
    // called with this->body in forward (APL-) order, i.e  { ... }
    //
@@ -1003,7 +1118,7 @@ const Fun_signature signature = compute_lambda_body(lambda_body, b, bend);
       │               │
       ENDL            RETURN
     */
-basic_string<Symbol *> local_vars;   // collector for local variables
+vector<Symbol *> local_vars;   // collector for local variables
    while (lambda_body.size() >= 4)
       {
         const size_t semi = lambda_body.size() - 4;   // maybe ';' SYMBOL ?
@@ -1021,7 +1136,7 @@ const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
    reverse_all_token(lambda_body);
 
   {
-    basic_string<Symbol *> local_vars;
+    vector<Symbol *> local_vars;
     while (lambda_body.size() > 4)
        {
          const size_t semi = lambda_body.size() - 4;
@@ -1037,7 +1152,7 @@ const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
 UserFunction * ufun = new UserFunction(signature, lambda_num,
                                        lambda_text, lambda_body, local_vars);
 
-   ufun->increment_refcount(LOC);
+   ufun->increment_refcount(LOC, "λ" );
 
    // put a token for the lambda at the place where the { was.
    // That replaces, for example, (in forward notation):
@@ -1046,7 +1161,7 @@ UserFunction * ufun = new UserFunction(signature, lambda_num,
    // A←UFUN      UFUN being a user-defined function with body { ... }
    //
 Token tok_ufun = ufun->get_token();
-   body[bend].move(tok_ufun, LOC);
+   body[bend].move_from(tok_ufun, LOC);
 
    return bend;
 }
@@ -1058,21 +1173,25 @@ Executable::compute_lambda_body(Token_string & lambda_body,
 int signature = SIG_FUN;
 int level = 0;
 
-   /* find the insertion point for λ←. for single statement lambda the
+   /* find the insertion point for λ←. For a single statement lambda the
       insertion point is the first body token lambda_body[b].
       For a multi-statement lambda it is the last ◊ before lambda_body[bend].
     */
-
 ShapeItem insertion_point = b;
    for (ShapeItem j = b; j < bend; ++j)
        {
-         if (body[j].get_tag() == TOK_END)   insertion_point = j + 1;
+         if (body[j].get_tag() == TOK_END)
+            {
+              // TOK_END indicates a multi-statement lambda. Move the
+              // insertion_point to the (beginning of) the next statement.
+              insertion_point = j + 1;
+            }
        }
 
    for (; b < bend; ++b)
        {
          Token t;
-         t.move(body[b], LOC);
+         t.move_from(body[b], LOC);
          body[b].clear(LOC);   // invalidate in main body
 
          // figure the signature by looking for ⍺, ⍶, ⍵, ⍹, and χ
@@ -1085,9 +1204,21 @@ ShapeItem insertion_point = b;
               case TOK_OMEGA_U: if (!level)   signature |= SIG_RO;  // no break
               case TOK_ALPHA_U: if (!level)   signature |= SIG_LO;        break;
 
-              case TOK_DIAMOND: DEFN_ERROR;
-              case TOK_BRANCH:  DEFN_ERROR;
-              case TOK_ESCAPE:  DEFN_ERROR;
+              case TOK_DIAMOND:
+                   MORE_ERROR() << "◊ is not allowed in λ expression ";
+                   DEFN_ERROR;
+
+              case TOK_BRANCH:
+                   MORE_ERROR() << "→ is not allowed in λ expression ";
+                   DEFN_ERROR;
+
+              case TOK_ESCAPE:
+              case TOK_IF_THEN:
+              case TOK_IF_ELSE:
+              case TOK_IF_END:
+                   MORE_ERROR() << "conditionals (i.e. ←←, ←→, or →→)"
+                                   " are not allowed in λ expressions";
+                   DEFN_ERROR;
 
               case TOK_L_CURLY: ++level;   break;
               case TOK_R_CURLY: --level;   break;
@@ -1145,52 +1276,59 @@ ShapeItem insertion_point = b;
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
-   // this->text is the text of this Executable. Extract the text of
-   // the skip'th lambda in this->text (and return it).
+   // Skip over 'skip' top -level lambdas and return the next one. 
+
+   // this->text is the entire text of this Executable. Extract the text of
+   // the skip'th top-level lambda in this->text (and return it).
    //
 UCS_string lambda_text;
 
-int level = 0;   // {/} nesting level
+// level is used to skip over nested lambdas (= lambdas in a lambda body)
+int level = 0;   // { } nesting level
+
+// copying is false for the first 'skip' lambdas, and true after that.
 bool copying = false;
+
 ShapeItem tidx = 0;    // the current line in text[]
 ShapeItem tcol = 0;    // the current column in text[tidx];
-bool in_single_quotes = false;
-bool in_double_quotes = false;
 
    // skip over the first skip lambdas and copy the next one to lambda_text
    //
    for (;;)
        {
-         if (tidx >= text.size())
+         if (tidx >= text.ssize())
             {
+              // this should never happens since we have 'skip' lambdas.
               Q1(copying)   Q1(tidx)   Q1(skip)   FIXME;
             }
 
          const UCS_string & line = text[tidx];
 
-         if (tcol >= line.size())   // end of line: wrap to next line
+         if (tcol >= line.ssize())   // end of line: wrap to next line
             {
               ++tidx;     // next line
               tcol = 0;   // first column
-              in_single_quotes = false;
-              in_double_quotes = false;
               continue;
             }
 
          const Unicode uni = line[tcol++];
-         if (in_single_quotes)
+         if (uni == UNI_SINGLE_QUOTE ||   // APL string: skip or copy it
+             uni == UNI_DOUBLE_QUOTE)     // GNU APL string: dito.
             {
-              if (uni == UNI_SINGLE_QUOTE)   in_single_quotes = false;
-              if (copying)   lambda_text.append(uni);
-              continue;
-            }
+              const ShapeItem end = line.string_end_pos(tcol - 1, false);
+              if (end == -1)
+                 {
+                   MORE_ERROR() << "No (APL-) string end in function line "
+                                << tidx;
+                   DOMAIN_ERROR;
+                 }
 
-         if (in_double_quotes)
-            {
-              if (uni == UNI_DOUBLE_QUOTE     // either \" or string end
-                 && !(tcol >= 2 && line[tcol - 2] == UNI_BACKSLASH))
-                 in_double_quotes = false;
-              if (copying)   lambda_text.append(uni);
+              if (copying)
+                 {
+                   lambda_text << uni;
+                   while (tcol < end + 1)   lambda_text << line[tcol++];
+                 }
+              tcol = end + 1;
               continue;
             }
 
@@ -1200,74 +1338,65 @@ bool in_double_quotes = false;
             {
               ++tidx;
               tcol = 0;
-              in_single_quotes = false;
-              in_double_quotes = false;
               continue;
             }
 
-         if (copying)   lambda_text.append(uni);
+         if (copying)   lambda_text << uni;
 
          switch(uni)
             {
-              case UNI_SINGLE_QUOTE:             // start of a new '...' string
-                   in_single_quotes = true;
-                   continue;
-
-              case UNI_DOUBLE_QUOTE:       // start of a new "..." string
-                   in_double_quotes = true;
-                   continue;
-
               case UNI_L_CURLY:            // start of a new { ... }
                    if (level++ == 0 && skip == 0)   copying = true;
                    continue;
 
               case UNI_R_CURLY:            // end of { ... }
-                   if (--level)   continue;      // but not top-level }
-                   --skip;                       // next {...} at top-level
+                   if (--level)   continue;      // but not of a top-level }
+                   --skip;                       // one less to skip
                    if (!copying)  continue;
 
-                   lambda_text.pop_back();       // the last }
-                   goto out;
+                   // this } is the 
+                   lambda_text.pop_back();       // the top-level }
+                   goto out;                     // copying done.
 
               default: continue;
             }
        }
 
 out:
-   
-   if (signature & SIG_Z)  // insert λ ←
+
+   // if thew lambda has no results, then we are done.
+   //
+   if (!(signature & SIG_Z))   return lambda_text;
+
+   // Otherwise: insert λ ←. The λ ← shall be inserted before the last
+   // statement (= after the last ◊), or at the beginning if there is only
+   // one statement
+   //
+ShapeItem sols = 0;   // start-of-last-statement; assume no ◊.
+   rev_loop(j, lambda_text.size())
       {
-        ShapeItem insertion_point = 0;
-        rev_loop(j, lambda_text.size())
+        if (Avec::is_DIAMOND(lambda_text[j]))
            {
-             if (lambda_text[j] == UNI_DIAMOND)
-                {
-                  insertion_point = j + 1;
-                  while (lambda_text[insertion_point] <= UNI_SPACE)
-                         ++insertion_point;
-                  break;
-                }
+             sols = j + 1;
+             while (lambda_text[sols] <= UNI_SPACE)   ++sols;
+             break;
            }
-        UCS_string ret;
-        loop(j, lambda_text.size())
-            {
-              if (j == insertion_point)
-                 {
-                   ret += UNI_LAMBDA;       // insert λ
-                   ret += UNI_LEFT_ARROW;   // insert ←
-                 }
-              ret += lambda_text[j];
-            }
-        return ret;
       }
-    return lambda_text;
+
+UCS_string ret;
+   loop(j, lambda_text.size())
+       {
+         if (j == sols)   ret << UNI_LAMBDA << UNI_LEFT_ARROW;   // insert λ←
+         ret << lambda_text[j];
+       }
+   return ret;
 }
 //----------------------------------------------------------------------------
 void
 Executable::reverse_each_statement(Token_string & tos)
 {
 const ShapeItem last = tos.size();
-   for (ShapeItem from = 0, to = 1; to < tos.size(); ++to)
+   for (ShapeItem from = 0, to = 1; to < tos.ssize(); ++to)
        {
          if (tos[to].get_Class() == TC_END)
             {
@@ -1296,10 +1425,16 @@ Executable::reverse_all_token(Token_string & tos)
 }
 //----------------------------------------------------------------------------
 void
-Executable::increment_refcount(const char * loc)
+Executable::increment_refcount(const char * loc, const char * creator)
 {
-   Assert1(get_exec_ufun());
-   Assert(get_exec_ufun()->is_lambda());
+const UserFunction * ufun = get_exec_ufun();
+   Assert1(ufun);
+   if (!ufun->is_lambda())
+      {
+        MORE_ERROR() << "Attempt (of " << creator <<
+                        ") to create or edit a lambda. Use { ... } instead.";
+        DEFN_ERROR;
+      }
 
    ++refcount;
 
@@ -1339,7 +1474,8 @@ UserFunction * ufun = get_exec_ufun();
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
-   // clear errors that may have occured before
+   // clear any errors that may have occured before
+   //
    if (Error * err = Workspace::get_error())   err->clear_error_code();
 
 ExecuteList * fun = new ExecuteList(data, loc);
@@ -1351,21 +1487,21 @@ ExecuteList * fun = new ExecuteList(data, loc);
              << "------------------- ExecuteList::fix() --" << endl;
       }
 
-   {
-     Error * err = Workspace::get_error();
-     if (err && err->get_error_code())
-        {
-          Log(LOG_UserFunction__fix)
-             {
-                CERR << "fix pmode=execute list failed with error "
-                     << Error::error_name(err->get_error_code()) << endl;
-             }
-
-          err->set_parser_loc(0);
-          delete fun;
-          return 0;
-        }
-   }
+   if (Error * err = Workspace::get_error())
+      {
+        if (err->get_error_code())
+           {
+             Log(LOG_UserFunction__fix)
+                {
+                   CERR << "fix pmode=execute list failed with error "
+                        << Error::error_name(err->get_error_code()) << endl;
+                }
+     
+             err->set_parser_loc(0);
+             delete fun;
+             return 0;
+           }
+      }
 
    try
       {
@@ -1399,7 +1535,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
 }
 //============================================================================
 StatementList *
-StatementList::fix(const UCS_string & data, const char * loc)
+StatementList::fix(const UCS_string & data, Value_P literal, const char * loc)
 {
 StatementList * fun = new StatementList(data, loc);
 
@@ -1419,6 +1555,35 @@ StatementList * fun = new StatementList(data, loc);
       }
    catch (Error & e)
       {
+         if (e.get_error_code() == E_UNBALANCED_L_CURLY)
+            {
+              int curly_level = 0;
+              loop(d, data.size())
+                  {
+                    const Unicode uni = data[d];
+                    if (uni == UNI_L_CURLY)        // opening {
+                       {
+                         ++curly_level;
+                       }
+                    else if (uni == UNI_R_CURLY)   // closing }
+                       {
+                         --curly_level;
+                       }
+                    else if (uni == UNI_COMMENT)
+                      {
+                        MORE_ERROR() << "Invalid comment (⍝) in { ... }";
+                      }
+                    else if (uni == UNI_NUMBER_SIGN)
+                      {
+                        MORE_ERROR() << "Invalid comment (#) in { ... }";
+                      }
+                  }
+              if (curly_level < 0)          // too many }
+                 MORE_ERROR() << "Unbalanced (too many) }";
+              else if (curly_level > 0)     // too many {
+                 MORE_ERROR() << "Unbalanced (too many) {";
+            }
+
         Log(LOG_UserFunction__fix)
            CERR << "parse_body_line(line 0) failed" << endl;
         delete fun;
@@ -1429,6 +1594,21 @@ StatementList * fun = new StatementList(data, loc);
       {
         CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
+
+   if (+literal)
+      {
+        bool found_marker = false;
+        loop(b, fun->body.size())
+            {
+              if (fun->body[b].get_tag() == TOK_MARKER)
+                 {
+                   found_marker = true;
+                   new (&fun->body[b])   Token(TOK_APL_VALUE1, literal);
+                   break;
+                 }
+            }
+         Assert(found_marker);
+       }
 
    fun->body.push_back(Token(TOK_RETURN_STATS));
    if (fun->compute_if_else_targets())

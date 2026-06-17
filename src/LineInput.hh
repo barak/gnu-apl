@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -215,7 +215,7 @@ public:
    void cursor_LEFT()   { if (uidx > 0)   move_idx(--uidx); }
 
    /// move cursor right
-   void cursor_RIGHT()   { if (uidx < user_line.size())   move_idx(++uidx); }
+   void cursor_RIGHT()   { if (uidx < user_line.ssize())   move_idx(++uidx); }
 
    /// move cursor left and delete char
    void backspc()
@@ -354,6 +354,9 @@ public:
    static LineHistory & get_history()
       { return the_line_input->history; }
 
+   // old-fashioned ^N (shift out) / ^O (shift in) replacement for the ALT keys
+   static void map_alt(int alt_map_profile, UCS_string & line);
+
 protected:
    /// constructor
    LineInput(bool do_read_history);
@@ -385,6 +388,12 @@ protected:
 
    /// single LineInput instance that restores stdin termios on destruction
    static LineInput * the_line_input;
+
+   /// map the next ASCII char to APL
+  static bool map_next;
+
+   /// map all subsequent ASCII chars to APL
+  static bool map_all;
 };
 //----------------------------------------------------------------------------
 /** A mapping from ESC sequences to (internal) pseudo-Unicodes such as

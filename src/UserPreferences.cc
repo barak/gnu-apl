@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,121 @@ UserPreferences UserPreferences::uprefs;
 #undef _B
 #endif
 
+//----------------------------------------------------------------------------
+UserPreferences::UserPreferences()
+   :
+     append_summary(false),
+     auto_OFF(false),
+     backup_before_save(false),
+     plot_ASCII_rows(0),          //  0: preference was not provided
+     plot_ASCII_columns(0),       //  0: preference was not provided
+     plot_ASCII_background(-1),   // -1: preference was not provided
+     control_Ds_to_exit(0),
+     CPU_limit_secs(0),
+     daemon(false),
+     discard_indentation(false),
+#define sec_def(X) X(false),
+#include "Security.def"   // all start with disable_
+     do_CONT(true),
+     do_Color(true),
+     do_not_echo(false),
+     echo_CIN(false),
+     emacs_arg(0),
+     emacs_mode(false),
+     initial_PW(DEFAULT_Quad_PW),
+     initial_PW_by_user(false),
+     line_history_len(500),
+     no_xmodmap(false),
+     line_history_path(".apl.history"),
+     mem_arg(0),
+     old_multi_line_strings(true),
+     new_multi_line_strings(true),
+     multi_line_literals(true),
+     nabla_to_history(1),   // if function was modified
+     output_to_cout(false),
+     randomize_testfiles(false),
+     raw_cin(false),
+     requested_cc(CCNT_UNKNOWN),
+     requested_id(0),
+     requested_par(0),
+     safe_mode(false),
+     script_argc(0),
+     silence(FULL_BANNER),
+     system_do_svars(true),
+     tcp_port(0),
+     tcp_websocket(false),
+     user_do_svars(true),
+     user_profile(0),
+     wait_ms(0),
+     WINCH_sets_pw(false)
+{
+   gettimeofday(&session_start, 0);
+}
+//----------------------------------------------------------------------------
+bool
+UserPreferences::collect_preferences(const std::vector<const char *> & args)
+{
+const bool log_startup0 = parse_args_0(args);
+   if (LOG_argc_argv || log_startup0)
+      {
+         CERR << "argc/argv before expansion:\n";
+         show_args(args);
+      }
+
+   expand_args(args);
+
+const bool log_startup = parse_args_1() || log_startup0;
+   if (LOG_argc_argv || log_startup)
+      {
+         CERR << "argc/argv after expansion:\n";
+         show_args(expanded_args);
+      }
+
+#ifdef cfg_DYNAMIC_LOG_WANTED
+   if (log_startup)   Log_control(LID_startup, true);
+#endif // cfg_DYNAMIC_LOG_WANTED
+
+   init_modules(args[0], log_startup);
+
+   // read /etc/gnu-apl.d/preferences
+   read_config_file(true,  log_startup);
+
+   // read $HOME/.config/gnu_apl/preferences
+   read_config_file(false, log_startup);
+
+  // read /etc/gnu-apl.d/parallel_thresholds
+   read_threshold_file(true, log_startup);
+
+  // read $HOME/.config/gnu_apl/parallel_thresholds
+   read_threshold_file(false, log_startup);
+
+  parse_args_2(log_startup);
+
+  return log_startup0;
+}
+//----------------------------------------------------------------------------
+/// print args
+void
+UserPreferences::show_args(const std::vector<const char *> & args)
+{
+   CERR << "argc: " << args.size() << endl;
+   loop(a, args.size())   CERR << "  args[" << a << "]: '"
+                               << args[a] << "'" << endl;
+
+   // tell if stdin is open or closed
+   //
+   if (fcntl(STDIN_FILENO, F_GETFD))
+      CERR << "stdin is: CLOSED" << endl;
+   else
+      CERR << "stdin is: OPEN" << endl;
+
+   // tell if fd 3 is open or closed
+   //
+   if (fcntl(3, F_GETFD))
+      CERR << "fd 3 is:  CLOSED" << endl;
+   else
+      CERR << "fd 3 is:  OPEN" << endl;
+}
 //----------------------------------------------------------------------------
 void
 UserPreferences::usage(const char * prog)
@@ -145,7 +260,7 @@ UserPreferences::show_GPL(ostream & out)
 "    This program is GNU APL, a free implementation of the\n"
 "    ISO/IEC Standard 13751, \"Programming Language APL, Extended\"\n"
 "\n"
-"    Copyright © 2008-2023  Dr. Jürgen Sauermann\n"
+"    Copyright © 2008-2025  Dr. Jürgen Sauermann\n"
 "\n"
 "    This program is free software: you can redistribute it and/or modify\n"
 "    it under the terms of the GNU General Public License as published by\n"
@@ -208,11 +323,11 @@ const size_t len = read(fd, buf, sizeof(buf));
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::parse_argv_0(int argc, const char * argv[])
+UserPreferences::parse_args_0(const std::vector<const char *> & args)
 {
-   for (int a = 1; a < (argc - 1); ++a)
+   for (size_t a = 1; a < (args.size() - 1); ++a)
        {
-         if (!strcmp(argv[a], "-l") && atoi(argv[a+1]) == LID_startup)
+         if (!strcmp(args[a], "-l") && atoi(args[a+1]) == LID_startup)
             return true;
        }
 
@@ -220,13 +335,13 @@ UserPreferences::parse_argv_0(int argc, const char * argv[])
 }
 //----------------------------------------------------------------------------
 bool
-UserPreferences::parse_argv_1()
+UserPreferences::parse_args_1()
 {
 bool log_startup = false;
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_args.size(); )
        {
-         const char * opt = expanded_argv[a++];
-         const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
+         const char * opt = expanded_args[a++];
+         const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
          if (!strcmp(opt, "-l"))
             {
@@ -306,7 +421,7 @@ bool log_startup = false;
 }
 //----------------------------------------------------------------------------
 void
-UserPreferences::parse_argv_2(bool logit)
+UserPreferences::parse_args_2(bool logit)
 {
    // execve() puts the script name (and optional script arguments at the
    // end of argv.
@@ -321,22 +436,22 @@ UserPreferences::parse_argv_2(bool logit)
    // if GNU APL is started as aplscript, then --script is implied
    //
    {
-      const char * prog = expanded_argv[0];
+      const char * prog = expanded_args[0];
       if (strlen(prog) >= 6 && !strcmp("script", (prog + strlen(prog) - 6)))
          {
             do_CONT = false;               // --noCONT
             do_not_echo = true;            // -noCIN
             do_Color = false;              // --noColor
-            silent = true;                 // --silent
+            silence = NO_BANNER;           // --silent
          }
    }
 
-   for (size_t a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_args.size(); )
        {
          if (a == script_argc)   { ++a;   continue; }   // skip scriptname
 
-         const char * opt = expanded_argv[a++];
-         const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
+         const char * opt = expanded_args[a++];
+         const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
@@ -360,7 +475,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-C"))
             {
               ++a;
-              continue;   // -C already handled in parse_argv_1()
+              continue;   // -C already handled in parse_args_1()
             }
 
 #if cfg_CORE_COUNT_WANTED == -2
@@ -443,7 +558,7 @@ UserPreferences::parse_argv_2(bool logit)
                    exit(a);
                  }
               eval_exprs.push_back(val);
-              uprefs.silent   = true;
+              uprefs.silence  = NO_BANNER;
               uprefs.do_Color = false;
               continue;
             }
@@ -472,7 +587,7 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "-h") || !strcmp(opt, "--help"))
             {
-              usage(expanded_argv[0]);
+              usage(expanded_args[0]);
               exit(0);
             }
 
@@ -588,7 +703,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-p"))
             {
               ++a;
-              continue;   // -p already handled in parse_argv_1()
+              continue;   // -p already handled in parse_args_1()
             }
 
          if (!strcmp(opt, "--par"))
@@ -612,14 +727,17 @@ UserPreferences::parse_argv_2(bool logit)
                   exit(a);
                 }
 
-              initial_pw = atoi(val);
-              if (initial_pw < MIN_Quad_PW || initial_pw > MAX_Quad_PW)
+              initial_PW = atoi(val);
+              if (initial_PW < MIN_Quad_PW || initial_PW > MAX_Quad_PW)
                 {
                   CERR << "bad --PW value (ignored)" << endl; 
+                  initial_PW_by_user = false;   // since ignored
+                  initial_PW = 80;
                 }
               else
                 {
-                  Workspace::set_PW(initial_pw, LOC);
+                  Workspace::set_PW(initial_PW, LOC);
+                  initial_PW_by_user = true;
                 }
               continue;
             }
@@ -649,7 +767,7 @@ UserPreferences::parse_argv_2(bool logit)
               do_CONT = false;               // --noCONT
               do_not_echo = true;            // -noCIN
               do_Color = false;              // --noColor
-              silent = true;                 // --silent
+              silence = NO_BANNER;           // --silent
               continue;
             }
 
@@ -695,7 +813,7 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "--silent") || !strcmp(opt, "-q"))
             {
-              silent = true;
+              silence = NO_BANNER;
               continue;
             }
 
@@ -706,15 +824,15 @@ UserPreferences::parse_argv_2(bool logit)
               // IO_Files::open_next_file() will exit if it sees "-"
               //
               IO_Files::need_total = true;
-              for (; a < expanded_argv.size(); ++a)   // inner for
+              for (; a < expanded_args.size(); ++a)   // inner for
                   {
-                    if (!strcmp(expanded_argv[a], "--"))  // end of -T args
+                    if (!strcmp(expanded_args[a], "--"))  // end of -T args
                        {
                          ++a;   // skip --
                          break;           // inner for
 
                        }
-                    const UTF8_string & filename = expanded_argv[a];
+                    const UTF8_string & filename = expanded_args[a];
                     InputFile fam(filename, 0, true, true, false, no_LX);
                     InputFile::files_todo.push_back(fam);
                     InputFile::files_orig.push_back(fam);
@@ -788,7 +906,7 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "-u"))
             {
               ++a;
-              continue;   // -u already handled in parse_argv_1()
+              continue;   // -u already handled in parse_args_1()
             }
 
          if (!strcmp(opt, "-w"))
@@ -804,7 +922,7 @@ UserPreferences::parse_argv_2(bool logit)
             }
 
          CERR << "unknown option '" << opt << "'" << endl;
-         usage(expanded_argv[0]);
+         usage(expanded_args[0]);
          exit(a);
        }
 
@@ -824,22 +942,22 @@ UserPreferences::parse_argv_2(bool logit)
      apl may have been started in one off these ways:
 
       A.  ./apl -f script1.apl   # with script1.apl NOT executable. Then:
-               expanded_argv[script_argc] is:  ./apl
+               expanded_args[script_argc] is:  ./apl
               InputFile::files_todo.size():    1   (from -f)
                script_argc is:                 0
 
       B.  ./apl -f script2.apl   # with script2.apl executable. Then:
-              expanded_argv[script_argc] is:   script2.apl
+              expanded_args[script_argc] is:   script2.apl
               InputFile::files_todo.size():    1    (from -f)
                script_argc is:                 2
 
       C.   ./apl
-               expanded_argv[script_argc] is:  ./apl
+               expanded_args[script_argc] is:  ./apl
               InputFile::files_todo.size():    0    (since no -f)
                script_argc is:                 0
 
       D.  ./script.apl   # with script2.apl executable. Then:
-              expanded_argv[script_argc] is:   script2.apl
+              expanded_args[script_argc] is:   script2.apl
               InputFile::files_todo.size():    0    (since no -f)
               script_argc is:                  1    #!./apl
               script_argc is:                  2    #!./apl --script
@@ -852,7 +970,7 @@ UserPreferences::parse_argv_2(bool logit)
    if (InputFile::files_todo.size() == 0)   // no -f (cases C. and D.)
    if (script_argc > 0)                     // (case D.)
       {
-        const UTF8_string & filename = expanded_argv[script_argc];
+        const UTF8_string & filename = expanded_args[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
         InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
       }
@@ -865,9 +983,10 @@ UserPreferences::parse_argv_2(bool logit)
 /**
     GNU APL can be started in a number of ways:
 
-    1. directly - argc/argv have the usual meaning
+    1. directly - argc/argv have the usual meaning. For example:
+       /usr/local/bin/apl [ binargs... ]
 
-    2. as a script without arguments on the first script line, e.g.
+    2. as a script without arguments on the first script line. For example:
        /usr/bin/apl SCRIPT.apl [ scriptargs... ]
 
     3. as a script with arguments on the first script line, e.g.
@@ -886,54 +1005,70 @@ UserPreferences::parse_argv_2(bool logit)
     /usr/bin/apl -s --             at least on GNU/linux
     /usr/bin/apl --script --       at least on GNU/linux
 
-    expand_argv() does the following:
+    If (!) GNU APL is started from an (executable) script, then:
+
+    A.  argv[0] is the program name (= GNU APL interpreter). I.e. the first
+        item on the shebang line
+            of the script, typically /usr/local/apl.
+    B1. if the shebang line contains any arguments, then:
+        argv[1] is the script arguments separated by blanks, and
+        argv[2] is the path to the script
+    B2. Otherwise (no arguments on the shebang line) then:
+        argv[1] is the path to the script
+
+    C.  the argguments from the command line (if any) follow after the path
+        to the script.
+
+    Function expand_args() does the following:
 
     1. expand argv[1] into multiple arguments
     2. maybe set script_argc
 
  **/
 void
-UserPreferences::expand_argv(int argc, const char ** argv)
+UserPreferences::expand_args(const std::vector<const char *> & args)
 {
-   // 1. copy the command line arguments into original_argv and expanded_argv.
+   // 1. copy the command line arguments into expanded_args.
    //
-   loop(a, argc)
-       {
-         original_argv.push_back(argv[a]);
-         expanded_argv.push_back(argv[a]);
-       }
+const size_t argc = args.size();
+   loop(a, argc)   expanded_args.push_back(args[a]);
 
-   if (argc <= 1)   // program name argv[0] only, hence no arguments to expand
+   if (argc <= 1)   // program name argv[0] only (no arguments to expand)
       {
         return;
       }
 
-   if (is_APL_script(argv[1]))   // case 2: script without argument
+   // argc >= 2
+   //
+   if (is_APL_script(args[1]))   // case B2: script without argument
       {
         script_argc = 1;
         return;
       }
 
-   if (!is_APL_script(argv[2]))   return;   // not run from a script
+   if (argc == 2)                             return;   // not run from a script
+   if (argc > 2 && !is_APL_script(args[2]))   return;   // unless B1
 
-   /* at this point:
+   /* case B1. At this point:
 
-      argv[1] is the optional argument of the interpreter on the shebang line,
-      argv[2] is the name of the script, and
-      argv[3] ... are the command line arguments given by the user
+      args[1] is one or more argument(s) of the interpreter on the shebang
+               line, separated by blanks.
+      args[2] is the path to the script, and
+      args[3]... are the command line arguments given by the user
                   when starting the script.
-      expand argv[1], stopping at --
+      expand argv[1], possibly stopping at --
     */
-const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
-   script_argc = 2;
+const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
    if (!strchr(apl_args, ' '))   // single option
       {
+        script_argc = 2;   // script name and one script argument
         return;
       }
 
-   // remove expanded_argv[1] and insert the expanded expanded_argv[1] instead
-   expanded_argv.erase(expanded_argv.begin() + 1);
-   --script_argc;
+   // remove expanded_args[1] and insert the expanded expanded_args[1] instead
+   // 
+   expanded_args.erase(expanded_args.begin() + 1);
+   script_argc = 1;   // script name
    for (int index = 1;;)
        {
          // skip leading whitespace
@@ -944,15 +1079,15 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
 
          if (!strcmp(apl_args, "--"))        // "--" at end of apl_args
             {
-              expanded_argv.insert(expanded_argv.begin() + index++, "--");
+              expanded_args.insert(expanded_args.begin() + index++, "--");
               ++script_argc;
               break;   // done
             }
 
-         if (!strncmp(apl_args, "-- ", 2) &&
+         if (!strncmp(apl_args, "--", 2) &&
                apl_args[2] <= ' ')   // "--" somewhere in apl_args
             {
-              expanded_argv.insert(expanded_argv.begin() + index++, "--");
+              expanded_args.insert(expanded_args.begin() + index++, "--");
               ++script_argc;
               apl_args += 2;   // skip "--"
               continue;
@@ -963,14 +1098,14 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
             {
               const int arg_len = arg_end - apl_args;
               const char * arg = strndup(apl_args, arg_len);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               apl_args += arg_len;
             }
          else           // last argument
             {
               const char * arg = strdup(apl_args);
-              expanded_argv.insert(expanded_argv.begin() + index++, arg);
+              expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               break;
             }
@@ -1297,9 +1432,11 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               // obsolete
             }
-         else if (yes_no && !strcasecmp(opt, "WELCOME"))
+         else if (!strcasecmp(opt, "WELCOME"))
             {
-              silent = no;
+              if (yes)                              silence = FULL_BANNER;
+              else if (no)                          silence = NO_BANNER;
+              else if (!strcasecmp(arg, "BRIEF"))   silence = BRIEF_BANNER;
             }
          else if (yes_no && !strcasecmp(opt, "SHAREDVARS"))
             {
@@ -1431,7 +1568,8 @@ int file_profile = 0;   // the current profile in the preferences file
                    continue;
                  }
 
-              LibPaths::set_lib_dir(LibRef(lib_ref), arg,
+              const UTF8_string arg_utf(arg);
+              LibPaths::set_lib_dir(LibRef(lib_ref), arg_utf,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
                                         : LibPaths::LibDir::CSRC_PREF_HOME);
             }
@@ -1456,7 +1594,7 @@ int file_profile = 0;   // the current profile in the preferences file
                    else
                       {
                         line_history_path = UTF8_string(HOME);
-                        line_history_path.append_ASCII(arg + 1);
+                        line_history_path << (arg + 1);
                       }
                  }
               else line_history_path = UTF8_string(arg);
@@ -1478,34 +1616,62 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               backup_before_save = yes;
             }
+         else if (!strcasecmp(opt, "plot-ASCII-rows"))
+            {
+              plot_ASCII_rows = atoi(arg);
+            }
+         else if (!strcasecmp(opt, "plot-ASCII-columns"))
+            {
+              plot_ASCII_columns = atoi(arg);
+            }
+         else if (!strcasecmp(opt, "plot-ASCII-background"))
+            {
+              plot_ASCII_background = strtol(arg, 0, 0);
+            }
          else if (!strcasecmp(opt, "KEYBOARD_LAYOUT_FILE"))
             {
               keyboard_layout_file = UTF8_string(arg);
             }
+         else if (!strcasecmp(opt, "NO-XMODMAP"))
+              {
+                no_xmodmap = true;
+              }
          else if (!strcasecmp(opt, "CONTROL-Ds-TO-EXIT"))
             {
               control_Ds_to_exit = atoi(arg);
             }
          else if (!strcasecmp(opt, "INITIAL-⎕PW"))
             {
-              if (initial_pw >= MIN_Quad_PW && initial_pw <= MAX_Quad_PW)
-                 initial_pw = atoi(arg);
+              initial_PW = atoi(arg);
+              if (initial_PW < MIN_Quad_PW || initial_PW > MAX_Quad_PW)
+                 {
+                   CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
+                        << endl;
+                   initial_PW_by_user = false;
+                   initial_PW = 80;
+                 }
               else
-                 CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
-                      << endl;
+                 {
+                   Workspace::set_PW(initial_PW, LOC);
+                   initial_PW_by_user = true;
+                 }
             }
-         else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "Multi-Line-Strings"))
             {
-              multi_line_strings = yes;
-              multi_line_strings_3 = yes;
+              old_multi_line_strings = yes;
+              new_multi_line_strings = yes;
             }
-         else if (!strcasecmp(opt, "NEW-MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "New-Multi-Line-Strings"))
             {
-              multi_line_strings_3 = yes;
+              new_multi_line_strings = yes;
             }
-         else if (!strcasecmp(opt, "OLD-MULTI-LINE-STRINGS"))
+         else if (!strcasecmp(opt, "Old-Multi-Line-Strings"))
             {
-              multi_line_strings = yes;
+              old_multi_line_strings = yes;
+            }
+         else if (!strcasecmp(opt, "Multi-Line-Literals"))
+            {
+              multi_line_literals = yes;
             }
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {
@@ -1660,6 +1826,7 @@ int line = 0;
             CERR << "Bad macro format in file " << filename
                  << " line " << line << endl;
        }
+   fclose(f);
 }
 //----------------------------------------------------------------------------
 void

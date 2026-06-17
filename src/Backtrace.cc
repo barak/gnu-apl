@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2024  Dr. Jürgen Sauermann,
+    Copyright © 2008-2025  Dr. Jürgen Sauermann,
     Copyright ©      2024  Paul Rockwell (Apple)
 
     This program is free software: you can redistribute it and/or modify
@@ -98,7 +98,7 @@ std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
 /// the difference between function main() in the result of backtrace_symbol()
 /// and the address of main() in the loaded program. Only valid after the
-/// line <main>: was processes in read_apl_lines_file().
+/// line main>: was processes in read_apl_lines_file().
 //
 static int64_t main_offset_0 = 0;
 
@@ -147,11 +147,10 @@ Backtrace::find_src(int64_t pc)
       {
         typedef Heapsort<Backtrace::PC_src> HS;
         if (const PC_src * posp = HS::search<const int64_t &>
-                                            (pc,                // key
-                                             pc_2_src.data(),   // array
-                                             pc_2_src.size(),   // array size
-                                             &pc_cmp,           // compare fun
-                                             0))                // compare arg
+                                            (pc,         // key
+                                             pc_2_src,   // array
+                                             &pc_cmp,    // compare fun
+                                             0))         // compare arg
         return posp->src_loc;   // found
       }
 
@@ -1390,18 +1389,20 @@ char ** strings = backtrace_symbols(buffer, size);
         return;
       }
 
-   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
+   for (int item = 1; item < size - 1; ++item)   // loop over stacktrace lines
        {
-         // make a copy si of strings[i] that show_item() can mess up.
-         // variable i is the number passed to show_item() and counts
-         // from oldest to latest, while 'strings' runs from latest to
-         // oldest. We want the lines to be displayed from oldest to latest.
-         //
-         const char * const_si = strings[size - i - 1];
-         char si[strlen(const_si) + 1];
-         strcpy(si, const_si);
-         si[sizeof(si) - 1] = 0;   // 0-terminate (just in case)
-         show_item(i - 1, si);
+         /* make a copy mutable_si of strings[item] which show_item() may mess
+            up.
+            variable item is the number passed to show_item() and counts
+            from oldest to latest, while 'strings' runs from latest to
+            oldest. We want the lines to be displayed from oldest to latest.
+          */
+         const char * const_si = strings[size - item - 1];
+         const size_t si_len =  strlen(const_si) + 1;
+         char * mutable_si = reinterpret_cast<char *>(alloca(si_len));
+         strcpy(mutable_si, const_si);
+         mutable_si[si_len - 1] = 0;   // 0-terminate mutable_si (just in case)
+         show_item(item - 1, mutable_si);
        }
 
    cerr << "========================================" << endl;
@@ -1432,7 +1433,7 @@ std::string tmp;
    tmp.reserve(result_max + 1);
    for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
        tmp += *b;
-   tmp.append(0);
+   tmp += char(0);
 
 char * e = 0;
 int status = 3;

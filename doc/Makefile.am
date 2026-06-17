@@ -28,13 +28,13 @@ uninstall-info-am:
 
 # apl.texi in HTML format
 #
-apl.html:   apl.texi
-	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
+apl.html:   apl.texi apl-info.css
+	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
 
 # apl.texi in info format
 #
 apl.info:   apl.texi
-	$(MAKEINFO) $< -o $@ --no-split || touch $@
+	@$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 # libapl.texi in HTML format
 #
@@ -47,14 +47,19 @@ libapl.info: libapl.texi
 	$(MAKEINFO) $< -o $@ --no-split || touch $@
 
 
-dist_doc_DATA =			\
-	apl.1			\
-	apl.texi		\
-	apl.info		\
-	apl.html		\
-	libapl.texi		\
-	libapl.info		\
-	PLOT_circle.png		\
-	PLOT_zigzag.png		\
+# NOTE that the .html version of aspl.text refers
+# to some of the files in dist_doc_DATA.
+#
+dist_doc_DATA =				\
+	apl.1					\
+	apl.texi				\
+	apl.info				\
+	apl-info.css			\
+	apl.html				\
+	libapl.texi				\
+	libapl.info				\
+	PLOT_circle.png			\
+	PLOT_zigzag.png			\
+    MX_distributions.png	\
 	libapl.html
 

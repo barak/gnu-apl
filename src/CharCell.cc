@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -125,31 +125,19 @@ Unicode uni = get_char_value();
 
    if (style == PR_APL_FUN)
       {
-        if (uni == UNI_SINGLE_QUOTE)
-           {
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(uni);
-             ucs.append(uni);
-             ucs.append(UNI_SINGLE_QUOTE);
-           }
-        else
-           {
-             ucs.append(UNI_SINGLE_QUOTE);
-             ucs.append(uni);
-             ucs.append(UNI_SINGLE_QUOTE);
-           }
+        ucs << UNI_SINGLE_QUOTE << uni;
+        if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' → ''
+        ucs << UNI_SINGLE_QUOTE;
       }
    else
       {
        if (style & PST_QUOTE_CHARS)
           {
-            ucs.append(UNI_SINGLE_QUOTE);
-            ucs.append(uni);
-            ucs.append(UNI_SINGLE_QUOTE);
+            ucs << UNI_SINGLE_QUOTE << uni << UNI_SINGLE_QUOTE;
           }
         else
           {
-            ucs.append(uni);
+            ucs << uni;
           }
       }
 

@@ -11,11 +11,11 @@
 ∇
 
       ⎕CR 'foo'
-foo;T                                                             
-'Vector Line 1'              ⍝ print value "Vector Line 1"        
-T←'Assigned Vector Line 2'   ⍝ print nothing (comitted value)     
-2 6⍴'MatrixLine 3'           ⍝ print 2 lines "Matrix" and "Line 3"
-T←2 6⍴'MatrixLine 4'         ⍝ print nothing (comitted value)     
+foo;T                                                              
+ 'Vector Line 1'              ⍝ print value "Vector Line 1"        
+ T←'Assigned Vector Line 2'   ⍝ print nothing (comitted value)     
+ 2 6⍴'MatrixLine 3'           ⍝ print 2 lines "Matrix" and "Line 3"
+ T←2 6⍴'MatrixLine 4'         ⍝ print nothing (comitted value)     
 
       foo
 Vector Line 1

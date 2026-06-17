@@ -65,7 +65,7 @@ int ret = SVE_NO_EVENTS;
             }
        }
 
-   return (Svar_event)ret;
+   return static_cast<Svar_event>(ret);
 }
 //-----------------------------------------------------------------------------
 SV_key
@@ -99,13 +99,13 @@ Svar_record * svar = find_var(key, LOC);
       {
         if (proc == svar->offering.id)
            {
-              svar->offering.events = (Svar_event)
-                                      (svar->offering.events | event);
+              svar->offering.events =
+                    static_cast<Svar_event>(svar->offering.events | event);
            }
         else if (proc == svar->accepting.id)
            {
-              svar->accepting.events = (Svar_event)
-                                       (svar->accepting.events | event);
+              svar->accepting.events =
+                    static_cast<Svar_event>(svar->accepting.events | event);
            }
       }
 }
@@ -139,8 +139,9 @@ Svar_DB_server::find_var(SV_key key, const char * loc) const
 
    for (size_t o = 0; o < offered_vars.size(); ++o)
        {
-         const Svar_record & svar = offered_vars[o];
-         if (key == svar.key)   return (Svar_record *)&svar;
+         Svar_record & svar = const_cast<Svar_record &>(offered_vars[o]);
+         if (key == svar.key)
+            return reinterpret_cast<Svar_record *>(&svar);
        }
 
    cerr << "*** key 0x" << hex << key << dec

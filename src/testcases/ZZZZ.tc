@@ -17,7 +17,7 @@ OK      - no duplicate parents
 CLEAR WS
       )HISTORY CLEAR
 "UCS strings:" (⎕FIO ¯13)
- UCS strings: 384 
+ UCS strings: 373 
 
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
           ⍝⍝                               ⍝⍝

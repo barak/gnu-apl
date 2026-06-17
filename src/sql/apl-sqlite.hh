@@ -35,7 +35,4 @@
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "Native_interface.hh"
 
-/// convert string \b str to the corresponding APL character vector.
-Value_P make_string_cell(const std::string & str, const char * loc);
-
 #endif

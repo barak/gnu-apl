@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -943,11 +943,11 @@ int int_fract = ucs.size();
 
    if (!is_near_real())
       {
-        ucs.append(UNI_J);
+        ucs << UNI_J;
         bool scaled_imag = pctx.get_scaled();  // may be changed by UCS_string()
         const UCS_string ucs_i(value.cval[1], scaled_imag, pctx);
 
-        ucs.append(ucs_i);
+        ucs << ucs_i;
 
         info.imag_len = ucs.size() - info.real_len;
         if (scaled_imag)   info.flags |= imag_has_E;

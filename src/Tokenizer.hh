@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ public:
      idx(src.idx + from),
      end(src.idx + from + to)
    {
-     if (end > src.str.size())   end = src.str.size();
+     if (end > src.str.ssize())   end = src.str.size();
      if (idx > end)   idx = end;
    }
 
@@ -93,6 +93,14 @@ public:
    /// skip \b count elements
    void skip(int count)
       { idx += count;   if (idx > end)   idx = end; }
+
+   /// return the underlying UCS_string
+   const UCS_string & data() const
+      { return str; }
+
+   /// return the current position
+   int get_pos() const
+      { return idx; }
 
 protected:
    /// the source string
@@ -158,6 +166,9 @@ public:
    /// tokenize a primitive (1-character) function
    static Token tokenize_function(Unicode uni);
 
+   /// tokenize a real number (integer or floating point).
+   static Int_or_Double tokenize_real(Unicode_source &src);
+
 protected:
    /// tokenize UCS string \b input into token string \b tos.
    void do_tokenize(const UCS_string & input, Token_string & tos,
@@ -183,9 +194,6 @@ protected:
 
    /// tokenize a hex number (integer).
    static Int_or_Double tokenize_hex(Unicode_source &src);
-
-   /// tokenize a real number (integer or floating point).
-   static Int_or_Double tokenize_real(Unicode_source &src);
 
    /// a locale-independent sscanf()
    static int scan_real(const char * strg, APL_Float & result, 

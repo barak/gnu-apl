@@ -22,8 +22,8 @@ static int display_mode = 1;
 //----------------------------------------------------------------------------
 // initialization...
 
-extern void init_1(const char * argv0, bool log_startup);
-extern void init_2(bool log_startup);
+extern void init_modules(const char * argv0, bool log_startup);
+extern void init_modules2(bool log_startup);
 
 void
 do_init()
@@ -35,7 +35,7 @@ const bool log_startup = false;
    UserPreferences::uprefs.system_do_svars = false;
    UserPreferences::uprefs.requested_id = 3000;
 
-   init_1("apl", log_startup);
+   init_modules("apl", log_startup);
 
    // /etc/gnu-apl.d/preferences or /usr/local/etc/gnu-apl.d/preferences
    UserPreferences::uprefs.read_config_file(true, log_startup);
@@ -43,7 +43,7 @@ const bool log_startup = false;
    // in $HOME/.config/gnu_apl/preferences
    UserPreferences::uprefs.read_config_file(false, log_startup);
 
-   init_2(log_startup);
+   init_modules2(log_startup);
 }
 
 inline void

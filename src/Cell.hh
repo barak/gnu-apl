@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -229,7 +229,7 @@ public:
    virtual bool is_example_field() const
       { return false; }
 
-   /// Return true iff this is a PointerCell which pouints to a member value
+   /// Return true iff this is a PointerCell which points to a member value.
    virtual bool is_member_anchor() const
       { return false; }
 
@@ -572,18 +572,6 @@ private:
 
    Cell & operator =(const Cell & other);
 };
-//----------------------------------------------------------------------------
-inline void
-Hswap(const Cell * & c1, const Cell * & c2)
-{
-const Cell * tmp = c1;   c1 = c2;   c2 = tmp;
-}
-//----------------------------------------------------------------------------
-inline void
-Hswap(Cell * & c1, Cell * & c2)
-{
-Cell * tmp = c1;   c1 = c2;   c2 = tmp;
-}
 //----------------------------------------------------------------------------
 
 typedef ErrorCode (Cell::*prim_f1)(Cell *) const;

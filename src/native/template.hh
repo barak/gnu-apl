@@ -360,7 +360,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs(UTF8_string("eval_fill_B() called"));
+UCS_string ucs(UTF8_string("eval_fill_AB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

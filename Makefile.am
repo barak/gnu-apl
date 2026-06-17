@@ -1,4 +1,6 @@
 
+# vim: et:ts=4:sw=4
+
 ACLOCAL_AMFLAGS = -I m4
 
 APL_DIRS	= workspaces wslib3 wslib4 wslib5
@@ -7,24 +9,30 @@ SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
 SUBDIRS		+= src support-files tools websock
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
-dist_doc_DATA = README					\
-		README-1-prerequisites			\
-		README-2-configure			\
-		README-3-keyboard			\
-		README-4-compliance			\
-		README-5-WINDOWS			\
-		README-6-porting			\
-		README-7-more-info			\
-		README-8-parallel			\
-		README-9-post-installation		\
-		README-10-python			\
+dist_doc_DATA = 							\
+		README								\
+		README-1-prerequisites				\
+		README-2-configure					\
+		README-3-keyboard					\
+		README-4-compliance					\
+		README-5-WINDOWS					\
+		README-6-porting					\
+		README-7-more-info					\
+		README-8-parallel					\
+		README-9-post-installation			\
+		README-10-python					\
 		README-11-bogus-compiler-warnings	\
-		README-12-vpath-builds			\
+		README-12-vpath-builds				\
 		README-13-build-pitfalls
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
-dist_noinst_DATA = Doxyfile Makefile.incl config.h
+dist_noinst_DATA =				\
+		Doxyfile				\
+		Makefile.incl			\
+		config.h				\
+		dynamic_lookup-11.patch	\
+		aclocal.patch
 
 include Makefile.incl
 

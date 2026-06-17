@@ -1,4 +1,7 @@
 
+!!! This document is outdated
+!!! See file HOWTOS/GNU-APL-Windows-11.html instead.
+
 You can run GNU APL on windows by means of CYGWIN:
 
 1. install CYGWIN (see http://www.cygwin.org)

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ public:
 
    /// move the mutable (!) \b src into \b this token. If \b src is an APL
    /// value, then it is properly cleared. and an event is added.
-   void move(Token & src, const char * loc)
+   void move_from(Token & src, const char * loc)
       {
          clear(loc);   // clear our Value_P
          copy_N(src);
@@ -134,6 +134,10 @@ public:
    Token(TokenTag tg, ErrorCode ec)
    : tag(tg) { Assert(tg == TOK_ERROR);   value.int_vals[0] = ec; }
 
+   /// Construct a token for a \b function \b axis
+   Token(TokenTag tg, sAxis fnum)
+   : tag(tg) { Assert(tg == TOK_FAXIS);   value.int_vals[0] = fnum; }
+
    /// Construct a token for a \b Symbol
    Token(TokenTag tg, Symbol * sp)
    : tag(tg) { Assert(get_ValueType() == TV_SYM);  value.sym_ptr = sp; }
@@ -165,7 +169,7 @@ public:
    Token(TokenTag tg, Value_P vp)
    : tag(tg)
    { Assert1(get_ValueType() == TV_VAL);
-     Assert(!!vp);   new (&value.apl_val) Value_P(vp); }
+     Assert(+vp);   new (&value.apl_val) Value_P(vp); }
 
    /// Construct a token for an index
    Token(TokenTag tg, IndexExpr & idx);
@@ -243,13 +247,41 @@ public:
    Function_Line get_fun_line() const
       { Assert(get_ValueType() == TV_LIN);   return value.fun_line; }
 
-   /// return true iff \b this token has no value
+   /// return \b true iff \b this token has no value
    bool is_void() const
-      { return (get_ValueType() == TV_NONE); }
+      { return get_ValueType() == TV_NONE; }
 
    /// return true iff \b this token is an apl value
    bool is_apl_val() const
-      { return (get_ValueType() == TV_VAL); }
+      { return get_ValueType() == TV_VAL; }
+
+   /// return \b true iff \b this token is a function (or operator)
+   bool is_function() const
+      { return get_ValueType() == TV_FUN; }
+
+   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   bool is_SLASH_or_BACKSLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_OPER1_SCAN ||
+               id == ID_OPER1_REDUCE1 || id == ID_OPER1_SCAN1;
+      }
+
+   /// return \b true iff \b this token is /, ⌿, ⊢, or ⍀
+   bool is_RHO_or_SLASH() const
+      {
+        const Id id = get_Id();   // use Id, not tag (which may change) !!!
+        return id == ID_OPER1_REDUCE  || id == ID_F12_RHO ||
+               id == ID_OPER1_REDUCE1;
+      }
+
+   /// return \b true iff \b this token is END or ENDL
+   bool is_ENDx() const
+      { return tag == TOK_END || tag == TOK_ENDL; }
+
+   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
+   bool is_COND() const
+      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
 
    /// return the Value_P value of this token. The token could be TOK_NO_VALUE;
    /// in that case VALUE_ERROR is thrown.
@@ -260,17 +292,12 @@ public:
    Value_P * get_apl_valp() const
       { if (is_apl_val())   return &value._apl_val();   VALUE_ERROR; }
 
-   /// clear this token, properly clearing Value token
+   /// clear this token, properly clearing its Value token (if any)
    void clear(const char * loc)
       {
          if (is_apl_val())   value.apl_val.reset();
          new (this) Token();
       }
-
-   /// return the axis specification of this token (expect non-zero axes)
-   Value_P get_nonzero_axes() const
-      { Assert1(!!value.apl_val && (get_tag() == TOK_AXIS));
-        return value._apl_val(); }
 
    /// return the axis specification of this token
    Value_P get_axes() const
@@ -284,21 +311,13 @@ public:
    IndexExpr & get_index_val() const
       { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
 
-   /// return b true iff \b this token is a function (or operator)
-   bool is_function() const
-      { return (get_ValueType() == TV_FUN); }
-
-   /// return \b true iff \b this token is END or ENDL
-   bool is_ENDx() const
-      { return tag == TOK_END || tag == TOK_ENDL; }
-
-   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
-   bool is_COND() const
-      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
-
    /// return the cFunction_P value of this token
    cFunction_P get_function() const
       { if (!is_function())   SYNTAX_ERROR;   return value.function; }
+
+   /// return the function axis specification of this token and check its
+   /// dimension. That is, throw AXIS error for [] anf for  [;...]
+   Value_P get_function_axis() const;
 
    /// return value usage counter
    int value_use_count() const;
@@ -343,7 +362,7 @@ public:
    inline void copy_N(const Token & src);
 
    /// return a brief token class name for debugging purposes
-   static const char * short_class_name(TokenClass cls);
+   static const char * short_class_name(TokenTag tag);
 
    /// the optional value of the token.
    union sval
@@ -364,7 +383,7 @@ public:
       };
 
    /// the name of \b tc
-   static const char * class_name(TokenClass tc);
+   static const char * class_name(TokenTag tag);
 
 protected:
    /// The tag indicating the type of \b this token
@@ -396,43 +415,9 @@ Token::copy_N(const Token & src)
         case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
         case TV_INDEX: value.index_val     = src.value.index_val;       break;
         case TV_FUN:   value.function      = src.value.function;        break;
-        default:       FIXME;
+        default:       Q1(src.get_ValueType());   FIXME;
       }
 }
-//----------------------------------------------------------------------------
-/// A sequence of Token
-class Token_string : public  std::vector<Token>
-{
-public:
-   /// construct an empty string
-   Token_string()   {}
-
-   /// make size() signed
-   ShapeItem size() const
-      { return ShapeItem(std::vector<Token>::size()); }
-
-   /// construct a string of \b len Token, starting at \b data.
-   Token_string(const Token * data, ShapeItem len)
-      { loop(l, len)   push_back(data[l]); }
-
-   /// construct a string of \b len Token from another token string
-   Token_string(const Token_string & other, uint32_t pos, uint32_t len)
-      { loop(l, len)   push_back(other[pos++]); }
-
-   /// reverse the token order from \b from to \b to (including)
-   void reverse_from_to(ShapeItem from, ShapeItem to);
-
-   /// replace the segment starting a \b pos with \b src. Return the new pos.
-   //
-   ShapeItem replace_segment(const Token_string & src, ShapeItem pos);
-
-   /// print this token string
-   void print(ostream & out, int details) const;
-
-private:
-   /// prevent accidental copying
-   Token_string & operator =(const Token_string & other);
-};
 //----------------------------------------------------------------------------
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location
@@ -507,5 +492,9 @@ protected:
    Function_PC pc;
 };
 //----------------------------------------------------------------------------
+/// complain about missing ioptional functions, libraries, and/or packages
+/// needed by ⎕XXX function qfun.
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
 
 #endif // __TOKEN_HH_DEFINED__

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -196,12 +196,12 @@ Quad_ARG::Quad_ARG()
 Value_P
 Quad_ARG::get_apl_value() const
 {
-const int argc = UserPreferences::uprefs.expanded_argv.size();
+const ShapeItem argc = UserPreferences::uprefs.expanded_args.size();
 
 Value_P Z(argc, LOC);
    loop(a, argc)
       {
-        const char * arg = UserPreferences::uprefs.expanded_argv[a];
+        const char * arg = UserPreferences::uprefs.expanded_args[a];
         UTF8_string utf(arg);
         UCS_string ucs(utf);
         Value_P sub(ucs, LOC);
@@ -702,8 +702,13 @@ Value_P Z(2, LOC);
 Quad_PW::Quad_PW()
    : SystemVariable(ID_Quad_PW)
 {
-   Symbol::assign(IntScalar(UserPreferences::uprefs.initial_pw, LOC),
-                  false, LOC);
+int pw = UserPreferences::uprefs.initial_PW;
+
+   // in cygwin it seems to be possible that ⎕PW is 0. Fix that here.
+   //
+   if (pw < MIN_Quad_PW || pw > MAX_Quad_PW)   pw = DEFAULT_Quad_PW;
+
+   Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
 //----------------------------------------------------------------------------
 void
@@ -750,7 +755,7 @@ UCS_string line;
    line.remove_leading_and_trailing_whitespaces();
 
 Token tok_exec(Bif_F1_EXECUTE::execute_statement(line));
-   token.move(tok_exec, LOC);
+   token.move_from(tok_exec, LOC);
 }
 //============================================================================
 Quad_QUOTE::Quad_QUOTE()
@@ -805,7 +810,7 @@ PrintBuffer pb(*B, pctx, /* print directly to COUT*/ 0);
    else if (pb.get_row_count() > 0)   // one line output
       {
         COUT << pb.l1().no_pad() << flush;
-        buffer.append(pb.l1());
+        buffer << pb.l1();
       }
    else                               // empty output
       {
@@ -839,7 +844,7 @@ UCS_string line;
                       LineHistory::quote_quad_history);
    done(false, LOC);   // in case InputMux::get_line() has not called it
 
-   if (interrupt_is_raised())   INTERRUPT
+   if (InterruptContext::interrupt_is_raised())   INTERRUPT
 
    if (Workspace::get_PR().size() > 0)   // valid prompt replacement char
       {
@@ -848,8 +853,8 @@ UCS_string line;
         // leave the characters after the first changed one unchanged.
         loop(i, line.size())
            {
-             if (i >= old_buffer.size())     break;   // end of prompt
-             if (old_buffer[i] != line[i])   break;   // changed prompt[i]
+             if (i >= old_buffer.ssize())     break;   // end of prompt
+             if (old_buffer[i] != line[i])    break;   // changed prompt[i]
              line[i] = qpr;          // unchanged prompt[i]: replace with qpr
            }
       }
@@ -922,13 +927,12 @@ Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
 {
    //  must be an array index of the form [something; 2]
    //
-   if (IDX.get_rank() != 2)   INDEX_ERROR;
+   if (IDX.get_rank() != 2)   RANK_ERROR;
 
    // The only point of getting X2 is to check that it is not elided
    // but quasi-scalar qio + 1
    //
 const Value * X2 = IDX.get_axis_value(1);
-
 const APL_Integer qio = Workspace::get_IO();
 
    if (!X2)                                          INDEX_ERROR;
@@ -936,9 +940,20 @@ const APL_Integer qio = Workspace::get_IO();
    if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
    if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
 
-const Value * X1 = IDX.get_axis_value(0);
-
-   assign_indexed(X1, B);
+   if (const Value * X1 = IDX.get_axis_value(0))   // normal index
+      {
+        assign_indexed(X1, B);
+      }
+   else                                            // elided index: ⎕SYL[;2]←B
+      {
+        Value_P E1(SYL_MAX, LOC);
+        loop(col, E1->element_count())
+            {
+              E1->next_ravel_Int(col + qio);
+            }
+        E1->check_value(LOC);
+        assign_indexed(E1.get(), B);
+      }
 }
 //----------------------------------------------------------------------------
 void

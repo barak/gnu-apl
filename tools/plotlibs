@@ -1,0 +1,66 @@
+#!/bin/bash
+
+X11=$(grep X11 ../config.h | grep '#define' \
+                           | grep -v XCB    \
+                           | awk '{ printf(" %s", $2); }')
+
+XCB=$(grep XCB ../config.h | grep '#define' \
+                           | awk '{ printf(" %s", $2); }')
+GTK="HAVE_LIBGTK_3 HAVE_LIBCAIRO"
+
+print_libs()
+{
+  local missing=""
+  echo "
+// $1"
+  for have in $2; do
+    if [ "${have:0:4}" = "apl_" ]; then continue; fi
+
+    what="${have:5}"
+    missing="$missing MISSING_$what "
+    case $what in
+    LIBXCB)         file="libX11-xcb.so"   ;;
+    LIBX11)         file="libX11.so"       ;;
+    LIBX11_XCB)     file="libX11-xcb.so"   ;;
+    LIBGTK_3)       file="libgtk-3.so"     ;;
+    LIBGDK_3)       file="libgdk-3.so"     ;;
+    LIBCAIRO)       file="libcairo.so"     ;;
+
+    XCB_XCB_H)      file="xcb/xcb.h"       ;;
+    X11_XLIB_H)    file="X11/Xlib.h"     ;;
+    X11_XLIB_XCB_H) file="X11/Xlib-xcb.h"  ;;
+    X11_XUTIL_H)    file="X11/Xutil.h"     ;;
+    *)   file="??? $what ???"
+    esac
+  echo -n "
+#if $have
+# define MISSING_$what \"\"
+#else   // not $have
+# define MISSING_$what \" $file\"
+#endif   // (don't) $have
+"
+  done
+  echo -n "
+// $1 summary
+"
+
+echo -n "#define MISSING_$1"
+
+for what in $missing; do
+   echo  " \\"
+   echo -n "    $what"
+done
+echo
+}
+
+print_libs X11 "$X11"
+print_libs XCB "$XCB"
+print_libs GTK "$GTK"
+
+echo "
+configure.ac:
+
+X11 $X11
+XCB $XCB
+GTK $GTK
+"

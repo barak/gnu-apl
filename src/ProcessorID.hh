@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ struct ProcAuth
    AP_num3 id;
 
    /// the allowed remote processors
-   std::basic_string<int> rsvopid;   // left arg of remote ⎕SVO and ⎕SVQ
+   std::vector<int> rsvopid;   // left arg of remote ⎕SVO and ⎕SVQ
 };
 
 /// A network profile

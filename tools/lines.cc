@@ -15,7 +15,7 @@ int UCS = 0;
    else if ((b0 & 0xF0) == 0xE0)   UCS = b0 & 0x0F;
    else if ((b0 & 0xF8) == 0xF0)   UCS = b0 & 0x0E;
  
-   while (*utf & 0x80)   UCS = UCS << 6 | *utf++ & 0x3F;
+   while (*utf & 0x80)   UCS = (UCS << 6) | (*utf++ & 0x3F);
 
    return printf(" U+%4.4X =", UCS);
 }

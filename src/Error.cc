@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -194,13 +194,13 @@ Error::get_error_line_3() const
    if (left_caret < 0)   return UCS_string();             // no ^ position
 
 UCS_string ret;
-   if (left_caret > 0)   ret.append(UCS_string(left_caret, UNI_SPACE));
-   ret.append(UNI_CIRCUMFLEX);
+   if (left_caret > 0)   ret << UCS_string(left_caret, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
 
 const int diff = right_caret - left_caret;
    if (diff <= 0)   return ret;
-   if (diff > 1)   ret.append(UCS_string(diff - 1, UNI_SPACE));
-   ret.append(UNI_CIRCUMFLEX);
+   if (diff > 1)   ret << UCS_string(diff - 1, UNI_SPACE);
+   ret << UNI_CIRCUMFLEX;
 
    return ret;
 }
@@ -240,7 +240,7 @@ StateIndicator * si = Workspace::SI_top();   // the current )SI entry
 
    Log(LOG_verbose_error)
       {
-        if (!(si && si->get_safe_execution_count()))   BACKTRACE
+        if (!(si && si->get_safe_execution_depth()))   BACKTRACE
       }
 
    // maybe map error to DOMAIN ERROR.
@@ -262,12 +262,18 @@ void
 Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
    Log(LOG_error_throw)
-      CERR << endl
-           << "throwing " << Error::error_name(code) << " at " << loc << endl;
+      {
+        CERR << "\nthrowing " << Error::error_name(code)
+             << " at " << loc << endl;
+      }
 
    Log(LOG_verbose_error)   BACKTRACE
 
-   MORE_ERROR() << Error::error_name(code);
+   // set )MORE error (unless the caller has done so)
+   if (Workspace::more_error().size() == 0)   // no )MORE info yet
+      {
+        MORE_ERROR() << Error::error_name(code);
+      }
 
 Error error(code, loc);
    error.parser_loc = par_loc;
@@ -289,9 +295,13 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
         CERR << endl;
       }
 
-   if (Workspace::more_error().size() == 0)   // no )MORE info provided
+   if (Workspace::more_error().size() == 0 &&   // no )MORE info provided, and
+       Workspace::SI_top()->get_safe_execution_depth() == 0)   // and not in ⎕ES
       {
-        MORE_ERROR() << "Offending symbol: " << sym_name;
+        char extra[20] = { 0 };
+        if (sym_name.size() == 1 && sym_name[0] >= 0x80)
+           SPRINTF(extra, " (U+%4.4X)", sym_name[0]);
+        MORE_ERROR() << "Offending symbol: " << sym_name << extra;
       }
 
    Log(LOG_verbose_error)     BACKTRACE
@@ -381,9 +391,8 @@ Error::update_error_info(StateIndicator * si)
            }
 
         UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
-        ucs.append(UNI_SPACE);
-        ucs.append(UNI_SPACE);
-        UTF8_string utf(ucs);
+        ucs << UNI_SPACE << UNI_SPACE;
+        const UTF8_string utf(ucs);
         set_error_line_2(utf.c_str());
         set_left_caret(ucs.size());
       }
@@ -405,7 +414,7 @@ out:
    // )SI entries below a ⎕ES entry must not print anything but simply return
    for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
        {
-         if (si1->get_safe_execution_count()) return;
+         if (si1->get_safe_execution_depth()) return;
        }
 
    print_em(UERR, LOC);

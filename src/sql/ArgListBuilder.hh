@@ -26,15 +26,16 @@
 
 #include "apl-sqlite.hh"
 
-class ArgListBuilder {
+class ArgListBuilder
+{
 public:
     virtual ~ArgListBuilder() {}
-    virtual void append_string( const string &arg, int pos ) = 0;
-    virtual void append_long( long arg, int pos ) = 0;
-    virtual void append_double( double arg, int pos ) = 0;
-    virtual void append_null( int pos ) = 0;
-    virtual Value_P run_query( bool ignore_result ) = 0;
-    virtual void clear_args( void ) = 0;
+    virtual void append_string(const string &arg, int pos) = 0;
+    virtual void append_long(long arg, int pos)            = 0;
+    virtual void append_double(double arg, int pos)        = 0;
+    virtual void append_null(int pos)                      = 0;
+    virtual Value_P run_query()                            = 0;
+    virtual void clear_args()                              = 0;
 };
 
 #endif

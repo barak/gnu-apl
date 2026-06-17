@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,13 +65,30 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
              if (!InputFile::current_file()->file)   break;   // no more files
            }
 
-        // At this point current_file and current_file->file are valid
-        // read a line with CR and LF removed.
+        // At this point current_file and current_file->file are valid.
+        // Read a line with CR and LF removed.
         //
         eof = false;
         read_file_line(line, eof);
         if (eof)   // end of file reached: do some global checks
            {
+             if (Command::inside_multi())
+             {
+                  CERR << "\n*** WARNING: Multiline string not closed "
+                          "at the end of a file.\n";
+                  if (InputFile::current_file())
+                     {
+                       CERR << "*** File: "
+                            << InputFile::current_file()->filename;
+                       if (const int start = Command::get_multiline_start() + 1)
+                          {
+                            CERR << " (the string starts near line "
+                                 << start << ")";
+                          }
+                       CERR << ".\n";
+                     }
+                }
+
              if (InputFile::current_file()->with_LX == do_LX)
                 {
                   InputFile::current_file()->with_LX = no_LX;
@@ -103,7 +120,8 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         if ((test_mode == TM_EXIT_AFTER_LAST_FILE) ||
             (test_mode == TM_EXIT_AFTER_LAST_FILE_IF_OK && !error_count()))
           {
-            CERR << "Exiting (test_mode " << test_mode << ")" << endl;
+            CERR << "Exiting (test_mode " << test_mode << ") : "
+                 << total_errors << " errors" << endl;
             cleanup(true);
             if (total_errors)   Command::cmd_OFF(1);
             else                Command::cmd_OFF(0);
@@ -145,10 +163,11 @@ InputFile * input = InputFile::current_file();
                   if (file_line.size() == 0)   continue;   // line with tag(s)
                  }
 
-              if (input->has_object_filter())
+              if (input->copy_filter.has_object_filter())
                  {
-                    const bool allowed = input->check_filter(file_line);
-                    if (!allowed)
+                    const bool line_allowed =
+                          input->copy_filter.check_filter(file_line);
+                    if (!line_allowed)
                        {
                          file_line.clear();
                          continue;
@@ -269,6 +288,7 @@ IO_Files::end_of_current_file()
 
         // print seconds if nonzero, else blanks
         //
+        summary << "  ";
         if (duration >= 1000000)     // ≥ 1 second
            {
              // sss.mmm
@@ -281,7 +301,8 @@ IO_Files::end_of_current_file()
              // mmm.uuu
              //
              summary << setw(3) << duration_msec << "."
-                     << setfill('0') << setw(3) << duration_usec << " ms ";
+                     << setfill('0') << setw(3) << duration_usec
+                     << setfill(' ') << " ms ";
            }
         else
            {
@@ -289,7 +310,7 @@ IO_Files::end_of_current_file()
              //
              summary << "    " << setw(3) << duration_usec << " μs ";
            }
-        summary << setfill(' ');   // restore fill
+        summary << setfill(' ') << " ";
 
         if (error_count())
            {
@@ -392,7 +413,7 @@ IO_Files::open_next_file()
                    {
                      summary_path = UTF8_string(utf8P(log_file_name),
                                                 slash + 1 - log_file_name);
-                     summary_path.append_ASCII("summary.log");
+                     summary_path << "summary.log";
                    }
 
                 CERR << "  #######################################"

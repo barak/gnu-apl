@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,8 +39,10 @@ Quad_FX  Quad_FX::fun;
 Token
 Quad_FX::do_eval_B(const Value * B)
 {
-static const int eprops[] = { 0, 0, 0, 0 };
-   return do_quad_FX(eprops, B, UTF8_string("⎕FX"), false);
+   // monadic ⎕FX is simply dyadic A ⎕FX with default execution properties A
+   //
+static const int default_eprops[] = { 0, 0, 0, 0 };
+   return do_quad_FX(default_eprops, B, UTF8_string("⎕FX"), false);
 }
 //----------------------------------------------------------------------------
 Token
@@ -128,7 +130,7 @@ Quad_FX::do_quad_FX(const int * exec_props, const Value * B,
 
 UCS_string text;
 
-   // ⎕FX accepts two kinds of B argments:
+   // ⎕FX accepts two kinds of arguments B:
    //
    // 1. A vector whose elements are the (nested) lines of the function, or
    // 2. A character matrix whose rows are the lines of the function.
@@ -136,6 +138,7 @@ UCS_string text;
    // we convert each format into text, which is a UCS string with
    // lines separated by ASCII_LF.
    //
+const bool keep_indent = !UserPreferences::uprefs.discard_indentation;
    if (B->compute_depth() >= 2)   // case 1: vector of simple character vectors
       {
         const ShapeItem rows = B->element_count();
@@ -144,13 +147,17 @@ UCS_string text;
              const Cell & cell = B->get_cravel(row);
              if (cell.is_character_cell())   /// a line with a single char.
                 {
+                  // rare special case: single char. This can only occur if
+                  // the user is using single APL quotes like 'a' (as opposed
+                  // to double quotes like "a".
+                  //
                   const Unicode uni = cell.get_char_value();
-                  if (uni > UNI_SPACE)   text.append(uni);
-                  text.append(UNI_LF);
+                  if (uni > UNI_SPACE || keep_indent)   text << uni;
+                  text << UNI_LF;
                   continue;
                 }
 
-             // row has more than 1 chatacter, so it must be nested
+             // row has more than 1 character, so it must be nested
              if (!cell.is_pointer_cell())
                 {
                   MORE_ERROR() << "⎕FX: Function line " << row
@@ -168,33 +175,33 @@ UCS_string text;
 
              if (line->is_char_vector())
                 {
+                  // this is the normal case. line is an APL string.
+                  //
                   const ShapeItem line_len = line->element_count();
                   bool skipping = false;
                   loop(l, line_len)
                      {
-                       const Cell & c = line->get_cravel(l);
-                       if (!c.is_character_cell())
+                       const Cell & cell = line->get_cravel(l);
+                       if (!cell.is_character_cell())
                           {
                             MORE_ERROR() << "non-char in line at " LOC;
                             DOMAIN_ERROR;
                           }
 
-                       const Unicode uni = c.get_char_value();
+                       const Unicode uni = cell.get_char_value();
                        if (l == 0 || skipping)
-                          skipping = (uni <= UNI_SPACE);
-                       if (!skipping)   text.append(uni);
+                          skipping = (uni <= UNI_SPACE && !keep_indent);
+                       if (!skipping)   text << uni;
                      }
                 }
              else if (line->is_scalar())
                 {
-                  const Cell & c1 = line->get_cfirst();
-                  if (!c1.is_character_cell())
-                     {
-                       MORE_ERROR() << "non-char in line at " LOC;
-                       DOMAIN_ERROR;
-                     }
-                  const Unicode uni = c1.get_char_value();
-                  if (uni > UNI_SPACE)   text.append(uni);
+                  // this should not happen because line is a nested simple
+                  // character scalar.
+                  //
+                  MORE_ERROR() << "Internal error: nested character scalar "
+                               << *line << " at " LOC;
+                  FIXME;
                 }
              else
                 {
@@ -203,7 +210,7 @@ UCS_string text;
                   DOMAIN_ERROR;
                 }
 
-             text.append(UNI_LF);
+             text << UNI_LF;
            }
       }
    else                      // case 2: simple character matrix
@@ -219,10 +226,10 @@ UCS_string text;
                  {
                    const Unicode uni = cB++->get_char_value();
                    if (col == 0 || skipping)
-                      skipping = (uni <= UNI_SPACE);
-                   if (!skipping)   text.append(uni);
+                      skipping = (uni <= UNI_SPACE && !keep_indent);
+                   if (!skipping)   text << uni;
                  }
-             text.append(UNI_LF);
+             text << UNI_LF;
            }
       }
 
@@ -234,14 +241,19 @@ Quad_FX::do_quad_FX(const int * exec_props, const UCS_string & text,
                     const UTF8_string & creator, bool tolerant)
 {
 int error_line = 0;
-UserFunction * fun = UserFunction::fix(text, error_line, false, LOC, creator,
-                                       tolerant);
-   if (fun == 0)
+UserFunction * fun = UserFunction::fix(text, error_line, false, LOC,
+                                       creator, tolerant);
+
+   if (fun == 0)   // UserFunction::fix() dailed
       {
-        Value_P Z(LOC);
-        Z->next_ravel_Int(error_line + Workspace::get_IO());
-        Z->check_value(LOC);
+        Value_P Z = IntScalar(error_line + Workspace::get_IO(), LOC);
         return Token(TOK_APL_VALUE1, Z);
+      }
+
+   if (text[0] == UNI_LAMBDA)
+      {
+        const char * creator = "⎕FX";
+        fun->increment_refcount(LOC, creator);
       }
 
    fun->set_exec_properties(exec_props);

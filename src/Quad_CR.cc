@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 /** @file
 */
 
+#include <sys/time.h>
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "CDR.hh"
 #include "Macro.hh"
@@ -28,133 +30,98 @@
 #include "Quad_CR.hh"
 #include "Symbol.hh"
 #include "Tokenizer.hh"
+#include "UCS_string.hh"
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
-Quad_CR::_sub_fun Quad_CR::sub_functions[] =
+const FunctionGroup::function_info Quad_CR::subfunction_infos[] =
 {
-#define crdef(N, name)   { N, #name },
+#define crdef(N, name, comm_2)   { N, #name, "", comm_2, -1 },
 #include "Quad_CR.def"
 };
 //----------------------------------------------------------------------------
-int
-Quad_CR::fun_compare(const void * key, const void * sf)
+Quad_CR::Quad_CR()
+ : QuadFunction(TOK_Quad_CR)
 {
-   return strcasecmp(reinterpret_cast<const char *>(key),
-                     reinterpret_cast<const _sub_fun *>(sf)->key);
+   // note: ⎕CR is instantiated twice, once for the static Quad_CR::fun,
+   // and once in Workspace::Workspace() fotr macro support
+   //
+enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
+   init_function_group(subfunction_infos, count, "⎕CR");
 }
 //----------------------------------------------------------------------------
-Token
-Quad_CR::list_functions(ostream & out, bool mapping)
+const char *
+Quad_CR::get_legend(FunctionGroup::Legend_type lt) const
 {
-   if (mapping)
+   switch(lt)
       {
-         out <<
-"      With a small performance penalty, ⎕CR also accepts the following "
-"strings\n      instead of function numbers as left argument:\n\n";
+        default: return "";
 
-         loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
-             {
-               const int N = sub_functions[f].val;
-               char NN[10];   SPRINTF(NN, "%2d", N);
-               const char * name = sub_functions[f].key;
-               out << "      " << NN << " ⎕CR  ←→"
-                   << UCS_string(24 - strlen(name), UNI_SPACE)
-                   << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
-             }
+        case LET_FUN_PREFIX: return
+"   ┌─── Legend:───────────────────────────────────────────────────┐\n"
+"   │    b - byte vector (vector of integers between -128 and 255) │\n"
+"   │    h - hex string (characters 0-9 or A-F resp. a-f)          │\n"
+"   │    i - integer vector                                        │\n"
+"   │    l - string of (\\n-terminated) lines                       │\n"
+"   │    m - character matrix                                      │\n"
+"   │    n - nested vector of strings                              │\n"
+"   │    r - base64 string according to RFC 4648                   │\n"
+"   │    s - string                                                │\n"
+"   │    t - token                                                 │\n"
+"   │    v - T,V (integer tag T and byte vector V)                 │\n"
+"   └──────────────────────────────────────────────────────────────┘\n"
+"\n";
 
-         out << "\n      For a more detailed description of all functions:\n\n"
-                "      ⎕CR ⍬" << endl;
+   case LET_MAP_SUFFIX: return
+"\n"
+"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M.\n";
       }
-   else
-      {
-   out <<
-"   Functions provided by A ⎕CR B...\n"
-"\n"
-"   Legend: b - byte vector (vector of integers between -128 and 255)\n"
-"           h - hex string (characters 0-9 or A-F resp. a-f)\n"
-"           i - integer vector\n"
-"           l - string of (\\n-terminated) lines\n"
-"           m - character matrix\n"
-"           n - nested vector of strings\n"
-"           r - base64 string according to RFC 4648\n"
-"           s - string\n"
-"           t - token\n"
-"           v - T,V (integer tag T and byte vector V)\n"
-"\n"
-"   Zm ←  0 ⎕CR B     Zm is B in APL output format\n"
-"   Zs ←  1 ⎕CR B     Zs is B in APL input format\n"
-"   Zm ←  2 ⎕CR B     Zm is B boxed using ASCII characters\n"
-"   Zm ←  3 ⎕CR B     Zm is B boxed using line-drawing characters\n"
-"   Zm ←  4 ⎕CR B     3 ⎕CR B + extra frame\n"
-"   Zs ←  5 ⎕CR Bb    Zs is Bb in (uppercase) HEX\n"
-"   Zs ←  6 ⎕CR Bb    Zs is Bb in (lowercase) hex\n"
-"   Zm ←  7 ⎕CR B     like 3 ⎕CR B with thin lines\n"
-"   Zm ←  8 ⎕CR B     like 4 ⎕CR B with thin lines\n"
-"   Zm ←  9 ⎕CR B     like 4 ⎕CR B with double-line outer frame\n"
-"   Zs ← 10 ⎕CR Bs    Zs is an APL expression producing variable(-name) Bs\n"
-"   Zs ← 11 ⎕CR B     value B → CDR (Common Data Representation) string Zs\n"
-"   Z  ← 12 ⎕CR Bs    CDR string Bs → value Z\n"
-"   Zb ← 13 ⎕CR Bh    hex string Bh → byte vector Z\n"
-"   Zh ← 14 ⎕CR B     Zs is 6 ⎕CR 11 ⎕CR B (Value → CDR → HEX)\n"
-"   Z  ← 15 ⎕CR Bh    Z is 11 ⎕CR 6 ⎕CR B (HEX → CDR → Value)\n"
-"   Zr ← 16 ⎕CR Bs    string Bs → base64 string Z (RFC 4648)\n"
-"   Zs ← 17 ⎕CR Br    base64 string Br → string Zs (RFC 4648)\n"
-"   Zb ← 18 ⎕CR Bs    UCS string Bs → UTF8 encoded byte vector Zb (⍴Z ≥ ⍴B)\n"
-"   Zs ← 19 ⎕CR Bb    UTF8 encoded byte vector Bb → UCS string Zs (⍴Z ≤ ⍴B)\n"
-"   Zm ← 20 ⎕CR B     4 ⎕CR B, but in NARS style (length instead of ↓ or →)\n"
-"   Zm ← 21 ⎕CR B     20 ⎕CR B but using thin lines\n"
-"   Zm ← 22 ⎕CR B     20 ⎕CR B with double-line outer frame\n"
-"   Zm ← 23 ⎕CR B     20 ⎕CR B with thick lines + extra frame\n"
-"   Zm ← 24 ⎕CR B     20 ⎕CR B using thin lines + extra frame\n"
-"   Zm ← 25 ⎕CR B     20 ⎕CR B with double-line extra frame\n"
-"   Zi ← 26 ⎕CR B     Zi is the cell types of corresponding items in B\n"
-"   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integers\n"
-"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as integers\n"
-"   Zm ← 29 ⎕CR B     4 ⎕CR B with strings being quoted + extra frame\n"
-"   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
-"   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
-"   Zn ← 32 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
-"   Zb ← 33 ⎕CR Bv    Zb is a TLV with Tag ↑Bv and Value 1↓Bv\n"
-"   Zv ← 34 ⎕CR Bb    TLV Bb to Tag ↑Z and Value 1↓Z\n"
-"   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
-"   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
-"   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
-"   Z  ← 38 ⎕CR Bi    empty structured variable with capacity Bi\n"
-"   Z  ← 39 ⎕CR Bi    structured variable capacity Bi\n"
-"   Zi ← 40 ⎕CR Bi    pack boolean Bi (experimental, don't use!)\n"
-"   Zi ← 41 ⎕CR Bi    unpack boolean Bi (experimental, don't use!)\n"
-"   Zt ← 42 ⎕CR Bs    tokenize APL statement(s) Bs\n"
-"   Zt ← 43 ⎕CR Bs    parse APL statement(s) Bs\n"
-"   Zs ← 44 ⎕CR Bt    decode token(s) or token tag(s) Bt\n"
-"\n"
-"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
-      }
-  return Token(TOK_APL_VALUE1, Str0(LOC));
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::print_fun_syntax(ostream & out,
+                          const function_info & info) const
+{
+   out << "    " << info.comment_fun << endl;
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::print_map_syntax(ostream & out,
+                          const function_info & info) const
+{
+char NN[10];   SPRINTF(NN, "%2d", int(info.axis));
+const char * name = info.function_name;
+   out << "      " << NN << " ⎕CR  ←→"
+       << UCS_string(24 - strlen(name), UNI_SPACE)
+       << "'" << name << "' ⎕CR  ←→  ⎕CR." << name << endl;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_CR::eval_B(Value_P B) const
 {
-   if (B->element_count() == 0)   // ⎕CR '' : print help
+   if (B->element_count())                    // the normal case
       {
-        if (B->get_cfirst().is_character_cell())
-           return list_functions(CERR, true);
-        if (B->get_cfirst().is_integer_cell())
-           return list_functions(CERR, false);
+        const bool discard = UserPreferences::uprefs.discard_indentation;
+        return do_eval_B(B.get(), discard);
       }
 
-   return do_eval_B(B.get(), true);
+   if (B->get_cfirst().is_character_cell())   // ⎕CR ''
+      {
+        return list_functions(CERR);
+      }
+
+   if (B->get_cfirst().is_integer_cell())     // ⎕CR ⍬
+      {
+        return list_mappings(CERR);
+      }
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_CR::do_eval_B(const Value * B, bool remove_extra_spaces)
 {
 UCS_string symbol_name(*B);
-
-   // remove trailing whitespaces in B
-   //
-   while (symbol_name.back() <= ' ')   symbol_name.pop_back();
+   symbol_name.remove_trailing_whitespaces();
 
    /*  return an empty character matrix,     if:
     *  1) symbol_name is not known,          or
@@ -178,9 +145,8 @@ const Function * function = 0;
                    break;
                  }
             }
-
       }
-   else   // maybe user defined function
+   else   // maybe defined function
       {
         const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
         if (obj && obj->is_user_defined())
@@ -202,7 +168,7 @@ int max_len = 0;
         if (remove_extra_spaces)
            tlines[row].remove_leading_and_trailing_whitespaces();
 
-        if (max_len < tlines[row].size())   max_len = tlines[row].size();
+        if (max_len < tlines[row].ssize())   max_len = tlines[row].ssize();
       }
 
 Shape shape_Z;
@@ -224,50 +190,19 @@ Value_P Z(shape_Z, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 //----------------------------------------------------------------------------
-sAxis
-Quad_CR::subfun_to_axis(const UCS_string & name) const
-{
-UTF8_string name_utf(name);
-const char * function_name = name_utf.c_str();
-
-  enum { SF_SIZE = sizeof(_sub_fun),
-         SF_COUNT = sizeof(sub_functions)  / SF_SIZE };
-
- if (const void * vp = bsearch(function_name, sub_functions,
-                                SF_COUNT, SF_SIZE, fun_compare))
-      return reinterpret_cast<const _sub_fun *>(vp)->val;
-
-  return -1;    // not found
-
-}
-//----------------------------------------------------------------------------
 Token
 Quad_CR::eval_AB(Value_P A, Value_P B) const
 {
-int function_number = -1;
+const sAxis subfunction = value_to_subfun(*A);
 
-   if (A->get_rank() > 1)                    RANK_ERROR;
-   if (A->is_char_array())   // function name, e.g. "APL_expression"
+   if (subfunction == 45)   // filter (= return B)
       {
-        UCS_string ucs_A(*A);
-        UTF8_string utf_A(ucs_A);
-        function_number = subfun_to_axis(UTF8_string(utf_A.c_str()));
-        if (function_number == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_A << "')";
-             DOMAIN_ERROR;
-           }
-      }
-   else
-      {
-        if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
-        function_number = A->get_cfirst().get_int_value();
+        do_CR45(B.get());
+        return Token(TOK_APL_VALUE1, B);
       }
 
 PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-
-Value_P Z = do_CR(function_number, B.get(), pctx);
+Value_P Z = do_CR(subfunction, B.get(), pctx);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -303,6 +238,7 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
                  DOMAIN_ERROR;
       }
 
+// extra_frame draws an extra frame (even if B is not nested).
 bool extra_frame = false;
    switch(a)
       {
@@ -311,7 +247,9 @@ bool extra_frame = false;
         case 23:
         case 24:
         case 25:
-        case 29: extra_frame = true;
+        case 29:
+        case 46:
+        case 47: extra_frame = true;
 
       }
 
@@ -323,13 +261,13 @@ bool extra_frame = false;
 
         case  0: FRAME(PR_APL)
         case  1: FRAME(PR_APL_FUN)
-        case  2: FRAME(PR_BOXED_CHAR)
+        case  2: FRAME(PR_BOXED_CHAR)           // fraed with ASCII chars
         case  3: FRAME(PR_BOXED_GRAPHIC)
-        case  4: FRAME(PR_BOXED_GRAPHIC)
+        case  4: FRAME(PR_BOXED_GRAPHIC)       // with extra frame
         case  5:                               // byte-vector → HEX
         case  6: return do_CR5_6(a, B);        // byte-vector → hex
         case  7: FRAME(PR_BOXED_GRAPHIC1)
-        case  8: FRAME(PR_BOXED_GRAPHIC1)
+        case  8: FRAME(PR_BOXED_GRAPHIC1)       // with extra frame
         case  9: FRAME(PR_BOXED_GRAPHIC2)
         case 10: return do_CR10(B);
         case 11: return do_CR11(B);            // Value → CDR conversion
@@ -344,13 +282,13 @@ bool extra_frame = false;
         case 20: FRAME(PR_NARS)
         case 21: FRAME(PR_NARS1)
         case 22: FRAME(PR_NARS2)
-        case 23: FRAME(PR_NARS)
-        case 24: FRAME(PR_NARS1)
-        case 25: FRAME(PR_NARS2)
+        case 23: FRAME(PR_NARS)                // with extra frame
+        case 24: FRAME(PR_NARS1)               // with extra frame
+        case 25: FRAME(PR_NARS2)               // with extra frame
         case 26: return do_CR26(B);            // Cell types
         case 27:                               // value as int
         case 28: return do_CR27_28(a, B);      // value2 as int
-        case 29: FRAME(PR_BOXED_GRAPHIC3)
+        case 29: FRAME(PR_BOXED_GRAPHIC3)      // with extra frame
         case 30: return do_CR30(B);            // conform B (for ⍤ macro)
         case 31:                               // ⎕INP helper
         case 32: return do_CR31_32(a, B);      // ⎕INP helper
@@ -365,7 +303,9 @@ bool extra_frame = false;
         case 41: return do_CR41(B);            // packed → boolean
         case 42: return do_CR42_43(B, false);  // tokenize B
         case 43: return do_CR42_43(B, true);   // parse B
-        case 44: return do_CR44(B);            // decode token ir tags
+        case 44: return do_CR44(B);            // decode token tags
+        case 46: FRAME(PR_BOXED_GRAPHIC4)
+        case 47: FRAME(PR_BOXED_GRAPHIC5)
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
@@ -424,8 +364,10 @@ const Cell * cB = &B->get_cfirst();
 Value_P
 Quad_CR::do_CR10(const Value * B)
 {
-   // cannot use PrintBuffer because the lines in ucs_vec
+   // cannot use PrintBuffer here because the lines in ucs_vec
    // have different lengths
+
+   // collect the APL code that produces B in ucs_vec
    //
 UCS_string_vector ucs_vec;
    do_CR10(ucs_vec, B);
@@ -445,9 +387,16 @@ Value_P Z(ucs_vec.size(), LOC);
 void
 Quad_CR::do_CR10(UCS_string_vector & result, const Value * B)
 {
+   // B is the name of a variable or function.
+   // result shall be the APL code that produces it.
+   //
 const UCS_string symbol_name(*B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
-   if (symbol == 0)   DOMAIN_ERROR;
+   if (symbol == 0)
+      {
+        MORE_ERROR() << "10⎕CR: bad Symbol in do_CR10()";
+        DOMAIN_ERROR;
+      }
 
    switch(symbol->get_NC())
       {
@@ -466,31 +415,29 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                if (ufun.is_lambda())
                   {
                     UCS_string res = symbol->get_name();
-                    res.append(UNI_LEFT_ARROW);
-                    res.append(UNI_L_CURLY);
+                    res << UNI_LEFT_ARROW << UNI_L_CURLY;
                     int t = 0;
-                    while (t < text.size())   // skip λ header
+                    while (t < text.ssize())   // skip λ header
                        {
                          const Unicode uni = text[t++];
                          if (uni == UNI_LF)   break;
                        }
 
 
-                    while (t < text.size())   // copy body
+                    while (t < text.ssize())   // copy body
                         {
                           const Unicode uni = text[t++];
                           if (uni == UNI_LF)   break;
-                           res.append(uni);
+                           res << uni;
                         }
-                    res.append(UNI_R_CURLY);
-
+                    res << (UNI_R_CURLY);
                     result.push_back(res);
                   }
                else
                   {
-                    UCS_string res(UTF8_string("∇"));
+                    UCS_string res(UNI_NABLA);
 
-                    loop(u, text.size())
+                    loop(u, text.ssize())
                        {
                          if (text[u] == '\n')
                              {
@@ -498,22 +445,22 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                                res.clear();
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
-                                   u < (text.size() - 1))
-                                  res.append(UNI_SPACE);
+                                   u < (text.ssize() - 1))   res << UNI_SPACE;
                              }
                          else
                              {
-                               res.append(text[u]);
+                               res << text[u];
                              }
                        }
-                    res.append(ufun.get_exec_properties()[0]
-                               ? UNI_DEL_TILDE : UNI_NABLA);
+                    res << (ufun.get_exec_properties()[0]
+                         ? UNI_DEL_TILDE : UNI_NABLA);
                     result.push_back(res);
                   }
                return;
              }
 
-        default: DOMAIN_ERROR;
+        default: MORE_ERROR() << "⎕RVAL: bad symbol->get_NC() in do_CR10()";
+                 DOMAIN_ERROR;
       }
 }
 //----------------------------------------------------------------------------
@@ -522,9 +469,11 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
                           const UCS_string & var_name,
                           const Value * value)
 {
+   // avoid any disturbances by ⎕FC (Format Control).
+   //
    Workspace::push_FC();
 
-   if (value->is_member())   // normal variable
+   if (value->is_member())   // structured variable
       {
         if (const char * error = do_CR10_structured(result, var_name, value))
            {
@@ -534,164 +483,267 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
              goto not_structured;
            }
 
-        Workspace::pop_FC();
+        Workspace::pop_FC();   // restore ⎕FC
         return;   // OK
       }
 
 not_structured:
 
-Picker picker(var_name);
-   do_CR10_value(result, value, picker, -99);
-   Workspace::pop_FC();
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::do_CR10_value(UCS_string_vector & result, const Value * value, 
-                     Picker & picker, ShapeItem pidx)
-{
-   /*
-      recursively encode var_name with value.
+#define PUSH_TEXT result.push_back(text);   text.clear();
+#define TMP_VAR_PREFIX "⍙¯_"
+#define TMP_VAR_SUFFIX "_∆¯"
+#define TMP_VAR(d)   TMP_VAR_PREFIX << int(d) << TMP_VAR_SUFFIX
 
-      we emit one of 2 formats:
+UCS_string text;
+const ShapeItem ec = value->element_count();
 
-      short format: dest ← (⍴ value) ⍴ value
-
-      long format:  dest ← (⍴ value) ⍴ 0                 " prolog "
-                    dest[] ← partial value ...
-
-      short format (the default) requires a reasonably short value
-
-      If value is nested then the short or long format is followed
-      by recursive do_CR10_value() calls for the sub-values.
-   */
-
-   picker.push(value->get_shape(), pidx);
-
-UCS_string left;
-   picker.get(left);
-
-   // compute shape_rho which is "" for scalars and true vectors
-   // of length > 1, "," for true vectors of length 1, and
-   // "n1 n2 ... ⍴" otherwise
+   // frequent special case: string
    //
-UCS_string shape_rho;
-   {
-     if (value->get_rank() == 1)   // true vector
-        {
-          if      (value->element_count() == 0)   shape_rho.append_UTF8("0⍴");
-          else if (value->element_count() == 1)   shape_rho.append_UTF8(",");
-        }
-     else if (value->get_rank() > 1)   // matrix or higher
-        {
-           shape_rho.append_shape(value->get_shape());
-           shape_rho.append_UTF8("⍴");
-         }
-   }
-
-   if (value->element_count() == 0)   // empty value
+   if (ec < 60 && is_plain_string(value))
       {
-        UCS_string reshape(2*(picker.get_level() - 1), UNI_SPACE);
-        Value_P proto = value->prototype(LOC);
-
-        // emit one line for the prototype
-        UCS_string proto_name;
-        picker.get(proto_name);
-        picker.pop();
-        do_CR10_value(result, proto.get(), picker, pidx);
-        result.back().append_UTF8(" ⍝ proto 1");
-
-        // and then another line to reshape the prototype
-        //
-        reshape.append(proto_name);
-        reshape.append_UTF8("←");
-        reshape.append(shape_rho);
-        reshape.append(proto_name);
-        result.push_back(reshape);
-        result.back().append_UTF8(" ⍝ proto 2");
+        text << var_name << "←\"";
+        loop(e, ec)   text << value->get_cravel(e).get_char_value();
+        text << "\"";
+        PUSH_TEXT
+        Workspace::pop_FC();   // restore ⎕FC
         return;
       }
 
-bool nested = false;
-
-   // step 1: top-level ravel. Try short (one-line) ravel and use long
-   // (multi-line ravel) if that fails.
+const APL_types::Depth depth = value->compute_depth();
+   // frequent special case: simple scalar or short simple vector
    //
-   if (short_ravel(result, nested, value, picker, left, shape_rho))
+   if (depth <= 1 && value->get_rank() <= 1 && ec < 20)   // short simple vector
       {
-        result.push_back(compute_prolog(picker.get_level(), left, value));
-
-        ShapeItem pos = 0;
-        V_mode mode = Vm_NONE;
-        UCS_string rhs;
-        ShapeItem count = 0;                // the number of items on this line
-        ShapeItem todo = value->nz_element_count();  // number of items to do
-
-        loop(p, todo)
+        text << var_name << "←";
+        if (value->element_count())   // non-empty value
            {
-             // recompute line (which changes because count changes)
-             //
-             UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
-             picker.get_indexed(line, pos, count);
-             line.append_UTF8("←");
-
-             // compute next item
-             //
-             UCS_string item;
-             const Cell & cell = value->get_cravel(p);
-             if (cell.is_pointer_cell())   nested = true;
-             const bool may_quote = use_quote(mode, value, p);
-             const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
-
-              if (count && (rhs.size() + item.size() + line.size()) > 76)
+             loop(e, value->element_count())
                  {
-                   // next item does not fit in this line. Close the line,
-                   // append it to result, and start a new line.
-                   //
-                   close_mode(rhs, mode);
-
-                   line.append(rhs);
-                   pos += count;
-                   count = 0;
-
-                   result.push_back(line);
-                   rhs.clear();
-                   mode = Vm_NONE;
+                   if (e)   text << " ";
+                   const Cell & cell = value->get_cravel(e);
+                   const UCS_string item_e = do_CR10_simple_cell(cell);
+                   text << item_e;
                  }
-
-             item_separator(rhs, mode, next_mode);
-
-             mode = next_mode;
-             rhs.append(item);
-             ++count;
            }
-
-     // all items done: close mode
-     //
-     close_mode(rhs, mode);
-
-UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
-     picker.get_indexed(line, pos, count);
-     line.append_UTF8("←");
-     line.append(rhs);
-
-     result.push_back(line);
-   }
-
-   // step 2: nested items
-   //
-   if (nested)
-      {
-        loop(p, value->element_count())
+        else                         // empty vector
            {
-             const Cell & cell = value->get_cravel(p);
-             if (!cell.is_pointer_cell())   continue;
-
-             const Value * sub_value = cell.get_pointer_value().get();
-             do_CR10_value(result, sub_value, picker, p);
+             if (value->get_cfirst().is_character_cell())   text << "''";
+             else                                           text << "⍬";
            }
+        PUSH_TEXT
+        Workspace::pop_FC();   // restore ⎕FC
+        return;
       }
 
-   picker.pop();
+   // VAR ← (depth+1)⍴0. The first depth items are used as temporary values
+   // for the different depths, while the last item is for saving ⎕IO.
+   //
+   text << TMP_VAR(depth) "←⎕IO ◊ ⎕IO←0   ⍝ " << var_name << "←";    PUSH_TEXT
+
+   do_CR10_level(result, 0, *value);
+   text << "⎕IO←" TMP_VAR(depth) << " ◊ "
+        << var_name << "←⍙¯_0_∆¯";                                   PUSH_TEXT
+   text << "⊣⎕EX ⊃";
+   loop(d, depth + 1)   text << " '" << TMP_VAR(d) << "'";
+                                                                     PUSH_TEXT
+   Workspace::pop_FC();   // restore ⎕FC
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR10_level(UCS_string_vector & result, size_t level,
+                       const Value & value)
+{
+UCS_string text;
+UCS_string indent(2*(level + 1), UNI_SPACE);
+UCS_string var_level;   var_level << TMP_VAR(level); 
+UCS_string ind_var_level = indent;   ind_var_level << var_level;
+
+   text << ind_var_level << "←";
+
+   // important special case: string
+   //
+   if (value.element_count() < int(60 - 2*level) && is_plain_string(&value))
+      {
+        text << "\"";
+        loop(e, value.element_count())
+            text << value.get_cravel(e).get_char_value();
+        text << "\"";                                                PUSH_TEXT
+        return;
+      }
+
+   text << value.nz_element_count()
+        << "⍴0   ⍝ L" << level << " zeroes";                         PUSH_TEXT
+
+size_t nested_count = 0;
+size_t simple_count = 0;
+size_t zero_count  = 0;
+   loop(v, value.nz_element_count())
+       {
+         const Cell & cell = value.get_cravel(v);
+         if (cell.is_pointer_cell())
+            {
+              ++nested_count;
+              continue;
+            }
+         if (cell.is_near_zero())
+            {
+              ++zero_count;
+            }
+         else
+            {
+              ++simple_count;
+            }
+       }
+
+   if (simple_count)
+      {
+        // if all items of value are numeric, then we can safely use ' '.
+        // as item separator. Otherwise we need commas (which is less
+        // efficient)
+        //
+        text << indent << "⍝ L" << level << ": ";
+        if (zero_count)   text << zero_count << "+";
+        text << simple_count << " simple item(s)...";                PUSH_TEXT
+        const ShapeItem ec = value.nz_element_count();
+        for (ShapeItem e = 0; e < ec;)
+            {
+              const Cell & cell = value.get_cravel(e);
+              if (cell.is_pointer_cell())
+                 {
+                   ++e;
+                   continue;
+                 }
+
+              UCS_string U1;   // ((⊃V    (fixed size)
+              UCS_string U2;   // indices (variable size)
+              UCS_string U3;   // ])←     (fixed size)
+              UCS_string U4;   // items   (variable size)
+
+              // code for one item
+              //
+              U1 << var_level << "[";
+              U2 << e;
+              U3 << "]←";
+              U4 << do_CR10_simple_cell(cell);
+              ++e;
+
+              UCS_string item_text;
+              item_text << U1 << U2 << U3 << U4;
+
+             const int line_limit = 72 - indent.size() - U1.size() - U3.size();
+
+             // fill U2 and U4 with more items until line_limit is reached...
+             //
+             bool has_string = false;
+             int count = 1;        // from first item above
+             int e_from = e - 1;   // dito.
+             while (e < ec && (U2.ssize() + U4.ssize()) < line_limit)
+                   {
+                     const Cell & cell = value.get_cravel(e++);
+                     if (cell.is_pointer_cell())   continue;
+
+                     U2 << " " << e - 1;   // - 1 since e++ above
+                     ++count;
+                     const UCS_string text_e = do_CR10_simple_cell(cell);
+                     if (U4.back() == UNI_SINGLE_QUOTE &&
+                         text_e.front() == UNI_SINGLE_QUOTE)
+                        {
+                          U4.pop_back();   // trailing '
+                          U4 << UCS_string(text_e, 1, text_e.size() - 1);
+                          has_string = true;
+                        }
+                     else
+                        {
+                          U4 << Invalid_Unicode << text_e;   // for now
+                        }
+                   }
+
+              // now we know if we need commas instead of spaces
+              //
+              loop(u, U4.size())
+                  {
+                    if (U4[u] == Invalid_Unicode)
+                       U4[u] = has_string ? UNI_COMMA : UNI_SPACE;
+                  }
+
+              if (count > 3 && count == (e - e_from))   // consecutive indices
+                 {
+                   U2.clear();
+                   U2 << e_from << "+⍳" << count;
+                 }
+
+              text << indent << U1 << U2 << U3 << U4;                PUSH_TEXT
+            }
+      }
+
+   if (nested_count)
+      {
+        text << indent << "⍝ L" << level << ": " << nested_count
+             << " nested item(s)...";                                PUSH_TEXT
+        loop(v, value.nz_element_count())
+            {
+              const Cell & cell = value.get_cravel(v);
+              if (!cell.is_pointer_cell())   continue;
+              const Value & sub_val = *cell.get_pointer_value();
+              do_CR10_level(result, level + 1, sub_val);
+
+              text << indent << var_level << "[" << v << "]←⊂"
+                   << TMP_VAR(level + 1);                            PUSH_TEXT
+            }
+      }
+
+   // final reshape
+   //
+const Shape & shape = value.get_shape();
+   if (shape.get_rank() != 1 || shape.get_volume() == 0)
+      {
+        text << ind_var_level << "←" <<  do_CR10_shape(shape)
+             << "⍴" << var_level
+             << "   ⍝ L" << level << " final reshape";               PUSH_TEXT
+      }
+   else
+      {
+        text << indent << "⍝ no (need for) L" << level
+             << " final reshape";                                    PUSH_TEXT
+      }
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::do_CR10_simple_cell(const Cell & cell)
+{
+UCS_string text;
+   if (cell.is_character_cell())
+      {
+        // be careful with non-printable characters and quotes
+        //
+        const Unicode uni = cell.get_char_value();
+        if (uni < ' ' || uni == 127)
+           {
+             return text << "(⎕UCS " << int(uni) << UNI_R_PARENT;
+           }
+        if (uni == UNI_SINGLE_QUOTE)   return text << "''''";
+        return text << "'" << uni << "'";
+      }
+
+   if (cell.is_integer_cell())   return text << cell.get_int_value();
+   if (cell.is_real_cell())      return text << cell.get_real_value();
+   if (cell.is_complex_cell()) return text << cell.get_real_value() << UNI_J
+                                           << cell.get_imag_value();
+   FIXME;   // cell is not simple
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::do_CR10_shape(const Shape & shape)
+{
+   if (shape.get_rank() == 0)   return UCS_string(UNI_ZILDE);   // scalar
+
+UCS_string result;
+   loop(r, shape.get_rank())
+       {
+         if (r)   result << UNI_SPACE;
+         result << shape.get_shape_item(r);
+       }
+   return result;
 }
 //----------------------------------------------------------------------------
 const char *
@@ -699,127 +751,39 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result,
                             const UCS_string & var_name,
                             const Value * value)
 {
-   if (value->get_rank() != 2)   return "bad rank";
-   if (value->get_cols() != 2)   return "bad shape";
+   if (value->get_rank() != 2)   return "bad rank (structured variable)";
+   if (value->get_cols() != 2)   return "bad shape (structured variable)";
 
    loop(r, value->get_rows())
        {
          const Cell & member_cell = value->get_cravel(2*r);
          if (!member_cell.is_pointer_cell())   continue;
          const Value * member_name = member_cell.get_pointer_value().get();
+
+         // unused member entries are integer 0.
+         //
          if (!member_name->is_char_string())   continue;
 
          const UCS_string member_ucs(*member_name);
-         UCS_string path = var_name;
-         path += UNI_FULLSTOP;
-         path.append(member_ucs);
+         UCS_string member_path = var_name;
+         member_path << UNI_FULLSTOP << member_ucs;
 
          const Cell & data_cell = value->get_cravel(2*r + 1);
-         if (data_cell.is_member_anchor())   // non-leaf
+         if (data_cell.is_simple_cell())
             {
-              const Value * sub_value = data_cell.get_pointer_value().get();
-              do_CR10_structured(result, path, sub_value);
+              member_path << UNI_LEFT_ARROW;
+              const UCS_string data_value = do_CR10_simple_cell(data_cell);
+              member_path << data_value;
+              result.push_back(member_path);
             }
-         else                                // leaf
+         else
             {
-              Picker picker(path);
-              if (data_cell.is_pointer_cell())   // nested data_cell
-                 {
-                   const Value * sub_value =
-                                 data_cell.get_pointer_value().get();
-                   do_CR10_value(result, sub_value, picker, -99);
-                 }
-              else                               // simple data_cell
-                 {
-                   Value_P sub_value(LOC);
-                   sub_value->next_ravel_Cell(data_cell);
-                   do_CR10_value(result, sub_value.get(), picker, -99);
-                 }
+              do_CR10_variable(result, member_path,
+                               data_cell.get_pointer_value().get());
             }
        }
 
    return 0;
-}
-//----------------------------------------------------------------------------
-bool
-Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
-                     const Value * value, const Picker & picker,
-                     const UCS_string & left, const UCS_string & shape_rho)
-{
-   // some quick checks beforehand to avoid wasting time attempting to
-   // create short ravel
-   //
-   enum { MAX_SHORT_RAVEL_LEN = 70 };
-
-const ShapeItem value_len = value->nz_element_count();
-   if (value_len >= MAX_SHORT_RAVEL_LEN)   return true;  // too long
-int len = 0;
-   loop(v, value_len)
-      {
-        const Cell & cell = value->get_cravel(v);
-        if (cell.is_integer_cell())   len += 2;   // min. integer (+ separator)
-        else if (cell.is_character_cell())   len += 1;
-        else if (cell.is_pointer_cell())     len += 1;
-        else if (cell.is_complex_cell())     len += 3;
-        else                                 len += 2;
-
-        if (len >= MAX_SHORT_RAVEL_LEN)   return true;
-      }
-
-   // at this point, a short ravel MAY be possible. Try it
-   //
-UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);  // indent
-
-   line.append(left);
-   line.append_UTF8("←");
-   line.append(shape_rho);
-
-V_mode mode = Vm_NONE;
-   loop(v, value_len)
-       {
-         // compute next item
-         //
-          UCS_string item;
-          const Cell & cell = value->get_cravel(v);
-          if (cell.is_pointer_cell())   nested = true;
-          const bool may_quote = use_quote(mode, value, v);
-          const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
-
-          item_separator(line, mode, next_mode);
-
-          mode = next_mode;
-          line.append(item);
-          if ((line.size() + item.size()) >= MAX_SHORT_RAVEL_LEN)   return true;
-       }
-
-   // all items done: close mode
-   //
-   close_mode(line, mode);
-
-   result.push_back(line);
-   return false;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Quad_CR::compute_prolog(int pick_level, const UCS_string & left,
-                        const Value * value)
-{
-   // compute the prolog
-   //
-UCS_string prolog(2 * (pick_level - 1), UNI_SPACE);
-Unicode default_char = UNI_SPACE;
-APL_Integer default_int  = 0;
-const bool default_is_int = figure_default(value, default_char, default_int);
-
-   prolog.append(left);
-   prolog.append_UTF8("←");
-   if (pick_level > 1)   prolog.append_UTF8("⊂");
-   prolog.append_shape(value->get_shape());
-   if (default_is_int)   prolog.append_UTF8("⍴0 ⍝ prolog ≡");
-   else                  prolog.append_UTF8("⍴' ' ⍝ prolog ≡");
-   prolog.append_number(pick_level);
-
-   return prolog;
 }
 //----------------------------------------------------------------------------
 bool
@@ -842,135 +806,6 @@ ShapeItem blanks = 0;
       }
 
    return zeroes >= blanks;
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::Picker::get(UCS_string & result)
-{
-const int level = shapes.size();
-
-   if (level == 1)
-      {
-        result.append(var_name);
-        return;
-      }
-
-   result.append_UTF8("((⎕IO+");
-   if (level == 2 && shapes[0].get_rank() > 1)   // need ⊂ for left ⊃ arg
-      {
-         Shape sh = shapes[0].offset_to_index(indices[1], 0);
-         result.append_UTF8("(⊂");
-         result.append_shape(sh);
-         result.append_UTF8(")");
-      }
-   else
-      {
-        loop(s, shapes.size() - 1)
-           {
-             if (s)   result.append_UTF8(" ");
-             Shape sh = shapes[s].offset_to_index(indices[s + 1], 0);
-             if (sh.get_rank() > 1)   result.append_UTF8("(");
-             result.append_shape(sh);
-             if (sh.get_rank() > 1)   result.append_UTF8(")");
-           }
-      }
-
-   result.append_UTF8(")⊃");
-   result.append(var_name);
-   result.append_UTF8(")");
-}
-//----------------------------------------------------------------------------
-void
-Quad_CR::Picker::get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len)
-{
-   // ⊃ is not needed at top level
-   //
-const bool need_disclose = get_level() > 1;
-
-   // , is only needed if the picked item is not a true vector
-   //
-const bool need_comma = shapes.back().get_rank() != 1;
-
-   result.append_UTF8("(");
-   if (need_comma)      result.append_UTF8(",");
-   if (need_disclose)   result.append_UTF8("⊃");
-   get(result);
-   result.append_UTF8(")");
-   result.append_UTF8("[");
-   if (pos)
-      {
-        result.append_number(pos);
-        result.append_UTF8("+");
-      }
-   result.append_UTF8("⍳");
-   result.append_number(len);
-   result.append_UTF8("]");
-}
-//----------------------------------------------------------------------------
-Quad_CR::V_mode
-Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
-                      bool may_quote)
-{
-   if (cell.is_character_cell())
-      {
-        if (may_quote)   // use ''
-           {
-             const Unicode uni = cell.get_char_value();
-             item.append(uni);
-             if (uni == UNI_SINGLE_QUOTE)   item.append(uni);
-             return Vm_QUOT;
-           }
-        else             // use UCS()
-           {
-             item.append_number(cell.get_char_value());
-             return Vm_UCS;
-           }
-      }
-
-   if (cell.is_integer_cell())
-      {
-        APL_Integer aint = cell.get_int_value();
-        if (aint < 0)
-           {
-             item.append(UNI_OVERBAR);
-             aint = -aint;
-           }
-        item.append_number(aint);
-        return Vm_NUM;
-      }
-
-   if (cell.is_float_cell())
-      {
-        bool scaled = false;
-        PrintContext pctx(PR_APL_MIN, MAX_Quad_PP, MAX_Quad_PW);
-        item = UCS_string(cell.get_real_value(), scaled, pctx);
-        return Vm_NUM;
-      }
-
-   if (cell.is_complex_cell())
-      {
-        bool scaled = false;
-        PrintContext pctx(PR_APL_MIN, MAX_Quad_PP, MAX_Quad_PW);
-        item = UCS_string(cell.get_real_value(), scaled, pctx);
-        item.append_UTF8("J");
-        scaled = false;
-        item.append(UCS_string(cell.get_imag_value(), scaled, pctx));
-        return Vm_NUM;
-      }
-
-   if (cell.is_pointer_cell())
-      {
-        // cell is a pointer cell which will be replaced later.
-        // For now we add an item in the current mode as placeholder
-        //
-        if (mode == Vm_QUOT)   { item.append_UTF8("∘");     return Vm_QUOT; }
-        if (mode == Vm_UCS)    { item.append_UTF8("33");    return Vm_UCS;  }
-        item.append_UTF8("00");
-        return Vm_NUM;
-      }
-
-   DOMAIN_ERROR;
-   return mode;   // not reached
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -1212,7 +1047,12 @@ Quad_CR::do_CR18(const Value * B)
 {
 UCS_string ucs(*B);
 UTF8_string utf(ucs);
-Value_P Z(utf, LOC);
+const ShapeItem length = utf.size();
+Value_P Z(length, LOC);
+
+   loop(l, length)   Z->next_ravel_Int(utf[l] & 0xFF);
+   Z->set_proto_Int();
+   Z->check_value(LOC);
    return Z;
 }
 //----------------------------------------------------------------------------
@@ -1222,7 +1062,7 @@ Quad_CR::do_CR19(const Value * B)
    if (B->get_rank() > 1)   RANK_ERROR;
 const ShapeItem len_B = B->element_count();
 
-UTF8 bytes_utf[len_B + 10];
+UTF8 * bytes_utf = ALLOCA(UTF8, len_B + 10);
    loop(b, len_B)   bytes_utf[b] = B->get_cravel(b).get_byte_value();
    bytes_utf[len_B] = 0;
 
@@ -1430,6 +1270,24 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 }
 //----------------------------------------------------------------------------
 bool
+Quad_CR::is_plain_string(const Value * value)
+{
+   if (value->get_rank() != 1)   return false;   // not a vector
+   loop(v, value->nz_element_count())
+       {
+         const Cell & cell = value->get_cravel(v);
+         if (!cell.is_character_cell())   return false;
+
+         const Unicode uni = cell.get_char_value();
+         if (uni < UNI_SPACE)           return false;   // control character
+         if (uni == UNI_SINGLE_QUOTE)   return false;
+         if (uni == UNI_DELETE)         return false;
+       }
+
+   return true;
+}
+//----------------------------------------------------------------------------
+bool
 Quad_CR::use_quote(V_mode mode, const Value * value, ShapeItem pos)
 {
 int char_len = 0;
@@ -1462,8 +1320,8 @@ int ascii_len = 0;
 void
 Quad_CR::close_mode(UCS_string & rhs, V_mode mode)
 {
-   if      (mode == Vm_QUOT)   rhs.append_UTF8("'");
-   else if (mode == Vm_UCS)    rhs.append_UTF8(")");
+   if      (mode == Vm_QUOT)   rhs << UNI_SINGLE_QUOTE;
+   else if (mode == Vm_UCS)    rhs << UNI_R_PARENT;
 }
 //----------------------------------------------------------------------------
 void
@@ -1471,16 +1329,16 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
 {
    if (from_mode == to_mode)   // separator in same mode (if any)
       {
-        if      (to_mode == Vm_UCS)    line.append_UTF8(" ");
-        else if (to_mode == Vm_NUM)    line.append_UTF8(" ");
+        if      (to_mode == Vm_UCS)    line << UNI_SPACE;
+        else if (to_mode == Vm_NUM)    line << UNI_SPACE;
       }
    else                // close old mode and open new one
       {
         close_mode(line, from_mode);
-        if (from_mode != Vm_NONE)   line.append_UTF8(",");
+        if (from_mode != Vm_NONE)   line << UNI_COMMA;
 
-        if      (to_mode == Vm_UCS)    line.append_UTF8("(,⎕UCS ");
-        else if (to_mode == Vm_QUOT)   line.append_UTF8("'");
+        if      (to_mode == Vm_UCS)    line << "(,⎕UCS ";
+        else if (to_mode == Vm_QUOT)   line << UNI_SINGLE_QUOTE;
       }
 }
 //----------------------------------------------------------------------------
@@ -1589,7 +1447,7 @@ UCS_string line;
             }
          else
             {
-              line.append(uni);
+              line << uni;
             }
        }
 
@@ -1623,8 +1481,7 @@ UCS_string UZ;
        {
          const Value & Bb = *B->get_cravel(b).get_pointer_value().get();
          UCS_string Ub(Bb);
-         UZ.append(Ub);
-         UZ.append(UNI_LF);
+         UZ << Ub << UNI_LF;
        }
 
 Value_P Z(UZ, LOC);
@@ -1713,9 +1570,9 @@ Value_P Z(shape_Z, LOC);
 Value_P
 Quad_CR::do_CR39(const Value * B)
 {
-   // structured value to array
+   // structured value B to array Z.
    //
-   if (B->get_rank()  != 2)   RANK_ERROR;
+   if (B->get_rank() != 2)   RANK_ERROR;
    if (B->get_cols() != 2)   LENGTH_ERROR;
 
 const ShapeItem rows_B = B->get_rows();
@@ -1784,7 +1641,7 @@ uint64_t bit  = 1;
        {
          const Cell & cell_B = B->get_cravel(b);
          if (!cell_B.is_near_bool())   DOMAIN_ERROR;
-         if (const APL_Integer bi = cell_B.get_near_int())   chunk |= bit;
+         if (cell_B.get_near_int())   chunk |= bit;
          bit += bit;
          if (bit == 0)   // uint64_t bit complete
             {
@@ -1952,12 +1809,8 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
         const UCS_ASCII_string tag_name(tag);
         const UCS_ASCII_string class_name(cls);
         const UCS_ASCII_string type_name(typ);
-        result.append(tag_name);
-        result.append_ASCII("(");
-        result.append(class_name);
-        result.append_ASCII(", ");
-        result.append(type_name);
-        result.append_ASCII(")");
+        result << tag_name << UNI_L_PARENT << class_name << UNI_COMMA
+               << UNI_SPACE << type_name << UNI_R_PARENT;
       }
    else if (cB.is_pointer_cell())    // token ←→ (tag, value)
       {
@@ -1973,59 +1826,55 @@ Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
         const TokenValueType typ = TokenValueType(tag & TV_MASK);
 
         const UCS_ASCII_string tag_name(tag);
-        result.append(tag_name);
-        result.append_ASCII("( ");
+        result << (tag_name) << UNI_L_PARENT << UNI_SPACE;
 
         switch(typ)
             {
                case TV_NONE:  switch(cls)
                                  {
-                                   case TC_ASSIGN: result.append_ASCII("←");
+                                   case TC_ASSIGN: result << UNI_LEFT_ARROW;
                                                    break;
-                                   default:        result.append_ASCII("-");
+                                   default:        result << UNI_MINUS;
                                  }
                               break;
 
-               case TV_CHAR:  result += cVal.get_char_value();
+               case TV_CHAR:  result << cVal.get_char_value();
                               break;
 
-               case TV_INT:   result.append_number(cVal.get_int_value());
+               case TV_INT:   result << cVal.get_int_value();
                               break;
 
-               case TV_FLT:   result.append_double(cVal.get_real_value());
+               case TV_FLT:   result << cVal.get_real_value();
                               break;
 
-               case TV_CPX:   result.append_double(cVal.get_real_value());
-                              result += UNI_J;
-                              result.append_double(cVal.get_imag_value());
+               case TV_CPX:   result << cVal.get_real_value() << UNI_J
+                                     << cVal.get_imag_value();
                               break;
 
                case TV_FUN:   
                case TV_SYM:   if (!cVal.is_pointer_cell())   DOMAIN_ERROR;
                               {
                                 Value_P symbol = cVal.get_pointer_value();
-                                const UCS_string sym_name(*symbol);
-                                result.append(sym_name);
+                                result << UCS_string(*symbol);
                               }
                               break;
 
-               case TV_LIN:   result.append_ASCII("[");
-                              result.append_number(cVal.get_int_value());
-                              result.append_ASCII("]");
+               case TV_LIN:   result << UNI_L_BRACK << cVal.get_int_value()
+                                     << UNI_R_BRACK;
                               break;
 
                case TV_VAL:   // optional shape
                               value_CR44(result, *cVal.get_pointer_value());
                               break;
 
-               case TV_INDEX: result.append_ASCII("[index]");
+               case TV_INDEX: result << "[index]";
                               break;
 
 
                default:       DOMAIN_ERROR;
             }
 
-        result.append_ASCII(" )");
+        result << UNI_SPACE << UNI_R_PARENT;
       }
    else
       {
@@ -2046,9 +1895,7 @@ const ShapeItem ec = value.element_count();
       {
         loop(r, rank)
            {
-             result.append_number(value.get_shape_item(r));
-             result += UNI_SPACE;
-             
+             result << value.get_shape_item(r) << UNI_SPACE;
            }
          result.back() = UNI_RHO;
       }
@@ -2057,49 +1904,84 @@ const ShapeItem ec = value.element_count();
        {
          if (result.size() > 60)   // long
             {
-              result.append_ASCII(" ...");
+              result << " ...";
               break;
             }
 
           const  Cell & cell = value.get_cravel(e);
           if (cell.is_character_cell())   // string or char
              {
-               result += UNI_SINGLE_QUOTE;
-               result += cell.get_char_value();
-               result += UNI_SINGLE_QUOTE;
+               result << UNI_SINGLE_QUOTE << cell.get_char_value()
+                      << UNI_SINGLE_QUOTE;
              }
           else if (cell.is_integer_cell())
              {
-               result.append_number(cell.get_int_value());
+               result << cell.get_int_value();
              }
           else if (cell.is_float_cell())
              {
-               result.append_double(cell.get_real_value());
+               result << cell.get_real_value();
              }
           else if (cell.is_complex_cell())
              {
-               result.append_double(cell.get_real_value());
-               result += UNI_J;
-               result.append_double(cell.get_imag_value());
+               result << cell.get_real_value() << UNI_J
+                      << cell.get_imag_value();
              }
           else if (cell.is_pointer_cell())
              {
-               result.append_ASCII("(...)");
+               result << "(...)";
              }
           else if (cell.is_lval_cell())
              {
-               result.append_ASCII("(...)←");
+               result << "(...)←";
              }
           else
              {
                FIXME;
              }
 
-         result += UNI_SPACE;
+         result << UNI_SPACE;
        }
 
    result.pop_back();   // trailing blanf
 
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR45(const Value * B)
+{
+UCS_string prefix;   prefix << "├───";
+   do_CR45_value(prefix, B);
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::do_CR45_value(const UCS_string prefix, const Value * B)
+{
+ostream & out = CERR;
+UCS_string sub_prefix = prefix;   sub_prefix << "────";
+
+   out << prefix << " " << voidP(B) << endl;
+   loop(b, B->nz_element_count())
+       {
+         const Cell & cB = B->get_cravel(b);
+         if (cB.is_pointer_cell())
+            {
+              do_CR45_value(sub_prefix, cB.get_pointer_value().get());
+            }
+       }
+}
+//----------------------------------------------------------------------------
+UCS_string
+Quad_CR::temp_varname()
+{
+char cc[40];
+timeval tv;
+   gettimeofday(&tv, 0);
+   SPRINTF(cc, "⍙¯%X¯%X", uint32_t(tv.tv_sec), uint32_t(tv.tv_usec));
+   usleep(1000);   // to make the timestamp unique;
+
+const UTF8_string varname_utf(cc);
+   return UCS_string(varname_utf);
 }
 //----------------------------------------------------------------------------
 

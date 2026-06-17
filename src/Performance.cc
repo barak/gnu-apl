@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -158,14 +158,17 @@ uint64_t sum_first_cycles_AB = 0;
 uint64_t sum_subsq_N_AB      = 0;
 uint64_t sum_subsq_cycles_AB = 0;
 
-   out <<
+UTF8_string_vector header(
 "╔═════════════════════════════════════════════════════════════════════╗\n"
 "║         Performance Statistics (CPU cycles per vector item)         ║\n"
 "╠═════════════════╦═════════════════════════╦═════════════════════════╣\n"
 "║                 ║        first pass       ║    subsequent passes    ║\n"
 "║      Cell       ╟───────┬───────┬─────────╫───────┬───────┬─────────╢\n"
 "║    Function     ║   N   │⌀cycles│   σ÷μ % ║   N   │⌀cycles│   σ÷μ % ║\n"
-"╠═════════════════╬═══════╪═══════╪═════════╬═══════╪═══════╪═════════╣\n";
+"╠═════════════════╬═══════╪═══════╪═════════╬═══════╪═══════╪═════════╣\n");
+
+
+   loop(h, header.size())   out << header[h] << endl << flush;
 
 
 #define perfo_1(id, ab, _name, _thr)                                     \

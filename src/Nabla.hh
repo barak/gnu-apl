@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@ class Symbol;
 /// a line number like 1.2 while editing it
 struct LineLabel
 {
-   /// empty constuctor
+   /// empty constructor
    LineLabel()
    : ln_major(0)
    {}
 
-   /// constuctor: line mj
+   /// constructor: line mj
    LineLabel(int mj)
    : ln_major(mj)
    {}
@@ -167,11 +167,15 @@ protected:
    /// restore function
    const char * execute_escape();
 
-   /// create a new function.
+   /// create a new function. Return a non-zero error text on error.
    const char * open_new_function();
 
-   /// open an existing function, or create a new one.
-   const char * open_existing_function();
+   /// open an existing function, or create a new one. Return a non-zero
+   // error text on error.
+   const char * open_existing_function(const UCS_string & name);
+
+   /// return true if \b ucs starts with an axis
+   static bool is_axis(const UCS_string & ucs);
 
    /// parse [nn.mm] into a LineLabel;
    LineLabel parse_lineno(UCS_string::iterator & c);
@@ -187,7 +191,12 @@ protected:
    /// started the ∇-editor
    const int defn_line_no;
 
-   /// the header of the function being edited
+   /** the header of the function being edited. This variable contains the
+       opening line up to (excluding) the [ ] (if any). For an existing
+       function this is only the function name, while for a new function this
+       is the function header, possibly truncated at '[' (i.e. if the header
+       contains an axis specification).
+     */
    UCS_string fun_header;
 
    /// the symbol for the function being edited
@@ -199,17 +208,17 @@ protected:
    /// editor commands
    enum Ecmd
       {
-        ECMD_NOP,      ///< do nothing
-        ECMD_SHOW,     ///< show function line(s) idx_from ... idx_to
-        ECMD_EDIT,     ///< edit function line edit_from
-        ECMD_DELETE,   ///< delete function line(s) edit_from ... idx_to
-        ECMD_ESCAPE,   ///< abort editing (discard changes made so far)
+        ECMD_NOP    = 0,   ///< do nothing
+        ECMD_SHOW   = 1,   ///< show function line(s) idx_from ... idx_to
+        ECMD_EDIT   = 2,   ///< edit function line edit_from
+        ECMD_DELETE = 3,   ///< delete function line(s) edit_from ... idx_to
+        ECMD_ESCAPE = 4,   ///< abort editing (discard changes made so far)
       } ecmd;          ///< the current editor command
 
-   /// optional start of a range for an editor command
+   /// optional start (line) of a range for an editor command
    LineLabel edit_from;
 
-   /// optional end of a range for an editor command
+   /// optional end (line) of a range for an editor command
    LineLabel edit_to;
 
    /// true if user has entered a range, i.e. [edit_from - edit_to],
@@ -221,6 +230,10 @@ protected:
 
    /// true if the function was modified
    bool modified;
+
+   /// true if the function to be editied shall be closed immediately
+   /// after processing the first editor line.
+   bool trailing_nabla;
 
    /// true iff this function shall be closed
    bool do_close;
@@ -237,7 +250,7 @@ protected:
    LineLabel current_line;
 
    /// the command used to open the function
-   const UCS_string first_command;
+   UCS_string first_command;
 
    /// the text for line \b current_line
    UCS_string current_text;

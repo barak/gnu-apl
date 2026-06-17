@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -274,12 +274,6 @@ protected:
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
 };
-//----------------------------------------------------------------------------
-inline void
-Hswap(IntCell & c1, IntCell & c2)
-{
-   c1.swap_ivals(c2);
-}
 //----------------------------------------------------------------------------
 
 #endif // __INTCELL_HH_DEFINED__

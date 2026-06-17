@@ -60,6 +60,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 iff ioctl(fd, TIOCGWINSZ, ...) is available */
+#undef HAVE_IOCTL_TIOCGWINSZ
+
 /* Define to 1 if you have the `atomicity' library (-latomicity). */
 #undef HAVE_LIBATOMICITY
 
@@ -80,6 +83,12 @@
 
 /* Define to 1 if you have the `gdk-3' library (-lgdk-3). */
 #undef HAVE_LIBGDK_3
+
+/* Define to 1 if you have the `gsl' library (-lgsl). */
+#undef HAVE_LIBGSL
+
+/* Define to 1 if you have the `gslcblas' library (-lgslcblas). */
+#undef HAVE_LIBGSLCBLAS
 
 /* Define to 1 if you have the `gtk-3' library (-lgtk-3). */
 #undef HAVE_LIBGTK_3
@@ -314,6 +323,9 @@
 /* Define to 1 if `vfork' works. */
 #undef HAVE_WORKING_VFORK
 
+/* Define to 1 if you have the <X11/XKBlib.h> header file. */
+#undef HAVE_X11_XKBLIB_H
+
 /* Define to 1 if you have the <X11/Xlib.h> header file. */
 #undef HAVE_X11_XLIB_H
 
@@ -500,6 +512,9 @@
 /* FFT available ? */
 #undef apl_FFT
 
+/* GSL available ? */
+#undef apl_GSL
+
 /* GTK+ version 3 installed ? */
 #undef apl_GTK3
 
@@ -532,6 +547,12 @@
 
 /* X11 is available ? */
 #undef apl_X11
+
+/* XCB is available ? */
+#undef apl_XCB
+
+/* Alt key map profile */
+#undef cfg_ALT_MAP_WANTED
 
 /* APserver listen port name */
 #undef cfg_APSERVER_PATH

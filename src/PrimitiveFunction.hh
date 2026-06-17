@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -222,11 +222,15 @@ public:
    : NonscalarFunction(TOK_F12_EQUIV)
    {}
 
-   /// overloaded Function::eval_B()
+   /// overloaded Function::eval_B() : B 
    virtual Token eval_B(Value_P B) const;
 
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// overloaded Function::eval_AB() : A ≡ B
+   virtual Token eval_AB(Value_P A, Value_P B) const
+      { return Token(TOK_APL_VALUE1,
+                     IntScalar((do_eval_AB(A, B) ? 1 : 0), LOC)); }
+
+   static bool do_eval_AB(Value_P A, Value_P B);
 
    static Bif_F12_EQUIV  fun;   ///< Built-in function
 
@@ -267,9 +271,16 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
+   /// overloaded Function::eval_AB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+
    static Bif_F12_ENCODE  fun;   ///< Built-in function
 
 protected:
+   /// return the (minimum) number of digits needed to represent every
+   /// item in B in a number system with base A0.
+   static int get_X0(APL_Integer A0, const Value & B);
+
    /// encode *ib() according to A (integer A and b)
    static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
                           const ConstRavel_P & iA,
@@ -465,40 +476,8 @@ public:
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
-   /// pointer to _fun
-
    /// Built-in function
    static Bif_F12_UNION  fun;
-
-protected:
-   /// a range of indices (including \b from, excluding \b to)
-   struct Zone
-      {
-        /// constructor
-        Zone(ShapeItem f, ShapeItem t)
-        : from(f),
-          to(t)
-        {}
-
-        /// return the number of elements (indices) in \b this zone
-        ShapeItem count() const
-           { return to - from; }
-
-        /// the first index in the zone (including)
-        ShapeItem from;
-
-        /// the last index in the zone (excluding)
-        ShapeItem to;
-      };
-
-   /// a list of zones
-   typedef std::vector<Zone> Zone_list;
-
-   /// find the unique(s) in cells_B[B_from] ... cells_B[B_to] and appendi
-   /// it/them to cells_Z. Return the number of uniquest appended.
-   /// 
-   static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
-                                Zone_list & B_from_to, double qct);
 };
 //----------------------------------------------------------------------------
 /** System function ∩ (intersection) */

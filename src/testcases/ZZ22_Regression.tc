@@ -21,10 +21,10 @@ Time    Tmfmt   To  Today   Trunc   UL  UL2 UL3 Unique  VI  Vck auto    box
 unbox   ∆  ∆1  ∆2  ∆3  ∆4  ∆DT ∆DT2    ∆LLP    ∆LP ∆LPH    ∆RD ∆SS
 'END-OF-INP'
 
-      L←1++\FUNS=' '     ◊ FUNS←L⊂FUNS
-      L←∼(⊂,' ')≡¨FUNS   ◊ FUNS←L/FUNS
-      FUNS←{(⍵≠' ')/⍵} ¨ FUNS
-      ⊣{ 0 0⍴⎕FX ⍵ } ¨ FUNS
+      L←1++\FUNS=' '     ◊ FUNS←L⊂FUNS   ⍝ partition FUNS
+      L←∼(⊂,' ')≡¨FUNS   ◊ FUNS←L/FUNS   ⍝ remove ' ' items in FUNS
+      FUNS←{(⍵≠' ')/⍵} ¨ FUNS            ⍝ remove ' ' in every item of FUNS
+      ⊣{ 0 0⍴⎕FX ⍵ } ¨ FUNS              ⍝ ⎕FX every item of FUNS
 
       )FNS
 Add             Add∆days        Ail         Aln             CAL

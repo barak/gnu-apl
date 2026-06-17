@@ -1,50 +1,73 @@
+/*
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-// !!! keep names below sorted by name (case insensitive!)
-// e.g.: sort -k 2 -t , Quad_CR.def
+    Copyright © 2008-2025 Dr. Jürgen Sauermann
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option, "" , "") any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifdef crdef
-  crdef(10, APL_expression         )
-  crdef(26, cell_type_to_int       )
-  crdef(17, from_base64            )
-  crdef(12, from_CDR               )
-  crdef(15, from_CDR_from_hex      )
-  crdef(39, from_structure         )
-  crdef(13, hex_to_bytes           )
-  crdef(37, monadic_keeping_indent )
-  crdef(36, nested_lines_to_string )
-  crdef(40, pack                   )
-  crdef(27, primary_cellto_int     )
-  crdef(31, Quad_INP_macro_helper1 )
-  crdef(32, Quad_INP_macro_helper2 )
-  crdef(28, secondary_cellto_int   )
-  crdef(35, string_to_nested_lines )
-  crdef(18, string_to_UTF8         )
-  crdef( 1, style_APL_in           )
-  crdef( 0, style_APL_out          )
-  crdef( 3, style_boxed_1          )
-  crdef( 4, style_boxed_2          )
-  crdef( 7, style_boxed_3          )
-  crdef( 8, style_boxed_4          )
-  crdef( 9, style_boxed_5          )
-  crdef(29, style_boxed_6          )
-  crdef( 2, style_boxed_ASCII      )
-  crdef(25, style_NARS_double_extra)
-  crdef(22, style_NARS_double_outer)
-  crdef(20, style_NARS_thick       )
-  crdef(23, style_NARS_thick_extra )
-  crdef(21, style_NARS_thin        )
-  crdef(24, style_NARS_thin_extra  )
-  crdef(30, text_to_matrix         )
-  crdef(34, TLV_bytes_to_TV        )
-  crdef(16, to_base64              )
-  crdef(14, to_CDR_to_hex          )
-  crdef(11, to_CRD                 )
-  crdef( 6, to_hex                 )
-  crdef( 5, to_HEX                 )
-  crdef(38, to_structure           )
-  crdef(42, tokenize               )
-  crdef(33, TV_to_TLV_bytes        )
-  crdef(41, unpack                 )
-  crdef(19, UTF8_to_string         )
+  crdef( 0, style_APL_out          , "Zm ←  0 ⎕CR B   ⍝ Zm is B in APL output format"                         )
+  crdef( 1, style_APL_in           , "Zs ←  1 ⎕CR B   ⍝ Zs is B in APL input format"                          )
+  crdef( 2, style_boxed_ASCII      , "Zm ←  2 ⎕CR B   ⍝ Zm is B boxed using ASCII characters"                 )
+  crdef( 3, style_boxed_1          , "Zm ←  3 ⎕CR B   ⍝ Zm is B boxed using line-drawing characters"          )
+  crdef( 4, style_boxed_2          , "Zm ←  4 ⎕CR B   ⍝ 3 ⎕CR B + extra frame"                                )
+  crdef( 5, to_HEX                 , "Zs ←  5 ⎕CR Bb  ⍝ Zs is Bb in (uppercase) HEX"                          )
+  crdef( 6, to_hex                 , "Zs ←  6 ⎕CR Bb  ⍝ Zs is Bb in (lowercase) hex"                          )
+  crdef( 7, style_boxed_3          , "Zm ←  7 ⎕CR B   ⍝ like 3 ⎕CR B with thin lines"                         )
+  crdef( 8, style_boxed_4          , "Zm ←  8 ⎕CR B   ⍝ like 4 ⎕CR B with thin lines"                         )
+  crdef( 9, style_boxed_5          , "Zm ←  9 ⎕CR B   ⍝ like 4 ⎕CR B with double-line outer frame"            )
+  crdef(10, APL_expression         , "Zs ← 10 ⎕CR Bs  ⍝ Zs is an APL expression producing variable(-name) Bs" )
+  crdef(11, to_CRD                 , "Zs ← 11 ⎕CR B   ⍝ value B → CDR (Common Data Representation) string Zs" )
+  crdef(12, from_CDR               , "Z  ← 12 ⎕CR Bs  ⍝ CDR string Bs → value Z"                              )
+  crdef(13, hex_to_bytes           , "Zb ← 13 ⎕CR Bh  ⍝ hex string Bh → byte vector Z"                        )
+  crdef(14, to_CDR_to_hex          , "Zh ← 14 ⎕CR B   ⍝ Zs is 6 ⎕CR 11 ⎕CR B (Value → CDR → HEX)"             )
+  crdef(15, from_CDR_from_hex      , "Z  ← 15 ⎕CR Bh  ⍝ Z is 11 ⎕CR 6 ⎕CR B (HEX → CDR → Value)"              )
+  crdef(16, to_base64              , "Zr ← 16 ⎕CR Bs  ⍝ string Bs → base64 string Z (RFC 4648)"               )
+  crdef(17, from_base64            , "Zs ← 17 ⎕CR Br  ⍝ base64 string Br → string Zs (RFC 4648)"              )
+  crdef(18, string_to_UTF8         , "Zb ← 18 ⎕CR Bs  ⍝ UCS string Bs → UTF8 encoded byte vector Zb (⍴Z ≥ ⍴B)")
+  crdef(19, UTF8_to_string         , "Zs ← 19 ⎕CR Bb  ⍝ UTF8 encoded byte vector Bb → UCS string Zs (⍴Z ≤ ⍴B)")
+  crdef(20, style_NARS_thick       , "Zm ← 20 ⎕CR B   ⍝ 4 ⎕CR B, but in NARS style (length instead of ↓ or →)")
+  crdef(21, style_NARS_thin        , "Zm ← 21 ⎕CR B   ⍝ 20 ⎕CR B but using thin lines"                        )
+  crdef(22, style_NARS_double_outer, "Zm ← 22 ⎕CR B   ⍝ 20 ⎕CR B with double-line outer frame"                )
+  crdef(23, style_NARS_thick_extra , "Zm ← 23 ⎕CR B   ⍝ 20 ⎕CR B with thick lines + extra frame"              )
+  crdef(24, style_NARS_thin_extra  , "Zm ← 24 ⎕CR B   ⍝ 20 ⎕CR B using thin lines + extra frame"              )
+  crdef(25, style_NARS_double_extra, "Zm ← 25 ⎕CR B   ⍝ 20 ⎕CR B with double-line extra frame"                )
+  crdef(26, cell_type_to_int       , "Zi ← 26 ⎕CR B   ⍝ Zi is the cell types of corresponding items in B"     )
+  crdef(27, primary_cellto_int     , "Zi ← 27 ⎕CR B   ⍝ Zi is the primary value of B as integer"      )
+  crdef(28, secondary_cellto_int   , "Zi ← 28 ⎕CR B   ⍝ Zi is the secondary values of B as integers"    )
+  crdef(29, style_boxed_6          , "Zm ← 29 ⎕CR B   ⍝ 4 ⎕CR B with strings being quoted + extra frame"      )
+  crdef(30, text_to_matrix         , "Z  ← 30 ⎕CR B   ⍝ Z is B with all items expanded to the same shape"     )
+  crdef(31, Quad_INP_macro_helper1 , "Zn ← 31 ⎕CR Bn  ⍝ internal helper function for the ⎕INP macro"          )
+  crdef(32, Quad_INP_macro_helper2 , "Zn ← 32 ⎕CR Bn  ⍝ internal helper function for the ⎕INP macro"          )
+  crdef(33, TV_to_TLV_bytes        , "Zb ← 33 ⎕CR Bv  ⍝ Zb is a TLV with Tag ↑Bv and Value 1↓Bv"              )
+  crdef(34, TLV_bytes_to_TV        , "Zv ← 34 ⎕CR Bb  ⍝ TLV Bb to Tag ↑Z and Value 1↓Z"                       )
+  crdef(35, string_to_nested_lines , "Zn ← 35 ⎕CR Bl  ⍝ string of lines Bl → nested vector of lines Zn"       )
+  crdef(36, nested_lines_to_string , "Zl ← 36 ⎕CR Bn  ⍝ nested vector of lines Bn → string of lines Bl"       )
+  crdef(37, monadic_keeping_indent , "Zl ← 37 ⎕CR Bn  ⍝ ⎕CR B without removing indentation"                   )
+  crdef(38, to_structure           , "Z  ← 38 ⎕CR Bi  ⍝ empty structured variable with capacity Bi"           )
+  crdef(39, from_structure         , "Z  ← 39 ⎕CR Bi  ⍝ structured variable capacity Bi"                      )
+  crdef(40, pack                   , "Zi ← 40 ⎕CR Bi  ⍝ pack boolean Bi (experimental, don't use!)"           )
+  crdef(41, unpack                 , "Zi ← 41 ⎕CR Bi  ⍝ unpack boolean Bi (experimental, don't use!)"         )
+  crdef(42, tokenize               , "Zt ← 42 ⎕CR Bs  ⍝ tokenize APL statement(s) Bs"                         )
+  crdef(43, parse_statement        , "Zt ← 43 ⎕CR Bs  ⍝ parse APL statement(s) Bs"                            )
+  crdef(44, token_tags             , "Zs ← 44 ⎕CR Bt  ⍝ decode token(s) or token tag(s) Bt"                   )
+  crdef(45, value_address          , "Z  ← 45 ⎕CR B   ⍝ print value addresses, return B"                      )
+  crdef(46, style_boxed_7          , "Z  ← 46 ⎕CR B   ⍝ 4 ⎕CR without frame decorators"                       )
+  crdef(47, style_boxed_8          , "Z  ← 47 ⎕CR B   ⍝ 8 ⎕CR without frame decorators"                       )
+#else
+ #error "macro crdef() was not #define'd"
+#endif
 #undef crdef
-#endif // crdef

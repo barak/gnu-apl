@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -137,77 +137,95 @@ InputFile::echo_current_file()
 }
 //----------------------------------------------------------------------------
 bool
-InputFile::check_filter(const UTF8_string & line)
+InputFile::COPY_filter::check_filter(const UTF8_string & line)
 {
-bool ret = in_matched;
 UCS_string ucs_line(line);
    ucs_line.remove_leading_and_trailing_whitespaces();
 
-   if (in_function)
+   /* if we are in a function or in a variable (matched or not) then look for
+      the end of the function or variable and return the current state (aka.
+      in_matched)...
+    */
+   if (where == WH_in_function)
       {
+        bool ret = in_matched;   // state of the current line
         if (ucs_line.size() && ucs_line[0] == UNI_NABLA)   // end of a function
            {
-             in_function = false;
-             in_variable = false;
+             where = WH_outside;
              in_matched  = false;
            }
         return ret;
       }
 
-   if (in_variable)
+   if (where == WH_in_variable)
       {
+        bool ret = in_matched;   // state of the current line
         if (ucs_line.size() == 0)                          // end of a vriable
            {
-             in_function = false;
-             in_variable = false;
+             where = WH_outside;
              in_matched  = false;
            }
         return ret;
       }
 
-   if (ucs_line.size() && (ucs_line[0] == UNI_NABLA))   // new function
+   /* at this point we are outside any function or variable.
+      Look for the start of a new function or variable...
+    */
+   if (ucs_line.size() && (ucs_line.front() == UNI_NABLA))   // new function
       {
-        in_function = true;
-        in_variable = false;
+        where = WH_in_function;
         in_matched  = false;
         ucs_line = ucs_line.drop(1);
         UserFunction_header uh(ucs_line, false);
-        const UCS_string fun_name = uh.get_name();
+        const UCS_string & fun_name = uh.get_name();
         loop(n, object_filter.size())
            {
-              if (fun_name == object_filter[n])
-                 {
-                   in_matched = true;
-                   return true;
-                 }
+             if (fun_name == object_filter[n])   return in_matched = true;
            }
         return false;
       }
 
-   if (ucs_line.size() && (Avec::is_quad(ucs_line[0]) ||
-             Avec::is_first_symbol_char(ucs_line[0])))   // new variable
+   /* maybe (the start of) a new variable.
+      There are two cases (see Symbol::dump()):
+
+      1. multiple lines, for example:   ... ⍝ VAR←
+      2. single line, for example:      VAR←1 2 3
+
+      Note that case 2. also matches case 1., therefore case 1.
+           needs to be checked first.
+
+      Strip off any garbage from ucs_line so that only the symbol name
+      remains (or ucs_line is empty)
+    */
+const Unicode u0 = ucs_line.size() ? ucs_line.front() : Invalid_Unicode;
+const Unicode u1 = ucs_line.size() ? ucs_line.back()  : Invalid_Unicode;
+   if (u1 == UNI_LEFT_ARROW)                             // case 1.
       {
-        in_function = false;
-        in_variable = true;
-        in_matched  = false;
+        ShapeItem pos = ucs_line.size() - 1;
+        while (pos && Avec::is_symbol_char(ucs_line[pos - 1]))   --pos;
+        ucs_line = UCS_string(ucs_line, pos, ucs_line.size() - pos - 1);
+      }
+   else if (Avec::is_quad(u0) || Avec::is_first_symbol_char(u0))   // case 2.
+      {
         loop(u, ucs_line.size())
            {
              if (ucs_line[u] != UNI_LEFT_ARROW)   continue;   // not ←
 
              ucs_line.resize(u);
              ucs_line.remove_leading_and_trailing_whitespaces();
-             loop(n, object_filter.size())
-                 {
-                   if (ucs_line == object_filter[n])
-                      {
-                        in_matched = true;
-                        return true;
-                      }
-                 }
            }
       }
+   else                                                       // something else
+      {
+        return false;   // since where = WH_outside
+      }
 
-   return ret;
+   where = WH_in_variable;   // start of a new variable
+   loop(of, object_filter.size())
+       {
+         if (ucs_line == object_filter[of])   return in_matched = true;
+       }
+   return in_matched = false;
 }
 //----------------------------------------------------------------------------
 

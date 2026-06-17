@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -109,14 +109,13 @@ operator << (ostream & out, TokenClass tc)
         tcc(TC_ASSIGN)
         tcc(TC_LINE)
         tcc(TC_VOID)
-        tcc(TC_DIAMOND)
         tcc(TC_NUMERIC)
         tcc(TC_SPACE)
         tcc(TC_NEWLINE)
         tcc(TC_COLON)
         tcc(TC_QUOTE)
         tcc(TC_OFF)
-        tcc(TC_SI_LEAVE)
+        tcc(TC_SI_CHANGE)
 
         default: break;
       }
@@ -128,58 +127,78 @@ operator << (ostream & out, TokenClass tc)
 ostream &
 operator << (ostream & out, const Token & token)
 {
-   if (token.get_tag() == TOK_CHARACTER)
+const TokenTag tag = token.get_tag();
+   switch(tag)
       {
-        out << "CHAR«" << token.get_char_val() << "»";
-        return out;
-      }
+        case TOK_CHARACTER: return out << "CHAR«" << token.get_char_val()
+                                       << "»";
 
-   if (token.get_tag() == TOK_APL_VALUE1 ||
-       token.get_tag() == TOK_APL_VALUE2 ||
-       token.get_tag() == TOK_APL_VALUE3)
-      {
-        if      (token.get_tag() == TOK_APL_VALUE1)   out << "VALUE1";
-        else if (token.get_tag() == TOK_APL_VALUE2)   out << "VALUE2";
-        else if (token.get_tag() == TOK_APL_VALUE3)   out << "VALUE3";
-        else                                          out << "VALUE???";
-        Value_P value = token.get_apl_val();
-        Assert(+value);
-        const APL_types::Depth depth = value->compute_depth();
-        out << "«";
-        for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
+        case TOK_APL_VALUE1:
+        case TOK_APL_VALUE2:
+        case TOK_APL_VALUE3:
+             if      (tag == TOK_APL_VALUE1)   out << "VALUE1";
+             else if (tag == TOK_APL_VALUE2)   out << "VALUE2";
+             else if (tag == TOK_APL_VALUE3)   out << "VALUE3";
+             else                              out << "VALUE???";
+             {
+               Value_P value = token.get_apl_val();
+               Assert(+value);
+               const APL_types::Depth depth = value->compute_depth();
+               out << "«";
+               for (APL_types::Depth d = 0; d < depth; ++d)   out << "≡";
 
-        if (value->get_rank())   out << value->get_shape();
+               if (value->get_rank())   out << value->get_shape();
 
-        const PrintContext pctx(PR_APL);
-        PrintBuffer pb(*value, pctx, 0);
-        bool more = pb.get_row_count() > 1;
-        if (pb.get_row_count() > 0)
-           {
-             UCS_string ucs = pb.get_line(0).no_pad();
-             if (ucs.size() > 20)
-                {
-                  ucs.resize(20);
-                  more = true;
-                }
-             out << ucs;
-           }
-        if (more)   out << "...";
-        return out << "»";
-      }
+               const PrintContext pctx(PR_APL);
+               PrintBuffer pb(*value, pctx, 0);
+               bool more = pb.get_row_count() > 1;
+               if (pb.get_row_count() > 0)
+                  {
+                    UCS_string ucs = pb.get_line(0).no_pad();
+                    if (ucs.size() > 20)
+                       {
+                         ucs.resize(20);
+                         more = true;
+                       }
+                    out << ucs;
+                  }
+               if (more)   out << "...";
+               return out << "»";
+             }
 
-   if (token.get_tag() == TOK_ERROR)
-      {
-        return out << Error::error_name(ErrorCode(token.get_int_val()));
-      }
+        case TOK_ERROR:
+             return out << Error::error_name( ErrorCode(token.get_int_val()));
 
-   if (token.get_tag() == TOK_BRANCH)
-      {
-        return out << token.get_Id() << token.get_int_val();
-      }
+        case TOK_BRANCH:
+             return out << token.get_Id() << token.get_int_val();
 
-   if (token.get_tag() == TOK_NOBRANCH)
-      {
-        return out << token.get_Id() << token.get_int_val();
+        case  TOK_GOTO_PC:
+              return out << "→PC=" << token.get_int_val();
+
+        case TOK_NOBRANCH:
+             return out << token.get_Id() << token.get_int_val();
+
+        case TOK_INTEGER:
+             return out << "INTEGER (" << token.get_int_val() << ") ";
+
+        case TOK_RETURN_SYMBOL:
+             {
+               const Symbol * symbol = token.get_sym_ptr();
+               Assert1(symbol);
+               return out << "RETURN_SYMBOL(" << symbol->get_name() << ")";
+             }
+
+        case TOK_DIAMOND:      return out << "◊";
+        case TOK_ENDL:         return out << "ENDL";
+        case TOK_IF_THEN:      return out << "→→";
+        case TOK_IF_ELSE:      return out << "←→";
+        case TOK_IF_END:       return out << "←←";
+
+        case TOK_RETURN_EXEC:  return out << "RETURN ⍎";
+        case TOK_RETURN_STATS: return out << "RETURN ◊";
+        case TOK_RETURN_VOID:  return out << "RETURN ∇FUN";
+
+         default: break;
       }
 
    if (token.get_Id() > ID_No_ID2)   return out << token.get_Id();
@@ -190,45 +209,40 @@ operator << (ostream & out, const Token & token)
              return out << "END";
 
         case TC_RETURN:
-             if (token.get_tag() == TOK_RETURN_EXEC)
-                return out << "RETURN ⍎";
-             if (token.get_tag() == TOK_RETURN_STATS)
-                return out << "RETURN ◊";
-             if (token.get_tag() == TOK_RETURN_VOID)
-                return out << "RETURN ∇FUN";
-             if (token.get_tag() == TOK_RETURN_SYMBOL)
-                return out << "RETURN Z←FUN";
              return out << "RETURN ???";
 
         case TC_VALUE:    return token.print_value(out);
 
         case TC_INDEX:
         case TC_PINDEX:
-             if (token.get_tag() == TOK_INDEX)
-                return out << token.get_index_val();
-             if (token.get_tag() == TOK_AXIS)
+             if (tag == TOK_INDEX)   return out << token.get_index_val();
+             if (tag == TOK_AXIS)
                 {
                   out << "[";
                   if (const Value * val = token.get_axes().get())
                      out << *val;
                   return out << "]";
                 }
+             if (tag == TOK_FAXIS)
+                {
+                  return out << "[" << token.get_int_val() << "]";
+                }
              FIXME;
 
         case TC_SYMBOL:
-             if (token.get_tag() == TOK_LSYMB)
+             if (tag == TOK_LSYMB)
                 {
-                  token.get_sym_ptr()->print(out << "'");
+                  token.get_sym_ptr()->print(out);
                   out << UNI_LEFT_ARROW;
                 }
-             else if (token.get_tag() == TOK_LSYMB2)
+             else if (tag == TOK_LSYMB2)
                 {
                   token.get_sym_ptr()->print(out << "'(... ");
                   out << ")←";
                 }
              else
                 {
-                  token.get_sym_ptr()->print(out << "'");
+                  token.get_sym_ptr()->print(out);
                 }
              return out;
 
@@ -243,7 +257,7 @@ operator << (ostream & out, const Token & token)
         default: break;
       }
 
-   return out <<  "{-unknown Token " << token.get_tag() << "-}";
+   return out <<  "{-unknown Token " << tag << "-}";
 }
 //----------------------------------------------------------------------------
 void
@@ -252,6 +266,39 @@ Token::ChangeTag(TokenTag new_tag)
    Assert((tag & TV_MASK) == (new_tag & TV_MASK));
    // tag is ia const TokenTag, so we cheat a little here.
    const_cast<TokenTag &>(tag) = new_tag;
+}
+//----------------------------------------------------------------------------
+Value_P
+Token::get_function_axis() const
+{
+   if (get_tag() == TOK_INDEX)  // axis has semicolons
+      {
+        MORE_ERROR() << "Invalid function axis rank.";
+        AXIS_ERROR;
+      }
+
+   if (get_tag() == TOK_AXIS)   // axis is an APL value
+      {
+        Value_P Z = get_apl_val();
+        if (+Z)   return Z;
+        MORE_ERROR() << "Invalid function axis []";
+        AXIS_ERROR;
+      }
+
+   if (get_tag() == TOK_FAXIS)   // axis is an integer
+      {
+        const sAxis axis = get_int_val();
+        if (axis == -1)   // [ ]
+           {
+             MORE_ERROR() << "Invalid elided function axis [ ]";
+             AXIS_ERROR;
+           }
+        return IntScalar(axis, LOC);
+      }
+
+   Q1(*this);
+   MORE_ERROR() << "Invalid Token type for function axis.";
+   AXIS_ERROR;
 }
 //----------------------------------------------------------------------------
 int
@@ -484,10 +531,7 @@ Token::show_trace(ostream & out, const UCS_string & fun_name,
                   Function_Line line) const
 {
 UCS_string fn = fun_name;
-   fn.append_UTF8("[");
-   fn.append_number(line);
-   fn.append_UTF8("] ");
-
+   fn << UNI_L_BRACK << line << UNI_R_BRACK << UNI_SPACE;
    out << fn;
 
    switch(get_tag())
@@ -566,34 +610,31 @@ UCS_string ucs;
    switch(get_Class())
       {
         case TC_ASSIGN:
-             ucs.append(UNI_LEFT_ARROW);
+             ucs << UNI_LEFT_ARROW;
              break;
 
         case TC_R_ARROW:
-             ucs.append(UNI_RIGHT_ARROW);
+             ucs << UNI_RIGHT_ARROW;
              break;
 
         case TC_L_BRACK:
-             if (get_tag() == TOK_L_BRACK)
-                ucs.append(UNI_L_BRACK);
-             else if (get_tag() == TOK_SEMICOL)
-                ucs.append(UNI_SEMICOLON);
+             if (get_tag() == TOK_L_BRACK)        ucs << UNI_L_BRACK;
+             else if (get_tag() == TOK_SEMICOL)   ucs << UNI_SEMICOLON;
              else
-                Assert(0);
+                FIXME;
              break;
 
         case TC_R_BRACK:
-             ucs.append(UNI_R_BRACK);
+             ucs << UNI_R_BRACK;
              break;
 
         case TC_END:
-        case TC_DIAMOND:
-             ucs.append(UNI_DIAMOND);
+             ucs << UNI_DIAMOND;
              break;
 
         case TC_RETURN:                                                  break;
         case TC_LINE:
-             ucs.append(UNI_LF);
+             ucs << UNI_LF;
              break;
 
         case TC_VALUE:
@@ -605,7 +646,7 @@ UCS_string ucs;
              }
 
         case TC_SYMBOL:
-             ucs.append(get_sym_ptr()->get_name());
+             ucs << get_sym_ptr()->get_name();
              break;
 
         case TC_R_PARENT:
@@ -637,6 +678,27 @@ UCS_string ucs;
                   ret << "]";
                   return ret;
                 }
+
+             if (get_tag() == TOK_FAXIS)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "[" << get_int_val() << "]";
+                }
+
+             if (get_tag() == TOK_MARKER)   // function axis
+                {
+                  UCS_string ret;
+                  return ret << "@" << get_int_val() << "@";
+                }
+
+             FIXME;
+
+        case TC_VOID:
+             {
+               UCS_string ret;
+               ret << "-VOID-";
+               return ret;
+             }
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
@@ -678,22 +740,30 @@ const Unicode c2 = canon.size() ? canon[0] : Invalid_Unicode;
    //
 bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
 
-   if (need_space)   ucs.append(UNI_SPACE);
+   if (need_space)   ucs << UNI_SPACE;
 
-   ucs.append(canon);
+   ucs << canon;
    return need_space ? -canon.size() : canon.size();
 }
 //----------------------------------------------------------------------------
 const char * 
-Token::short_class_name(TokenClass cls)
+Token::short_class_name(TokenTag tag)
 {
-   switch(cls)
+const TokenClass tc = TokenClass(tag & TC_MASK);
+   switch(tc)
       {
         case TC_ASSIGN:    return "←";
         case TC_R_ARROW:   return "→";
         case TC_L_BRACK:   return "[";
         case TC_R_BRACK:   return "]";
-        case TC_END:       return "END";
+        case TC_END:
+             if (tag == TOK_DIAMOND)   return "◊";
+             if (tag == TOK_ENDL)      return "ENDL";
+             if (tag == TOK_IF_THEN)   return "→→";
+             if (tag == TOK_IF_ELSE)   return "←→";
+             if (tag == TOK_IF_END)    return "←←";
+             return "END";
+
         case TC_FUN0:      return "F0";
         case TC_FUN12:     return "F12";
         case TC_INDEX:     return "IDX";
@@ -709,9 +779,8 @@ Token::short_class_name(TokenClass cls)
         case TC_VOID:      return "VOID";
 
         case TC_OFF:       return "OFF";
-        case TC_SI_LEAVE:  return "LEAVE";
+        case TC_SI_CHANGE: return "CHANGE";
         case TC_LINE:      return "LINE";
-        case TC_DIAMOND:   return "◊";
         case TC_NUMERIC:   return "NUMB";
         case TC_SPACE:     return "SPACE";
         case TC_NEWLINE:   return "LF";
@@ -727,108 +796,49 @@ Token::short_class_name(TokenClass cls)
    return "???";
 }
 //----------------------------------------------------------------------------
-ostream &
-operator << (ostream & out, const Token_string & tos)
-{
-   out << "[" << tos.size() << " token]: ";
-   loop(t, tos.size())   CERR << "`" << tos[t] << "  ";
-   out << endl;
-   out << endl;
-   return out;
-}
-//----------------------------------------------------------------------------
 const char *
-Token::class_name(TokenClass tc)
+Token::class_name(TokenTag tag)
 {
 #define tcn(x) case x: return #x;
 
+const TokenClass tc = TokenClass(tag & TC_MASK);
    switch(tc)
       {
-        tcn( TC_ASSIGN   )
-        tcn( TC_R_ARROW  )
-        tcn( TC_L_BRACK  )
-        tcn( TC_R_BRACK  )
-        tcn( TC_END      )
-        tcn( TC_FUN0     )
-        tcn( TC_FUN12    )
-        tcn( TC_INDEX    )
-        tcn( TC_OPER1    )
-        tcn( TC_OPER2    )
-        tcn( TC_L_PARENT )
-        tcn( TC_R_PARENT )
-        tcn( TC_RETURN   )
-        tcn( TC_SYMBOL   )
-        tcn( TC_VALUE    )
+        tcn(TC_ASSIGN)
+        tcn(TC_R_ARROW)
+        tcn(TC_L_BRACK)
+        tcn(TC_R_BRACK)
+        tcn(TC_END)
+        tcn(TC_FUN0)
+        tcn(TC_FUN12)
+        tcn(TC_INDEX)
+        tcn(TC_OPER1)
+        tcn(TC_OPER2)
+        tcn(TC_L_PARENT)
+        tcn(TC_R_PARENT)
+        tcn(TC_RETURN)
+        tcn(TC_SYMBOL)
+        tcn(TC_VALUE)
 
-        tcn( TC_PINDEX   )
-        tcn( TC_VOID     )
+        tcn(TC_PINDEX)
+        tcn(TC_VOID)
 
-        tcn( TC_OFF      )
-        tcn( TC_SI_LEAVE )
-        tcn( TC_LINE     )
-        tcn( TC_DIAMOND  )
-        tcn( TC_NUMERIC  )
-        tcn( TC_SPACE    )
-        tcn( TC_NEWLINE  )
-        tcn( TC_COLON    )
-        tcn( TC_QUOTE    )
-        tcn( TC_L_CURLY  )
-        tcn( TC_R_CURLY  )
+        tcn(TC_OFF)
+        tcn(TC_SI_CHANGE)
+        tcn(TC_LINE)
+        tcn(TC_NUMERIC)
+        tcn(TC_SPACE)
+        tcn(TC_NEWLINE)
+        tcn(TC_COLON)
+        tcn(TC_QUOTE)
+        tcn(TC_L_CURLY)
+        tcn(TC_R_CURLY)
 
-        tcn( TC_INVALID  )
-        default: break;
+        tcn(TC_INVALID)
+        default: ;
       }
 
    return "*** Obscure token class ***";
 }
 //----------------------------------------------------------------------------
-void
-Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
-{
-Token * t1 = &at(from);
-Token * t2 = &at(to);
-   Assert(0 <= from);
-   Assert(from <= to);
-   Assert(to <= ShapeItem(size()));
-
-   while (t1 < t2)   t1++->swap_token(*t2--);
-}
-//----------------------------------------------------------------------------
-ShapeItem
-Token_string::replace_segment(const Token_string & src, ShapeItem pos)
-{
-   loop(s, src.size())
-       {
-         at(pos).clear(LOC);
-         new (&at(pos++)) Token(src[s], LOC);
-       }
-   return pos;
-}
-//----------------------------------------------------------------------------
-void
-Token_string::print(ostream & out, int details) const
-{
-const bool PC  = details    & 1;
-const bool VAL = details & 2;
-
-   loop(pc, size())
-       {
-         const Token & tok = at(pc);
-         if (PC)   out << "    [PC=" << setw(2) << pc << "] ";
-         out << "`" << tok;
-         if (VAL)
-            {
-              switch(tok.get_ValueType())
-                 {
-                   case TV_INT: out << ":" << tok.get_int_val();   break;
-                   case TV_FLT: out << ":" << tok.get_flt_val();   break;
-                   default:                                        break;
-                 }
-            }
-         if (PC)   out << endl;
-         else      out << "  ";
-       }
-
-   out << endl;
-}
-//----------------------------------------------------------------------------
+// EOF

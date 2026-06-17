@@ -30,6 +30,8 @@
 #include "Error.hh"
 #include "LibPaths.hh"
 #include "PrintOperator.hh"
+#include "UCS_string_vector.hh"
+#include "Workspace.hh"
 
 bool LibPaths::root_from_env = false;
 bool LibPaths::root_from_pwd = false;
@@ -40,6 +42,8 @@ char LibPaths::APL_lib_root[APL_PATH_MAX + 10] = "";
 
 LibPaths::LibDir LibPaths::lib_dirs[LIB_MAX];
 
+// realpath() complains if its result is not used, To avoid that warning
+// we assign the result to variable unused below.
 const void * unused = 0;
 
 //----------------------------------------------------------------------------
@@ -71,33 +75,22 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
          //
          // we fix this by searching argv0 in $PATH
          //
-         const char * path = getenv("PATH");   // must NOT be modified
-
-         if (path)
+         if (const char * paths = getenv("PATH"))
             {
               logit && CERR << "initializing paths from  $PATH = "
-                            << path << endl;
+                            << paths << endl;
 
-              // we must not modify path, so we copy it to path1 and
-              // replace the semicolons in path1 by 0. That converts
-              // p1;p2; ... into a sequence of 0-terminated strings
-              // p1 p2 ... The variable next points to the start of each
-              // string.
-              //
-              const size_t plen = strlen(path);
-              std::string   path1;
-              path1.reserve(plen + 1);
-              loop(p, (plen + 1))   path1 += path[p];
-              char * next = &path1[0];
-              for (;;)
-                  {
-                    char * semi = strchr(next, ':');
-                    if (semi)   *semi = 0;
-                    UTF8_string filename;
-                    for (const char * n = next; *n; ++n)   filename += *n;
+              while (*paths)
+                    {
+                      size_t dir_len;
+                      if (const char * colon = strchr(paths, ':'))
+                         dir_len = colon - paths;
+                      else
+                         dir_len = strlen(paths);
+
+                    std::string filename(paths, dir_len);
                     filename += '/';
-                    for (const char * a = argv0; *a; ++a)   filename += *a;
-
+                    filename.append(argv0);
                     if (access(filename.c_str(), X_OK) == 0)
                        {
                          strncpy(APL_bin_path, filename.c_str(),
@@ -111,8 +104,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
                          goto done;
                        }
 
-                    if (semi == 0)   break;
-                    next = semi + 1;
+                    paths += dir_len + 1;   // next $PATH item
                   }
             }
            else
@@ -125,7 +117,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
    unused = realpath(argv0, APL_bin_path);
    APL_bin_path[APL_PATH_MAX] = 0;
    {
-     char * slash =   strrchr(APL_bin_path, '/');
+     char * slash = strrchr(APL_bin_path, '/');
      if (slash)   { *slash = 0;   APL_bin_name = slash + 1; }
      else         { APL_bin_name = APL_bin_path;            }
    }
@@ -209,9 +201,10 @@ LibPaths::set_APL_lib_root(const char * new_root)
 }
 //----------------------------------------------------------------------------
 void
-LibPaths::set_lib_dir(LibRef libref, const char * path, LibDir::CfgSrc src)
+LibPaths::set_lib_dir(LibRef libref, const UTF8_string & path,
+                      LibDir::CfgSrc src)
 {
-   lib_dirs[libref].dir_path = UTF8_string(path);
+   lib_dirs[libref].dir_path = path;
    lib_dirs[libref].cfg_src = src;
 }
 //----------------------------------------------------------------------------
@@ -233,28 +226,25 @@ LibPaths::get_lib_dir(LibRef libref)
 UTF8_string ret(APL_lib_root);
    if (libref == LIB0)   // workspaces
       {
-        const UTF8_string subdir("/workspaces");
-        ret.append_UTF8(subdir);
+        ret << "/workspaces";
       }
    else                  // wslibN
       {
-        const UTF8_string subdir("/wslib");
-        ret.append_UTF8(subdir);
-        ret += libref + '0';
+        (ret << "/wslib") += (libref + '0');
       }
 
    return ret;
 }
 //----------------------------------------------------------------------------
 void
-LibPaths::maybe_warn_ambiguous(int name_has_extension, const UTF8_string name,
+LibPaths::maybe_warn_ambiguous(int has_extension, const UTF8_string name,
                                const char * ext1, const char * ext2)
 {
-   if (name_has_extension)   return;   // extension was provided
-   if (ext2 == 0)            return;   // no second extension
+   if (has_extension)   return;   // extension was provided
+   if (ext2 == 0)       return;   // no second extension
 
 UTF8_string filename_ext2 = name;
-   filename_ext2.append_ASCII(ext2);
+   filename_ext2 << ext2;
    if (access(filename_ext2.c_str(), F_OK))   return;   // not existing
 
    CERR << endl 
@@ -265,60 +255,61 @@ UTF8_string filename_ext2 = name;
 }
 //----------------------------------------------------------------------------
 UTF8_string
-LibPaths::get_lib_filename(LibRef lib, const UTF8_string & name, 
-                           bool existing, const char * ext1, const char * ext2)
+LibPaths::get_filename(const LibRef_name & lib_name, bool existing,
+                       const char * ext1, const char * ext2)
 {
    // check if name has one of the extensions ext1 or ext2 already.
    //
-int name_has_extension = 0;   // assume name has neither extension ext1 nor ext2
-   if      (name.ends_with(ext1))   name_has_extension = 1;
-   else if (name.ends_with(ext2))   name_has_extension = 2;
+int has_extension = 0;   // assume name has neither extension ext1 nor ext2
+   if      (lib_name.get_name().ends_with(ext1))           has_extension = 1;
+   else if (ext2 && lib_name.get_name().ends_with(ext2))   has_extension = 2;
 
-   if (name.starts_with("/")   || 
-       name.starts_with("./")  || 
-       name.starts_with("../"))
+   if (lib_name.get_name().starts_with("/")   || 
+       lib_name.get_name().starts_with("./")  || 
+       lib_name.get_name().starts_with("../"))
       {
         // paths from / or ./ are fallbacks for the case where the library
         // path setup is wrong. So that the user can survive by using an
         // explicit path
         //
-        if (name_has_extension)   return name;
+        if (has_extension)   return lib_name.get_name();
 
-        UTF8_string filename(name);
+        UTF8_string filename(lib_name.get_name());
         if (access(filename.c_str(), F_OK) == 0)   return filename;
 
         if (ext1)
            {
-             UTF8_string filename_ext1 = name;
-             filename_ext1.append_ASCII(ext1);
+             UTF8_string filename_ext1 = lib_name.get_name();
+             filename_ext1 << ext1;
              if (!access(filename_ext1.c_str(), F_OK))
                 {
                    // filename_ext1 exists, but filename_ext2 may exist as well.
                    // warn user unless an explicit extension was given.
                    //
-                   maybe_warn_ambiguous(name_has_extension, name, ext1, ext2);
+                   maybe_warn_ambiguous(has_extension, lib_name.get_name(),
+                                        ext1, ext2);
                    return filename_ext1;
                 }
            }
 
         if (ext2)
            {
-             UTF8_string filename_ext2 = name;
-             filename_ext2.append_ASCII(ext2);
+             UTF8_string filename_ext2 = lib_name.get_name();
+             filename_ext2 << ext2;
              if (!access(filename_ext2.c_str(), F_OK))   return filename_ext2;
            }
 
          // neither ext1 nor ext2 worked: return original name
          //
-         filename = name;
+         filename = lib_name.get_name();
          return filename;
       }
 
-UTF8_string filename = get_lib_dir(lib);
+UTF8_string filename = get_lib_dir(lib_name.get_libref());
    filename += '/';
-   filename.append_UTF8(name);
+   filename << lib_name.get_name();
 
-   if (name_has_extension)   return filename;
+   if (has_extension)   return filename;
 
    if (existing)
       {
@@ -330,10 +321,10 @@ UTF8_string filename = get_lib_dir(lib);
         if (ext1)
            {
              UTF8_string filename_ext1 = filename;
-             filename_ext1.append_ASCII(ext1);
+             filename_ext1 << ext1;
              if (!access(filename_ext1.c_str(), F_OK))
                 {
-                  maybe_warn_ambiguous(name_has_extension,
+                  maybe_warn_ambiguous(has_extension,
                                        filename, ext1, ext2);
                    return filename_ext1;
                 }
@@ -342,7 +333,7 @@ UTF8_string filename = get_lib_dir(lib);
         if (ext2)
            {
              UTF8_string filename_ext2 = filename;
-             filename_ext2.append_ASCII(ext2);
+             filename_ext2 << ext2;
              if (!access(filename_ext2.c_str(), F_OK))   return filename_ext2;
            }
 
@@ -354,25 +345,59 @@ UTF8_string filename = get_lib_dir(lib);
         // therefore checking the existence does not work.
         // check that the file ends with ext1 or ext2 if provided
         //
-        if (name_has_extension)   return filename;
+        if (has_extension)   return filename;
 
-        if      (ext1) filename.append_ASCII(ext1);
-        else if (ext2) filename.append_ASCII(ext2);
+        if      (ext1) filename << ext1;
+        else if (ext2) filename << ext2;
         return filename;
       }
 }
 //----------------------------------------------------------------------------
-bool
+const char *
 LibPaths::is_present(LibRef lib)
 {
-   // try to open dir and return false if that fails
+   // try to open dir and return the reason if that fails
    //
 UTF8_string path = LibPaths::get_lib_dir(lib);
 DIR * dir = opendir(path.c_str());
-   if (!dir)   return false;
+   if (dir)   // success
+      {
+        closedir(dir);
+        return 0;
+      }
+   else
+      {
+        return strerror(errno);
+      }
 
-   closedir(dir);
-   return true;
 }
-//----------------------------------------------------------------------------
+//============================================================================
+LibRef_name::LibRef_name(ostream & out, const UCS_string_vector & args,
+                         bool allow_LIB_NONE)
+{
+   Assert(args.size() > 0);
+   if (args.size() == 1)   // workspace name without library reference number
+      {
+        lib  = allow_LIB_NONE ? LIB_NONE : LIB0;
+        name = args.front();
+        return;   // OK
+      }
+
+   // name with library reference number (0-9)
+   //
+const UCS_string & libref = args.front();
+   if (libref.size() == 1 && Avec::is_digit(libref[0]))
+      {
+        lib  = LibRef(args.front()[0] - '0');
+        name = args[1];
+        return;   // OK
+      }
+
+   out << "BAD COMMAND+" << endl;
+   MORE_ERROR() << "invalid library reference '" << args.front() << "'";
+   if (Command::auto_MORE)   CERR << Workspace::more_error() << endl;
+
+   // error (lib_name.name is "").
+}
+//============================================================================
 

@@ -92,7 +92,7 @@ SqliteArgListBuilder::append_null(int pos)
 }
 //-----------------------------------------------------------------------------
 Value_P
-SqliteArgListBuilder::run_query(bool ignore_result)
+SqliteArgListBuilder::run_query()
 {
 vector<ResultRow> result_rows;
 

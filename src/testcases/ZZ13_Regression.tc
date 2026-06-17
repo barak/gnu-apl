@@ -16,7 +16,7 @@
  X = 4 
 
       foo[2;3] 4
-SYNTAX ERROR
+AXIS ERROR+
       foo[2;3]4
       ^      ^
 

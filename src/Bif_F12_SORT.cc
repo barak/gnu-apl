@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ CollatingCache::CollatingCache(const Value & A,
 const ShapeItem ec_A = A.element_count();
 UCS_string UA;
    UA.reserve(ec_A);
-   loop(a, ec_A)   UA.append(A.get_cravel(a).get_char_value());
+   loop(a, ec_A)   UA << A.get_cravel(a).get_char_value();
 
 UCS_string UA1 = UA.unique();
 
@@ -143,7 +143,7 @@ CollatingCache::get_significance(Unicode uni) const
 const CollatingCacheEntry * entries = &at(0);
 const CollatingCacheEntry * entry =
 
-   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, entries, size(),
+   Heapsort<CollatingCacheEntry>::search<Unicode>(uni, *this,
                                          CollatingCacheEntry::compare_chars, 0);
 
    if (entry)   return entry - entries;
@@ -212,11 +212,10 @@ vector<ShapeItem> vZ;
    loop(z, len_BZ)   vZ.push_back(z);
 
    if (order == SORT_ASCENDING)
-      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
-                                &CollatingCache::greater_vec);
+      Heapsort<ShapeItem>::sort(vZ, &CollatingCache::greater_vec, &cache);
    else
-      Heapsort<ShapeItem>::sort(vZ.data(), len_BZ, &cache,
-                                &CollatingCache::smaller_vec);
+      Heapsort<ShapeItem>::sort(vZ, &CollatingCache::smaller_vec, &cache);
+
 Value_P Z(len_BZ, LOC);
    loop(z, len_BZ)   Z->next_ravel_Int(vZ[z] + qio);
    Z->check_value(LOC);

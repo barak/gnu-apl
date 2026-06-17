@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,12 +25,14 @@
 #define __WORKSPACE_HH_DEFINED__
 
 #include "Command.hh"
+#include "LibPaths.hh"
 #include "PrimitiveOperator.hh"
 #include "PrintContext.hh"
 #include "QuadFunction.hh"
 #include "Quad_CR.hh"
 #include "Quad_DLX.hh"
 #include "Quad_FIO.hh"
+#include "Quad_MX.hh"
 #include "Quad_RE.hh"
 #include "Quad_RL.hh"
 #include "Quad_SVx.hh"
@@ -40,6 +42,7 @@
 #include "SymbolTable.hh"
 #include "SystemVariable.hh"
 
+class DerivedFunction;
 class Executable;
 class StateIndicator;
 class UTF8_string;
@@ -132,7 +135,7 @@ public:
       { return the_workspace.top_SI; }
 
    /// copy all allocated symbols into \b table of size \b table_size
-   static std::basic_string<const Symbol *> get_all_symbols()
+   static std::vector<const Symbol *> get_all_symbols()
       { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
@@ -176,16 +179,19 @@ public:
       { return the_workspace.prompt; }
 
    /// return the name of the current workspace.
-   static const UCS_string & get_WS_name()
-      { return the_workspace.WS_name; }
+   static const LibRef_name & get_WSID()
+      { return the_workspace.WS_id; }
 
    /// set the name of the current workspace.
-   static void set_WS_name(const UCS_string & new_name)
-      { the_workspace.WS_name = new_name; }
+   static void set_WSID(const LibRef_name & new_id)
+      { the_workspace.WS_id = new_id; }
 
    /// Return all user-defined commands
    static vector<Command::user_command> & get_user_commands()
       {  return the_workspace.user_commands; }
+
+   /// return \b true if \b the_workspace is the CLEAR WS
+   static bool is_CLEAR_WS();
 
    /// Create a new SI-entry on the SI stack.
    static void push_SI(const Executable * fun, const char * loc);
@@ -231,15 +237,15 @@ public:
       { return the_workspace.symbol_table.find_lambda_name(lambda); }
 
    /// save this workspace
-   static void save_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+   static void save_WS(ostream & out, const LibRef_name & lib_name,
                        bool name_from_WSID);
 
    /// backup an existing file \b filename, return true on error
    static bool backup_existing_file(const char * filename);
 
    /// dump this workspace
-   static void dump_WS(ostream & out, LibRef lib, const UCS_string & wsname,
-                       bool html, bool silent);
+   static void dump_WS(ostream & out, const LibRef_name & lib_name, bool html,
+                       bool silent);
 
    /// dump the commands in this workspace
    static void dump_commands(ostream & out);
@@ -253,17 +259,19 @@ public:
                          UCS_string_vector * object_filter);
 
    /// load \b lib_ws into the_workspace, maybe set ⎕LX of the new WS.
-   static void load_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+   static void load_WS(ostream & out, ostream & err,
+                       const LibRef_name & lib_name,
                        UCS_string & quad_lx, bool silent);
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, LibRef lib, const UCS_string & wsname,
+   static void copy_WS(ostream & out, ostream & err,
+                      const LibRef_name & lib_name,
                        UCS_string_vector & objects, bool protection);
 
    /// return a token for system function or variable \b ucs
    static Token get_quad(const UCS_string & ucs, int & len);
 
-   /// return oldest SI entry that is running \b exex, or 0 if none
+   /// return the oldest SI entry that is running \b exex, or 0 if none
    static StateIndicator * oldest_exec(const Executable * exec);
 
    /// return true iff function \b funname is on the current call stack
@@ -306,8 +314,8 @@ public:
       { return the_workspace.pushed_command; }
 
 protected:
-   /// the name of the workspace
-   UCS_string WS_name;
+   /// Optional library reference, mandatory workspace name
+   LibRef_name WS_id;
 
    // system variables.
    //
@@ -323,7 +331,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   std::basic_string<const UserFunction *> expunged_functions;
+   std::vector<const UserFunction *> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;

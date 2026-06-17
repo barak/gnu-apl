@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,49 +112,34 @@ public:
    Value * get_val_wptr()
       { return apl_val.get(); }
 
-   /// flags of this ValueStackItem
-   enum VS_flags
-      {
-        VSF_NONE = 0,      ///< no flags
-        VSF_COW  = 0x01,   ///< Clone On Write
-      };
-
-   /// return the flags of \b this ValueStackItem
-   VS_flags get_vs_flags() const
-      { return flags; }
-
-   /// set the flags of \b this ValueStackItem
-   void set_vs_flags(VS_flags flg)
-      { flags = flg; }
-
    /// make \b apl_val the sole owner of apl_val.value
    void isolate(const char * loc)
       { if (+apl_val)   apl_val.isolate(loc); }
 
+   /// isolate \b apl_val and its sub-values
+   void isolate_deep(const char * loc)
+      { if (+apl_val)   apl_val.isolate_deep(loc); }
+
 protected:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem()
-   : name_class(NC_UNUSED_USER_NAME),
-     flags(VSF_NONE)
+   : name_class(NC_UNUSED_USER_NAME)
       { memset(&sym_val, 0, sizeof(sym_val)); }
 
    /// constructor: ValueStackItem for a label (function line)
    ValueStackItem(Function_Line lab)
-   : name_class(NC_LABEL),
-     flags(VSF_NONE)
+   : name_class(NC_LABEL)
       { sym_val.label = lab; }
 
    /// constructor: ValueStackItem for a variable
    ValueStackItem(Value_P val)
    : apl_val(val),
-     name_class(NC_VARIABLE),
-     flags(VSF_NONE)
+     name_class(NC_VARIABLE)
    {}
 
    /// constructor: ValueStackItem for a shared variable
    ValueStackItem(SV_key key)
-   : name_class(NC_SYSTEM_VAR),
-     flags(VSF_NONE)
+   : name_class(NC_SYSTEM_VAR)
       { sym_val.sv_key = key; }
 
    /// reset \b this ValueStackItem to being unused
@@ -164,7 +149,6 @@ protected:
         memset(&sym_val, 0, sizeof(sym_val));
         if (!!apl_val)   apl_val.reset();
         name_class = NC_UNUSED_USER_NAME;
-         flags = VSF_NONE;
       }
 
    /// the possible "values" of a symbol
@@ -183,9 +167,6 @@ protected:
 
    /// the (current) name class (like ⎕NC, unless shared variable)
    NameClass name_class;
-
-   /// flags of \b this ValueStackItem
-   VS_flags flags;
 };
 //----------------------------------------------------------------------------
 /// Base class for variables, defined functions, and distinguished names
@@ -396,7 +377,7 @@ public:
 
    /// perform a vector assignment (like (A B C)←1 2 3) for variables in
    /// \b symbols with values \b values
-   static void vector_assignment(std::basic_string<Symbol *> & symbols,
+   static void vector_assignment(std::vector<Symbol *> & symbols,
                                  Value_P values);
 
    /// dump this symbol to out
@@ -429,11 +410,6 @@ protected:
    /// the value stack of \b this \b Symbol
    std::vector<ValueStackItem> value_stack;
 };
-
-inline void
-Hswap(const Symbol * & u1, const Symbol * & u2)
-{ const Symbol * tmp = u1;   u1 = u2;   u2 = tmp; }
-
 //----------------------------------------------------------------------------
 /// lambda result λ
 class LAMBDA : public Symbol

@@ -16,7 +16,7 @@ A←B←10000∣⎕RVAL 2 2 (0 10 0 0 1) 3
 
 ⍝ set S to a random integer scalar
 ⍝
-S←100 | ⎕RVAL ''
+S←100 | ⎕RVAL 0
 
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
@@ -113,10 +113,10 @@ AB ≡  A EQUIV ¨ B
  ⍝
  ⍝ randomly replace half of the top-level items of B with A
  ⍝
- VB←,B                       ⍝ keep it simple
- VS←{2|⎕RVAL '' ⊣  ⍵ } ¨VB   ⍝ random 0/1 vector of length ⍴VB
- (VS/VB)←A                   ⍝ replace random subset with A
-  Z←(⍴B)⍴VB
+ VB←,B                      ⍝ keep it simple
+ VS←{2|⎕RVAL 0 ⊣  ⍵ } ¨VB   ⍝ random 0/1 vector of length ⍴VB
+ (VS/VB)←A                  ⍝ replace random subset with A
+ Z←(⍴B)⍴VB
 ∇
 
 QA←S RANDOM_REPLACE A

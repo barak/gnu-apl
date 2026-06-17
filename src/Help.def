@@ -22,31 +22,35 @@
 /// \cond NOPE
 
 /* the help_def() macro defines help texts used in different places.
- *
- * It is called with 5 arguments:
- *
- *    help_def(arity, prim, name, title, descr)
- *
- * the arguments are:
- *
- * arity: the arity of the primitive, encoded as follows:
- *     0: niladic function
- *     1: monadic function
- *     2: dyadic function
- *    -1: monadic operator taking one argument
- *    -2: monadic operator taking two arguments
- *    -3: dyadic operator taking one argument
- *    -4: dyadic operator taking two arguments
- *    -5: quasi-dyadic operator (outer product)
- *
- * prim:  the APL symbol for the primitive
- *
- * name:  the official name of the primitive
- *
- * title: a short description of the primitive
- *
- * descr: a longer description what the primitive computes,
- *        possibly including a short example
+  
+   It is called with 5 arguments:
+  
+      help_def(arity, prim, name, title, descr)
+  
+   the arguments are:
+  
+   arity: the arity of the primitive, encoded as follows:
+       0: niladic function
+       1: monadic function
+       2: dyadic function
+       3: monadic primitive function with axis
+       4: dyadic primitive function with axis
+      -1: monadic operator taking one argument
+      -2: monadic operator taking two arguments
+      -3: dyadic operator taking one argument
+      -4: dyadic operator taking two arguments
+      -5: quasi-dyadic operator (outer product)
+      -6: various special cases that do not fit into the schemes above.
+          The brief and descr arguments are copied to the )HELP output.
+  
+   prim:  the APL symbol for the primitive
+  
+   name:  the official name of the primitive
+  
+   title: a short description of the primitive
+  
+   descr: a longer description what the primitive computes,
+          possibly including a short example
  */
 
 // APL primitive functions...
@@ -73,7 +77,7 @@ help_def(1, "+", "Conjugate",
 
 help_def(2, "+", "Addition",
          "Add A and B",
-         "A and B must be numeric. Example:\n"
+         "A and B must be numeric. Examples:\n"
          "      1+1\n"
          "2\n"
          "      1 2 3 + ¯1 ¯2 ¯3\n"
@@ -104,7 +108,7 @@ help_def(1, "×", "Signum(Direction)",
          "      × 10 ¯10 0 3J¯2\n"
          "1 ¯1 0 0.8320502943J¯0.5547001962")
 
-help_def(2, "×", "Times(Multiply by)",
+help_def(2, "×", "Multiplication",
          "A multiplied by B",
          "A and B must be numbers. Return A times B. Example:\n"
          "      1 2 3 × ¯1\n"
@@ -383,8 +387,8 @@ help_def(2, "⌹", "Matrix divide",
          "Z is a minimal (least square) solution of the system of linear equations A = B +.× Z",
          "")
 
-help_def(3, "⌹", "QR Factorization",
-         "Z←⌹[X] B computes a QR factorization of the real or complex matrix B.\n",
+help_def(3, "⌹", "Factorizations",
+         "Z←⌹[X] B computes a factorization of the real or complex matrix B.\n",
          "      The axis argument X selects the algorithm to be used:\n"
          "          ⌹[1] B: Garry Helzer's algorithm (APL Quote Wuad 1990)\n"
          "          ⌹[2] B: LApack based algorithm.\n"
@@ -537,15 +541,22 @@ help_def(2, "⊤=", "Bitwise XNOR",
 
 
 help_def(1, "⊢", "Identity",
-         "Return B as non-committed value",
+         "Return B as non-committed value (e.g. to display it)",
          "")
 
 help_def(2, "⊢", "Right",
          "Return B.",
          "")
 
+help_def(4, "⊢", "Select",
+         "Return A for X=1 or B for X=0.",
+         "    After scalar extension of A, B, and X:"
+         "    ⍴Z ←→ ⍴A ←→ ⍴B ←→ ⍴X.\n    Example:\n"
+         "      'abcdef' ⊢[1 1 0 0 1 0] 1 2 3 4 5 6\n"
+         "1 2 cd 5 f\n")
+
 help_def(1, "⊣", "Hide",
-         "Return committed 0 (as to prevent printing of B)",
+         "Return committed 0 (as to prevent display of B)",
          "")
 
 help_def(2, "⊣", "Left",
@@ -564,12 +575,22 @@ help_def(2, "←", "Assignment",
          "Assign the value of B to A",
          "")
 
+help_def(2, "←", "I-Beam",
+         "Not used in GNU APL",
+         "")
+
 help_def(1, "→", "Goto",
          "Go to line B",
          "")
 
-help_def(1, "∇", "Function definition",
-         "Enter or leave the del editor for defined functions",
+help_def(-6, "∇", "Defined Function editor",
+       "\n      ∇{A} FUN {B}         Create and edit function FUN\n"
+         "      ∇{A} (LOP OP1) B     Create and edit monadic operator OP1\n"
+         "      ∇{A} (LO OP2 RO) B   Create and edit dyadic doperator OP2\n"
+         "      ∇FUN                 Edit existing function FUN\n"
+         "      ∇FUN[⎕]∇             Display existing function FUN\n"
+         "      ∇                    End of editing\n"
+         "      ⍫                    End of editing (and lock the function).",
          "")
 
 // APL primitive operators (except those that are also functions)

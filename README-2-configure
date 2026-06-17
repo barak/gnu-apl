@@ -15,10 +15,27 @@ the option will not occur.
 
 --with-libapl
    This option builds GNU APL as a shared library (libapl.so) rather than an
-   integrated executable. This option is often combined with option
+   executable program. This option is often combined with option
    --with-android, and is automatically set by option --with-erlang. The
-   --with-libapl option not only builds approproate Makefiles, but it also
+   --with-libapl option not only creates approproate Makefiles, but it also
    changes the GNU APL code in some places.
+
+   It is important to note that the libapl.so library needs to be initialized
+   with its function init_libapl() before calling any of its other functions.
+   IOW: the top-level main() function of an executable that uses libapl.so
+   should look like this:
+
+   int
+   main(int argc, char * argv[])
+   {
+     init_libapl(argv[0], /* no start-up-logging */ 0);
+     ...
+     return 0;
+   }
+
+   The first argument of init_libapl() is, by convention, the name of the
+   executable program. The second argument, if non-zero, enables start-up
+   logging of the interpreter (for debugging purposes).
 
 --with-sqlite3=[ARG]
    Build the native function for SQL using sqlite3. ARG may provide the
@@ -189,6 +206,22 @@ MAX_RANK_WANTED=n
 
     ./configure MAX_RANK_WANTED=10
 
+ALT_MAP_WANTED=n
+    Enable an APL input mechanism that allows the input of APL characters
+    without installing a keyboard mapping. This is primarily for Windows
+    machines where no reliable mechanism for entering APL characters exists.
+    The parameter n specifies a profile as sollows:
+
+    n=0 : disable the mecxhanism
+    n=1 : ^A (ASCII SOH) maps the next ASCII character to an APL character
+          ^N (ASCII SO)  maps all subsequenct ASCII characters (until ^N is
+                         entered again). Like CAPS LOCK for mapping lowercase
+                         characters to uppercase.
+
+    Example:
+
+    ./configure ALT_MAP_WANTED=1
+
 
 PRINT_SEMA_WANTED=yes
    This option is now obsolete.
@@ -277,6 +310,23 @@ RATIONAL_NUMBERS_WANTED=yes
    This feature is currently experimental. Example:
 
     ./configure RATIONAL_NUMBERS_WANTED=yes
+
+without-optional_libs
+   This option pretends that any of yje optional library is missing.
+   It patches the config.h file produced by ./configure (though not the LIBS
+   shell variable set by ./configure). IOW: the compiler is told that these
+   libraries are not available, but the liker will still link agains them
+   (with no effect). The purpose of this option is to compile (for test
+   purposes) also those paths in the GNU APL source code that were disabled
+   by the presence of an optional library. Examples:
+
+    ./configure --without-optional_libs
+
+    ./configure --without-optional_libs  \
+                --enable-maintainer-mode \
+                 DEVELOP_WANTED=yes      \
+                 DYNAMIC_LOG_WANTED=yes  \
+                 CXX_WERROR=yes
 
 -------------------------------------------------------------------------------
 

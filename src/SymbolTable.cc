@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -137,45 +137,35 @@ SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
 {
 UCS_string from;
 UCS_string to;
-   {
-     const bool bad_from_to = Command::parse_from_to(from, to, from_to);
-     if (bad_from_to)
-        {
-          CERR << "bad range argument" << endl;
-          MORE_ERROR() << "bad range argument " << from_to
-               << ", expecting from-to";
+   if ( Command::parse_from_to(from, to, from_to))
+      {
+        CERR << "bad range argument" << endl;
+        MORE_ERROR() << "bad range argument " << from_to
+                     << ", expecting from-to";
           return;
-        }
-   }
+      }
 
-   // put those symbols into 'list' that satisfy 'which'
+   // collect those symbols in 'list' that satisfy 'which' and 'from_to'
    //
-std::basic_string<Symbol *> list;
-int symbol_count = 0;
+vector<const Symbol *> list;
+int symbol_count = 0;   // tital count for )SYMBOLS
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
-         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
+         for (const Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
-               if (sym->get_name()[0] == UNI_MUE)   continue;   // macro
+               const UCS_string symbol_name = sym->get_name();
+               if (symbol_name[0] == UNI_MUE)   continue;   // hide macros
                ++symbol_count;
 
                // check range
                //
-               if (from.size() && sym->get_name().lexical_before(from))
-                  {
-                    // CERR << "'" << sym->get_name() << "' comes before '"
-                    //       << from << "'" << endl;
-                    continue;
-                  }
-               if (to.size() && to.lexical_before(sym->get_name()))
-                  {
-                    // CERR << "'" << to << "' comes before '"
-                    //      << sym->get_name() << "'" << endl;
-                    continue;
-                  }
+               if (!symbol_name.is_in_range(from, to))   continue;
 
                if (sym->value_stack.size() == 0)
                   {
+                    // a value_stack size of 0 means that the name is
+                    // currently not used.
+                    //
                     if (which == LIST_ALL)   list.push_back(sym);
                     continue;
                   }
@@ -215,8 +205,8 @@ UCS_string_vector names;
         UCS_string name = list[l]->get_name();
         if (which == LIST_NAMES)   // append .NC
            {
-             name.append(UNI_FULLSTOP);
-             name.append_number(list[l]->value_stack.back().get_NC());
+             const int nc = list[l]->value_stack.back().get_NC() & NC_case_mask;
+             name << UNI_FULLSTOP << nc;
            }
         names.push_back(name);
       }
@@ -226,7 +216,7 @@ UCS_string_vector names;
    // figure column widths
    //
    enum { tabsize = 4 };
-std::basic_string<int> col_widths;
+std::vector<int> col_widths;
    names.compute_column_width(tabsize, col_widths);
 
    loop(c, count)
@@ -441,10 +431,10 @@ ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
    return true;
 }
 //----------------------------------------------------------------------------
-std::basic_string<const Symbol *>
+std::vector<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
-std::basic_string<const Symbol *> ret;
+std::vector<const Symbol *> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -461,7 +451,7 @@ std::basic_string<const Symbol *> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-std::basic_string<const Symbol *> symbols;
+std::vector<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
@@ -487,7 +477,7 @@ std::basic_string<const Symbol *> symbols;
             }
       }
 
-   // pass 1: functions
+   // pass 1: defined functions and operators
    //
    loop(s, symbols.size())
       {
@@ -547,6 +537,6 @@ SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
 
 SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
-   if (max_name_len < name.size())   max_name_len = name.size();
+   if (max_name_len < name.ssize())   max_name_len = name.size();
 }
 //----------------------------------------------------------------------------

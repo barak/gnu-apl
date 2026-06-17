@@ -5,7 +5,7 @@
 CLEAR WS
 
       +
-SYNTAX ERROR+
+VALENCE ERROR+
       +
       ^
 
@@ -23,7 +23,7 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       )SIC
 
-      ⍝ regression
+      ⍝ regression tests
       ⍝
       )CLEAR
 CLEAR WS
@@ -75,6 +75,46 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       )DROP test.xml
 ³
+
+⍝ Davd Alden 8. Nov. 2025 bugapl@gnu.org
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ Note that { ... } notation does not allow s this
+
+      ⎕FX'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'
+DEFN ERROR+
+      ⎕FX 'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'
+      ^
+
+      )MORE
+Attempt (of ⎕FX) to create or edit a lambda. Use { ... } instead.
+
+      ⍝ Test was created despite of the DEFN ERROR
+      ⍝
+      ⎕CR 'Test'
+λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵
+λ←○+/⍵                     
+
+      )DROP test.xml
+³
+      )SAVE test
+³
+
+      )SIC   ⍝⍝ due to DEFN ERROR
+
+      )LOAD test.xml
+³
+
+      ⎕CR 'Test'
+λ←λ0 ⍵;C;D          
+λ←○+/⍵ ⍝⍝ π times Ʃ⍵
+
+      ⎕EX 'Test'
+1
+
+      )CHECK BRIEF
 
 ⍝ ==================================
 

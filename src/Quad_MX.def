@@ -1,0 +1,45 @@
+/*
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
+
+    Copyright © 2024 Henrik Moller
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifdef mx_def
+mx_def(   0, list              , "print ⎕MX subfunctions"       , 1, HELP              )
+mx_def(   1, determinant       , "Determinant of B"             , 1, DETERMINANT       )
+mx_def(   2, cross_product     , "Cross product"                , 3, CROSS_PRODUCT     )
+mx_def(   3, vector_angle      , "Angle between vectors A and B", 2, VECTOR_ANGLE      )
+mx_def(   4, eigenvector       , "Eigenvector"                  , 1, EIGENVECTORS      )
+mx_def(   5, eigenvalue        , "Eigenvalue"                   , 1, EIGENVALUES       )
+mx_def(   6, ident             , "Identity matrix"              , 1, IDENT             )
+mx_def(   7, rotation_matrix   , "Rotation matrix"              , 1, ROTATION_MATRIX   )
+mx_def(   8, homogeneous_matrix, "Homogeneous matrix"           , 2, HOMOGENEOUS_MATRIX)
+mx_def(   9, norm              , "Norm of B"                    , 1, NORM              )
+mx_def(  10, randoms           , "Randoms"                      , 3, RANDOMS           )
+mx_def(  11, covariance        , "Covariance"                   , 3, COVARIANCE        )
+mx_def(  12, histogram         , "Histogram"                    , 2, HISTOGRAM         )
+mx_def(  13, print             , "Print B to file A"            , 2, PRINT             )
+mx_def(  14, set_rng_seed      , "Set RNG seed"                 , 1, SET_RNG_SEED      )
+mx_def( 100, normal_dist       , "Same as ⎕MX[10, 0]"           , 3, RANDOMS_100        )
+mx_def( 101, log_normal_dist   , "Same as ⎕MX[10, 1]"           , 3, RANDOMS_101        )
+mx_def( 102, chi_square_dist   , "Same as ⎕MX[10, 2]"           , 3, RANDOMS_102        )
+mx_def( 104, t_dist            , "Same as ⎕MX[10, 3]"           , 3, RANDOMS_103        )
+# undef mx_def
+#else
+# error "macro mx_def() was not #define'd"
+#endif // mx_def
+

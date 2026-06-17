@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-std::basic_string<NativeFunction *> NativeFunction::valid_functions;
+std::vector<NativeFunction *> NativeFunction::valid_functions;
 
 //----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
@@ -172,28 +172,23 @@ void *
 NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
 const int t4_len = t4.size();
-   t4.append_UTF8("    file ");
-   t4.append_UTF8(filename);
+   t4 << "    file " << filename;
 
    if (access(filename, R_OK) != 0)
       {
-        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
-        t4.append_UTF8(" (");
-        t4.append_UTF8(strerror(errno));
-        t4.append_UTF8(")\n");
+        while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
+        t4 << " (" << strerror(errno) << ")\n";
         return 0;
       }
 
-void * handle = dlopen(filename, RTLD_NOW);
+void * handle = dlopen(filename, RTLD_LAZY);
    if (handle == 0)
       {
         const char * err = dlerror();
         if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
 
-        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
-        t4.append_UTF8(" (");
-        t4.append_UTF8(err);
-        t4.append_UTF8(" )\n");
+        while (t4.ssize() < t4_len + 44)     t4 << UNI_SPACE;
+        t4 << " (" << err << " )\n";
       }
 
    return handle;
@@ -205,10 +200,8 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
    // prepare a )MORE error message containing the file names tried.
    //
    t4.clear();
-   t4.append_UTF8("Could not find shared library '");
-   t4.append(so_path);
-   t4.append_UTF8("'\n"
-                  "The following directories and file names were tried:\n");
+   t4 << "Could not find shared library '" << so_path << "'\n"
+         "The following directories and file names were tried:\n";
 
    // if the name starts with / (or \ on Windows) or .
    // then take it as is without changes.
@@ -222,10 +215,9 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 
         if (handle == 0)
            {
-             t4.append_UTF8(
-            "NOTE: Filename extensions are NOT automatically added "
-            "when a full path\n"
-            "      (i.e. a path starting with / or .) is used.");
+             t4 << "NOTE: Filename extensions are NOT automatically added "
+                   "when a full path\n"
+                   "      (i.e. a path starting with / or .) is used.";
            }
         return handle;
       }
@@ -256,15 +248,13 @@ const char * dirs[] =
 
          UTF8_string dir_so_path(dirs[d]);
          dir_so_path += '/';
-         dir_so_path.append_UTF8(utf_so_path);
+         dir_so_path << utf_so_path;
 
          UTF8_string dir_only(dir_so_path);
          dir_only[strrchr(dir_only.c_str(), '/') - dir_only.c_str()] = 0;
          if (access(dir_only.c_str(), R_OK | X_OK))
             {
-              t4.append_UTF8("    directory ");
-              t4.append_UTF8(dir_only.c_str());
-              t4.append_UTF8("\n");
+              t4 << "    directory " << dir_only << UNI_LF;
               continue;   // new directory
             }
 
@@ -294,7 +284,7 @@ const char * dirs[] =
                if (has_extension && *exts[e])   continue;
 
                UTF8_string filename(dir_so_path);
-               if (exts[e])   filename.append_UTF8(UTF8_string(exts[e]));
+               if (exts[e])   filename << UTF8_string(exts[e]);
 
                void * handle = try_one_file(filename.c_str(), t4);
                if (handle)   // found library
@@ -448,20 +438,20 @@ NativeFunction::print(std::ostream & out) const
 UCS_string
 NativeFunction::load_emacs_library(const char * emacs_arg)
 {
-UCS_string so_path(UTF8_string("libemacs"));
+UCS_string so_path(U"libemacs");
 UCS_string t4;
 
 void * handle = open_so_file(t4, so_path);
    if (handle == 0)   return t4;
 
    t4 = UCS_ASCII_string("found emacs library ");
-   t4.append(so_path);
+   t4 << so_path;
 
 void * emacs_start = dlsym(handle, "emacs_start");
    if (emacs_start == 0)
       {
-        t4.append_UTF8(", but it\n   it is lacking the mandatory "
-                       "function emacs_start()\n");
+        t4 << ", but it\n   it is lacking the mandatory "
+                       "function emacs_start()\n";
         return t4;
       }
 
@@ -469,12 +459,10 @@ UTF8_string so_path_utf(so_path);
 const int error =
     reinterpret_cast<int (*)(const char *, const char *)>(emacs_start)
             (emacs_arg, charP(so_path_utf.c_str()));
+
    if (error)
       {
-        t4.append_UTF8(", but emacs_start()  returned error ");
-        t4.append_number(error);
-        t4.append_UTF8("\n");
-        return t4;
+        return t4 << ", but emacs_start()  returned error " << error << UNI_LF;
       }
 
    t4.clear();   // success

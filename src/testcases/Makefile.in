@@ -93,15 +93,18 @@ host_triplet = @host@
 subdir = src/testcases
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
+	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
+	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/m4/check_GSL.m4 $(top_srcdir)/m4/check_GTK.m4 \
+	$(top_srcdir)/m4/apl_TARGETs.m4 $(top_srcdir)/m4/build_date.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -135,6 +138,7 @@ am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+ALT_MAP_WANTED = @ALT_MAP_WANTED@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 APSERVER_PATH = @APSERVER_PATH@
@@ -251,6 +255,8 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+apl_BUILD_DATE = @apl_BUILD_DATE@
+apl_BUILD_OS = @apl_BUILD_OS@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -296,6 +302,7 @@ top_srcdir = @top_srcdir@
 # put them into apl-x.x.tar.gz, but don't install them.
 #
 dist_noinst_DATA = \
+		0000_OBSOLETE_TESTCASES                 \
         AAA0_Global_Settings.tc                 \
         AAA1.tc                                 \
         AAA2.tc                                 \
@@ -381,6 +388,7 @@ dist_noinst_DATA = \
         Minimum.tc                              \
         Multiply.tc                             \
         MultiLineStrings.tc                     \
+        MultiLineLiterals.tc                    \
         Nabla.tc                                \
         NativeFunctions.tc                      \
         NaturalLogarithm.tc                     \
@@ -397,6 +405,7 @@ dist_noinst_DATA = \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
         PiTimes.tc                              \
+        Polynomials.tc                          \
         Power.tc                                \
         Quad_AF.tc                              \
         Quad_AI.tc                              \
@@ -542,6 +551,9 @@ dist_noinst_DATA = \
         ZZ58_Regression.tc                      \
         ZZ59_Regression.tc                      \
         ZZ60_Regression.tc                      \
+        ZZ61_Regression.tc                      \
+        ZZ62_Regression.tc                      \
+        ZZ63_Regression.tc                      \
         ZZZ0_Standard_08x.tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \

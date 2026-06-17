@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -50,6 +50,9 @@ protected:
      set_dyadic_threshold(thresh_AB);
      set_monadic_threshold(thresh_B);
    }
+
+   /// overloaded Function::is_scalar_function
+   virtual bool is_scalar_function() const   { return true; }
 
    /// Evaluate a scalar function monadically.
    Token eval_scalar_B(Value_P B, prim_f1 fun) const;
@@ -287,8 +290,7 @@ public:
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A, B,
-                              &Cell::bif_not_equal_bitwise); }
+      { return eval_scalar_AB(A, B, &Cell::bif_not_equal_bitwise); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
@@ -557,6 +559,9 @@ public:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B, &Cell::bif_not_equal); }
+
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B) const;
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const

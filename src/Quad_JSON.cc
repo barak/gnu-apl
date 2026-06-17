@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -151,8 +151,8 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    if (cell.is_integer_cell())
       {
         char cc[40];
-        SPRINTF(cc, "%lld", static_cast<long long>(cell.get_int_value()));
-        result.append_UTF8(cc);
+        SPRINTF(cc, "%lld", long_long(cell.get_int_value()));
+        result << cc;
         return;
       }
 
@@ -160,7 +160,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
       {
         char cc[40];
         SPRINTF(cc, "%lg", cell.get_real_value());
-        result.append_UTF8(cc);
+        result << cc;
         return;
       }
 
@@ -168,7 +168,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
       {
         char cc[50];
         SPRINTF(cc, "%lgJ%lg", cell.get_real_value(), cell.get_imag_value());
-        result.append_UTF8(cc);
+        result << cc;
         return;
       }
 
@@ -199,7 +199,7 @@ const UCS_string lit_ucs(*Z);
        lit_ucs.compare(UCS_ASCII_string("true"))  == COMP_EQ ||
        lit_ucs.compare(UCS_ASCII_string("false")) == COMP_EQ)
       {
-        result.append(lit_ucs);
+        result << lit_ucs;
         return;
       }
 
@@ -221,45 +221,45 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
    if (B.is_char_vector())
       {
         const UCS_string ucs_string(B);
-        result += UNI_DOUBLE_QUOTE;
+        result << UNI_DOUBLE_QUOTE;
         loop(u, ucs_string.size())
             {
               switch(const Unicode uni = ucs_string[u])
                  {
-                   case UNI_BS:           result.append_UTF8("\\b");   break;
-                   case UNI_HT:           result.append_UTF8("\\t");   break;
-                   case UNI_LF:           result.append_UTF8("\\n");   break;
-                   case UNI_FF:           result.append_UTF8("\\f");   break;
-                   case UNI_CR:           result.append_UTF8("\\r");   break;
-                   case UNI_DOUBLE_QUOTE: result.append_UTF8("\\\"");   break;
+                   case UNI_BS:           result << "\\b";   break;
+                   case UNI_HT:           result << "\\t";   break;
+                   case UNI_LF:           result << "\\n";   break;
+                   case UNI_FF:           result << "\\f";   break;
+                   case UNI_CR:           result << "\\r";   break;
+                   case UNI_DOUBLE_QUOTE: result << "\\\"";   break;
 
                    default: if (uni < UNI_SPACE)
                                {
                                  char cc[10];
                                  SPRINTF(cc, "\\u%4.4X", int(uni));
-                                 result.append_UTF8(cc);
+                                 result << cc;
                                }
                             else
                                {
-                                 result += uni;
+                                 result << uni;
                                }
                  }
             }
-        result += UNI_DOUBLE_QUOTE;
+        result << UNI_DOUBLE_QUOTE;
         return;
       }
 
    if (B.get_rank() == 1)   // JSON array
       {
-        UCS_string array(UTF8_string("[ "));
+        UCS_string array(U"[ ");
         const ShapeItem ec = B.element_count();
         loop(e, ec)
             {
-              if (e)   array.append_ASCII(", ");
+              if (e)   array << ", ";
               if (array.size() > 60)
                  {
                    array.back() = UNI_LF;
-                   result.append(array);
+                   result << array;
                    array = UCS_string(2*level + 2, UNI_SPACE);
                  }
 
@@ -270,14 +270,14 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    return;
                  }
             }
-        array.append_UTF8(" ]");
-        result.append(array);
+        array << UNI_SPACE << UNI_R_BRACK;
+        result << array;
         return;
       }
 
    if (B.is_structured())   // JSON object
       {
-        std::basic_string<ShapeItem> member_indices;
+        std::vector<ShapeItem> member_indices;
         B.used_members(member_indices, sorted);
 
         loop(m, member_indices.size())
@@ -285,26 +285,24 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
              const Cell & member_name = B.get_cravel(2*member_indices[m]);
              const Cell & member_data = B.get_cravel(2*member_indices[m] + 1);
 
-             result.append(UCS_string(2*level, UNI_SPACE));   // level indent
-             if (m)   result.append_UTF8("  \"");
-             else     result.append_UTF8("{ \"");
+             result << UCS_string(2*level, UNI_SPACE);   // level indent
+             if (m)   result << "  \"";
+             else     result << "{ \"";
              UCS_string member(*member_name.get_pointer_value());
-             result.append(member_name);
-             result.append_UTF8("\": ");
+             result << member_name << "\": ";
              APL_to_JSON_string(result, member_data, level + 1, sorted);
              if (result.size() == 0)   return;   // error converting member_data
              if (size_t(m) < (member_indices.size() - 1))
                 {
-                  result += UNI_COMMA;
-                  result += UNI_LF;
+                  result << UNI_COMMA << UNI_LF;
                 }
              else
                 {
-                  result += UNI_SPACE;
+                  result << UNI_SPACE;
                 }
            }
 
-        result.append_UTF8("}");
+        result << UNI_R_CURLY;
         return;
       }
 
@@ -321,7 +319,7 @@ const ShapeItem B0 = b++;   // the leading "
    Assert(ucs_B[B0] == UNI_DOUBLE_QUOTE);
 
 ShapeItem content_len = 0;
-   for (; b < ucs_B.size(); ++b)
+   for (; b < ucs_B.ssize(); ++b)
        {
          const Unicode uni = ucs_B[b];
          if (uni == UNI_DOUBLE_QUOTE)   return content_len;
@@ -411,12 +409,12 @@ const ShapeItem len_B = B.element_count();
 
 UCS_string ucs_B;
    ucs_B.reserve(len_B + 1);
-   loop(b, len_B)   ucs_B += B.get_cravel(b).get_char_value();
-   ucs_B += Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
+   loop(b, len_B)   ucs_B << B.get_cravel(b).get_char_value();
+   ucs_B << Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
 
    // tokenize ucs_B
    //
-std::basic_string<ShapeItem> tokens_B;
+std::vector<ShapeItem> tokens_B;
    tokens_B.reserve(10 + len_B/2);
 
    loop(b, ucs_B.size())
@@ -467,7 +465,7 @@ size_t token0 = 0;
    if (token0 != tokens_B.size())
       {
         MORE_ERROR() <<
-        "⎕JSON B: there were extra token in B (tokenized: " << tokens_B.size()
+        "⎕JSON B: there were extra tokens in B (tokenized: " << tokens_B.size()
         << ", but processed: " << token0 <<
         ").\n    The JSON string must be one serialized value.";
         LENGTH_ERROR;
@@ -486,7 +484,7 @@ size_t token0 = 0;
 //----------------------------------------------------------------------------
 void
 Quad_JSON::parse_value(Value & Z, const UCS_string & ucs_B,
-                      const std::basic_string<ShapeItem> & tokens_B, size_t & token0)
+                      const std::vector<ShapeItem> & tokens_B, size_t & token0)
 {
 const ShapeItem b = tokens_B.at(token0);
    switch(ucs_B[b])
@@ -531,7 +529,7 @@ const ShapeItem b = tokens_B.at(token0);
 //----------------------------------------------------------------------------
 void
 Quad_JSON::parse_array(Value & Z, const UCS_string & ucs_B,
-                       const std::basic_string<ShapeItem> & tokens_B,
+                       const std::vector<ShapeItem> & tokens_B,
                        size_t & token0)
 {
 size_t token_from = token0;
@@ -589,7 +587,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
 //----------------------------------------------------------------------------
 void
 Quad_JSON::parse_object(Value & Z, const UCS_string & ucs_B,
-                        const std::basic_string<ShapeItem> & tokens_B,
+                        const std::vector<ShapeItem> & tokens_B,
                         size_t & token0)
 {
 size_t token_from = token0;
@@ -632,7 +630,7 @@ Value_P assoc_array = EmptyStruct(LOC);
 //----------------------------------------------------------------------------
 void
 Quad_JSON::parse_object_member(Value & Z, const UCS_string & ucs_B,
-                               const std::basic_string<ShapeItem> & tokens_B,
+                               const std::vector<ShapeItem> & tokens_B,
                                size_t & token_from)
 {
 const size_t B_start =  tokens_B[token_from];
@@ -901,7 +899,7 @@ Value_P Zsub(LOC);
 //----------------------------------------------------------------------------
 size_t
 Quad_JSON::comma_count(const UCS_string & ucs_B,
-                       const std::basic_string<ShapeItem> & tokens_B,
+                       const std::vector<ShapeItem> & tokens_B,
                        size_t & token0)
 {
    // ucs_B is the JSON text string being parsed,
@@ -926,11 +924,11 @@ bool expect_colon = true;
          switch(uni)
                {
                  case UNI_L_BRACK:            // [
-                      stack += UNI_R_BRACK;   // push ]
+                      stack << UNI_R_BRACK;   // push ]
                       continue;
 
                  case UNI_L_CURLY:            //      {
-                      stack += UNI_R_CURLY;   // push }
+                      stack << UNI_R_CURLY;   // push }
                       continue;
 
                  case UNI_COMMA:

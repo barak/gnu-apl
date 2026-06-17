@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,21 @@ inline Value_P::Value_P(ShapeItem len, const char * loc)
 const char * args = "ShapeItem len, const char * loc";
    value_p = 0;
 
-   try                           { value_p = new Value(len, loc); }
+   try                           { value_p = new Value(len, loc);             }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   value_p->increment_owner_count(loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//----------------------------------------------------------------------------
+inline Value_P::Value_P(ShapeItem rows, ShapeItem cols, const char * loc)
+{
+const char * args = "ShapeItem rows, Shapeitem cols, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(rows, cols, loc);      }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
    catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
@@ -268,6 +282,27 @@ Value_P_Base::isolate(const char * loc)
         value_p->decrement_owner_count(LOC);
         value_p = Z.value_p;
         Z.value_p = 0;
+      }
+#endif
+}
+//----------------------------------------------------------------------------
+inline void
+Value_P_Base::isolate_deep(const char * loc)
+{
+#ifdef NEW_CLONE
+   isolate(LOC);
+
+   if (value_p)
+      {
+        loop(j, value_p->nz_element_count())
+            {
+              Cell & cell = value_p->get_wravel(j);
+              if (cell.is_pointer_cell())
+                 {
+                   PointerCell & ptr = reinterpret_cast<PointerCell &>(cell);
+                   ptr.isolate_deep(LOC);
+                 }
+            }
       }
 #endif
 }

@@ -61,7 +61,8 @@ std::string UnixSocketListener::start( void )
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
     strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) );
-    if( ::bind( server_socket, (struct sockaddr *)&addr, sizeof( addr ) ) == -1 ) {
+    if(::bind(server_socket, reinterpret_cast<sockaddr *>(&addr),
+              sizeof(addr)) == -1) {
         stringstream errmsg;
         errmsg << "Error binding unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );

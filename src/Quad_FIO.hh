@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -77,7 +77,14 @@ public:
    /// cycle counter at start of a benchmark (⎕FIO[-1])
    static uint64_t benchmark_cycles_from;
 
+   /// return the open FILE * for (APL integer value) \b handle
+   static FILE * get_FILE(const Value & handle)
+      { return get_FILE(handle.get_cscalar().get_near_int()); }
+
 protected:
+   /// a mapping between function names and function numbers
+   static const FunctionGroup::function_info subfunction_infos[];
+
    /// overloaded Function::is_operator()
    virtual bool is_operator() const   { return true; }
 
@@ -93,28 +100,11 @@ protected:
    /// overloaded Function::eval_LXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
-   /// overloaded Function::has_subfuns()
-   virtual bool has_subfuns() const
-      { return true; }
-
-   /// overloaded Function::subfun_to_axis
-   virtual sAxis subfun_to_axis(const UCS_string & name) const;
-
    /// return one or more random values
    static Value_P get_random(APL_Integer mode, APL_Integer len);
 
    /// return the open FILE * for (APL integer) \b handle
    static FILE * get_FILE(int handle);
-
-   /// a mapping between function names and function numbers
-   struct _sub_fun
-      {
-        unsigned int val;   ///< the function number
-        const char * key;   ///< the name for it
-      };
-
-   /// a mapping between function names and function numbers
-   static _sub_fun sub_functions[];
 
    /// one file (openend with open(), fopen(), or fdopen()).
    /// : handle == fd, and FILE * may or may not exist for fd
@@ -158,10 +148,6 @@ protected:
    static file_entry & get_file_entry(const Value & handle)
       { return get_file_entry(handle.get_cscalar().get_near_int()); }
 
-   /// return the open FILE * (APL integer) \b handle
-   static FILE * get_FILE(const Value & handle)
-      { return get_FILE(handle.get_cscalar().get_near_int()); }
-
    /// return the open file descriptor for (APL integer) \b handle
    static int get_fd(const Value & value)
        {
@@ -179,13 +165,17 @@ protected:
         if (UserPreferences::uprefs.safe_mode)
            {
              MORE_ERROR() << "⎕FIO[" << funnum
-                          << " is not permitted in safe mode (see ⎕ARGi)";
+                          << " is not permitted in safe mode (see ⎕ARG)";
              DOMAIN_ERROR;
            }
       }
 
    /// list all ⎕IO functions to \b out
-   static Token list_functions(ostream & out, bool mapping);
+   Token list_functions(ostream & out) const;
+
+   /// helper function to print the subfunction syntax mapping
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
 
    /// convert bits set in \b fds to an APL integer vector
    static Value_P fds_to_val(fd_set * fds, int max_fd);
@@ -200,12 +190,6 @@ protected:
    /// perform an fscanf() from file
    static Token do_scanf(File_or_String & input, const UCS_string & format,
                          int function_number);
-
-   /// compare two axis strings (function names)
-   static int axis_compare(const void * key, const void * sf);
-
-   /// find function number for function name, -1 if not found
-   static int function_name_to_int(const char * function_name);
 
    /// for Date/Time Bv. return its seconds since midnight Jan 1, 1970
    static APL_Integer secs_epoch(const Value & B);

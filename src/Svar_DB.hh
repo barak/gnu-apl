@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -88,9 +88,13 @@ public:
    /// return true if \b id is registered in APserver
    static bool is_registered_id(const AP_num3 & id);
 
+   /// close the connection to the APserver
+   static void close_connection();
+
    /// get TCP socket to APserver, complain if not connected
    static TCP_socket get_Svar_DB_tcp(const char * calling_function);
 
+   
    /// retract an offer, return previous coupling
    static void retract_var(SV_key key);
 
@@ -106,11 +110,11 @@ public:
    /// add processors with pending offers to \b to_proc. Duplicates
    /// are OK and will be removed later
    static void get_offering_processors(AP_num to_proc,
-                                       std::basic_string<AP_num> & processors);
+                                       std::vector<AP_num> & processors);
 
    /// return all variables shared between \b to_proc and \b from_proc
    static void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                     std::basic_string<uint32_t> & varnames);
+                                     std::vector<uint32_t> & varnames);
 
    /// return coupling of \b entry with \b key.
    static SV_Coupling get_coupling(SV_key key)
@@ -171,11 +175,7 @@ public:
                                          bool logit);
 
    /// close TCP connection to APserver
-   static void disconnect()
-      {
-        if (DB_tcp != NO_TCP_SOCKET)
-           { close(DB_tcp);   DB_tcp = NO_TCP_SOCKET; }
-      }
+   static void disconnect();
 
    /// return true if the connection to APserver is up
    static bool APserver_available()
@@ -199,6 +199,8 @@ protected:
    /// The TCP port of APserver
    static uint16_t APserver_port;
 
+   /// log some details
+   static bool do_log;
 private:
    /// don't create...
   Svar_DB();

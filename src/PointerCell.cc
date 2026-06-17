@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2025  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -201,27 +201,40 @@ Value_P val = get_pointer_value();
 
         if (val->is_char_vector())
            {
-             ucs.append(UNI_SINGLE_QUOTE);
+             ucs << UNI_SINGLE_QUOTE;
              loop(e, ec)
                 {
                   const Unicode uni = val->get_cravel(e).get_char_value();
-                  ucs.append(uni);
-                  if (uni == UNI_SINGLE_QUOTE)   ucs.append(uni);   // ' -> ''
+                  ucs << uni;
+                  if (uni == UNI_SINGLE_QUOTE)   ucs << uni;   // ' -> ''
                 }
-             ucs.append(UNI_SINGLE_QUOTE);
+             ucs << UNI_SINGLE_QUOTE;
+           }
+        else if (ec == 0)   // empty
+           {
+             if (val->get_rank() > 1)   TODO;
+             if (val->get_cfirst().is_character_cell())
+                {
+                  ucs << UNI_SINGLE_QUOTE << UNI_SINGLE_QUOTE;
+                }
+             else if (val->get_cfirst().is_integer_cell())
+                {
+                  ucs << UNI_ZILDE;
+                }
+             else TODO;
            }
         else
            {
-             ucs.append(UNI_L_PARENT);
+             ucs << UNI_L_PARENT;
              loop(e, ec)
                 {
                   PrintBuffer pb = val->get_cravel(e).
                         character_representation(pctx);
-                  ucs.append(UCS_string(pb, 0, Workspace::get_PW()));
+                  ucs << UCS_string(pb, 0, Workspace::get_PW());
 
-                  if (e < ec - 1)   ucs.append(UNI_SPACE);
+                  if (e < ec - 1)   ucs << UNI_SPACE;
                 }
-             ucs.append(UNI_R_PARENT);
+             ucs << UNI_R_PARENT;
            }
 
         ColInfo ci;
@@ -245,8 +258,8 @@ PrintBuffer ret(*val, pctx, 0);
                 {
                   if (val->get_shape_item(r) == 0)   // an empty axis
                      {
-                       if (r == val->get_rank() - 1)   style |= PST_EMPTY_LAST;
-                       else                            style |= PST_EMPTY_NLAST;
+                       if (r == val->get_rank()-1)   style |= PST_EMPTY_LAST;
+                       else                          style |= PST_EMPTY_NLAST;
                      }
                 }
 
@@ -276,10 +289,30 @@ PrintBuffer ret(*val, pctx, 0);
            }
        else
            {
+             int style = pctx.get_style();
+             bool is_simple   = true;
+             bool has_chars   = false;
+             bool has_numbers = false;
+             loop(e, ec)
+                 {
+                   const Cell & cell = val->get_cravel(e);
+                   if      (cell.is_pointer_cell())     is_simple = false;
+                   else if (cell.is_character_cell())   has_chars = true;
+                   else if (cell.is_numeric())          has_numbers = true;
+                 }
+              if (has_chars && has_numbers)
+                 {
+                   style |= PST_SIMPLE_MIXED;
+                 }
+              else if (is_simple && has_numbers)
+                 {
+                   style |= PST_SIMPLE_NUMER;
+                 }
+
              if (!(pctx.get_style() & PST_QUOTE_CHARS && val->is_char_array()))
                 {
-                  ret.add_frame(pctx.get_style(), val->get_shape(),
-                                val->compute_depth());
+                  ret.add_frame(PrintStyle(style),
+                                val->get_shape(), val->compute_depth());
                 }
            }
       }
@@ -287,6 +320,22 @@ PrintBuffer ret(*val, pctx, 0);
    ret.get_info().int_len  = ret.get_column_count();
    ret.get_info().real_len = ret.get_column_count();
    return ret;
+}
+//----------------------------------------------------------------------------
+void
+PointerCell::isolate_deep(const char * loc)
+{
+   isolate(loc);
+Value * val = value.pval.valp.get();
+   loop(j, val->nz_element_count())
+       {
+         Cell & cell = val->get_wravel(j);
+         if (cell.is_pointer_cell())
+            {
+              PointerCell & ptr = reinterpret_cast<PointerCell &>(cell);
+              ptr.isolate_deep(loc);
+            }
+       }
 }
 //----------------------------------------------------------------------------
 

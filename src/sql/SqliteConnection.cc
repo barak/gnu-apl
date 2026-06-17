@@ -64,7 +64,7 @@ void
 SqliteConnection::run_simple(const string & sql)
 {
 SqliteArgListBuilder builder(this, sql);
-   builder.run_query(false);
+   builder.run_query();
 }
 //-----------------------------------------------------------------------------
 void
@@ -142,8 +142,3 @@ SqliteStmtWrapper statement_wrapper(statement);
         }
 }
 
-const string
-SqliteConnection::make_positional_param(int)
-{
-    return "?";
-}
