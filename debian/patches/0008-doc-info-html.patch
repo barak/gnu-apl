@@ -19,15 +19,16 @@ on make clean.
 Add AM_INIT_AUTOMAKE info-in-builddir option so generated .info
 files are written to the build directory rather than the source tree.
 ---
- configure.ac    |  2 +-
- doc/Makefile.am | 67 ++++++++++++++-------------------------------------------
- 2 files changed, 17 insertions(+), 52 deletions(-)
+ configure.ac         |  2 +-
+ doc/DALY/Makefile.am | 43 +---------------------------------------
+ doc/Makefile.am      | 55 +++++++++++++---------------------------------------
+ 3 files changed, 15 insertions(+), 85 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index cf8a5dd..59f1234 100644
+index 9790a9e..c4164bc 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -35,7 +35,7 @@ AC_USE_SYSTEM_EXTENSIONS
+@@ -101,7 +101,7 @@ AC_USE_SYSTEM_EXTENSIONS
  #
  # enable_dependency_tracking=no
  
@@ -36,23 +37,68 @@ index cf8a5dd..59f1234 100644
  AM_MAINTAINER_MODE([disable])
  AC_CONFIG_SRCDIR([src])
  AC_CONFIG_MACRO_DIR([m4])
-diff --git a/doc/Makefile.am b/doc/Makefile.am
-index 35afeef..8394e88 100644
---- a/doc/Makefile.am
-+++ b/doc/Makefile.am
-@@ -1,57 +1,22 @@
+diff --git a/doc/DALY/Makefile.am b/doc/DALY/Makefile.am
+index a6787de..dce1fee 100644
+--- a/doc/DALY/Makefile.am
++++ b/doc/DALY/Makefile.am
+@@ -1,42 +1 @@
 -
--# NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
+-dist_doc_DALY_DATA =    apl_kbd.texi            \
+-                        apl-library.info        \
+-                        apl-library.texi        \
+-                        apl-pkg-mgr.texi        \
+-                        arg_parser.texi         \
+-                        assert.texi             \
+-                        cfg.texi                \
+-                        cl.texi                 \
+-                        date.texi               \
+-                        dom.texi                \
+-                        export.texi             \
+-                        fdl-1.3.texi            \
+-                        finance.texi            \
+-                        fmt.texi                \
+-                        html.texi               \
+-                        import.texi             \
+-                        lex1.texi               \
+-                        lex.texi                \
+-                        lpr.texi
+-
+-doc_DALYdir = $(pkglibdir)/doc/DALY
+-
+- NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
 -# to be deleted on 'make clean' That is bad for people not having a
--# $MAKEINFOHTML installed. We therefore leve info_TEXINFOS empty and instead
+-# $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
 -# install info stuff manually below.
 -#
+-info_TEXINFOS =
+-
+-install-info-am:
+-	@echo " $(MKDIR_P) $(DESTDIR)$(infodir)"
+-	@       $(MKDIR_P) "$(DESTDIR)$(infodir)" || exit 1
+-	@echo " $(INSTALL_DATA) $(srcdir)/apl-library.info   $(DESTDIR)$(infodir)"
+-	@       $(INSTALL_DATA) $(srcdir)/apl-library.info  $(DESTDIR)$(infodir)
+-
+-uninstall-info-am:
+-	@echo " rm -f $(DESTDIR)$(infodir)/apl.info"
+-	@       rm -f $(DESTDIR)$(infodir)/apl.info
+-	@echo " rm -f $(DESTDIR)$(infodir)/libapl.info"
+-	@       rm -f $(DESTDIR)$(infodir)/libapl.info
+-
++info_TEXINFOS = apl-library.texi
+diff --git a/doc/Makefile.am b/doc/Makefile.am
+index d8ba624..1f83474 100644
+--- a/doc/Makefile.am
++++ b/doc/Makefile.am
+@@ -7,54 +7,25 @@ SUBDIRS = DALY
+ # $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
+ # install info stuff manually below.
+ #
 -info_TEXINFOS = 
 +info_TEXINFOS = apl.texi libapl.texi
  
  man1_MANS = apl.1
  
--# info_TEXINFOS = fails for more than one .texi file. We therefore install
+-# info_TEXINFOS = fails for more than one .info file. We therefore install
 -# libapl.info explicitly
 -#
 -install-info-am:
@@ -71,22 +117,21 @@ index 35afeef..8394e88 100644
 -#
 -apl.html:   apl.texi
 -	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
--
++AM_MAKEINFOHTMLFLAGS = --no-split
+ 
 -# apl.texi in info format
 -#
 -apl.info:   apl.texi
 -	$(MAKEINFO) $< -o $@ --no-split || touch $@
--
--# libapl.texi in HTML format
--#
-+AM_MAKEINFOHTMLFLAGS = --no-split
-+
 +apl.html: apl.texi
 +	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
-+
+ 
+-# libapl.texi in HTML format
+-#
  libapl.html: libapl.texi
 -	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
--
++	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
+ 
 -# libapl.texi in info format
 -#
 -libapl.info: libapl.texi
@@ -102,8 +147,6 @@ index 35afeef..8394e88 100644
 -	libapl.info		\
 -	PLOT_circle.png		\
 -	PLOT_zigzag.png		\
-+	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
-+
 +nodist_doc_DATA =	\
 +	apl.html	\
  	libapl.html

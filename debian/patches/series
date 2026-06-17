@@ -1,9 +1,3 @@
 0001-append-null-ptr.patch
 0002-out-of-tree-Isql.patch
-0003-out-of-tree-makefile-h.patch
-0004-out-of-tree-buildtag.hh.patch
-0005-out-of-tree-configure_args.cc.patch
-0006-include-config.h.patch
-0007-spelling.patch
 0008-doc-info-html.patch
-0009-out-of-tree-include-derived.patch

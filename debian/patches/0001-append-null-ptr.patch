@@ -11,10 +11,10 @@ trap.
  1 file changed, 1 deletion(-)
 
 diff --git a/src/Backtrace.cc b/src/Backtrace.cc
-index bee80ff..beec15b 100644
+index 3bf9186..02c53c8 100644
 --- a/src/Backtrace.cc
 +++ b/src/Backtrace.cc
-@@ -327,7 +327,6 @@ std::string tmp;
+@@ -1432,7 +1432,6 @@ std::string tmp;
     tmp.reserve(result_max + 1);
     for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
         tmp += *b;
