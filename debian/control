@@ -10,6 +10,9 @@ Build-Depends:
  libsqlite3-dev,
  libxcb1-dev,
  pkgconf,
+ texinfo,
+ asciidoc,
+ libreoffice-writer,
 Standards-Version: 4.7.4
 Homepage: https://www.gnu.org/software/apl/
 Vcs-Git: https://salsa.debian.org/debian/gnu-apl.git

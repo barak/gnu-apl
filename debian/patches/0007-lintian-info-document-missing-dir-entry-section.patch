@@ -1,0 +1,24 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Mon, 22 Jun 2026 14:46:49 +0100
+Subject: lintian info-document-missing-dir-{entry,section}
+
+---
+ doc/DALY/apl-library.texi | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/doc/DALY/apl-library.texi b/doc/DALY/apl-library.texi
+index 81a964e..d0db9e1 100644
+--- a/doc/DALY/apl-library.texi
++++ b/doc/DALY/apl-library.texi
+@@ -19,6 +19,11 @@ Free Documentation License".
+ @end quotation
+ @end copying
+ 
++@dircategory GNU programming tools
++@direntry
++* APL-LIBRARY: (apl-library). Collection of useful functions for the APL programmer
++@end direntry
++
+ @titlepage
+ @title APL Library
+ @author Bill Daly

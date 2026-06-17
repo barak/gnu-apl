@@ -1,0 +1,341 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sat, 20 Jun 2026 16:59:32 +0100
+Subject: deconstruct info-to-texi
+
+---
+ doc/DALY/Makefile.am     |  38 ++++++-
+ doc/DALY/info-to-texi.pl | 277 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 312 insertions(+), 3 deletions(-)
+ create mode 100644 doc/DALY/info-to-texi.pl
+
+diff --git a/doc/DALY/Makefile.am b/doc/DALY/Makefile.am
+index e8b2b18..baa3467 100644
+--- a/doc/DALY/Makefile.am
++++ b/doc/DALY/Makefile.am
+@@ -1,8 +1,40 @@
+ info_TEXINFOS = apl-library.texi
+ 
+-apl-library.html: apl-library.texi
+-	$(MAKEINFO) $< -o $@ --no-split --html
++# apl-library.texi @includes one chapter per workspace.  Most chapters are
++# shipped as Texinfo source, but several (aparse, pw, ...) are not -- only
++# the pre-built apl-library.info, made by someone who did have them, is.
++# Reconstruct those chapters from that .info file with info-to-texi.pl so
++# the manual can be rebuilt.  These are build artifacts, not distributed.
++GENERATED_TEXI =		\
++	aparse.texi		\
++	pw.texi			\
++	pref.texi		\
++	prompt.texi		\
++	seq.texi		\
++	stack.texi		\
++	stat.texi		\
++	utf8.texi		\
++	utl.texi		\
++	wblg.texi		\
++	wp.texi			\
++	xml.texi
+ 
+-CLEANFILES = apl-library.html apl-library.info
++$(GENERATED_TEXI): %.texi: info-to-texi.pl apl-library.info
++	perl $(srcdir)/info-to-texi.pl $* $(srcdir)/apl-library.info >$@
++
++# makeinfo must find both the committed chapters (in $(srcdir)) and the
++# reconstructed ones (written to the build directory).
++AM_MAKEINFOFLAGS = -I $(srcdir) -I .
++
++# Reconstruct the missing chapters before the manual is formatted.
++BUILT_SOURCES = $(GENERATED_TEXI)
++apl-library.info: $(GENERATED_TEXI)
++
++apl-library.html: apl-library.texi $(GENERATED_TEXI)
++	$(MAKEINFO) $(AM_MAKEINFOFLAGS) $< -o $@ --no-split --html
++
++CLEANFILES = apl-library.html apl-library.info $(GENERATED_TEXI)
+ 
+ nodist_doc_DATA = apl-library.html
++
++EXTRA_DIST = info-to-texi.pl
+diff --git a/doc/DALY/info-to-texi.pl b/doc/DALY/info-to-texi.pl
+new file mode 100644
+index 0000000..aefd72e
+--- /dev/null
++++ b/doc/DALY/info-to-texi.pl
+@@ -0,0 +1,277 @@
++#!/usr/bin/perl
++# info-to-texi.pl --- reconstruct a per-chapter Texinfo source file from
++# the pre-built apl-library.info file.
++#
++# doc/DALY/apl-library.texi @includes one XXX.texi file per workspace
++# (aparse.texi, pw.texi, ...).  Several of these are not shipped by
++# upstream; only the compiled apl-library.info, built by someone who did
++# have them, is.  This script splits that .info file back into the
++# individual chapter sources so the document can be rebuilt.
++#
++# Usage: perl info-to-texi.pl CHAPTER apl-library.info > CHAPTER.texi
++#
++# CHAPTER is the @include basename used in apl-library.texi (e.g. aparse).
++# It is mapped below to the Info node name actually used in the .info file
++# (e.g. arg_parser) where the two differ.
++
++use strict;
++use warnings;
++
++# @include basename in apl-library.texi  =>  node name in apl-library.info
++my %NODE = (
++    aparse => 'arg_parser',
++    pw     => 'password',
++    pref   => 'preferences',
++    wblg   => 'web_log',
++);
++
++my ($chapter, $infofile) = @ARGV;
++die "usage: $0 CHAPTER apl-library.info\n" unless defined $chapter && defined $infofile;
++my $node = $NODE{$chapter} || $chapter;
++
++open my $fh, '<:encoding(UTF-8)', $infofile or die "$infofile: $!\n";
++local $/;
++my $data = <$fh>;
++close $fh;
++
++# The body of the .info file (before the tag table) is a sequence of
++# "pages" separated by Control-_ (0x1f).  Each page after the header is
++# one node.  The indirection/tag tables that follow the last real node
++# are ignored below (the second "Top" node marks the tag table).
++my @pages = split /\x1f/, $data;
++
++# Parse each page into { node, up, title, level, body }.
++my @nodes;
++for my $page (@pages) {
++    my @lines = split /\n/, $page;
++    # find the "File: ..., Node: X, ... Up: Y" header line
++    my $hi;
++    for my $i (0 .. $#lines) {
++        if ($lines[$i] =~ /^File: .*?,\s+Node:\s+(.*)$/) { $hi = $i; last; }
++    }
++    next unless defined $hi;
++    my $hdr = $lines[$hi];
++    my ($nn) = $hdr =~ /Node:\s+([^,]+?)\s*,/;
++    next unless defined $nn;
++    last if $nn eq 'Top' && @nodes;   # tag table region
++    my ($up) = $hdr =~ /Up:\s+([^,]+?)\s*$/;
++    $up = '' unless defined $up;
++
++    # title line + its underline come right after the header (skip blanks)
++    my $j = $hi + 1;
++    $j++ while $j <= $#lines && $lines[$j] =~ /^\s*$/;
++    my $title = $lines[$j] // '';
++    my $under = $lines[$j + 1] // '';
++    my $level = 0;
++    $level = 1 if $under =~ /^\*+\s*$/;   # chapter
++    $level = 2 if $under =~ /^=+\s*$/;    # section
++    $level = 3 if $under =~ /^-+\s*$/;    # subsection
++    $title =~ s/^[\d]+(?:\.[\d]+)*\s+//;  # strip the "12.3 " section number
++    my @body = @lines[$j + 2 .. $#lines];
++
++    push @nodes, { node => $nn, up => $up, title => $title,
++                   level => $level, body => \@body };
++}
++
++# Collect the requested chapter (Up: Top) plus the subnodes that follow it
++# until the next chapter.
++my @out;
++my $collecting = 0;
++for my $n (@nodes) {
++    if ($n->{up} eq 'Top') {
++        last if $collecting;            # reached the next chapter
++        $collecting = 1 if $n->{node} eq $node;
++    }
++    push @out, $n if $collecting;
++}
++die "$0: chapter node '$node' not found in $infofile\n" unless @out;
++
++# ---------------------------------------------------------------------------
++# Formatting helpers
++# ---------------------------------------------------------------------------
++
++sub esc {
++    my $s = shift;
++    $s =~ s/\@/\@\@/g;
++    $s =~ s/\{/\@\{/g;
++    $s =~ s/\}/\@\}/g;
++    return $s;
++}
++
++# inline conversions applied to ordinary prose (after escaping)
++sub inline {
++    my $s = esc(shift);
++    $s =~ s/\*note\s+([^:]+?)::/\@ref{$1}/g;   # cross references
++    return $s;
++}
++
++sub indent_of {
++    my $l = shift;
++    return 9999 if $l =~ /^\s*$/;
++    $l =~ /^(\s*)/;
++    return length $1;
++}
++
++sub dedent {
++    my ($n, @lines) = @_;
++    return @lines if $n <= 0;
++    return map { my $l = $_; $l =~ s/^ {1,$n}//; $l } @lines;
++}
++
++my @result;     # accumulated output lines
++my $list = '';  # current open list: '', 'itemize' or 'enumerate'
++
++sub close_list {
++    if ($list) { push @result, "\@end $list", ''; $list = ''; }
++}
++
++# Emit one blank-line-delimited block (already trimmed of surrounding blanks).
++sub emit_block {
++    my @blk = @_;
++    return unless @blk;
++    my $first = $blk[0];
++    (my $stripped = $first) =~ s/^\s+//;
++    my $min = 9999;
++    for (@blk) { my $i = indent_of($_); $min = $i if $i < $min; }
++    $min = 0 if $min == 9999;
++
++    if ($stripped =~ /^\*\s+/) {                      # itemize
++        close_list() if $list && $list ne 'itemize';
++        if (!$list) { push @result, '@itemize @bullet'; $list = 'itemize'; }
++        for my $l (@blk) {
++            if ($l =~ /^\s*\*\s+(.*)$/) { push @result, '@item', inline($1); }
++            else { (my $c = $l) =~ s/^\s+//; push @result, inline($c); }
++        }
++        return;
++    }
++    if ($stripped =~ /^\d+\.\s+/) {                   # enumerate
++        close_list() if $list && $list ne 'enumerate';
++        if (!$list) { push @result, '@enumerate'; $list = 'enumerate'; }
++        for my $l (@blk) {
++            if ($l =~ /^\s*\d+\.\s+(.*)$/) { push @result, '@item', inline($1); }
++            else { (my $c = $l) =~ s/^\s+//; push @result, inline($c); }
++        }
++        return;
++    }
++    close_list();
++    if ($min >= 5) {                                  # example / code
++        push @result, '@example';
++        push @result, map { esc($_) } dedent($min, @blk);
++        push @result, '@end example', '';
++        return;
++    }
++    # ordinary paragraph
++    push @result, map { inline($_) } dedent($min, @blk);
++    push @result, '';
++}
++
++# Format a run of body lines (recursively used for @deffn bodies).
++sub emit_body {
++    my @lines = @_;
++    my @blk;
++    my $i = 0;
++    while ($i <= $#lines) {
++        my $L = $lines[$i];
++
++        if ($L =~ /^\s*$/) {                          # blank: end block
++            emit_block(@blk); @blk = ();
++            $i++; next;
++        }
++
++        # heading: a line directly followed by an underline rule
++        if (defined $lines[$i + 1] && $lines[$i + 1] =~ /^(=+|-+|\*+)\s*$/
++            && $L !~ /^\s/) {
++            emit_block(@blk); @blk = (); close_list();
++            (my $t = $L) =~ s/^[\d]+(?:\.[\d]+)*\s+//;
++            my $u = $lines[$i + 1];
++            my $cmd = $u =~ /^=/ ? '@section'
++                    : $u =~ /^-/ ? '@subsection' : '@chapter';
++            push @result, '', "$cmd " . esc($t), '';
++            $i += 2; next;
++        }
++
++        # menu
++        if ($L =~ /^\*\s*Menu:/) {
++            emit_block(@blk); @blk = (); close_list();
++            push @result, '@menu';
++            $i++;
++            while ($i <= $#lines) {
++                my $m = $lines[$i];
++                if ($m =~ /^\s*$/) { $i++; next; }
++                if ($m =~ /^\*\s+(.+?)\s*::\s*(.*)$/) {
++                    my ($n, $d) = ($1, $2);
++                    push @result, "* ${n}::" . (length $d ? "  $d" : '');
++                    $i++; next;
++                }
++                last;
++            }
++            push @result, '@end menu', '';
++            next;
++        }
++
++        # deffn / defvr (rendered by makeinfo as " -- Category: signature")
++        if ($L =~ /^ -- (\S+?):\s?(.*)$/) {
++            emit_block(@blk); @blk = (); close_list();
++            my $cat = $1;
++            my $sig = $2;
++            $i++;
++            # a signature can wrap onto deeper-indented continuation lines
++            while ($i <= $#lines && $lines[$i] !~ /^\s*$/
++                   && indent_of($lines[$i]) > 5 && $lines[$i] !~ /^ -- /) {
++                (my $c = $lines[$i]) =~ s/^\s+//;
++                $sig .= ' ' . $c;
++                $i++;
++            }
++            # collect the body: indented lines (>=5) and blanks, until we
++            # dedent back out, hit another definition, or a heading.
++            my @bd;
++            while ($i <= $#lines) {
++                my $b = $lines[$i];
++                last if $b =~ /^ -- \S+?:/;
++                if ($b =~ /^\s*$/) { push @bd, ''; $i++; next; }
++                last if indent_of($b) < 5;
++                last if defined $lines[$i + 1]
++                        && $lines[$i + 1] =~ /^(=+|-+|\*+)\s*$/;
++                push @bd, $b; $i++;
++            }
++            pop @bd while @bd && $bd[-1] eq '';
++            push @result, '', "\@deffn $cat " . esc($sig), '';
++            emit_body(dedent(5, @bd));
++            push @result, '@end deffn', '';
++            next;
++        }
++
++        push @blk, $L;
++        $i++;
++    }
++    emit_block(@blk);
++    close_list();
++}
++
++# ---------------------------------------------------------------------------
++# Drive the output
++# ---------------------------------------------------------------------------
++
++for my $idx (0 .. $#out) {
++    my $n = $out[$idx];
++    if ($idx == 0) {
++        push @result, "\@node $chapter";
++        push @result, "\@chapter " . esc($n->{title});
++    } else {
++        push @result, "\@node $n->{node}";
++        my $cmd = $n->{level} >= 3 ? '@subsection' : '@section';
++        push @result, "$cmd " . esc($n->{title});
++    }
++    push @result, '';
++    emit_body(@{ $n->{body} });
++    push @result, '';
++}
++
++# tidy: collapse runs of blank lines
++my @final;
++for my $l (@result) {
++    next if $l eq '' && @final && $final[-1] eq '';
++    push @final, $l;
++}
++binmode STDOUT, ':encoding(UTF-8)';
++print "$_\n" for @final;

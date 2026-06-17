@@ -1,0 +1,60 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sat, 20 Jun 2026 17:38:53 +0100
+Subject: missing @includes
+
+---
+ doc/DALY/apl-library.texi | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/doc/DALY/apl-library.texi b/doc/DALY/apl-library.texi
+index c20fa34..81a964e 100644
+--- a/doc/DALY/apl-library.texi
++++ b/doc/DALY/apl-library.texi
+@@ -40,6 +40,7 @@ A collection of usefull functions for the APL programmer.
+ @end ifnottex
+ 
+ @menu
++*  apl_kbd:: Turn the apl keyboard on and off.
+ *  aparse:: Functions to parse a script's command line.
+ *  assert::   Workspace to test source code
+ *  cfg:: Workspace to read a Windows' configuration file
+@@ -51,6 +52,7 @@ A collection of usefull functions for the APL programmer.
+ *  html::     Workspace to create html pages
+ *  import::   Functions to read delimited files
+ *  lex::      Workspace for storing lexicons of name--value pairs
++*  lex1::     Workspace for storing name-value pairs in a hash
+ *  cl::       Workspace for storing name--value pairs in a component file
+ *  lpr::      Functions for printing
+ *  pw:: Generate pseudorandom passwords
+@@ -64,10 +66,13 @@ A collection of usefull functions for the APL programmer.
+ *  wblg::  Workspace to read Apache access files.
+ *  wp::       Workspace to print workpapers
+ *  xml::      Workspace to create xml applications
++*  apl-pkg-mgr:: Install the library's workspaces into APL Package Manager
+ *  license::
+ *  Index::
+ 
+ @end menu
++@include apl_kbd.texi
++@page
+ @include aparse.texi
+ @page
+ @include assert.texi
+@@ -90,6 +95,8 @@ A collection of usefull functions for the APL programmer.
+ @page
+ @include lex.texi
+ @page
++@include lex1.texi
++@page
+ @include cl.texi
+ @page
+ @include lpr.texi
+@@ -116,6 +123,8 @@ A collection of usefull functions for the APL programmer.
+ @page
+ @include xml.texi
+ @page
++@include apl-pkg-mgr.texi
++@page
+ 
+ @node license
+ @chapter The GNU Free Documentation License.

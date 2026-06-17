@@ -1,3 +1,7 @@
-0001-append-null-ptr.patch
 0002-out-of-tree-Isql.patch
 0008-doc-info-html.patch
+0004-reconstructed-texi-files.patch
+0004-missing-includes.patch
+0005-missing-DiffOut.hh.patch
+0007-spelling.patch
+0007-lintian-info-document-missing-dir-entry-section.patch

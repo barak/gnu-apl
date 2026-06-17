@@ -1,0 +1,167 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 21 Jun 2026 03:33:06 +0100
+Subject: missing DiffOut.hh
+
+---
+ src/{FileBuffers.hh => DiffOut.hh} | 57 ++------------------------------------
+ src/FileBuffers.hh                 | 38 +------------------------
+ src/libapl.cc                      |  4 +--
+ 3 files changed, 6 insertions(+), 93 deletions(-)
+ copy src/{FileBuffers.hh => DiffOut.hh} (54%)
+
+diff --git a/src/FileBuffers.hh b/src/DiffOut.hh
+similarity index 54%
+copy from src/FileBuffers.hh
+copy to src/DiffOut.hh
+index 1e190e8..2d1bb77 100644
+--- a/src/FileBuffers.hh
++++ b/src/DiffOut.hh
+@@ -18,64 +18,13 @@
+     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+ 
+-#ifndef __FILEBUFFERS_HH_DEFINED__
+-#define __FILEBUFFERS_HH_DEFINED__
++#ifndef __DIFFOUT_HH_DEFINED__
++#define __DIFFOUT_HH_DEFINED__
+ 
+ #include <fstream>
+ 
+ #include "UTF8_string.hh"
+ 
+-//============================================================================
+-/// a filebuf for stdin echo
+-class CinOut_filebuf : public filebuf
+-{
+-   /// overloaded filebuf::overflow
+-   virtual int overflow(int c);
+-};
+-extern CinOut_filebuf CIN_filebuf;
+-//============================================================================
+-// a filebuf for stderr output
+-class ErrOut_filebuf : public filebuf
+-{
+-protected:
+-   /// overloaded filebuf::overflow()
+-   virtual int overflow(int c);
+-
+-public:
+-   /// constructor
+-   ErrOut_filebuf()
+-   : expand_LF(false)
+-   { }
+-
+-   /// destructor
+-   ~ErrOut_filebuf()   { used = false; }
+-   /// set LF → CRLF expansion mode
+-   bool LF_to_CRLF(bool on)
+-      {
+-        const int ret = expand_LF;
+-        expand_LF = on;
+-        return ret;
+-      }
+-
+-   /** a helper function telling whether the constructor for CERR was called
+-       if CERR is used before its constructor was called (which can happen in
+-       when constructors of static objects are called and use CERR) then a
+-       segmentation fault would occur.
+-
+-       We avoid that by using get_CERR() instead of CERR in such constructors.
+-       get_CERR() checks \b used and returns cerr instead of CERR if it is
+-       false.
+-    **/
+-   filebuf * use()   { used = true;   return this; }
+-
+-   /// true iff the constructor for CERR was called
+-   static bool used;   // set when CERR is constructed
+-
+-   /// expand LF to CRLF
+-   bool expand_LF;
+-
+-   /// current column
+-};
+ //============================================================================
+ /// a filebuf that compares its output with a file.
+ class DiffOut : public filebuf
+@@ -114,4 +63,4 @@ protected:
+    bool expand_LF;
+ };
+ //============================================================================
+-#endif // __FILEBUFFERS_HH_DEFINED__
++#endif // __DIFFOUT_HH_DEFINED__
+diff --git a/src/FileBuffers.hh b/src/FileBuffers.hh
+index 1e190e8..8c9e784 100644
+--- a/src/FileBuffers.hh
++++ b/src/FileBuffers.hh
+@@ -23,6 +23,7 @@
+ 
+ #include <fstream>
+ 
++#include "DiffOut.hh"
+ #include "UTF8_string.hh"
+ 
+ //============================================================================
+@@ -77,41 +78,4 @@ public:
+    /// current column
+ };
+ //============================================================================
+-/// a filebuf that compares its output with a file.
+-class DiffOut : public filebuf
+-{
+-public:
+-   /// constructor
+-   DiffOut(bool _errout)
+-   : aplout(""),
+-     errout(_errout),
+-     expand_LF(false)
+-   { aplout.clear(); }
+-
+-   /// discard all characters
+-   void reset()
+-   { aplout.clear(); }
+-
+-   /// set LF → CRLF expansion mode
+-   int LF_to_CRLF(int on)
+-      { const int old = expand_LF;   expand_LF = on;   return old; }
+-
+-protected:
+-   /// overloaded filebuf::overflow()
+-   virtual int overflow(int c);
+-
+-   /// return true iff 0-terminated strings apl and ref differ
+-   /// at \b pos
+-   bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
+-
+-   /// a buffer for one line of APL output
+-   UTF8_string aplout;
+-
+-   /// true for error messages, false for normal APL output
+-   bool errout;
+-
+-   /// expand LF to CRLF
+-   bool expand_LF;
+-};
+-//============================================================================
+ #endif // __FILEBUFFERS_HH_DEFINED__
+diff --git a/src/libapl.cc b/src/libapl.cc
+index 4d3130d..21373f3 100644
+--- a/src/libapl.cc
++++ b/src/libapl.cc
+@@ -535,7 +535,7 @@ UTF8_string text;
+    text.reserve(len);
+    for (const char ** f = function_lines_utf8; *f; ++f)
+       {
+-        text << *f << UNI_LF;
++        text << *f << "\n";
+       }
+ 
+    return fix_function_NL(text.c_str());
+@@ -759,7 +759,7 @@ init_libapl(const char * progname, int log_startup)
+ //----------------------------------------------------------------------------
+ extern DiffOut DOUT_filebuf;
+ extern DiffOut UERR_filebuf;
+-extern ErrOut  CERR_filebuf;
++extern ErrOut_filebuf CERR_filebuf;
+ 
+ int
+ expand_LF_to_CRLF(int on)

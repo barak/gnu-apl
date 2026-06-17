@@ -18,13 +18,6 @@ override_dh_auto_configure::
 	dh_auto_configure --builddirectory=debian/obj/libapl -- \
 		$(CONFIGURE_EXTRA) --with-libapl
 
-execute_before_dh_auto_build:
-	@echo "src/makefile.h in source tree can override built file"
-	-rm --verbose src/makefile.h
-	@echo "src/buildtag.hh in source tree contains stale info"
-	-rm --verbose src/buildtag.hh
-	@echo "remove more random generated files"
-	-rm --verbose src/configure_args.cc gnu-apl.d/preferences erlang/apl.erl rpm/apl.spec
 override_dh_auto_build::
 	dh_auto_build --builddirectory=debian/obj/apl -- $(JOPT)
 override_dh_auto_build::

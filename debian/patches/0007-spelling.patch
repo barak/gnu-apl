@@ -1,0 +1,147 @@
+From: "Barak A. Pearlmutter" <barak@pearlmutter.net>
+Date: Sat, 6 Jun 2026 20:01:53 +0100
+Subject: correct spelling
+
+Correct misspellings in comments and strings across src/ and the
+testcases directory.
+
+# Conflicts:
+#	src/Executable.cc
+#	src/Help.def
+#	src/QuadFunction.cc
+#	src/SystemVariable.def
+---
+ doc/apl.texi             | 2 +-
+ src/Archive.cc           | 2 +-
+ src/Executable.cc        | 2 +-
+ src/Help.def             | 2 +-
+ src/QuadFunction.cc      | 2 +-
+ src/Quad_CC.cc           | 2 +-
+ src/SystemVariable.hh    | 2 +-
+ src/main.cc              | 2 +-
+ src/testcases/Quad_ES.tc | 4 ++--
+ 9 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/doc/apl.texi b/doc/apl.texi
+index 33f01da..dfaa2cb 100644
+--- a/doc/apl.texi
++++ b/doc/apl.texi
+@@ -4733,7 +4733,7 @@ character classes for ⎕CC:
+       ⎕CC   4:  ASCII characters (same as ⎕CC 127)
+       ⎕CC   5:  superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )
+       ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )
+-      ⎕CC   7:  line drawing chatacters
++      ⎕CC   7:  line drawing characters
+       ⎕CC   8:  octal digits 0-7
+       ⎕CC   9:  some mathematical symbols
+       ⎕CC  10:  decimal digits 0-9
+diff --git a/src/Archive.cc b/src/Archive.cc
+index af4e6da..5e73734 100644
+--- a/src/Archive.cc
++++ b/src/Archive.cc
+@@ -2600,7 +2600,7 @@ const int levels = find_int_attr("levels", false, 10);
+            {
+              err <<
+ "\n"
+-"*** SORRY! An error occured while reading the )SI stack of the )SAVEd\n"
++"*** SORRY! An error occurred while reading the )SI stack of the )SAVEd\n"
+ "    workspace. The )SI stack was reconstructed to the extent possible.\n"
+ "    We strongly recommend to perform )SIC and then )DUMP the workspace under\n"
+ "    a different name.\n" << endl;
+diff --git a/src/Executable.cc b/src/Executable.cc
+index 3434a5c..c9a242d 100644
+--- a/src/Executable.cc
++++ b/src/Executable.cc
+@@ -1474,7 +1474,7 @@ UserFunction * ufun = get_exec_ufun();
+ ExecuteList *
+ ExecuteList::fix(const UCS_string & data, const char * loc)
+ {
+-   // clear any errors that may have occured before
++   // clear any errors that may have occurred before
+    //
+    if (Error * err = Workspace::get_error())   err->clear_error_code();
+ 
+diff --git a/src/Help.def b/src/Help.def
+index 60dd8a1..ab469de 100644
+--- a/src/Help.def
++++ b/src/Help.def
+@@ -633,7 +633,7 @@ help_def(-3, "⍤",  "Rank",
+          "")
+ 
+ help_def(-4, "⍤",  "Rank",
+-         "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",
++         "Call GA F GB with each of the corresponding rank-G cells GA of A and GB of B\n",
+          "")
+ 
+ help_def(-3, "⍣",  "Power Operator",
+diff --git a/src/QuadFunction.cc b/src/QuadFunction.cc
+index 79c92bd..026cc2e 100644
+--- a/src/QuadFunction.cc
++++ b/src/QuadFunction.cc
+@@ -572,7 +572,7 @@ const ErrorCode ec = get_error_code(B);
+    else                                   //  ⎕ES B with unknown major/minor B
+       {
+         char cc[58];
+-        SPRINTF(cc, "Unkown error (major %d, minor %d) in ⎕ES B",
++        SPRINTF(cc, "Unknown error (major %d, minor %d) in ⎕ES B",
+                     error.get_error_code() >> 16,
+                     error.get_error_code() & 0xFFFF);
+         error.set_error_line_1(cc);
+diff --git a/src/Quad_CC.cc b/src/Quad_CC.cc
+index 3cfd7a4..869b305 100644
+--- a/src/Quad_CC.cc
++++ b/src/Quad_CC.cc
+@@ -192,7 +192,7 @@ Quad_CC::print_classes(ostream & out)
+        << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
+        << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
+        << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
+-       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
++       << "      ⎕CC   7:  Line drawing characters"                    << endl
+        << "      ⎕CC   8:  Octal digits 0-7"                           << endl
+        << "      ⎕CC   9:  Some mathematical symbols"                  << endl
+        << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
+diff --git a/src/SystemVariable.hh b/src/SystemVariable.hh
+index 270d0be..3655d5f 100644
+--- a/src/SystemVariable.hh
++++ b/src/SystemVariable.hh
+@@ -536,7 +536,7 @@ protected:
+ };
+ //----------------------------------------------------------------------------
+ /**
+-   System variable Quad-R (Right Argment).
++   System variable Quad-R (Right Argument).
+  */
+ /// The class implementing ⎕R
+ class Quad_R : public NL_SystemVariable
+diff --git a/src/main.cc b/src/main.cc
+index b954cb2..c6af0d3 100644
+--- a/src/main.cc
++++ b/src/main.cc
+@@ -253,7 +253,7 @@ const char * lines[] =
+   c2                                                                      ,
+   ""                                                                      ,
+   "This program is free software, and you are welcome to redistribute it" ,
+-  "according to the GNU Public License (GPL) version 3 or later."         ,
++  "according to the GNU General Public License (GPL) version 3 or later."         ,
+   ""                                                                      ,
+ };
+ 
+diff --git a/src/testcases/Quad_ES.tc b/src/testcases/Quad_ES.tc
+index c93fea3..95af24f 100644
+--- a/src/testcases/Quad_ES.tc
++++ b/src/testcases/Quad_ES.tc
+@@ -93,12 +93,12 @@ OK      - no duplicate parents
+ 0.3333333333
+ 
+       RECIP 0
+-Unkown error (major 13, minor 17) in ⎕ES B
++Unknown error (major 13, minor 17) in ⎕ES B
+       RECIP 0
+       ^     ^
+ 
+       ⎕EM
+-Unkown error (major 13, minor 17) in ⎕ES B
++Unknown error (major 13, minor 17) in ⎕ES B
+       RECIP 0                             
+       ^     ^                             
+ 

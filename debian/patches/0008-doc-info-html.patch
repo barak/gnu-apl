@@ -20,12 +20,12 @@ Add AM_INIT_AUTOMAKE info-in-builddir option so generated .info
 files are written to the build directory rather than the source tree.
 ---
  configure.ac         |  2 +-
- doc/DALY/Makefile.am | 43 +---------------------------------------
- doc/Makefile.am      | 55 +++++++++++++---------------------------------------
- 3 files changed, 15 insertions(+), 85 deletions(-)
+ doc/DALY/Makefile.am | 45 +++++--------------------------------
+ doc/Makefile.am      | 63 +++++++++++-----------------------------------------
+ 3 files changed, 20 insertions(+), 90 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
-index 9790a9e..c4164bc 100644
+index 0856575..898176d 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -101,7 +101,7 @@ AC_USE_SYSTEM_EXTENSIONS
@@ -38,11 +38,13 @@ index 9790a9e..c4164bc 100644
  AC_CONFIG_SRCDIR([src])
  AC_CONFIG_MACRO_DIR([m4])
 diff --git a/doc/DALY/Makefile.am b/doc/DALY/Makefile.am
-index a6787de..dce1fee 100644
+index a6787de..d86cbe8 100644
 --- a/doc/DALY/Makefile.am
 +++ b/doc/DALY/Makefile.am
-@@ -1,42 +1 @@
--
+@@ -1,42 +1,9 @@
++info_TEXINFOS = apl-library.texi
++MAKEINFOFLAGS = --no-split
+ 
 -dist_doc_DALY_DATA =    apl_kbd.texi            \
 -                        apl-library.info        \
 -                        apl-library.texi        \
@@ -62,7 +64,9 @@ index a6787de..dce1fee 100644
 -                        lex1.texi               \
 -                        lex.texi                \
 -                        lpr.texi
--
++apl-library.html: apl-library.texi
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) $<
+ 
 -doc_DALYdir = $(pkglibdir)/doc/DALY
 -
 - NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
@@ -83,13 +87,14 @@ index a6787de..dce1fee 100644
 -	@       rm -f $(DESTDIR)$(infodir)/apl.info
 -	@echo " rm -f $(DESTDIR)$(infodir)/libapl.info"
 -	@       rm -f $(DESTDIR)$(infodir)/libapl.info
--
-+info_TEXINFOS = apl-library.texi
++CLEANFILES = apl-library.html apl-library.info
+ 
++nodist_doc_DATA = apl-library.html
 diff --git a/doc/Makefile.am b/doc/Makefile.am
-index d8ba624..1f83474 100644
+index 17b1639..14c2f5d 100644
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
-@@ -7,54 +7,25 @@ SUBDIRS = DALY
+@@ -7,59 +7,22 @@ SUBDIRS = DALY
  # $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
  # install info stuff manually below.
  #
@@ -97,6 +102,8 @@ index d8ba624..1f83474 100644
 +info_TEXINFOS = apl.texi libapl.texi
  
  man1_MANS = apl.1
++HTMLFILES = apl.html libapl.html
++MAKEINFOFLAGS = --no-split
  
 -# info_TEXINFOS = fails for more than one .info file. We therefore install
 -# libapl.info explicitly
@@ -115,45 +122,48 @@ index d8ba624..1f83474 100644
 -
 -# apl.texi in HTML format
 -#
--apl.html:   apl.texi
--	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
-+AM_MAKEINFOHTMLFLAGS = --no-split
+-apl.html:   apl.texi apl-info.css
+-	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
++apl.html: apl.texi apl-info.css
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
++libapl.html: libapl.texi apl-info.css
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
  
 -# apl.texi in info format
 -#
 -apl.info:   apl.texi
--	$(MAKEINFO) $< -o $@ --no-split || touch $@
-+apl.html: apl.texi
-+	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
+-	@$(MAKEINFO) $< -o $@ --no-split || touch $@
++CLEANFILES = $(HTMLFILES) apl.info libapl.info
  
 -# libapl.texi in HTML format
 -#
- libapl.html: libapl.texi
+-libapl.html: libapl.texi
 -	$(MAKEINFOHTML) $< -o $@ --no-split || touch $@
-+	$(MAKEINFO) $(AM_MAKEINFOHTMLFLAGS) --html -o $@ $<
- 
+-
 -# libapl.texi in info format
 -#
 -libapl.info: libapl.texi
 -	$(MAKEINFO) $< -o $@ --no-split || touch $@
 -
 -
--dist_doc_DATA =			\
--	apl.1			\
--	apl.texi		\
--	apl.info		\
--	apl.html		\
--	libapl.texi		\
--	libapl.info		\
--	PLOT_circle.png		\
--	PLOT_zigzag.png		\
-+nodist_doc_DATA =	\
-+	apl.html	\
- 	libapl.html
+-# NOTE that the .html version of aspl.text refers
+-# to some of the files in dist_doc_DATA.
+-#
+-dist_doc_DATA =				\
+-	apl.1					\
+-	apl.texi				\
+-	apl.info				\
+-	apl-info.css			\
+-	apl.html				\
+-	libapl.texi				\
+-	libapl.info				\
+-	PLOT_circle.png			\
+-	PLOT_zigzag.png			\
+-    MX_distributions.png	\
+-	libapl.html
++nodist_doc_DATA = $(HTMLFILES)
  
-+CLEANFILES = apl.html libapl.html apl.info libapl.info
-+
 +dist_doc_DATA =		\
 +	PLOT_circle.png	\
-+	PLOT_zigzag.png
-+
++	PLOT_zigzag.png	\
++	MX_distributions.png

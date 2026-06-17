@@ -1,3 +1,12 @@
+gnu-apl (2.0-1) unstable; urgency=medium
+
+  * New upstream version
+  * Forward port patches
+  * Patches for missing *.texi files, build issues, missing src/DiffOut.hh
+  * Add dependencies for building documentation
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Sun, 21 Jun 2026 03:37:33 +0100
+
 gnu-apl (1.9-3) unstable; urgency=medium
 
   * just leave the derived files from the upstream tarball (so annoying!)

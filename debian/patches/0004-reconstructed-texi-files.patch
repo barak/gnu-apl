@@ -1,0 +1,1167 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sat, 20 Jun 2026 17:01:54 +0100
+Subject: reconstructed texi files
+
+---
+ doc/DALY/{arg_parser.texi => aparse.texi} | 107 ++++--------
+ doc/DALY/pref.texi                        |  44 +++++
+ doc/DALY/prompt.texi                      |  31 ++++
+ doc/DALY/pw.texi                          |  40 +++++
+ doc/DALY/seq.texi                         |  46 +++++
+ doc/DALY/stack.texi                       |  52 ++++++
+ doc/DALY/stat.texi                        |  80 +++++++++
+ doc/DALY/utf8.texi                        |  37 ++++
+ doc/DALY/utl.texi                         |  47 +++++
+ doc/DALY/wblg.texi                        | 181 +++++++++++++++++++
+ doc/DALY/wp.texi                          | 278 ++++++++++++++++++++++++++++++
+ doc/DALY/xml.texi                         |  63 +++++++
+ 12 files changed, 932 insertions(+), 74 deletions(-)
+ copy doc/DALY/{arg_parser.texi => aparse.texi} (52%)
+ create mode 100644 doc/DALY/pref.texi
+ create mode 100644 doc/DALY/prompt.texi
+ create mode 100644 doc/DALY/pw.texi
+ create mode 100644 doc/DALY/seq.texi
+ create mode 100644 doc/DALY/stack.texi
+ create mode 100644 doc/DALY/stat.texi
+ create mode 100644 doc/DALY/utf8.texi
+ create mode 100644 doc/DALY/utl.texi
+ create mode 100644 doc/DALY/wblg.texi
+ create mode 100644 doc/DALY/wp.texi
+ create mode 100644 doc/DALY/xml.texi
+
+diff --git a/doc/DALY/arg_parser.texi b/doc/DALY/aparse.texi
+similarity index 52%
+copy from doc/DALY/arg_parser.texi
+copy to doc/DALY/aparse.texi
+index 4ab49c7..67166d1 100644
+--- a/doc/DALY/arg_parser.texi
++++ b/doc/DALY/aparse.texi
+@@ -1,53 +1,15 @@
+-@ifplaintext
+-\input texinfo
+-@settitle arg_parser, Command line arguments
+-@setfilename arg_parser.txt
+-@copying
+-This manual is for workspace assert version  0 1 2.
+-
+-Copyright @copyright{} 2019 Bill Daly
+-
+-This program is free software: you can redistribute it and/or modify
+-it under the terms of the GNU General Public License as published by
+-the Free Software Foundation, either version 3 of the License, or
+-(at your option) any later version.
+-
+-This program is distributed in the hope that it will be useful,
+-but WITHOUT ANY WARRANTY; without even the implied warranty of
+-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-GNU General Public License for more details.
+-
+-You should have received a copy of the GNU General Public License
+-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-@end copying
+-
+-@titlepage
+-@title arg_parser, Command line arguments
+-@author Bill Daly
+-
+-@end titlepage
+-
+-@ifnottex
+-@node TOP
+-@end ifnottex
+-
+-@end ifplaintext
+-
+-@ifnotplaintext
+-@node arg_parser
+-@end ifnotplaintext
+-
++@node aparse
+ @chapter arg_parser, Command line arguments
+-@cindex arguments
+-@cindex command line
+-@cindex arg_parser
+ 
+ arg_parser parses command line arguments that follow posix long-name
+ options.  That is a double dash followed by the argument and,
+ optionally, followed by an equals sign and a value.  That is
+-@example
+---option[=value].
+-@end example
++     --option[=value].
++
++@menu
++* Overview::
++* API::
++@end menu
+ 
+ @node Overview
+ @section Overview
+@@ -57,22 +19,16 @@ arg_parser presents an application programming interface:
+ @enumerate
+ @item
+ Create a parser object with ap∆init.
+-
+ @item
+ Define options with ap∆new_option.
+-
+ @item
+ Parse the command line with ap∆parse.
+-
+ @item
+ Test for errors with ap∆has_errors.
+-
+ @item
+ Test for help request wtih ap∆has_help.
+-
+ @item
+ Get option values with ap∆get_option_value.
+-
+ @end enumerate
+ 
+ For instance:
+@@ -88,16 +44,14 @@ First←po ap∇get_option_value 'first'
+ Second←po ap∆get_option_value 'second'
+ @end example
+ 
+-arg_parser uses both the utl and lex workspace. As shipped the
+-arg_parser.apl file copies these utilities into its workspace.  APL
+-may not be able to find these utilities at run time.  We recomend
+-copying all three apl files into your script file to avoid any
+-confusion.
++   arg_parser uses both the utl and lex workspace.  As shipped the
++arg_parser.apl file copies these utilities into its workspace.  APL may
++not be able to find these utilities at run time.  We recomend copying
++all three apl files into your script file to avoid any confusion.
+ 
+ @node API
+ @section API
+ 
+-
+ @deffn ∇ parser_object ← ap∆init name
+ 
+ Function returns a new parser object
+@@ -106,36 +60,41 @@ Function returns a new parser object
+ 
+ @deffn ∇ parser_object ← parser_object ap∆new_option alist or lexicon
+ 
+-Function adds a new option to the parser instance. The object defined
+-in the right argument is a list of name value pairs for the following
+-names:
++Function adds a new option to the parser instance.  The object
++defined in the right argument is a list of name value pairs for the
++following names:
+ 
+-@itemize
+-@item name (required)
+-@item type (required)
+-@item help (optional)
+-@item value (provided by the parser)
++@itemize @bullet
++@item
++name (required)
++@item
++type (required)
++@item
++help (optional)
++@item
++value (provided by the parser)
+ @end itemize
+ 
+ @end deffn
+ 
+ @deffn ∇ parser_object ← ap∆parse parser_object
+ 
+-Function examines the command line, confirms that command line options
+-have been defined with new_option; that string type options have value
+-and that boolen options do not. It then saves the given values.
++Function examines the command line, confirms that command line
++options have been defined with new_option; that string type options
++have value and that boolen options do not.  It then saves the given
++values.
+ 
+-Function sets errors true when it detects errors and sets help true if
+-the operator included --help on the command line.
++Function sets errors true when it detects errors and sets help true
++if the operator included -help on the command line.
+ 
+ @end deffn
+ 
+ @deffn ∇ value←parser_object ap∆get_option_value name
+ 
+-Function returns the value of an option.  If a string option was not
+-on the command line, ⍬ will be returned. If a boolean option was one
+-the command line 1 (True) will be returned, if not, 0 will be
+-returned.
++Function returns the value of an option.  If a string option was
++not on the command line, ⍬ will be returned.  If a boolean option
++was one the command line 1 (True) will be returned, if not, 0 will
++be returned.
+ 
+ @end deffn
+ 
+diff --git a/doc/DALY/pref.texi b/doc/DALY/pref.texi
+new file mode 100644
+index 0000000..cb0f862
+--- /dev/null
++++ b/doc/DALY/pref.texi
+@@ -0,0 +1,44 @@
++@node pref
++@chapter preferences - workspace to view apl preferences
++
++preferences is a workspace that displays the currently active settings
++in the gnu-apl preference file.  The command 'pref∆current
++pref∆find_prefs' does the displaying.
++
++@example
++     pref∆current pref∆find_prefs
++Welcome                  No
++Color                    No
++SharedVars               Enabled (default)
++LIBREF-3                 /usr/local/lib/apl/wslib3
++LIBREF-4                 /usr/local/lib/apl/wslib4
++LIBREF-5                 /usr/local/lib/apl/wslib5
++READLINE_HISTORY_LEN     500
++READLINE_HISTORY_PATH    .apl.history
++NABLA-TO-HISTORY         Modified (default)
++BACKUP_BEFORE_SAVE       yes
++CONTROL-Ds-TO-EXIT       0
++Profile                  2
++disable_Quad_GTK         yes # disable ⎕cwGTK
++disable_Quad_FIO         no # do not disable ⎕FIO
++disable_native_functions yes # disable A ⎕FX B (native fnctions)
++disable_Quad_PLOT        yes # disable ⎕PLOT
++disable_Quad_SQL         yes # disable ⎕SQL
++disable_SAVE_command     yes # disable )SAVE and )DUMP ws
++CIN-SEQUENCE             1b 5b 30 3b 33 32 3b 34 30 6d // ESC [0;32;40m
++COUT-SEQUENCE            1b 5b 30 3b 33 37 3b 34 30 6d // ESC [0;37;40m
++CERR-SEQUENCE            1b 5b 30 3b 33 31 3b 34 30 6d // ESC [0;31;40m
++UERR-SEQUENCE            1b 5b 30 3b 33 31 3b 34 30 6d // ESC [0;31;40m
++RESET-SEQUENCE           1b 5b 30 3b 33 37 3b 34 30 6d // ESC [0;37;48m
++CLEAR-EOL-SEQUENCE       //
++CLEAR-EOS-SEQUENCE       //
++Keyboard                 NOCURSES (default)
++LIBREF-0                 /home/dalyw/workspaces
++LIBREF-1                 /home/dalyw/wslib1
++LIBREF-2                 /home/dalyw/wslib2
++LIBREF-6                 /home/dalyw/wslib6
++LIBREF-7                 /dilworth/workspaces
++LIBREF-8                 /mnt/workspaces
++LIBREF-9                 /mnt/wslib1
++@end example
++
+diff --git a/doc/DALY/prompt.texi b/doc/DALY/prompt.texi
+new file mode 100644
+index 0000000..246998d
+--- /dev/null
++++ b/doc/DALY/prompt.texi
+@@ -0,0 +1,31 @@
++@node prompt
++@chapter Seeking answers in a top - quit - done world.
++
++Workspace to seek answers from your users.
++
++@deffn ∇ ans ← prompt 'Query'
++
++Function prints the query and returns the user's answer.  If one of
++the four keywords quit, top, done, or back are entered, prompt will
++return an integer.  1 for quit, 2 for top, 3 from done, and 4 for
++back when ⎕io is set to 1.
++
++This should allow the programmer to react:
++
++@example
++[1] ans←prompt 'Last Name ... '
++[2] →(utl∆numberp ans)/keyword
++[3] ⍝ Deal with actual data
++..
++[n]→0
++[n+1] →(top,quit,done,back)[ans]
++[n+2] top:
++@end example
++
++I use 'top' to return the user to the first prompt in the program;
++'quit' to exit the program making no changes; 'done' to exit the
++program making changes; and 'back' to return the users to the
++previous prompt.
++
++@end deffn
++
+diff --git a/doc/DALY/pw.texi b/doc/DALY/pw.texi
+new file mode 100644
+index 0000000..bc17ca4
+--- /dev/null
++++ b/doc/DALY/pw.texi
+@@ -0,0 +1,40 @@
++@node pw
++@chapter (Pseudo) Randomly generated password
++
++Workspace to generate passwords.
++
++@deffn ∇ password ← length pw∆password character_set
++
++Function returns a pseudo-randomly generated password from the
++given character set.  If length is omitted, eight characters will
++be generated.
++
++@end deffn
++
++@deffn set ← pw∆alpha
++
++Returns a list of alphabetic characters.
++
++@end deffn
++
++@deffn set ← pw∆numeric
++
++Returns the ten digits in Arabic numerals.
++
++@end deffn
++
++@deffn set ← pw∆dingbats
++
++Returns a set of characters that are not alpha-numeric.  Wikipedia
++does not agree with what a dingbat is.  This function can't read
++Wikipedia.
++
++It also can't read the instructions you have from some rogue
++website.  Type them in.  viz:
++
++@example
++pw∆password pw∆alpha,pw∆numeric,'!*%^$'
++@end example
++
++@end deffn
++
+diff --git a/doc/DALY/seq.texi b/doc/DALY/seq.texi
+new file mode 100644
+index 0000000..c51e07b
+--- /dev/null
++++ b/doc/DALY/seq.texi
+@@ -0,0 +1,46 @@
++@node seq
++@chapter Sequences with Prefixes
++
++Workspace to provide the next entry in a sequence.  Each sequence is a
++prefix and a count.
++
++@deffn ∇ item ← seq∆posting∆ref key
++
++Function returns the next item in a sequence with prefix key,
++'Invoice0001, Invoice0002 ...  for example.
++
++@end deffn
++
++@deffn ∇ key seq∆set value
++
++Function sets the value of a given sequence.  Some do not like to
++start at zero.  Use seq∆set.
++
++@example
++      'foo' seq∆set 10001
++      t1←(⊂seq∆next 'foo'),⊂seq∆next 'foo'
++      t1
++foo10001 f0010002
++@end example
++
++@end deffn
++
++@deffn ∇ count← seq∆next key
++
++Function returns the next integer in the sequence
++
++@end deffn
++
++@deffn ∇ seq∆reset
++
++Function erase existing sequences.
++
++@end deffn
++
++@deffn Variable seq∆items
++
++A lexicon of existing sequences with each prefix as a key and its
++value as the last number generated.
++
++@end deffn
++
+diff --git a/doc/DALY/stack.texi b/doc/DALY/stack.texi
+new file mode 100644
+index 0000000..69399b0
+--- /dev/null
++++ b/doc/DALY/stack.texi
+@@ -0,0 +1,52 @@
++@node stack
++@chapter Simple Stack
++
++Workspace to implements a simple stack using functional programming
++constructs.
++
++   This means that whenever the stack changes the function returns a
++modified stack.  Accordingly four functions are required:
++
++@deffn ∇ st∆init
++
++Function returns a new, empty stack.
++
++@end deffn
++
++@deffn ∇ old st∆push item
++
++Function returns stack old with item as the first item on old.
++
++@end deffn
++
++@deffn ∇ old st∆peek item
++
++Function returns the first item on stack old.
++
++@end deffn
++
++@deffn ∇ st∆pop old
++
++Function returns stack old with the first item removed.
++
++@end deffn
++
++To use this library, first initiate the stack:
++
++@example
++my_stack←st∆init
++@end example
++
++Add items to the stack:
++
++@example
++my_stack←my_stack st∆push item
++@end example
++
++Pop items from the stack:
++
++@example
++item←st∆peek my_stack
++my_stack← st∆pop my_stack
++@end example
++
+diff --git a/doc/DALY/stat.texi b/doc/DALY/stat.texi
+new file mode 100644
+index 0000000..9c672f8
+--- /dev/null
++++ b/doc/DALY/stat.texi
+@@ -0,0 +1,80 @@
++@node stat
++@chapter stat is short for Statistics
++
++The stat workspace provides functions to perform statistical calculation
++and to organize data for statistical analysis.  It is very much a work
++in process.
++
++Current Functions are:
++
++@deffn ∇ int ← stat∆count vector
++
++Returns a count of the items in the vector.
++
++@end deffn
++
++@deffn ∇ amt ←slope stat∆lms∆intercept data
++
++Computes the y intercept of the Least Mean Squares function given
++the slope the that line.
++
++@end deffn
++
++@deffn ∇ slope ← stat∆lms∆slope data
++
++Computes the slope of a least mean square regression.  In the data
++(a level 2 array) data[;1] is the dependent data and data[;2] the
++independent.
++
++@end deffn
++
++@deffn ∇ corr ← stat∆lms∆cor data
++
++Calculates the coefficient of correlation of the regression by use
++of stat∆lms∆slope and stat∆lms∆intercept.
++
++@end deffn
++
++@deffn ∇ high_low ← stat∆range vector
++
++Returns the range of a data set.  The is the highest amount less
++the lowest.
++
++@end deffn
++
++@deffn ∇ var ← stat∆popVar vector
++
++Returns the population variance.
++
++@end deffn
++
++@deffn ∇ sd ← stat∆popSD vector
++
++Returns the population standard deviation.
++
++@end deffn
++
++@deffn ∇ mean ← stat∆mean vector
++
++Returns the sample mean of a vector.
++
++@end deffn
++
++@deffn ∇ var ← stat∆sampleVar vector
++
++Returns the sample variance.
++
++@end deffn
++
++@deffn ∇ sd ← stat∆sampleSD vector
++
++Returns the sample standard deviation.
++
++@end deffn
++
++@deffn ∇ median ← stat∆median vector
++
++Returns the median.
++
++@end deffn
++
+diff --git a/doc/DALY/utf8.texi b/doc/DALY/utf8.texi
+new file mode 100644
+index 0000000..7524c10
+--- /dev/null
++++ b/doc/DALY/utf8.texi
+@@ -0,0 +1,37 @@
++@node utf8
++@chapter Working with files using utf8 format.
++
++Workspace provides access to utf8 files.
++
++@deffn ∇ err ← text utf8∆write file_name
++
++Function to write text to a new file or replace an existing file.
++
++Function return 0 on success.
++
++@end deffn
++
++@deffn ∇txt ← utf8∆read file_name
++
++Function returns the text of file_name.
++
++@end deffn
++
++@deffn ∇ file_list ← utf8∆dir path
++
++File returns a list of the files in directory path.
++
++@end deffn
++
++@deffn ∇ txt utf8pipe cmd
++
++Functions pipes text to an operating system command.
++
++@end deffn
++
++@deffn ∇ txt ← utf8∆sh cmd
++
++Functions returns the standard out of a command.
++
++@end deffn
++
+diff --git a/doc/DALY/utl.texi b/doc/DALY/utl.texi
+new file mode 100644
+index 0000000..25eb75c
+--- /dev/null
++++ b/doc/DALY/utl.texi
+@@ -0,0 +1,47 @@
++@node utl
++@chapter utl
++
++Utl is a collection of generally usefull routines.
++
++@deffn ∇ utl∆helpFns FunctionName
++
++Display help about a function.  This routine prints the function
++header and any comments that immediately follow.
++
++@end deffn
++
++@deffn ∇ utl∆numberp item
++
++Tests whether item is a number.  Returns true or false.  See also
++utl∆numberis.
++
++@end deffn
++
++@deffn ∇ t←utl∆numberis item
++
++Tests whether an item can become a number.  IE is utl∆numberp ⍎
++test true?
++
++@end deffn
++
++@deffn ∇ t←utl∆stringp item
++
++Tests whether item is a character vector.
++
++@end deffn
++
++@deffn ∇ new←utl∆stripArraySpaces old
++
++Returns a left justified array of characters with the minimum
++number of trailing spaces.  At least one line of the array will
++have no trailing spaces.
++
++@end deffn
++
++@deffn ∇ cl←utl∆clean txt
++
++Converts all white space to spaces and then removes duplicate
++spaces.
++
++@end deffn
++
+diff --git a/doc/DALY/wblg.texi b/doc/DALY/wblg.texi
+new file mode 100644
+index 0000000..05fc282
+--- /dev/null
++++ b/doc/DALY/wblg.texi
+@@ -0,0 +1,181 @@
++@node wblg
++@chapter web_log -- parse web server logs
++
++web_log parses web server logs in the common format.  Web servers keep a
++log of requests made of the server and the servers response.  Analyzing
++those logs may confirm the relative popularity of a site monitoring
++those logs may yield insight into what content changes were well
++received.
++
++   The process of parsing a log is load the log into the current
++workspace with function log∆loadFile, apply several tests to the file
++and remove irrelevant entries, and count the number of entries.
++
++   To that end web_log provides a function, log∆filter_hits, to remove
++entries that I thought were not actual visits to a site.  Each line of
++this function applies a test to each line of the log using one of two
++operators, log∆filter and log∆not_filter.  To use log∆filter_hits call
++it with a left argument of your ip address and a right argument of the
++log returned by log∆loadFile.  viz.:
++
++@example
++      access←log∆loadFile '/dilworth/www.dalywebandedit.com/logs/access_log.2022-06-30'
++      ⍴access
++217
++      ⍴'68.81.178.238' log∆filter_hits access
++53
++@end example
++
++   log∆filter_hits is a good example of how to use this workspace.  It
++applies a series of tests to the log data, removing lines as it does its
++work.
++
++@example
++      ∇log∆filter_hits[⎕]∇
++    ∇
++[0]   new←ip log∆filter_hits old
++[1]     ⍝ Function returns the number of page requests
++[2]     new←200 log∆test_status log∆filter old
++[3]     new←'bot' 'spider' 'google' 'crawler' log∆test_agent_contents log∆not_filter new
++[4]     new←'js' 'css' 'jpg' 'gif' 'ico' 'png' log∆test_suffix log∆not_filter new
++[5]     new←ip log∆test_ip log∆not_filter new
++[6]     new←'/wordpress1/wp-cron.php' log∆test_file log∆not_filter new
++    ∇
++@end example
++
++   log∆filter and log∆not_filter are operators that apply a test to each
++line of the log.  log∆filter returns lines where the test is true while
++log∆not_filter returns lines where the test is false.
++
++   web_log provides a series of tests.  Each test's name starts with
++'log∆test_'.  Provided tests are:
++
++@deffn ∇ bool←string log∆test_agent_contents log_line
++
++Each log line contains an agent field.  This test is true when the
++supplied string can be found in the agent field.  In
++log∆filter_hits we remove requests from spiders, crawlers and bots
++by looking for these name in the agent fields
++
++@end deffn
++
++@deffn ∇ bool←fname log∆test_file log_line
++
++Each log line contains a target field, or what the client
++requested.  This test is true if fname is that target.  The test
++ignores the CGI query that might be included in the target.
++
++@end deffn
++
++@deffn ∇ bool←host log∆test_host log_line
++
++Each log line has a referrer which if present is the URL of the web
++page that contained the link the client clicked on.  The test is
++true if the host matches the host in the URL.
++
++@end deffn
++
++@deffn ∇ bool←ip log∆test_ip log_line
++
++The log line includes the ip address of the client and this test is
++true when the line's ip address is in the set of ip addresses
++supplied.
++
++@end deffn
++
++@deffn ∇ bool←log∆test_not_referred log_line
++
++This test returns true if the referrer field is blank.
++
++@end deffn
++
++@deffn ∇ bool← integer log∆test∆status log_line
++
++The line's status field contains an integer, defined by the
++Hypertext Transfer Protocol (HTTP). A code of 200, OK, means this
++server supplied a page.  Wikipedia has a complete list of codes.
++
++@end deffn
++
++@deffn ∇ bool←suffixes log∆test_suffix log_line
++
++Function tests if the file name from the target field has a suffix
++in the list of supplied suffixes.
++
++@end deffn
++
++   There are ten fields in each log line.  The web_log workspace
++provides a function for each field.
++
++@deffn ∇ log∆ip log_line
++
++Function returns the client's ip address.
++
++@end deffn
++
++@deffn ∇ log∆user log_line
++
++Function returns the client's user name.  This field is populated
++only when the server requires login using HTTP.
++
++@end deffn
++
++@deffn ∇ log∆time log_line
++
++Function returns the time stamp in the log line.  The time stamp is
++generally in coordinated universal time.  The next field, time zone
++is the adjustment to local time.
++
++The workspace also provides log∆ParsedTime which returns a vector
++of five integers: year month day hour second.
++
++@end deffn
++
++@deffn ∇ log∆zone log-line
++
++The adjustment needed to apply to UTC for local time.
++
++@end deffn
++
++@deffn ∇ log∆request log-line
++
++The HTTP request.  An HTTP request is a three part datum.  The
++first part is the HTTP method, the second the requested URL, and
++the third the version of HTTP.
++
++HTTP defines 'POST' 'GET' among others as methods.
++
++web_log provides the functions log∆method and log∆target for the
++first two parts.
++
++@end deffn
++
++@deffn ∇ log∆status log-line
++
++Function returns the HTTP status code that the server used to
++respond to this request.  The status code is an integer defined by
++HTTP. 200, OK and 404, NOT FOUND are the most usual.
++
++@end deffn
++
++@deffn ∇ log∆size log-line
++
++Function returns the count of bytes returned by the server to the
++client.
++
++@end deffn
++
++@deffn ∇ log∆referrer log-line
++
++This function returns the URL of the page the client clicked on to
++make the current request.
++
++@end deffn
++
++@deffn ∇ log∆agent log-line
++
++The agent field contains information about the program on the
++client's computer that made the request.
++
++@end deffn
++
+diff --git a/doc/DALY/wp.texi b/doc/DALY/wp.texi
+new file mode 100644
+index 0000000..84be750
+--- /dev/null
++++ b/doc/DALY/wp.texi
+@@ -0,0 +1,278 @@
++@node wp
++@chapter wp Workspace
++
++This is a workspace for printing arrays (on paper).  It offers control
++over many aspects of the printed page.
++
++   The workspace generates an HTML page which can then be loaded into
++one's browser and printed.
++
++@menu
++* Howto::  Create a report, basic instructions.
++* Init::  Create a blank report.
++* Set data::  Add an array of data.
++* Attributes::  Data must have attributes to describe formatting.
++* Stylesheet::  A style sheet describes formatting for a class of data.
++* Required Classes::  Parts of the report that require their own classes.
++* Other Tweaks::  Other things to try.
++* Distances::  Units of measure in a class.
++@end menu
++
++@node Howto
++@section Howto
++
++Reports are a complex data structure initiated and maintained through
++functions in the wp workspace.
++
++   A report consists of an array, report heading, and stylesheet.  For
++each cell in the array additional attributes can be saved for formatting
++the report cell by cell.
++
++The basic process is:
++
++@itemize @bullet
++@item
++Create the report with wp∆init 'Report Name'
++@item
++Add the array to print with wp∆setData
++@item
++Add attributes to cells in the array.  Attributes identify the
++format strings for numbers and the applicable stylesheet classes.
++@item
++Create or modify a stylesheet.
++@item
++Generate the HTML for the report with wp∆html∆assemble.
++@end itemize
++
++@node Init
++@section Initiating the report
++
++Use the function wp∆init to create a report.  Init requires a short
++character string as its sole argument and will print that string in the
++report as an identifier for the report.
++
++   The report itself is a lexicon of Id, Data, Attributes, Stylesheet,
++Head_ln01 through Head_ln03, and Author.  wp∆init will use the
++environment's USER for the Author.
++
++@node Set data
++@section Adding data to your report
++
++By default, a report's data is a single cell of 0.
++
++   wp requires an array of rank 2 and expects that descriptions of the
++rows and columns will be included in the array.  There is no enforced
++limit on the size of the array.  However, the target browser that
++displays the array may limit what you can put on the screen.
++
++   The HTML coding is designed to allow the browser to determine column
++widths, text wrapping within a cell and other features.  As the browser
++window size is changed the browser should reformat the report.
++
++   Users experienced in cascading style sheets can add style sheet
++classes to establish actual widths, heights and placements for a more
++fixed presentation @ref{Stylesheet}.
++
++@node Attributes
++@section Attributes
++
++An attribute is a name-value pair.  Each cell can have a list of
++attributes.  Two are in general use 'format' and 'class'.  Other
++attributes will be passed to your browser as attributes of the cell.
++For example a cell has three attributes, format, class and passed.  the
++coded HTML would be:
++
++@example
++<td class=''number'' passed=''user-defined''>',
++CF14.2 fmt cell_amount,
++'</td>...</tr>'
++@end example
++
++   The format attribute is used by the workspace to format the number of
++the cell.  APL2's format by example ('55,550.00' ⍕ number) and function
++fmt @ref{fmt} can be used.
++
++   The class attribute selects the style sheet class to use for the cell
++@ref{Stylesheet}.
++
++Accessor functions for attributes have a prefix wp∆attr∆.  They are:
++
++@deffn ∇ report wp∆attr∆getCellAttr row_number column_number
++
++Function returns a lexicon (@ref{lex}) of attributes.
++
++@end deffn
++
++@deffn ∇ report wp∆attr∆setCellAttr row_number Column_number lexicon
++
++Function adds, or replaces the name value pair.  The function
++expects a lexicon of name value pairs.  For example:
++
++@example
++rpt←rpt wp∆attr∆setCellAttr 15 3,⊂lex∆from_alist 'format' 'CF10.2' 'class' 'number'
++@end example
++
++@end deffn
++
++@deffn ∇ report wp∆attr∆getQuadAttr start_row start_column end_row end_column
++
++Function returns a portion of the Attribute array.
++
++@end deffn
++
++@deffn ∇ report wp∆attr∆setQuadAttr start_row start_column end_row end_column encapsulated_lexicon(s)
++
++Funtion sets a rectangular portion of the Attribute array.  If one
++lexicon is given that lexicon will be copied to each cell in the
++rectangle.  If more than one lexicon is given, the size and shape
++of the final argument must match the size and shape of the
++rectangle.
++
++@end deffn
++
++@node Stylesheet
++@section Stylesheet
++
++The style sheet is a lexicon of classes that describe how to present a
++cell in the data.  Each class within the sheet is a lexicon of
++properties.  An example style sheet is returned by the function
++wp∆defaultSS.
++
++   Properties are defined in the global variable wp∆ssp∆propertyList
++which is derived from the W3.com cascading style sheet standards.  The
++standards define what values each property may take.
++
++@itemize @bullet
++@item
++Create a style sheet wp∆ss∆init or wp∆defaultSS.
++@item
++Create classes with wp∆ssc∆init
++@item
++Add properties to the class.
++@item
++Add classes to the spread sheet.
++@item
++Assign the spreadsheet to the report
++@end itemize
++
++@deffn ∇ wp∆ss∆init
++
++Function returns an empty style sheet.
++
++@end deffn
++
++@deffn ∇ wp∆defaultSS
++
++Function returns a style sheet with classes defined for a typical
++array.
++
++@end deffn
++
++@deffn ∇ wp∆ssc∆init
++
++Function returns a new style sheet class.
++
++@end deffn
++
++@deffn class wp∆ssc∆assignProp Property
++
++Function adds a property to a class.  Properties are name-value
++pairs.  For instance:
++
++@example
++r4←wp∆ssr∆init '.page-head'
++r4←r4 wp∆ssr∆assignProp 'font-size' 'large'
++@end example
++
++@end deffn
++
++@deffn ∇ StyleSheet wp∆ss∆assign Class
++
++Assign a class to a stylesheet.  Function will silently replace an
++existing class.
++
++@example
++ss←ss wp∆ss∆assignClass r4
++@end example
++
++@end deffn
++
++@node Required Classes
++@section Required Classes
++
++Parts of the final report require their own class.
++
++@itemize @bullet
++@item
++Body is a global class that applies to whole report.
++@item
++colhead describes how to format the descriptions at the top of each
++column.
++@item
++number describes the formatting for any number in your array.
++@item
++page-head describes how the head lines will appear.
++@item
++initial block is for the report ID, author and creation date that
++appear in a distinctive block.
++@end itemize
++
++   All of these classes are included in the default style sheet.  You
++may not like the results if they are omitted from the published style
++sheet.
++
++@node Other Tweaks
++@section Other Tweaks
++
++@itemize @bullet
++@item
++Initials.  Use 'wp∆setInitialFlag 0' to remove the initial block
++from the report.
++@end itemize
++
++@node Distances
++@section Distances
++
++Many properties are looking for a distance.  Distances can be fixed,
++relative or percentages (a number followed by %).  There should be no
++white space between the amount the the measure.
++
++Fixed distances can be measured in:
++
++@itemize @bullet
++@item
++pt (points) or 1/72 of an inch.  Fonts are measured in points.
++@item
++pc (picas) or 12pt
++@item
++mm (millimeters)
++@item
++cm (centimeters)
++@item
++in (inches)
++@end itemize
++
++Relative units are determined by the font:
++
++@itemize @bullet
++@item
++em is the width of the capital M. This should be the point size of
++the font and the distance between baselines.
++@item
++ex is the height of the letter x.  This should be the base line and
++the mean line of lower case letters.
++@item
++px (pixels).  This is more of a measure for monitors than printers.
++@end itemize
++
++@example
++You may be thinking that because elements on web pages are
++measured in numbers of pixels, and because pixels are
++considered a relative measurement, that they are the answer to
++all font size problems.  It would be nice if the were.  For
++some designers, control over text at the pixel level is
++intoxicating.
++@end example
++
++-- _Jennifer Niederst Robbins, Web Design in a Nutshell, O'Reilly_
++
+diff --git a/doc/DALY/xml.texi b/doc/DALY/xml.texi
+new file mode 100644
+index 0000000..2c67c71
+--- /dev/null
++++ b/doc/DALY/xml.texi
+@@ -0,0 +1,63 @@
++@node xml
++@chapter xml workspace
++
++This workspace provides functions to implement an xml schema and a
++cascading stylesheet to display that schema.
++
++@section Schema
++
++Each element in a document using this schema can be generated from a
++function of that name.
++
++   Each element-function will use its left argument as the element's
++attributes and its right as the element's content.  Attributes are
++stored in lexicons (see workspace lex).
++
++For example, assume an HTML5 schema has been implemented:
++
++      attr←(lex∆init) lex∆assign 'class' 'right-justified'
++      tag←attr html∆p 'Now is the winter of our discontent'
++	   tag
++<p class="right-justified">Now is the winter of our discontent" </p>`
++
++   The schema is implemented by calling xml∆MkTagFns or
++xml∆MkClosedTagFns:
++
++@section Creating functions to support a schema
++
++@deffn ∇ xml∆MkTagFns tag
++
++Creates a function for elements named tag
++
++@end deffn
++
++@deffn ∇ xml∆MkClosedTagFns tag
++
++Creates a function for a empty tag (<br\>).
++
++@end deffn
++
++   We've put an example application in html_test.apl.  This workspaces
++first provides functions for a subset of HTML5 and then defines
++html∆fmt_table to take an array of rank two and return an HTML page.
++
++@section Cascading Stylesheets
++
++Browsers use cascading stylesheets display an xml documnet.  They
++consist of a lexicon (see workspace lex) of selectors and rules.  Each
++rule consists of a lexicon of properties and values.
++
++There are two functions for cascading stylesheets:
++
++@deffn ∇ lex ← xml∆parse text
++
++Function returns a nested lexcion from the text of a stylesheet.
++
++@end deffn
++
++@deffn ∇ text ← xml∆mkSheet lex
++
++Function returns the text of a stylesheet from a nested lexicon.
++
++@end deffn
++
