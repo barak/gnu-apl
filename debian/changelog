@@ -1,3 +1,9 @@
+gnu-apl (1.9-2) unstable; urgency=medium
+
+  * debian/source/options: stop tag2upload's fussing re removed derived files
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 17 Jun 2026 15:21:35 +0100
+
 gnu-apl (1.9-1) unstable; urgency=medium
 
   * Remove more derived files from source tree for safety, and search
