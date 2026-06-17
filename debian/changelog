@@ -1,3 +1,9 @@
+gnu-apl (1.9-3) unstable; urgency=medium
+
+  * just leave the derived files from the upstream tarball (so annoying!)
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 17 Jun 2026 15:30:48 +0100
+
 gnu-apl (1.9-2) unstable; urgency=medium
 
   * debian/source/options: stop tag2upload's fussing re removed derived files
