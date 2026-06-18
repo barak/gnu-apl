@@ -5734,7 +5734,7 @@ if test "x$apl_TARGET_MINGW" = "xyes"; then
    : ${host_alias:=x86_64-w64-mingw32}
    : ${CC:=x86_64-w64-mingw32-gcc}
    : ${CXX:=x86_64-w64-mingw32-g++}
-   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -static -static-libgcc -static-libstdc++ -lwinpthread}
+   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -static-libgcc -static-libstdc++ -lwinpthread}
    : ${with_sqlite3:=no}
    : ${with_postgresql:=no}
    # Cross-compilation: AC_FUNC_MALLOC/AC_FUNC_REALLOC cannot run the test
@@ -11265,10 +11265,6 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
-## CAVEAT EMPTOR:
-## There is no encapsulation within the following macros, do not change
-## the running order or otherwise move them around unless you know exactly
-## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -22324,7 +22320,7 @@ fi
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $cfg_CTRLD_DEL" >&5
 printf "%s\n" "$cfg_CTRLD_DEL" >&6; }
 
-ac_config_files="$ac_config_files Makefile build/Makefile Claude/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/testcases/invariants/Makefile src/workspaces/Makefile support-files/Makefile support-files/fonts/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/Juergen-Mint-21/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
+ac_config_files="$ac_config_files Makefile build/Makefile Claude/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/testcases/invariants/Makefile src/workspaces/Makefile support-files/Makefile support-files/fonts/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/Juergen-Mint-21/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile support-files/windows-installer/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
 
 
 # AM_CXXFLAGS: do/dont -Werror ?
@@ -24127,6 +24123,7 @@ do
     "support-files/OS-X-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/OS-X-Keyboard/Makefile" ;;
     "support-files/Unicomp-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/Unicomp-Keyboard/Makefile" ;;
     "support-files/WASD-Keyboard/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/WASD-Keyboard/Makefile" ;;
+    "support-files/windows-installer/Makefile") CONFIG_FILES="$CONFIG_FILES support-files/windows-installer/Makefile" ;;
     "tools/Makefile") CONFIG_FILES="$CONFIG_FILES tools/Makefile" ;;
     "websock/Makefile") CONFIG_FILES="$CONFIG_FILES websock/Makefile" ;;
     "websock/client/Makefile") CONFIG_FILES="$CONFIG_FILES websock/client/Makefile" ;;

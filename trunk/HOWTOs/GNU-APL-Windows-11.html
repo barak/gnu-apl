@@ -737,6 +737,7 @@ asciidoc.install(4);
 <h1>GNU APL on Windows 11</h1>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
 </div>
 </div>
 <div id="content">
@@ -763,24 +764,171 @@ on the screen and the generation of APL characters by the keyboard - are
 already satisfied by almost all modern GNU/Linux distribution and the missing
 pieces can easily be added via the package manager of the linux distribution.</p></div>
 <div class="paragraph"><p>Even for the latest Windows version - Windows 11 as of this writing -
-the situation is more complicated. When it comes to APL, Windows 11 still has
-limitations that make the installation of GNU APL on Windows more complicated
-than on GNU/Linux. On Windows 11 the user needs to fetch different components
-from different places on the internet. Under GNU/Linux the display of APL
-characters works out-of-the box and the generation of APL characters on the
-keyboard can be done with typically a single configuration file
-(shipped with GNU APL; see file <strong>README-3-keyboard</strong> and directory
-<strong>support-files</strong>). On Windows the user has to install a suitable APL font to
-display APL characters and a keyboard mapping for the keyboard. While
-installing an APL font is relatively easy, the installation of a keyboard
-mapping has become more and more difficult from one Windows version to the
-next. In older Windows versions one could "hack" the Windows registry to make
-Windows produce APL characters with the keyboard, but this does not work
-anymore under Windows 11. Microsoft provides alternatives like the Keyboard
-Manager in their PowerTools, or the Input Mode Editor (IME), but both seem
-not to work for terminal applications like GNU APL. To address this issue, GNU
-APL comes with a built-in keyboard mapper that allows the user to toggle the
-keyboard between ASCII and APL.</p></div>
+the situation is more complicated. On Windows the user has to install a
+suitable APL font to display APL characters and have a way to enter them
+from the keyboard. Both are handled by the Windows installer: it installs
+the GNU_APL font and provides built-in Right Alt (AltGr) keyboard support
+directly in <strong>apl.exe</strong>. Pressing <strong>Right Alt + key</strong> produces the corresponding
+APL character, so no additional keyboard software needs to be installed.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_two_ways_to_get_gnu_apl_on_windows">Two Ways to Get GNU APL on Windows</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>There are two distinct paths to GNU APL on Windows, depending on whether
+you just want to <strong>use</strong> it or want to <strong>build</strong> it yourself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>GNU APL on Windows: which path do you need?
+│
+├─ Build it yourself
+│  │
+│  ▼
+│  ┌─────────────────────────────────────────────┐
+│  │ Fetch the source from Savannah (svn or git) │
+│  └─────────────────────────────────────────────┘
+│  │
+│  ▼
+│  ./configure --with-mingw &amp;&amp; make &amp;&amp; make install
+│  (cross-compiles apl.exe from Linux; see "For developers" below)
+│
+└─ Run a pre-built copy (no build tools needed)
+   │
+   ▼
+   ┌──────────────────────────────────────┐
+   │ Fetch an installer from a GNU mirror │
+   └──────────────────────────────────────┘
+   │
+   ├─ Need everything (apl.exe + font + library directories)
+   │  │
+   │  ▼
+   │  GNU_APL_2_0_Setup.exe   (the full installer)
+   │
+   └─ Already have apl.exe, just need the font
+      │
+      ▼
+      GNU_APL_Font_Setup.exe   (GUI installer), or
+      install_GNU_APL_font.bat (no-GUI script)</code></pre>
+</div></div>
+<div class="sect2">
+<h3 id="_for_windows_users_install_a_pre_built_release">For Windows users: install a pre-built release</h3>
+<div class="paragraph"><p>If you only want to run GNU APL and do not need to compile it yourself,
+fetch a pre-built installer from a GNU mirror (the canonical location is
+<a href="https://ftp.gnu.org/gnu/apl/">https://ftp.gnu.org/gnu/apl/</a>; see <a href="https://www.gnu.org/prep/ftp.html">https://www.gnu.org/prep/ftp.html</a> for
+the full mirror list). Two installers are provided:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>GNU_APL_2_0_Setup.exe</strong> - the full installer (the <strong>2.0</strong> is the GNU APL
+  version, so that installers for different releases can coexist on the
+  mirror). It installs <strong>apl.exe</strong>, the library directory structure
+  (<strong>workspaces</strong> and <strong>wslib1</strong> to <strong>wslib5</strong>), the default preferences file,
+  and the GNU_APL font, all under <strong>%USERPROFILE%\gnu-apl.d</strong>. No
+  administrator rights are required.
+</p>
+</li>
+<li>
+<p>
+<strong>GNU_APL_Font_Setup.exe</strong> - installs only the GNU_APL font. Use this one
+  instead of the full installer if you already have an <strong>apl.exe</strong> from
+  elsewhere (e.g. copied from another machine, or built yourself) and just
+  need the font.
+</p>
+</li>
+</ol></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">As explained in the Introduction above, <strong>apl.exe</strong> is built against
+whatever optional libraries happen to be available in the (cross-)
+compilation environment used to build it. The pre-built <strong>apl.exe</strong> on the
+GNU mirror is unlikely to have been linked against all of them, so some
+⎕-functions that depend on an optional library - for example <strong>⎕SQL</strong>
+(needs SQLite/PostgreSQL), <strong>⎕GTK</strong> and <strong>⎕PLOT</strong> (need GTK), or <strong>⎕FFT</strong>
+(needs FFTW) - may not be available in it, even though the same functions
+work fine in a GNU/Linux build where those libraries are routinely
+installed. If you need one of these, you will have to build GNU APL
+yourself with that library available; see "For developers" below.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The full installer creates a <strong>GNU APL</strong> shortcut in the Start Menu that
+launches <strong>apl.exe</strong> with its working directory set to the install location.
+This matters: <strong>apl.exe</strong> currently looks for its library directories
+(<strong>workspaces</strong>, <strong>wslib1</strong>, etc.) relative to its current working directory,
+not relative to the location of the <strong>.exe</strong> file itself, so launching
+<strong>apl.exe</strong> directly from a different working directory will not find them.</p></div>
+<div class="paragraph"><p>The GNU_APL font installer can also be fetched directly from the GNU
+Savannah Subversion repository with a plain web browser, without needing
+an SVN or git client:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>http://svn.savannah.gnu.org/viewvc/apl/trunk</code></pre>
+</div></div>
+<div class="paragraph"><p>Look under <strong>support-files/fonts/</strong> for the font installer (NOTE: like any
+public server, this one occasionally returns a temporary error - e.g. a
+503 - under heavy load; if that happens, just retry later or use the GNU
+mirror above instead).</p></div>
+</div>
+<div class="sect2">
+<h3 id="_for_developers_build_from_source">For developers: build from source</h3>
+<div class="paragraph"><p>If you want to modify GNU APL, or simply prefer to build it yourself,
+fetch the sources from Savannah (Subversion is preferred; Git is also
+available) and build as usual:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>svn co http://svn.savannah.gnu.org/svn/apl/trunk apl-2.0</code></pre>
+</div></div>
+<div class="paragraph"><p>or</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>git clone https://git.savannah.gnu.org/git/apl.git apl-2.0</code></pre>
+</div></div>
+<div class="paragraph"><p>then:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>cd apl-2.0
+./configure
+make
+make install</code></pre>
+</div></div>
+<div class="paragraph"><p>This is the same procedure used on GNU/Linux, and is also what you would
+use to build and run GNU APL <strong>on</strong> Windows itself (via Cygwin or WSL); see
+the rest of this document for the additional steps needed for that.</p></div>
+<div class="paragraph"><p>To instead <strong>cross-compile</strong> a native Windows <strong>apl.exe</strong> from a GNU/Linux
+machine (e.g. to produce the pre-built binary mentioned above), use
+<strong>--with-mingw</strong> instead of a plain <strong>./configure</strong>:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>./configure --with-mingw
+make</code></pre>
+</div></div>
+<div class="paragraph"><p>This presets the MinGW-w64 cross-compiler (<strong>x86_64-w64-mingw32-g++</strong>) and
+related flags, and disables libraries that are impractical to
+cross-compile (e.g. SQLite/PostgreSQL, hence no <strong>⎕SQL</strong> - see the NOTE
+above). <strong>make install</strong> does not apply when cross-compiling; the build
+just leaves a working <strong>src/apl.exe</strong>. To turn that into a release artifact
+for the GNU mirror, use one of:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>make -C src windows-release</strong> - copies <strong>apl.exe</strong> to
+  <strong>apl-2.0.exe</strong> (the <strong>2.0</strong> is the GNU APL version, so that mirrored
+  binaries from different releases do not overwrite each other).
+</p>
+</li>
+<li>
+<p>
+<strong>make windows-installer</strong> (run from the top-level source directory,
+  after placing the cross-compiled <strong>apl.exe</strong> into
+  <strong>support-files/windows-installer/</strong>) - packages <strong>apl.exe</strong> together with
+  the font and library directories into <strong>GNU_APL_2_0_Setup.exe</strong>, see
+  the top-level <strong>Makefile.am</strong> for details.
+</p>
+</li>
+</ol></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -808,7 +956,9 @@ Installation of a keyboard mapping. This step is needed for the WSL
 </li>
 </ol></div>
 <div class="paragraph"><p>These 3 sub-installations are independent of each other and the third is
-somewhat optional (and likely to fail).</p></div>
+somewhat optional (the pre-built <strong>apl.exe</strong> already has Right Alt keyboard
+support built in, so no separate keyboard mapping step is needed when using
+the installer).</p></div>
 <div class="sect2">
 <h3 id="_installation_of_a_development_environment">Installation of a development environment</h3>
 <div class="paragraph"><p>GNU APL is a standard C++ program. In theory there are 3 development
@@ -1022,52 +1172,30 @@ Open the Windows Command Prompt (<strong>cmd.exe</strong>) and enter <strong>bas
 <div class="sect2">
 <h3 id="_installation_of_an_apl_font">Installation of an APL font</h3>
 <div class="paragraph"><p>This step is only needed for <strong>WSL</strong> and not for <strong>Cygwin</strong>.</p></div>
-<div class="paragraph"><p>The recommended font for GNU APL on Windows is <strong>BQN386 Unicode</strong>, an
-open-source TrueType font (MIT licence) originally designed for the BQN
-programming language.  It covers all APL characters in their standard Unicode
-positions and works correctly in the Windows console without any workarounds.</p></div>
+<div class="paragraph"><p>The recommended font for GNU APL on Windows is <strong>GNU_APL</strong>, a TrueType font
+covering all APL characters in their standard Unicode positions. It is a
+derivative of the open-source <strong>BQN386 Unicode</strong> font (originally designed
+for the BQN programming language; see <strong>support-files/fonts/COPYRIGHT_NOTICE</strong>
+for attribution and licensing) with added glyphs (e.g. <strong>∈</strong> and <strong>⊗</strong>) and
+fixed display-width bugs for several characters that rendered too wide in
+the Windows console with the original font.</p></div>
 <div class="sect3">
-<h4 id="_step_1_download_bqn386_unicode">Step 1: Download BQN386 Unicode</h4>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Open a web browser and visit <a href="https://github.com/dzaima/BQN386">https://github.com/dzaima/BQN386</a>
-</p>
-</li>
-<li>
-<p>
-On that page, click the <strong>BQN386.ttf</strong> link to download the font file.
-</p>
-</li>
-</ol></div>
+<h4 id="_step_1_install_the_font">Step 1: Install the font</h4>
+<div class="paragraph"><p>Use one of the two GNU_APL font installers described in
+"<a href="#_two_ways_to_get_gnu_apl_on_windows">Two Ways to Get GNU APL on Windows</a>" above (<strong>GNU_APL_Font_Setup.exe</strong> or
+<strong>install_GNU_APL_font.bat</strong>). Both install the font for the current user
+only, without requiring administrator privileges.</p></div>
 </div>
 <div class="sect3">
-<h4 id="_step_2_install_the_font">Step 2: Install the font</h4>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-Double-click the downloaded <strong>BQN386.ttf</strong> file.
-  A font preview window opens showing sample characters and the name
-  <strong>BQN386 Unicode</strong> at the top.
-</p>
-</li>
-<li>
-<p>
-Click the <strong>Install</strong> button (or <strong>Install for all users</strong>).
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>Windows copies the file into <strong>C:\Windows\Fonts</strong> and registers the font.</p></div>
-</div>
-<div class="sect3">
-<h4 id="_step_3_register_the_font_for_use_in_the_windows_console">Step 3: Register the font for use in the Windows console</h4>
+<h4 id="_step_2_register_the_font_for_use_in_the_windows_console">Step 2: Register the font for use in the Windows console</h4>
 <div class="paragraph"><p>Windows only allows a short pre-approved list of fonts in the <strong>cmd.exe</strong>
-font picker.  BQN386 Unicode must be added to a registry key before it
-appears there.  This step requires administrator privileges.</p></div>
+font picker. <strong>GNU_APL</strong> must be added to a registry key before it
+appears there (the font installers above do not do this automatically).
+This step requires administrator privileges.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="./images/icons/note.png" alt="Note" />
+<div class="title">Note</div>
 </td>
 <td class="content">The <code>Console\TrueTypeFont</code> registry key often does <strong>not</strong> exist on a
 fresh Windows installation.  The <code>reg add</code> command below creates it
@@ -1078,15 +1206,11 @@ automatically if it is absent.</td>
 <strong>Run as administrator</strong>) and run:</p></div>
 <div class="literalblock">
 <div class="content">
-<pre>
-
-<code>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v 0 /t REG_SZ /d "BQN386 Unicode" /f</code>
-
-</pre>
+<pre><code>reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v 0 /t REG_SZ /d "GNU_APL" /f</code></pre>
 </div></div>
 </div>
 <div class="sect3">
-<h4 id="_step_4_select_the_font_in_cmd_exe">Step 4: Select the font in cmd.exe</h4>
+<h4 id="_step_3_select_the_font_in_cmd_exe">Step 3: Select the font in cmd.exe</h4>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -1105,12 +1229,13 @@ Select the <strong>Font</strong> tab.
 </li>
 <li>
 <p>
-In the font list, choose <strong>BQN386 Unicode</strong>.
+In the font list, choose <strong>GNU_APL</strong>.
 </p>
 </li>
 <li>
 <p>
-Choose a comfortable size (10 or 12 points work well).
+Choose a size large enough to distinguish APL characters - <strong>14pt</strong> is
+  the minimum for that, <strong>18pt</strong> is more comfortable.
 </p>
 </li>
 <li>
@@ -1125,9 +1250,9 @@ Click <strong>OK</strong>.
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="./images/icons/note.png" alt="Note" />
+<div class="title">Note</div>
 </td>
-<td class="content">An index of alternative APL fonts (in case BQN386 does not suit
+<td class="content">An index of alternative APL fonts (in case GNU_APL does not suit
 your needs) is maintained at <a href="https://sigapl.org/fonts/FontsIndex.php">https://sigapl.org/fonts/FontsIndex.php</a></td>
 </tr></table>
 </div>
@@ -1135,146 +1260,181 @@ your needs) is maintained at <a href="https://sigapl.org/fonts/FontsIndex.php">h
 </div>
 <div class="sect2">
 <h3 id="_installation_of_a_keyboard_mapping">Installation of a keyboard mapping</h3>
-<div class="paragraph"><p>At this point you have a working GNU APL interpreter. What is missing is
-a way to interactively enter APL characters. What should already work at
-this point is:</p></div>
+<div class="paragraph"><p>At this point you have a working GNU APL interpreter. APL characters can
+be entered in several ways:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Copying APL characters (^C and ^V). If you start GNU APL and enter
-  the command  <strong>]KEYB</strong> then you should get the display of a keyboard
-  layout that you could copy from (with ^C) and then paste into the
-  GNU APL window (with ^V).
+<strong>Right Alt + key</strong> (the primary method in the pre-built <strong>apl.exe</strong>).
+  The <strong>Right Alt</strong> key (sometimes labelled <strong>AltGr</strong> on European keyboards) is
+  used as the APL shift key. Holding <strong>Right Alt</strong> and pressing a letter or
+  punctuation key produces the corresponding APL character.  For example,
+  <strong>Right Alt + r</strong> gives <strong>⍴</strong>, <strong>Right Alt + i</strong> gives <strong>⍳</strong>, and so on.
+  The layout follows the standard GNU APL keyboard (see <strong>]KEYB</strong> inside APL).
+  This mapping is built into <strong>apl.exe</strong> itself and requires no additional
+  software or administrator rights.
 </p>
 </li>
 <li>
 <p>
-Running APL scripts or workspaces. The <strong>)LOAD</strong>, <strong>)COPY</strong>, and <strong>OFF</strong>
-  commands need no APL characters and can therefore be entered even if no
-  APL keyboard mapping is installed.
+<strong>Copying and pasting</strong> APL characters (Ctrl+C / Ctrl+V). The command
+  <strong>]KEYB</strong> inside APL displays the keyboard layout; you can copy characters
+  from it. The command <strong>]AV</strong> prints the entire APL character set (<strong>⎕AV</strong>)
+  and is useful for characters not shown by <strong>]KEYB</strong>.
 </p>
 </li>
 <li>
 <p>
-Last but not least there is the built-in ASCII-to-APL mapping of GNU APL
-  which is described in more detail further down.
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>There are a number of different options that you can choose from. Many
-of them work only on true GNU/Linux systems, though. GNU APL is shipped with
-a separate file <strong>README-3-keyboard</strong> that discusses some of the methods.
-The author has spent quite some time to find a method that works reliably
-under Windows 11, but to no avail.</p></div>
-<div class="paragraph"><p>Keyboard mappings in Windows 11 are, simply speaking, a mess. The author
-has tried the following.</p></div>
-<div class="olist arabic"><ol class="arabic">
-<li>
-<p>
-The <strong>Keyboard Manager</strong> (which is a component in the <strong>PowerTools</strong>) offered
-  by Microsoft free of charge. One can indeed map keys to APL characters
-  with the <strong>Keyboard Manager</strong>. However, the mapping works in some Microsoft
-  applications, but not in others. When the <strong>Keyboard Manager</strong> is running
-  (and if an APL font is installed and selected) then you can edit APL
-  scripts in Microsoft&#8217;s <strong>Notepad</strong>, but if you open Microsoft&#8217;s Windows
-  Command Prompt <strong>cmd.exe</strong> in another window then the mapping provided by
-  the <strong>Keyboard Manager</strong> does not apply in that window.
+<strong>Running APL scripts or workspaces</strong>. The <strong>)LOAD</strong>, <strong>)COPY</strong>, and <strong>OFF</strong>
+  commands need no APL characters and work without any keyboard mapping.
 </p>
 </li>
 <li>
 <p>
-Microsoft provides a thing called <strong>Input Method Editor</strong> (<strong>IME</strong>) that should
-  provide arbitrary keyboard mappings. In fact there are hundreds of such
-  mappings provided by Microsoft, but none of them is suitable for APL.
-  The IMEs are not configurable in any way, so if you need Chinese characters
-  then you are fine because Microsoft provides a Chinese IME, but for APL
-  you are out of luck. Also there are several detailed instructions how to
-  add IMEs under Windows 11 on the internet, but all of them fail in the first
-  or second step because the Windows 11 of the author was different from the
-  Windows 11 in these instructions. The instructions referred to items
-  in the Windows 11 <strong>Control Panel</strong> that simply did not exist.
-</p>
-</li>
-<li>
-<p>
-There are a number of keyboard mappers offered on the internet, both commercial
-  and free ones. The author has not tried any of those because most looked
-  like mere convenience front-ends to Windows 11 components above that did
-  not work. If a GNU APL user should find a mapping that works with GNU APL
-  then please report that to the mailing list <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>!
+<strong>The built-in Ctrl+O / Ctrl+N mapper</strong> (secondary method, described
+  below).
 </p>
 </li>
 </ol></div>
 </div>
 <div class="sect2">
 <h3 id="_the_gnu_apl_built_in_ascii_to_apl_mapper">The GNU APL Built-in ASCII to APL Mapper</h3>
-<div class="paragraph"><p>As a consequence of all the failed attempts to find a working keyboard
-mapping outside of GNU APL (where it belongs) the author vaguely
-remembered how APL characters were entered in the 1970s. At that time
-keyboards had no <strong>ALT</strong> keys. Instead, some keyboards could be switched
-between an ASCII mode and an APL mode with the ASCII control characters
-<strong>SI</strong> and <strong>SO</strong> (aka, <code>^O</code> and <code>^N</code>). One of them (the author has forgotten
-which in the meantime) would select the ASCII mode (and all subsequently
-typed characters were ASCII characters) and the other would select the
-APL mode (not to be confused with the APL overstrike method of that time,
-which would operate in parallel when in APL mode). Technically speaking
-these mappings were made in the keyboard driver of the operating system
-and not in the keyboards themselves.</p></div>
-<div class="paragraph"><p>The built-in ASCII to APL mapper of GNU APL has adopted this old mechanism
-as follows:</p></div>
+<div class="paragraph"><p>In addition to the Right Alt mapping above, GNU APL provides a second
+mechanism based on ASCII control characters, recalling how APL characters
+were entered on 1970s terminals:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Typing <code>^O</code> (Windows) or <code>^A</code> (Linux/macOS), i.e. holding down the CTRL
-  key and typing O or A respectively, will map the next character typed to
-  APL, and
+Typing <code>^O</code> (Windows) or <code>^A</code> (Linux/macOS) maps the <strong>next</strong> character
+  typed to APL.
 </p>
 </li>
 <li>
 <p>
-Typing <code>^N</code> will map all subsequent characters typed to APL (until
-  <code>^N</code> is typed again).
+Typing <code>^N</code> toggles a permanent APL mode: all subsequent characters are
+  mapped to APL until <code>^N</code> is typed again.
 </p>
 </li>
 </ol></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<img src="./images/icons/note.png" alt="Note" />
+<div class="title">Note</div>
 </td>
 <td class="content">On Windows, <code>^O</code> is used as the single-character trigger instead of
 <code>^A</code>, because the Windows 10/11 console intercepts <code>^A</code> as "select all"
 before GNU APL sees it.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>The built-in ASCII to APL mapper of GNU APL is disabled by default because
-all platforms other than Windows 11 have no problems generating APL
-characters.  To enable the mapper one has to <strong>./configure</strong> GNU APL with
-the option <strong>ALT_MAP_WANTED=1</strong> as it was done in the examples above.
-The parameter <strong>1</strong> of <strong>ALT_MAP_WANTED=1</strong> specifies a mapping profile
-to be used; the mapping profile to be used, where the profile defines
-the control codes (<code>^O</code> and <code>^N</code> for profile 1 on Windows) and the details
-of the mapping (map <strong>r</strong> to <strong>⍴</strong>, <strong>i</strong> to <strong>⍳</strong>, &#8230;). Currently two such
-profiles are defined:</p></div>
+<div class="paragraph"><p>Both the Right Alt mapping and the <code>^O</code>/<code>^N</code> mapper are enabled in the
+pre-built <strong>apl.exe</strong> (compiled with <strong>ALT_MAP_WANTED=1</strong>). They use profile 1,
+which maps a US keyboard to the standard GNU APL layout (map <strong>r</strong> to <strong>⍴</strong>,
+<strong>i</strong> to <strong>⍳</strong>, and so on). To build with a different profile or to define your
+own mapping, see <strong>src/LineInput.cc</strong> and search for <strong>cfg_ALT_MAP_WANTED</strong>.</p></div>
+<div class="paragraph"><p>When building from source, enable the mapper with:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><code>./configure ALT_MAP_WANTED=1</code></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_building_the_windows_installer">Appendix A: Building the Windows Installer</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This appendix is for GNU APL maintainers who need to cross-compile the
+Windows installer on a Linux host using MinGW.</p></div>
+<div class="paragraph"><p>The build uses two SVN working copies side by side:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>LEFT window</strong>: <code>~/apl-2.0/</code> — source edits, SVN commits
+</p>
+</li>
+<li>
+<p>
+<strong>RIGHT window</strong>: <code>~/mingw-apl/</code> — MinGW cross-compilation, installer build
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The binary is cross-compiled in the RIGHT window.
+The workspace library and NSIS script live in the LEFT window.
+<code>make windows-release</code> in the RIGHT window drives the whole process.</p></div>
+<div class="paragraph"><p><code>apl.exe</code> links statically against <code>libgcc</code>/<code>libstdc++</code> but requires
+<code>libwinpthread-1.dll</code> at runtime (bundled by the installer).
+Windows system DLLs (<code>KERNEL32</code>, <code>WS2_32</code>, <code>msvcrt</code>) are always present.</p></div>
+<div class="sect2">
+<h3 id="_step_1_commit_changes_left_window_only_when_code_was_changed">Step 1 — Commit changes (LEFT window, only when code was changed)</h3>
+<div class="listingblock">
+<div class="content"></div></div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_update_and_reconfigure_right_window_only_after_step_1">Step 2 — Update and reconfigure (RIGHT window, only after Step 1)</h3>
+<div class="listingblock">
+<div class="content"></div></div>
+<div class="paragraph"><p><code>ALT_MAP_WANTED=1</code> enables the <code>^O</code> (map next char) / <code>^N</code> (toggle map-all)
+APL keyboard input shortcuts.</p></div>
+<div class="paragraph"><p>The two <code>sed</code> lines fix libtool 2.4.6 cross-compilation bugs:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>ALT_MAP_WANTED=0</strong> (or omitting the <strong>ALT_MAP_WANTED</strong> option disables
-  the mapper.
+The lt-wrapper template does not include <code>&lt;process.h&gt;</code>/<code>&lt;io.h&gt;</code> for
+  <code>\__MINGW32__</code> (only for <code>_MSC_VER</code>), causing <code>_P_WAIT</code> undeclared errors.
 </p>
 </li>
 <li>
 <p>
-<strong>ALT_MAP_WANTED=1</strong> maps an US-keyboard to the standard GNU APL keyboard
-   layout.
+The wrapper is compiled with <code>$LTCC</code> (native gcc) instead of <code>$CC</code> (the
+  cross-compiler), so Windows-specific headers are not found.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Unlike in Windows 11 (which is closed source and prevents the user from
-defining her own layout), GNU APL is free software that allows the user
-to modify it to suit her needs. To construct your own mapping,
-have a look at file <strong>src/LineInput.cc</strong> and search for all occurrences of
-<strong>cfg_ALT_MAP_WANTED</strong>.</p></div>
+<div class="paragraph"><p>Both must be re-applied after every <code>./configure</code> run.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_force_relink_right_window_only_after_configure_changes">Step 3 — Force relink (RIGHT window, only after configure changes)</h3>
+<div class="listingblock">
+<div class="content"></div></div>
+<div class="paragraph"><p><code>make</code> only relinks when source files change, not when linker flags change.
+Removing <code>src/.libs/apl.exe</code> forces the full libtool link step; without it
+libtool may skip relinking and <code>src/apl-2.0.exe</code> (the file copied into the
+installer) will never be created.
+Skip this step if only APL workspace files were edited.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_build_the_installer_right_window">Step 4 — Build the installer (RIGHT window)</h3>
+<div class="listingblock">
+<div class="content"></div></div>
+<div class="paragraph"><p>This does everything automatically:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+compiles <code>src/apl.exe</code> and <code>src/apl-2.0.exe</code>
+</p>
+</li>
+<li>
+<p>
+copies <code>src/apl-2.0.exe</code> into <code>support-files/windows-installer/</code>
+</p>
+</li>
+<li>
+<p>
+stages workspaces, runs <code>makensis</code>, and copies the finished installer
+  here as <code>GNU_APL_2_0_Setup.exe</code>
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_step_5_transfer_and_test_windows">Step 5 — Transfer and test (Windows)</h3>
+<div class="paragraph"><p>Copy <code>~/mingw-apl/GNU_APL_2_0_Setup.exe</code> to Windows and run it.
+The installer requires no administrator rights and installs to
+<code>%USERPROFILE%\gnu-apl.d\</code>.</p></div>
+<div class="paragraph"><p>Quick smoke test in the APL session:</p></div>
+<div class="listingblock">
+<div class="content"></div></div>
+<div class="paragraph"><p><code>)lib</code> should list <code>wslib1</code> through <code>wslib9</code>; <code>)copy 3 meta</code> tests the
+library path via <code>wslib3/meta.apl</code>; the last line reads back system variables.</p></div>
 </div>
 </div>
 </div>
@@ -1283,7 +1443,7 @@ have a look at file <strong>src/LineInput.cc</strong> and search for all occurre
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-06-15 12:45:41 CEST
+ 2026-06-18 19:27:43 CEST
 </div>
 </div>
 </body>

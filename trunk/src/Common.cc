@@ -173,6 +173,10 @@ cleanup(bool soft)
       }
 
    LineInput::restore_termios();
+
+#if MINGW_SRC
+   WSACleanup();
+#endif
 }
 //════════════════════════════════════════════════════════════════════════════
 void

@@ -89,10 +89,25 @@ UserPreferences::UserPreferences()
      safe_mode(false),
      script_argc(0),
      silence(FULL_BANNER),
+#if MINGW_SRC
+     // Shared variables (⎕SVx) require the APserver auxiliary processor,
+     // which exists for backward compatibility with IBM APL2 and is rarely
+     // used. APserver is not supported on Windows, so default to the
+     // equivalent of --noSV there to avoid a spurious "Svar_DB not
+     // connected" message on every startup. Still overridable via SharedVars
+     // in the preferences file or the --noSV/--SV command line options.
+     //
+     system_do_svars(false),
+#else
      system_do_svars(true),
+#endif
      tcp_port(0),
      tcp_websocket(false),
+#if MINGW_SRC
+     user_do_svars(false),
+#else
      user_do_svars(true),
+#endif
      user_profile(0),
      wait_ms(0),
      WINCH_sets_pw(false)
@@ -1267,8 +1282,15 @@ UserPreferences::open_user_file(const char * fname, char * filename,
 {
    if (sys)   // filename in /etc/gnu-apl.d/preferences
       {
+#if MINGW_SRC
+        // On Windows the install directory ($PROFILE\apl) serves the same
+        // role as /etc/gnu-apl.d: preferences lives directly inside it.
+        snprintf(filename, APL_PATH_MAX,
+                 "%s\\%s", LibPaths::get_APL_lib_root(), fname);
+#else // ! MINGW_SRC
         snprintf(filename, APL_PATH_MAX,
                  "%s/gnu-apl.d/%s", apl_DIR__sysconf, fname);
+#endif // MINGW_SRC
       }
    else       // try $HOME/.gnu_apl
       {

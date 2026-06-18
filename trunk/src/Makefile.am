@@ -258,6 +258,11 @@ apl_SOURCES = main.cc $(common_SOURCES)
 apl_CXXFLAGS = $(common_CXXFLAGS)
 apl_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 apl_LDFLAGS = $(common_LDFLAGS)
+if apl_TARGET_MINGW
+# Cross-compiled Windows binary: suppress libtool's lt-apl.c wrapper, which
+# uses _spawnv/_P_WAIT without including <process.h> and fails to compile.
+apl_LDFLAGS += -no-install
+endif
 
 endif
 endif
@@ -316,6 +321,25 @@ test4: all
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
+
+if apl_TARGET_MINGW
+# On MinGW builds apl-VERSION.exe is the primary deliverable.  Build it
+# automatically as part of 'make all'.
+# Libtool places the real binary in .libs/apl.exe; apl.exe in the build
+# directory is a libtool wrapper that spawns .libs/apl.exe and is only
+# useful for in-tree testing.  Copy the real binary for the installer.
+#
+all-local: $(bin_PROGRAMS)
+	cp .libs/apl.exe apl-$(VERSION).exe
+
+apl-$(VERSION).exe: $(bin_PROGRAMS)
+	cp .libs/apl.exe apl-$(VERSION).exe
+
+CLEANFILES = apl-$(VERSION).exe
+
+windows-release: apl-$(VERSION).exe
+	cp apl-$(VERSION).exe ../support-files/windows-installer/
+endif
 
 
 .PHONY:	patch

@@ -1,7 +1,9 @@
 
 # noinst_PROGRAMS will be compiled (in this subdirectory 'tools')
 # but will not be installed (in e.g. /usr/bin or /usr/local/bin).
+# None of these tools are needed when cross-compiling for Windows.
 #
+if !apl_TARGET_MINGW
 noinst_PROGRAMS = APL_keyboard       \
                   APL_keyboard_learn \
                   APL_keyboard_show  \
@@ -17,6 +19,7 @@ noinst_PROGRAMS = APL_keyboard       \
 
 if BUILD_NCURSES_EMUL
 noinst_PROGRAMS += ncurses_emul
+endif
 endif
 
 

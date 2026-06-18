@@ -89,22 +89,23 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
-	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) \
-	check_command_def$(EXEEXT) filter_apl_lines$(EXEEXT) \
-	filter_apl_lines2$(EXEEXT) lines$(EXEEXT) phrase_gen$(EXEEXT) \
-	sockconst$(EXEEXT) TLV_server$(EXEEXT) unicodes_used$(EXEEXT) \
-	$(am__EXEEXT_1)
-@BUILD_NCURSES_EMUL_TRUE@am__append_1 = ncurses_emul
+@apl_TARGET_MINGW_FALSE@noinst_PROGRAMS = APL_keyboard$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	APL_keyboard_learn$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	APL_keyboard_show$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	apl2html$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	check_command_def$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	filter_apl_lines$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	filter_apl_lines2$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	lines$(EXEEXT) phrase_gen$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	sockconst$(EXEEXT) TLV_server$(EXEEXT) \
+@apl_TARGET_MINGW_FALSE@	unicodes_used$(EXEEXT) $(am__EXEEXT_1)
+@BUILD_NCURSES_EMUL_TRUE@@apl_TARGET_MINGW_FALSE@am__append_1 = ncurses_emul
 subdir = tools
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
-	$(top_srcdir)/m4/apl_TARGETs.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
@@ -120,7 +121,7 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-@BUILD_NCURSES_EMUL_TRUE@am__EXEEXT_1 = ncurses_emul$(EXEEXT)
+@BUILD_NCURSES_EMUL_TRUE@@apl_TARGET_MINGW_FALSE@am__EXEEXT_1 = ncurses_emul$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_APL_keyboard_OBJECTS = APL_keyboard.$(OBJEXT)
 APL_keyboard_OBJECTS = $(am_APL_keyboard_OBJECTS)

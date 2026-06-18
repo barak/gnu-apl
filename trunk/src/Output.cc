@@ -101,17 +101,24 @@ Output::ColorMode Output::color_mode = COLM_UNDEF;
 /// CSI sequence for ANSI/VT100 terminals (ESC [)
 #define CSI "\x1B["
 
-/// VT100 escape sequence to change to the CIN color
-char Output::color_CIN[MAX_ESC_LEN] = CSI "0;30;47m";
+// Fixed (non-"terminal default") colors, identical on every platform, so
+// that the look of GNU APL no longer depends on the terminal's own theme
+// (ANSI codes 39/49 mean "terminal default fg/bg" and silently follow
+// whatever theme the terminal currently has - that caused GNU APL's
+// appearance to drift on its own when a terminal/desktop theme changed,
+// even though nothing in GNU APL or its preferences had changed).
+//
+/// VT100 escape sequence to change to the CIN color (blue on white)
+char Output::color_CIN[MAX_ESC_LEN] = CSI "0;34;47m";
 
-/// VT100 escape sequence to change to the COUT color
-char Output::color_COUT[MAX_ESC_LEN] = CSI "0;39;49m";
+/// VT100 escape sequence to change to the COUT color (black on bright white)
+char Output::color_COUT[MAX_ESC_LEN] = CSI "0;30;107m";
 
-/// VT100 escape sequence to change to the CERR color
-char Output::color_CERR[MAX_ESC_LEN] = CSI "0;35;49m";
+/// VT100 escape sequence to change to the CERR color (bright red on bright white)
+char Output::color_CERR[MAX_ESC_LEN] = CSI "0;91;107m";
 
-/// VT100 escape sequence to change to the UERR color
-char Output::color_UERR[MAX_ESC_LEN] = CSI "0;35;49m";
+/// VT100 escape sequence to change to the UERR color (same as CERR)
+char Output::color_UERR[MAX_ESC_LEN] = CSI "0;91;107m";
 
 /// VT100 escape sequence to reset colors to their default
 char Output::color_RESET[MAX_ESC_LEN] = CSI "0;39;49m";

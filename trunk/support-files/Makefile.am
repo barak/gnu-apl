@@ -9,6 +9,7 @@ SUBDIRS = Bill_Daly_Ubuntu  \
         OS-X-Keyboard       \
         Unicomp-Keyboard    \
         WASD-Keyboard       \
+        windows-installer   \
         105-key-International-Keyboard
 
 dist_noinst_DATA = apl.vim

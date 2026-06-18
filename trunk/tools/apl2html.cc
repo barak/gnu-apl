@@ -98,8 +98,9 @@ int year, mon, day;
 
    {
      timeval tv;
+     const time_t seconds = tv.tv_sec;
      gettimeofday(&tv, 0);
-     tm * t = localtime(&tv.tv_sec);
+     tm * t = localtime(&seconds);
      year = 1900 + t->tm_year;
      mon = 1 + t->tm_mon;
      day = t->tm_mday;

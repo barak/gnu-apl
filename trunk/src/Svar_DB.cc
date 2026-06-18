@@ -491,8 +491,24 @@ Svar_DB::get_Svar_DB_tcp(const char * calling_function)
 const TCP_socket tcp = Svar_DB::get_DB_tcp();
    if (tcp == NO_TCP_SOCKET)
       {
-        get_CERR() << "Svar_DB not connected in Svar_DB::"
-             << calling_function << "()" << endl;
+        static bool warned = false;
+        if (!warned)
+           {
+             warned = true;
+#if MINGW_SRC
+             MORE_ERROR() <<
+"APserver (the shared variable server) is not supported on Windows.\n"
+"This message is harmless unless you use shared variables.";
+             get_CERR() << "Svar_DB not connected in Svar_DB::"
+                  << calling_function << "()+"
+                  << endl;
+#else
+             get_CERR() << "Svar_DB not connected in Svar_DB::"
+                  << calling_function << "()"
+                  << " (APserver not running; shared variables unavailable)"
+                  << endl;
+#endif
+           }
       }
 
    return tcp;
@@ -679,6 +695,10 @@ bool
 Svar_DB::start_APserver(const char * server_sockname,
                         const char * bin_dir, bool logit)
 {
+#if MINGW_SRC
+   return true;   // APserver is not supported on Windows; suppress all output
+#endif
+
    // bin_dir is the directory where the apl interpreter binary lives.
    // The APserver then lives in:
    //

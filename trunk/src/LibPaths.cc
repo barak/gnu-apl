@@ -244,7 +244,8 @@ void
 LibPaths::set_APL_lib_root(const char * new_root)
 {
 #if MINGW_SRC
-   strncpy(APL_lib_root, ".", sizeof(APL_lib_root) - 1);
+   strncpy(APL_lib_root, new_root, sizeof(APL_lib_root) - 1);
+   APL_lib_root[sizeof(APL_lib_root) - 1] = 0;
 #else // ! MINGW_SRC
    unused = realpath(new_root, APL_lib_root);
 #endif // ! MINGW_SRC
@@ -329,6 +330,16 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
 
 #if MINGW_SRC
    strncpy(APL_bin_path, argv0, sizeof(APL_bin_path) - 1);
+   APL_bin_path[APL_PATH_MAX] = 0;
+   {
+     // argv0 on Windows uses backslashes; strip last component with either.
+     //
+     char * slash = strrchr(APL_bin_path, '\\');
+     if (!slash)   slash = strrchr(APL_bin_path, '/');
+     if (slash)   { *slash = 0;   APL_bin_name = slash + 1; }
+     else         { APL_bin_name = APL_bin_path;            }
+   }
+   goto done;
 #else // ! MINGW_SRC
    unused = realpath(argv0, APL_bin_path);
 #endif // // ! MINGW_SRC
@@ -396,6 +407,15 @@ LibPaths::search_APL_lib_root()
                   << APL_lib_root << endl;
              break;
            }
+      }
+
+   // Current-directory search failed.  Fall back to the binary's own
+   // directory — on Windows this is typically $INSTDIR where wslib1/ lives.
+   //
+   if (APL_bin_path[0] && is_lib_root(APL_bin_path))
+      {
+        set_APL_lib_root(APL_bin_path);
+        return;
       }
 
    set_APL_lib_root(".");

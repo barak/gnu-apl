@@ -27,24 +27,143 @@ already satisfied by almost all modern GNU/Linux distribution and the missing
 pieces can easily be added via the package manager of the linux distribution.
 
 Even for the latest Windows version - Windows 11 as of this writing -
-the situation is more complicated. When it comes to APL, Windows 11 still has
-limitations that make the installation of GNU APL on Windows more complicated
-than on GNU/Linux. On Windows 11 the user needs to fetch different components
-from different places on the internet. Under GNU/Linux the display of APL
-characters works out-of-the box and the generation of APL characters on the
-keyboard can be done with typically a single configuration file
-(shipped with GNU APL; see file *README-3-keyboard* and directory
-*support-files*). On Windows the user has to install a suitable APL font to
-display APL characters and a keyboard mapping for the keyboard. While
-installing an APL font is relatively easy, the installation of a keyboard
-mapping has become more and more difficult from one Windows version to the
-next. In older Windows versions one could "hack" the Windows registry to make
-Windows produce APL characters with the keyboard, but this does not work
-anymore under Windows 11. Microsoft provides alternatives like the Keyboard
-Manager in their PowerTools, or the Input Mode Editor (IME), but both seem
-not to work for terminal applications like GNU APL. To address this issue, GNU
-APL comes with a built-in keyboard mapper that allows the user to toggle the
-keyboard between ASCII and APL.
+the situation is more complicated. On Windows the user has to install a
+suitable APL font to display APL characters and have a way to enter them
+from the keyboard. Both are handled by the Windows installer: it installs
+the GNU_APL font and provides built-in Right Alt (AltGr) keyboard support
+directly in *apl.exe*. Pressing *Right Alt + key* produces the corresponding
+APL character, so no additional keyboard software needs to be installed.
+
+== Two Ways to Get GNU APL on Windows
+
+There are two distinct paths to GNU APL on Windows, depending on whether
+you just want to *use* it or want to *build* it yourself:
+
+----
+GNU APL on Windows: which path do you need?
+│
+├─ Build it yourself
+│  │
+│  ▼
+│  ┌─────────────────────────────────────────────┐
+│  │ Fetch the source from Savannah (svn or git) │
+│  └─────────────────────────────────────────────┘
+│  │
+│  ▼
+│  ./configure --with-mingw && make && make install
+│  (cross-compiles apl.exe from Linux; see "For developers" below)
+│
+└─ Run a pre-built copy (no build tools needed)
+   │
+   ▼
+   ┌──────────────────────────────────────┐
+   │ Fetch an installer from a GNU mirror │
+   └──────────────────────────────────────┘
+   │
+   ├─ Need everything (apl.exe + font + library directories)
+   │  │
+   │  ▼
+   │  GNU_APL_2_0_Setup.exe   (the full installer)
+   │
+   └─ Already have apl.exe, just need the font
+      │
+      ▼
+      GNU_APL_Font_Setup.exe   (GUI installer), or
+      install_GNU_APL_font.bat (no-GUI script)
+----
+
+=== For Windows users: install a pre-built release
+
+If you only want to run GNU APL and do not need to compile it yourself,
+fetch a pre-built installer from a GNU mirror (the canonical location is
+https://ftp.gnu.org/gnu/apl/; see https://www.gnu.org/prep/ftp.html for
+the full mirror list). Two installers are provided:
+
+. *GNU_APL_2_0_Setup.exe* - the full installer (the *2.0* is the GNU APL
+  version, so that installers for different releases can coexist on the
+  mirror). It installs *apl.exe*, the library directory structure
+  (*workspaces* and *wslib1* to *wslib5*), the default preferences file,
+  and the GNU_APL font, all under *%USERPROFILE%\gnu-apl.d*. No
+  administrator rights are required.
+. *GNU_APL_Font_Setup.exe* - installs only the GNU_APL font. Use this one
+  instead of the full installer if you already have an *apl.exe* from
+  elsewhere (e.g. copied from another machine, or built yourself) and just
+  need the font.
+
+NOTE: As explained in the Introduction above, *apl.exe* is built against
+whatever optional libraries happen to be available in the (cross-)
+compilation environment used to build it. The pre-built *apl.exe* on the
+GNU mirror is unlikely to have been linked against all of them, so some
+⎕-functions that depend on an optional library - for example *⎕SQL*
+(needs SQLite/PostgreSQL), *⎕GTK* and *⎕PLOT* (need GTK), or *⎕FFT*
+(needs FFTW) - may not be available in it, even though the same functions
+work fine in a GNU/Linux build where those libraries are routinely
+installed. If you need one of these, you will have to build GNU APL
+yourself with that library available; see "For developers" below.
+
+The full installer creates a *GNU APL* shortcut in the Start Menu that
+launches *apl.exe* with its working directory set to the install location.
+This matters: *apl.exe* currently looks for its library directories
+(*workspaces*, *wslib1*, etc.) relative to its current working directory,
+not relative to the location of the *.exe* file itself, so launching
+*apl.exe* directly from a different working directory will not find them.
+
+The GNU_APL font installer can also be fetched directly from the GNU
+Savannah Subversion repository with a plain web browser, without needing
+an SVN or git client:
+
+ http://svn.savannah.gnu.org/viewvc/apl/trunk
+
+Look under *support-files/fonts/* for the font installer (NOTE: like any
+public server, this one occasionally returns a temporary error - e.g. a
+503 - under heavy load; if that happens, just retry later or use the GNU
+mirror above instead).
+
+=== For developers: build from source
+
+If you want to modify GNU APL, or simply prefer to build it yourself,
+fetch the sources from Savannah (Subversion is preferred; Git is also
+available) and build as usual:
+
+ svn co http://svn.savannah.gnu.org/svn/apl/trunk apl-2.0
+
+or
+
+ git clone https://git.savannah.gnu.org/git/apl.git apl-2.0
+
+then:
+
+ cd apl-2.0
+ ./configure
+ make
+ make install
+
+This is the same procedure used on GNU/Linux, and is also what you would
+use to build and run GNU APL *on* Windows itself (via Cygwin or WSL); see
+the rest of this document for the additional steps needed for that.
+
+To instead *cross-compile* a native Windows *apl.exe* from a GNU/Linux
+machine (e.g. to produce the pre-built binary mentioned above), use
+*--with-mingw* instead of a plain *./configure*:
+
+ ./configure --with-mingw
+ make
+
+This presets the MinGW-w64 cross-compiler (*x86_64-w64-mingw32-g++*) and
+related flags, and disables libraries that are impractical to
+cross-compile (e.g. SQLite/PostgreSQL, hence no *⎕SQL* - see the NOTE
+above). *make install* does not apply when cross-compiling; the build
+just leaves a working *src/apl.exe*. To turn that into a release artifact
+for the GNU mirror, use one of:
+
+. *make -C src windows-release* - copies *apl.exe* to
+  *apl-2.0.exe* (the *2.0* is the GNU APL version, so that mirrored
+  binaries from different releases do not overwrite each other).
+. *make windows-installer* (run from the top-level source directory,
+  after placing the cross-compiled *apl.exe* into
+  *support-files/windows-installer/*) - packages *apl.exe* together with
+  the font and library directories into *GNU_APL_2_0_Setup.exe*, see
+  the top-level *Makefile.am* for details.
 
 == Top-level Installation Procedure
 
@@ -58,7 +177,9 @@ sub-installations:
   environment, but not for Cygwin.
 
 These 3 sub-installations are independent of each other and the third is
-somewhat optional (and likely to fail).
+somewhat optional (the pre-built *apl.exe* already has Right Alt keyboard
+support built in, so no separate keyboard mapping step is needed when using
+the installer).
 
 === Installation of a development environment
 
@@ -151,30 +272,28 @@ After having installed *WSL*, GNU APL can be compiled as usual:
 
 This step is only needed for *WSL* and not for *Cygwin*.
 
-The recommended font for GNU APL on Windows is *BQN386 Unicode*, an
-open-source TrueType font (MIT licence) originally designed for the BQN
-programming language.  It covers all APL characters in their standard Unicode
-positions and works correctly in the Windows console without any workarounds.
+The recommended font for GNU APL on Windows is *GNU_APL*, a TrueType font
+covering all APL characters in their standard Unicode positions. It is a
+derivative of the open-source *BQN386 Unicode* font (originally designed
+for the BQN programming language; see *support-files/fonts/COPYRIGHT_NOTICE*
+for attribution and licensing) with added glyphs (e.g. *∈* and *⊗*) and
+fixed display-width bugs for several characters that rendered too wide in
+the Windows console with the original font.
 
-==== Step 1: Download BQN386 Unicode
+==== Step 1: Install the font
 
-. Open a web browser and visit https://github.com/dzaima/BQN386
-. On that page, click the *BQN386.ttf* link to download the font file.
+Use one of the two GNU_APL font installers described in
+"<<_two_ways_to_get_gnu_apl_on_windows,Two Ways to Get GNU APL on
+Windows>>" above (*GNU_APL_Font_Setup.exe* or
+*install_GNU_APL_font.bat*). Both install the font for the current user
+only, without requiring administrator privileges.
 
-==== Step 2: Install the font
-
-. Double-click the downloaded *BQN386.ttf* file.
-  A font preview window opens showing sample characters and the name
-  *BQN386 Unicode* at the top.
-. Click the *Install* button (or *Install for all users*).
-
-Windows copies the file into *C:\Windows\Fonts* and registers the font.
-
-==== Step 3: Register the font for use in the Windows console
+==== Step 2: Register the font for use in the Windows console
 
 Windows only allows a short pre-approved list of fonts in the *cmd.exe*
-font picker.  BQN386 Unicode must be added to a registry key before it
-appears there.  This step requires administrator privileges.
+font picker. *GNU_APL* must be added to a registry key before it
+appears there (the font installers above do not do this automatically).
+This step requires administrator privileges.
 
 NOTE: The `Console\TrueTypeFont` registry key often does *not* exist on a
 fresh Windows installation.  The `reg add` command below creates it
@@ -183,121 +302,165 @@ automatically if it is absent.
 Open a Command Prompt *as administrator* (search for *cmd*, right-click →
 *Run as administrator*) and run:
 
- reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v 0 /t REG_SZ /d "BQN386 Unicode" /f
+ reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Console\TrueTypeFont" /v 0 /t REG_SZ /d "GNU_APL" /f
 
-==== Step 4: Select the font in cmd.exe
+==== Step 3: Select the font in cmd.exe
 
 . Open a *cmd.exe* window (*Win+R* → type *cmd* → *Enter*).
 . Right-click the title bar and choose *Properties*.
 . Select the *Font* tab.
-. In the font list, choose *BQN386 Unicode*.
-. Choose a comfortable size (10 or 12 points work well).
+. In the font list, choose *GNU_APL*.
+. Choose a size large enough to distinguish APL characters - *14pt* is
+  the minimum for that, *18pt* is more comfortable.
 . Click *OK*.
 
 To make the selection permanent for all future *cmd.exe* windows, use
 *Defaults* instead of *Properties* in step 2, or when prompted choose
 *Modify shortcut that started this window*.
 
-NOTE: An index of alternative APL fonts (in case BQN386 does not suit
+NOTE: An index of alternative APL fonts (in case GNU_APL does not suit
 your needs) is maintained at https://sigapl.org/fonts/FontsIndex.php
 
 === Installation of a keyboard mapping
 
-At this point you have a working GNU APL interpreter. What is missing is
-a way to interactively enter APL characters. What should already work at
-this point is:
+At this point you have a working GNU APL interpreter. APL characters can
+be entered in several ways:
 
-. Copying APL characters (\^C and \^V). If you start GNU APL and enter
-  the command  *]KEYB* then you should get the display of a keyboard
-  layout that you could copy from (with \^C) and then paste into the
-  GNU APL window (with ^V).
-. Running APL scripts or workspaces. The *)LOAD*, *)COPY*, and *OFF*
-  commands need no APL characters and can therefore be entered even if no
-  APL keyboard mapping is installed.
-. Last but not least there is the built-in ASCII-to-APL mapping of GNU APL
-  which is described in more detail further down.
+. *Right Alt + key* (the primary method in the pre-built *apl.exe*).
+  The *Right Alt* key (sometimes labelled *AltGr* on European keyboards) is
+  used as the APL shift key. Holding *Right Alt* and pressing a letter or
+  punctuation key produces the corresponding APL character.  For example,
+  *Right Alt + r* gives *⍴*, *Right Alt + i* gives *⍳*, and so on.
+  The layout follows the standard GNU APL keyboard (see *]KEYB* inside APL).
+  This mapping is built into *apl.exe* itself and requires no additional
+  software or administrator rights.
 
-There are a number of different options that you can choose from. Many
-of them work only on true GNU/Linux systems, though. GNU APL is shipped with
-a separate file *README-3-keyboard* that discusses some of the methods.
-The author has spent quite some time to find a method that works reliably
-under Windows 11, but to no avail.
+. *Copying and pasting* APL characters (Ctrl+C / Ctrl+V). The command
+  *]KEYB* inside APL displays the keyboard layout; you can copy characters
+  from it. The command *]AV* prints the entire APL character set (*⎕AV*)
+  and is useful for characters not shown by *]KEYB*.
 
-Keyboard mappings in Windows 11 are, simply speaking, a mess. The author
-has tried the following.
+. *Running APL scripts or workspaces*. The *)LOAD*, *)COPY*, and *OFF*
+  commands need no APL characters and work without any keyboard mapping.
 
-. The *Keyboard Manager* (which is a component in the *PowerTools*) offered
-  by Microsoft free of charge. One can indeed map keys to APL characters
-  with the *Keyboard Manager*. However, the mapping works in some Microsoft
-  applications, but not in others. When the *Keyboard Manager* is running
-  (and if an APL font is installed and selected) then you can edit APL
-  scripts in Microsoft's *Notepad*, but if you open Microsoft's Windows
-  Command Prompt *cmd.exe* in another window then the mapping provided by
-  the *Keyboard Manager* does not apply in that window.
-
-. Microsoft provides a thing called *Input Method Editor* (*IME*) that should
-  provide arbitrary keyboard mappings. In fact there are hundreds of such
-  mappings provided by Microsoft, but none of them is suitable for APL.
-  The IMEs are not configurable in any way, so if you need Chinese characters
-  then you are fine because Microsoft provides a Chinese IME, but for APL
-  you are out of luck. Also there are several detailed instructions how to
-  add IMEs under Windows 11 on the internet, but all of them fail in the first
-  or second step because the Windows 11 of the author was different from the
-  Windows 11 in these instructions. The instructions referred to items
-  in the Windows 11 *Control Panel* that simply did not exist.
-
-. There are a number of keyboard mappers offered on the internet, both commercial
-  and free ones. The author has not tried any of those because most looked
-  like mere convenience front-ends to Windows 11 components above that did
-  not work. If a GNU APL user should find a mapping that works with GNU APL
-  then please report that to the mailing list bug-apl@gnu.org!
-
+. *The built-in Ctrl+O / Ctrl+N mapper* (secondary method, described
+  below).
 
 === The GNU APL Built-in ASCII to APL Mapper
 
-As a consequence of all the failed attempts to find a working keyboard
-mapping outside of GNU APL (where it belongs) the author vaguely
-remembered how APL characters were entered in the 1970s. At that time
-keyboards had no *ALT* keys. Instead, some keyboards could be switched
-between an ASCII mode and an APL mode with the ASCII control characters
-*SI* and *SO* (aka, `^O` and `^N`). One of them (the author has forgotten
-which in the meantime) would select the ASCII mode (and all subsequently
-typed characters were ASCII characters) and the other would select the
-APL mode (not to be confused with the APL overstrike method of that time,
-which would operate in parallel when in APL mode). Technically speaking
-these mappings were made in the keyboard driver of the operating system
-and not in the keyboards themselves.
+In addition to the Right Alt mapping above, GNU APL provides a second
+mechanism based on ASCII control characters, recalling how APL characters
+were entered on 1970s terminals:
 
-The built-in ASCII to APL mapper of GNU APL has adopted this old mechanism
-as follows:
-
-. Typing `^O` (Windows) or `^A` (Linux/macOS), i.e. holding down the CTRL
-  key and typing O or A respectively, will map the next character typed to
-  APL, and
-. Typing `^N` will map all subsequent characters typed to APL (until
-  `^N` is typed again).
+. Typing `^O` (Windows) or `^A` (Linux/macOS) maps the *next* character
+  typed to APL.
+. Typing `^N` toggles a permanent APL mode: all subsequent characters are
+  mapped to APL until `^N` is typed again.
 
 NOTE: On Windows, `^O` is used as the single-character trigger instead of
 `^A`, because the Windows 10/11 console intercepts `^A` as "select all"
 before GNU APL sees it.
 
-The built-in ASCII to APL mapper of GNU APL is disabled by default because
-all platforms other than Windows 11 have no problems generating APL
-characters.  To enable the mapper one has to *./configure* GNU APL with
-the option *ALT_MAP_WANTED=1* as it was done in the examples above.
-The parameter *1* of *ALT_MAP_WANTED=1* specifies a mapping profile
-to be used; the mapping profile to be used, where the profile defines
-the control codes (`^O` and `^N` for profile 1 on Windows) and the details
-of the mapping (map *r* to *⍴*, *i* to *⍳*, ...). Currently two such
-profiles are defined:
+Both the Right Alt mapping and the `^O`/`^N` mapper are enabled in the
+pre-built *apl.exe* (compiled with *ALT_MAP_WANTED=1*). They use profile 1,
+which maps a US keyboard to the standard GNU APL layout (map *r* to *⍴*,
+*i* to *⍳*, and so on). To build with a different profile or to define your
+own mapping, see *src/LineInput.cc* and search for *cfg_ALT_MAP_WANTED*.
 
-. *ALT_MAP_WANTED=0* (or omitting the *ALT_MAP_WANTED* option disables
-  the mapper.
-. *ALT_MAP_WANTED=1* maps an US-keyboard to the standard GNU APL keyboard
-   layout.
+When building from source, enable the mapper with:
 
-Unlike in Windows 11 (which is closed source and prevents the user from
-defining her own layout), GNU APL is free software that allows the user
-to modify it to suit her needs. To construct your own mapping,
-have a look at file *src/LineInput.cc* and search for all occurrences of
-*cfg_ALT_MAP_WANTED*.
+ ./configure ALT_MAP_WANTED=1
+
+[appendix]
+== Building the Windows Installer
+
+This appendix is for GNU APL maintainers who need to cross-compile the
+Windows installer on a Linux host using MinGW.
+
+The build uses two SVN working copies side by side:
+
+* *LEFT window*: `~/apl-2.0/` — source edits, SVN commits
+* *RIGHT window*: `~/mingw-apl/` — MinGW cross-compilation, installer build
+
+The binary is cross-compiled in the RIGHT window.
+The workspace library and NSIS script live in the LEFT window.
+`make windows-release` in the RIGHT window drives the whole process.
+
+`apl.exe` links statically against `libgcc`/`libstdc++` but requires
+`libwinpthread-1.dll` at runtime (bundled by the installer).
+Windows system DLLs (`KERNEL32`, `WS2_32`, `msvcrt`) are always present.
+
+=== Step 1 — Commit changes (LEFT window, only when code was changed)
+
+[source,sh]
+----
+svn -m "your message" commit
+----
+
+=== Step 2 — Update and reconfigure (RIGHT window, only after Step 1)
+
+[source,sh]
+----
+svn up
+autoreconf
+./configure --with-mingw ALT_MAP_WANTED=1
+sed -i 's/#ifdef _MSC_VER/#if defined(_MSC_VER) || defined(__MINGW32__)/' libtool
+sed -i 's/\$LTCC \$LTCFLAGS -o \$cwrapper/\$CC \$CFLAGS -o \$cwrapper/' libtool
+----
+
+`ALT_MAP_WANTED=1` enables the `^O` (map next char) / `^N` (toggle map-all)
+APL keyboard input shortcuts.
+
+The two `sed` lines fix libtool 2.4.6 cross-compilation bugs:
+
+. The lt-wrapper template does not include `<process.h>`/`<io.h>` for
+  `\__MINGW32__` (only for `_MSC_VER`), causing `_P_WAIT` undeclared errors.
+. The wrapper is compiled with `$LTCC` (native gcc) instead of `$CC` (the
+  cross-compiler), so Windows-specific headers are not found.
+
+Both must be re-applied after every `./configure` run.
+
+=== Step 3 — Force relink (RIGHT window, only after configure changes)
+
+[source,sh]
+----
+rm -f src/apl.exe src/apl-2.0.exe src/.libs/apl.exe
+----
+
+`make` only relinks when source files change, not when linker flags change.
+Removing `src/.libs/apl.exe` forces the full libtool link step; without it
+libtool may skip relinking and `src/apl-2.0.exe` (the file copied into the
+installer) will never be created.
+Skip this step if only APL workspace files were edited.
+
+=== Step 4 — Build the installer (RIGHT window)
+
+[source,sh]
+----
+make -j 10 windows-release
+----
+
+This does everything automatically:
+
+* compiles `src/apl.exe` and `src/apl-2.0.exe`
+* copies `src/apl-2.0.exe` into `support-files/windows-installer/`
+* stages workspaces, runs `makensis`, and copies the finished installer
+  here as `GNU_APL_2_0_Setup.exe`
+
+=== Step 5 — Transfer and test (Windows)
+
+Copy `~/mingw-apl/GNU_APL_2_0_Setup.exe` to Windows and run it.
+The installer requires no administrator rights and installs to
+`%USERPROFILE%\gnu-apl.d\`.
+
+Quick smoke test in the APL session:
+
+[source,apl]
+----
+)lib
+)copy 3 meta
+⎕←⎕IO ⎕CT ⎕PP
+----
+
+`)lib` should list `wslib1` through `wslib9`; `)copy 3 meta` tests the
+library path via `wslib3/meta.apl`; the last line reads back system variables.

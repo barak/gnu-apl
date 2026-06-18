@@ -34,6 +34,16 @@ dist_noinst_DATA =				\
 		dynamic_lookup-11.patch	\
 		aclocal.patch
 
+# wslib1 and wslib2 are reserved library directories with no shipped
+# content of their own (see doc/apl.texi, "library-root"), so unlike
+# wslib3/wslib4/wslib5 they have no Makefile of their own to install
+# files from. Create them as empty directories so that a fresh install
+# is recognized as a valid library-root (which requires wslib1 to exist).
+#
+install-data-hook:
+	$(MKDIR_P) $(DESTDIR)$(pkglibdir)/wslib1
+	$(MKDIR_P) $(DESTDIR)$(pkglibdir)/wslib2
+
 include Makefile.incl
 
 .PHONY: check_sources
@@ -122,6 +132,60 @@ EXPO1:
 	$(MAKE) -j10 dist
 	$(MAKE) -j10 DEB
 	$(MAKE) -j10 RPM
+
+# Stage a DESTDIR install tree containing only the platform-independent
+# library content (workspaces, wslib1-5, the default preferences file) -
+# i.e. everything that a Windows install needs *except* apl.exe itself,
+# which must be cross-compiled separately (e.g. with MinGW) and is NOT
+# produced by this (Linux) build. Place that versioned binary
+# (apl-VERSION.exe, produced by 'make -C src windows-release') into
+# support-files/windows-installer/ before running 'make windows-installer'.
+#
+.PHONY: windows-installer-stage
+windows-installer-stage:
+	rm -rf support-files/windows-installer/stage
+	$(MAKE) -C workspaces install DESTDIR=$(abs_top_builddir)/support-files/windows-installer/stage
+	$(MAKE) -C wslib3     install DESTDIR=$(abs_top_builddir)/support-files/windows-installer/stage
+	$(MAKE) -C wslib4     install DESTDIR=$(abs_top_builddir)/support-files/windows-installer/stage
+	$(MAKE) -C wslib5     install DESTDIR=$(abs_top_builddir)/support-files/windows-installer/stage
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib1
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib2
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib6
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib7
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib8
+	$(MKDIR_P) support-files/windows-installer/stage$(pkglibdir)/wslib9
+	$(MKDIR_P) support-files/windows-installer/stage$(sysconfdir)
+	$(INSTALL_DATA) gnu-apl.d/preferences support-files/windows-installer/stage$(sysconfdir)/
+	sed -i 's/^  LIBREF-\([345]\) /# LIBREF-\1 /' \
+	    support-files/windows-installer/stage$(sysconfdir)/preferences
+
+# Build the full Windows installer (apl-VERSION.exe + font + library
+# directory structure) from the staged tree above.  Requires the "nsis"
+# package (makensis).  When called via 'make windows-release', the binary
+# is copied automatically.  For a standalone invocation, place the versioned
+# binary apl-VERSION.exe in support-files/windows-installer/ first.
+#
+.PHONY: windows-installer
+windows-installer: windows-installer-stage
+	VUS=`echo "$(VERSION)" | tr . _` && \
+	cd support-files/windows-installer && \
+	makensis -DAPL_VERSION=$(VERSION) -DAPL_VERSION_US=$$VUS \
+	         GNU_APL_2_0_Setup.nsi
+
+# Produce versioned release files for the GNU mirror: the standalone binary
+# apl-VERSION.exe and the full installer GNU_APL_VERSION_US_Setup.exe, both
+# deposited in the top-level directory.  Calls 'make -C src windows-release'
+# to build and stage the binary, then 'make windows-installer' to run NSIS.
+# Must be run in the MinGW build tree (configured with --with-mingw).
+#
+.PHONY: windows-release
+windows-release:
+	$(MAKE) -C src windows-release
+	$(MAKE) windows-installer
+	cp support-files/windows-installer/apl-$(VERSION).exe apl-$(VERSION).exe
+	VUS=`echo "$(VERSION)" | tr . _` && \
+	cp "support-files/windows-installer/GNU_APL_$${VUS}_Setup.exe" \
+	   "GNU_APL_$${VUS}_Setup.exe"
 
 Makefile.dist:
 	echo "%:"		 > $@

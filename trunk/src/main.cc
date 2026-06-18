@@ -228,6 +228,16 @@ static void
 show_welcome(ostream & out, const char * argv0, Silence silence)
 {
    if (silence == NO_BANNER)   return;
+
+   // Apply the configured output color (e.g. black-on-white) to the banner.
+   // We deliberately do NOT write the banner through COUT: COUT also drives
+   // the .tc testcase comparison machinery (DiffOut), which is not yet
+   // initialized this early at startup (no testcase report file is open
+   // yet), and routing the banner through it corrupts test-mode output
+   // comparison for the rest of the run.
+   //
+   Output::set_color_mode(Output::COLM_OUTPUT);
+
    if (silence == BRIEF_BANNER)
       {
         out << "GNU APL version " << build_tag[1] << endl;
@@ -548,6 +558,12 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    init_modules2(log_startup);
 
+   // enable colors (if wanted) before show_welcome() so that the banner
+   // below is colored too, instead of falling back to the console's
+   // native/default colors.
+   //
+   if (uprefs.do_Color)   Output::toggle_color(U"ON");
+
    show_welcome(cout, args[0], uprefs.silence);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
@@ -559,8 +575,6 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
         cleanup(true);
         return 8;
       }
-
-   if (uprefs.do_Color)   Output::toggle_color(U"ON");
 
    if (uprefs.latent_expression.size())
       {
@@ -643,6 +657,13 @@ main(int argc, const char *argv[])
    // CP_UTF8 makes cmd.exe render it correctly (given a Unicode-capable font).
    //
    SetConsoleOutputCP(CP_UTF8);
+   SetConsoleCP(CP_UTF8);         // input: deliver AltGr/keyboard-layout chars as UTF-8
+
+   // Winsock must be initialised before any socket() call.  Without this,
+   // socket() returns WSANOTINITIALISED and Svar_DB prints a spurious
+   // "socket(AF_INET...) failed" error before the banner.
+   //
+   { WSADATA wsa; WSAStartup(MAKEWORD(2, 2), &wsa); }
 #endif
 //════════════════════════════════════════════════════════════════════════════
 

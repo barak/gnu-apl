@@ -124,15 +124,15 @@ host_triplet = @host@
 @apl_TARGET_LIBAPL_TRUE@am__append_15 = libapl.la
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_16 = lib_gnu_apl.la
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
+# Cross-compiled Windows binary: suppress libtool's lt-apl.c wrapper, which
+# uses _spawnv/_P_WAIT without including <process.h> and fails to compile.
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_MINGW_TRUE@@apl_TARGET_PYTHON_FALSE@am__append_17 = -no-install
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/apl_sugar.m4 \
-	$(top_srcdir)/m4/apl_TARGETs.m4 $(top_srcdir)/m4/check_X11.m4 \
-	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/m4/check_X11.m4 $(top_srcdir)/m4/check_FFT.m4 \
+	$(top_srcdir)/m4/check_PNG.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
@@ -1445,8 +1445,10 @@ pkglib_LTLIBRARIES = $(am__append_15) $(am__append_16)
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(GCOV_WANTED) \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(GPROF_WANTED) \
 @apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(CXX_RDYNAMIC)
-@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(am__append_17)
 apl_LDADD = $(LIBS)
+@apl_TARGET_MINGW_TRUE@CLEANFILES = apl-$(VERSION).exe
 all: all-recursive
 
 .SUFFIXES:
@@ -5950,8 +5952,9 @@ distdir-am: $(DISTFILES)
 	done
 check-am: all-am
 check: check-recursive
+@apl_TARGET_MINGW_FALSE@all-local:
 all-am: Makefile $(PROGRAMS) $(LTLIBRARIES) $(SCRIPTS) $(DATA) \
-		$(HEADERS)
+		$(HEADERS) all-local
 installdirs: installdirs-recursive
 installdirs-am:
 	for dir in "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(distdir)" "$(DESTDIR)$(pkgincludedir)"; do \
@@ -5979,6 +5982,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -6847,7 +6851,7 @@ uninstall-am: uninstall-binPROGRAMS uninstall-distSCRIPTS \
 
 .MAKE: $(am__recursive_targets) install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am all-local \
 	am--depfiles check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool clean-pkglibLTLIBRARIES \
 	cscopelist-am ctags ctags-am distclean distclean-compile \
@@ -6921,6 +6925,21 @@ test4: all
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt
+
+# On MinGW builds apl-VERSION.exe is the primary deliverable.  Build it
+# automatically as part of 'make all'.
+# Libtool places the real binary in .libs/apl.exe; apl.exe in the build
+# directory is a libtool wrapper that spawns .libs/apl.exe and is only
+# useful for in-tree testing.  Copy the real binary for the installer.
+#
+@apl_TARGET_MINGW_TRUE@all-local: $(bin_PROGRAMS)
+@apl_TARGET_MINGW_TRUE@	cp .libs/apl.exe apl-$(VERSION).exe
+
+@apl_TARGET_MINGW_TRUE@apl-$(VERSION).exe: $(bin_PROGRAMS)
+@apl_TARGET_MINGW_TRUE@	cp .libs/apl.exe apl-$(VERSION).exe
+
+@apl_TARGET_MINGW_TRUE@windows-release: apl-$(VERSION).exe
+@apl_TARGET_MINGW_TRUE@	cp apl-$(VERSION).exe ../support-files/windows-installer/
 
 .PHONY:	patch
 patch:

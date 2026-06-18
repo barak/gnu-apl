@@ -105,7 +105,7 @@ if apl_YES($apl_TARGET_MINGW); then
    : ${host_alias:=x86_64-w64-mingw32}
    : ${CC:=x86_64-w64-mingw32-gcc}
    : ${CXX:=x86_64-w64-mingw32-g++}
-   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -static -static-libgcc -static-libstdc++ -lwinpthread}
+   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -static-libgcc -static-libstdc++ -lwinpthread}
    : ${with_sqlite3:=no}
    : ${with_postgresql:=no}
    # Cross-compilation: AC_FUNC_MALLOC/AC_FUNC_REALLOC cannot run the test

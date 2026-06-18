@@ -49,6 +49,13 @@ int LineInput::initial_termios_errno = 0;
 
 #if MINGW_SRC
 unsigned long LineInput::initial_console_mode = 0;
+// Ring buffer and state for ReadConsoleInputW-based keyboard input.
+// Declared here (before any constructor) so all member functions can see them.
+static unsigned char g_kbuf[64];
+static int           g_khead      = 0;
+static int           g_ktail      = 0;
+static bool          g_is_console = false;
+static bool          g_keof       = false;
 #endif
 
 // hooks for external editors (emacs)
@@ -1048,14 +1055,15 @@ LineInput::LineInput(bool do_read_history)
       const HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
       GetConsoleMode(hStdin, &initial_console_mode);
       // Disable line buffering and echo; keep ENABLE_PROCESSED_INPUT so that
-      // the console continues to deliver correct character codes (without it
-      // some OEM code-page translations corrupt alphabetic keys).
+      // Ctrl+C and other control events are processed correctly.
+      // We use ReadConsoleInputW for keyboard input (see win_refill()), so
+      // ENABLE_VIRTUAL_TERMINAL_INPUT is not needed here.
       SetConsoleMode(hStdin,
                      (initial_console_mode | ENABLE_PROCESSED_INPUT)
                      & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT));
-      // Switch stdin to binary mode so the MinGW CRT delivers CR (0x0D)
-      // immediately instead of buffering it while waiting for a following LF.
+      // Switch stdin to binary mode (used for piped/file input fallback).
       _setmode(fileno(stdin), 0x8000);   // 0x8000 = _O_BINARY
+      g_is_console = _isatty(fileno(stdin)) != 0;
    }
    if (do_read_history)
       {
@@ -1250,10 +1258,6 @@ const int b0 = safe_fgetc();
               //
               if (ESCmap::need_more(seq, s))   continue;
 
-//            CERR << endl << "Unknown ESC sequence: ESC";
-//            loop(ss, s)   CERR << " " << HEX2(seq[ss + 1]);
-//            CERR << endl;
-
               return Invalid_Unicode;
             }
       }
@@ -1290,18 +1294,175 @@ const int b0 = safe_fgetc();
    return Unicode(b0);
 }
 //────────────────────────────────────────────────────────────────────────────
+#if MINGW_SRC
+// ── Windows keyboard input via ReadConsoleInputW ──────────────────────────────
+// Reads raw KEY_EVENT records so RIGHT_ALT_PRESSED is captured at keypress
+// time (not polled asynchronously).  Generates the VT escape sequences that
+// the ESCmap expects for navigation keys (Up/Down/Left/Right/Home/End/Ins/Del).
+// Used only when stdin is an interactive console; piped/file input falls back
+// to ordinary fgetc() so APL scripts work unchanged.
+
+static void
+kpush(unsigned char c)
+{
+   const int nx = (g_ktail + 1) & (int(sizeof g_kbuf) - 1);
+   if (nx != g_khead)   { g_kbuf[g_ktail] = c; g_ktail = nx; }
+}
+static bool  kempty() { return g_khead == g_ktail; }
+static int   kpop()
+{
+   if (kempty()) return EOF;
+   unsigned char c = g_kbuf[g_khead];
+   g_khead = (g_khead + 1) & (int(sizeof g_kbuf) - 1);
+   return c;
+}
+static void
+kpush_utf8(unsigned int u)
+{
+   if      (u <    0x80) { kpush(u); }
+   else if (u <   0x800) { kpush(0xC0|(u>>6));  kpush(0x80|(u&0x3F)); }
+   else if (u < 0x10000) { kpush(0xE0|(u>>12)); kpush(0x80|((u>>6)&0x3F)); kpush(0x80|(u&0x3F)); }
+}
+static void
+kpush_str(const char * s) { for (; *s; ++s) kpush((unsigned char)*s); }
+
+// Return APL Unicode for VK+shift via profile-1 map; 0 = no mapping.
+static unsigned int
+win_apl_char(WORD vk, bool sh)
+{
+   // Letter keys (VK_A–VK_Z == 'A'–'Z')
+   if (vk >= 'A' && vk <= 'Z')
+      {
+        const int c = sh ? vk : vk + 32;
+# define KM(u,a,s,b) if (c==(u)) return (unsigned int)(a); if (c==(s)) return (unsigned int)(b);
+        KM('q',U'?', 'Q',U'?')   KM('w',U'⍵','W',U'⍹') KM('e',U'∊','E',U'⍷')
+        KM('r',U'⍴','R',U'⍴')   KM('t','~',  'T',U'⍨') KM('y',U'↑','Y',U'¥' )
+        KM('u',U'↓','U',U'↓')   KM('i',U'⍳','I',U'⍸') KM('o',U'○','O',U'⍥')
+        KM('p',U'⋆','P',U'⍣')   KM('a',U'⍺','A',U'⍶') KM('s',U'⌈','S',U'⌈')
+        KM('d',U'⌊','D',U'⌊')   KM('f',U'_', 'F',U'∇') KM('g',U'∇','G',U'∇')
+        KM('h',U'∆','H',U'⍙')   KM('j',U'∘','J',U'⍤') KM('k',U'λ','K',U'λ' )
+        KM('l',U'⎕','L',U'⌷')   KM('z',U'⊂','Z',U'⊂') KM('x',U'⊃','X',U'χ')
+        KM('c',U'∩','C',U'¢')   KM('v',U'∪','V',U'∪') KM('b',U'⊥','B',U'⊥')
+        KM('n',U'⊤','N',U'⊤')   KM('m','|', 'M',U'μ' )
+# undef KM
+        return 0;
+      }
+   // Digit and OEM keys: derive base char then look up
+   char c = 0;
+   switch (vk)
+      {
+        case '1': c=sh?'!':'1'; break;  case '2': c=sh?'@':'2'; break;
+        case '3': c=sh?'#':'3'; break;  case '4': c=sh?'$':'4'; break;
+        case '5': c=sh?'%':'5'; break;  case '6': c=sh?'^':'6'; break;
+        case '7': c=sh?'&':'7'; break;  case '8': c=sh?'*':'8'; break;
+        case '9': c=sh?'(':'9'; break;  case '0': c=sh?')':'0'; break;
+        case VK_OEM_MINUS:  c=sh?'_':'-';  break;
+        case VK_OEM_PLUS:   c=sh?'+':'=';  break;
+        case VK_OEM_4:      c=sh?'{':'[';  break;
+        case VK_OEM_6:      c=sh?'}':']';  break;
+        case VK_OEM_5:      c=sh?'|':'\\'; break;
+        case VK_OEM_1:      c=sh?':':';';  break;
+        case VK_OEM_7:      c=sh?'"':'\''; break;
+        case VK_OEM_COMMA:  c=sh?'<':',';  break;
+        case VK_OEM_PERIOD: c=sh?'>':'.';  break;
+        case VK_OEM_2:      c=sh?'?':'/';  break;
+        default: return 0;
+      }
+# define KM(u,a,s,b) if (c==(u)) return (unsigned int)(a); if (c==(s)) return (unsigned int)(b);
+   KM('1',U'¨','!',U'⌶') KM('2',U'¯','@',U'⍫') KM('3',U'<','#',U'⍒')
+   KM('4',U'≤','$',U'⍋') KM('5',U'=','%',U'⌽') KM('6',U'≥','^',U'⍉')
+   KM('7',U'>','&',U'⊖') KM('8',U'≠','*',U'⍟') KM('9',U'∨','(',U'⍱')
+   KM('0',U'∧',')',U'⍲') KM('-',U'×','_',U'!')  KM('=',U'÷','+',U'⌹')
+   KM('[',U'←','{',U'⍞') KM(']',U'→','}',U'⍬') KM('\\',U'⊢','|',U'⊣')
+   KM(';',U'⍎',':',U'≡') KM('\'',U'⍕','"',U'≢')
+   KM(',',U'⍝','<',U'⍪') KM('.',U'⍀','>',U'⍙') KM('/',U'⌿','?',U'⍠')
+# undef KM
+   return 0;
+}
+
+// Fill g_kbuf from the next usable keyboard event.
+static void
+win_refill()
+{
+   const HANDLE hin = GetStdHandle(STD_INPUT_HANDLE);
+   for (;;)
+      {
+        INPUT_RECORD ir;   DWORD nr = 0;
+        if (!ReadConsoleInputW(hin, &ir, 1, &nr) || nr == 0)
+           { g_keof = true;   return; }
+        if (ir.EventType != KEY_EVENT)    continue;
+        const KEY_EVENT_RECORD & ke = ir.Event.KeyEvent;
+        if (!ke.bKeyDown)                 continue;
+
+        const WORD    vk   = ke.wVirtualKeyCode;
+        const DWORD   ctrl = ke.dwControlKeyState;
+        const bool    sh   = (ctrl & SHIFT_PRESSED)     != 0;
+        const bool    ra   = (ctrl & RIGHT_ALT_PRESSED) != 0;
+        const wchar_t wch  = ke.uChar.UnicodeChar;
+
+        // Skip lone modifier keys
+        switch (vk)
+           {
+             case VK_SHIFT: case VK_LSHIFT:   case VK_RSHIFT:
+             case VK_CONTROL: case VK_LCONTROL: case VK_RCONTROL:
+             case VK_MENU:  case VK_LMENU:   case VK_RMENU:
+             case VK_CAPITAL: case VK_NUMLOCK: case VK_SCROLL:
+                continue;
+           }
+
+        // Right Alt (AltGr) → APL glyph
+        if (ra)
+           {
+             const unsigned int apl = win_apl_char(vk, sh);
+             if (apl)   { kpush_utf8(apl);   return; }
+             // no APL mapping: emit the normal character below
+           }
+
+        // Navigation keys → VT sequences (matches existing ESCmap entries)
+        switch (vk)
+           {
+             case VK_UP:     kpush_str("\x1B[A");   return;
+             case VK_DOWN:   kpush_str("\x1B[B");   return;
+             case VK_RIGHT:  kpush_str("\x1B[C");   return;
+             case VK_LEFT:   kpush_str("\x1B[D");   return;
+             case VK_END:    kpush_str("\x1B[F");   return;
+             case VK_HOME:   kpush_str("\x1B[H");   return;
+             case VK_INSERT: kpush_str("\x1B[2~");  return;
+             case VK_DELETE: kpush_str("\x1B[3~");  return;
+           }
+
+        // Regular character (includes Ctrl+key as control codes)
+        if (wch)   { kpush_utf8((unsigned int)wch);   return; }
+        // No character (e.g. unbound Alt+key) → skip this event
+      }
+}
+#endif  // MINGW_SRC
 //────────────────────────────────────────────────────────────────────────────
 int
 LineInput::safe_fgetc()
 {
    for (;;)
        {
-          errno = 0;
-          const int ret_raw = fgetc(stdin);
 #if MINGW_SRC
-          // Windows raw console sends CR for Enter; translate to LF (ICRNL equivalent).
+          // Interactive console: use ReadConsoleInputW so RIGHT_ALT_PRESSED is
+          // captured at keypress time.  Pipe/file input falls back to fgetc().
+          int ret_raw;
+          if (g_is_console)
+             {
+               if (g_keof)          return EOF;
+               if (kempty())        win_refill();
+               if (g_keof)          return EOF;
+               ret_raw = kpop();
+             }
+          else
+             {
+               errno = 0;
+               ret_raw = fgetc(stdin);
+             }
           const int ret = (ret_raw == UNI_CR) ? UNI_LF : ret_raw;
 #else
+          errno = 0;
+          const int ret_raw = fgetc(stdin);
           if (errno == EINTR)   continue;
           const int ret = ret_raw;
 #endif

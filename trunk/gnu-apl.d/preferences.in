@@ -131,19 +131,32 @@
 # Each sequence can be up to 20 characters long.
 #
 # The default setting in GNU APL assumes a VT100 terminal with a white
-# background, which correspnds to the following setup:
+# background, which correspnds to the following setup. These are FIXED
+# colors (not the ANSI "terminal default" codes 39/49), identical on every
+# platform (Linux and Windows/MinGW), so that the appearance of GNU APL
+# does not silently change when the terminal's own theme changes (ANSI
+# codes 39/49 mean "whatever the terminal's current default fg/bg is" and
+# would otherwise drift along with it):
 #
 #               VT100:     foreground       background
 #                          color    |       |    color
 #                                   V       V
-# general color format; ESC [ 0 ; 3 fg ; 4 bg m
-# CIN-SEQUENCE          ESC [ 0 ; 3 0  ; 4 7  m
-# COUT-SEQUENCE         ESC [ 0 ; 3 9  ; 4 9  m
-# CERR-SEQUENCE         ESC [ 0 ; 3 5  ; 4 9  m
-# UERR-SEQUENCE         ESC [ 0 ; 3 5  ; 4 9  m
-# RESET-SEQUENCE        ESC [ 0 ; 3 9  ; 4 9  m
+# general color format; ESC [ 0 ; fg ; bg m
+# CIN-SEQUENCE          ESC [ 0 ; 3 4  ; 4 7   m   (blue on white)
+# COUT-SEQUENCE         ESC [ 0 ; 3 0  ; 1 0 7 m   (black on bright white)
+# CERR-SEQUENCE         ESC [ 0 ; 9 1  ; 1 0 7 m   (bright red on bright white)
+# UERR-SEQUENCE         ESC [ 0 ; 9 1  ; 1 0 7 m   (same as CERR)
+# RESET-SEQUENCE        ESC [ 0 ; 3 9  ; 4 9   m   (restore the terminal's own default)
 # CLEAR-EOL-SEQUENCE    ESC [ K
 # CLEAR-EOS-SEQUENCE    ESC [ J
+#
+# In hex bytes (as required below if you want to override them):
+#
+# CIN-SEQUENCE           1b 5b 30 3b 33 34 3b 34 37 6d          // ESC [0;34;47m
+# COUT-SEQUENCE          1b 5b 30 3b 33 30 3b 31 30 37 6d       // ESC [0;30;107m
+# CERR-SEQUENCE          1b 5b 30 3b 39 31 3b 31 30 37 6d       // ESC [0;91;107m
+# UERR-SEQUENCE          1b 5b 30 3b 39 31 3b 31 30 37 6d       // ESC [0;91;107m
+# RESET-SEQUENCE         1b 5b 30 3b 33 39 3b 34 39 6d          // ESC [0;39;49m
 #
 # On a black background (still assuming VT100 so that the CLEAR-EOL-SEQUENCE
 # does not need to be re-defined), the following may be more suitable:

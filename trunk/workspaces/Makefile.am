@@ -1,5 +1,5 @@
 
-dist_doc_DATA =	
+dist_doc_DATA =	\
 		APL_CGI.apl				\
 		RUBIK.apl		        \
 		SCRIPT.apl		        \
