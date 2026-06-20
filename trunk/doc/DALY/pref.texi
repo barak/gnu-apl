@@ -1,0 +1,44 @@
+@node pref
+@chapter preferences - workspace to view apl preferences
+
+preferences is a workspace that displays the currently active settings
+in the gnu-apl preference file.  The command 'pref∆current
+pref∆find_prefs' does the displaying.
+
+@example
+     pref∆current pref∆find_prefs
+Welcome                  No
+Color                    No
+SharedVars               Enabled (default)
+LIBREF-3                 /usr/local/lib/apl/wslib3
+LIBREF-4                 /usr/local/lib/apl/wslib4
+LIBREF-5                 /usr/local/lib/apl/wslib5
+READLINE_HISTORY_LEN     500
+READLINE_HISTORY_PATH    .apl.history
+NABLA-TO-HISTORY         Modified (default)
+BACKUP_BEFORE_SAVE       yes
+CONTROL-Ds-TO-EXIT       0
+Profile                  2
+disable_Quad_GTK         yes # disable ⎕cwGTK
+disable_Quad_FIO         no # do not disable ⎕FIO
+disable_native_functions yes # disable A ⎕FX B (native fnctions)
+disable_Quad_PLOT        yes # disable ⎕PLOT
+disable_Quad_SQL         yes # disable ⎕SQL
+disable_SAVE_command     yes # disable )SAVE and )DUMP ws
+CIN-SEQUENCE             1b 5b 30 3b 33 32 3b 34 30 6d // ESC [0;32;40m
+COUT-SEQUENCE            1b 5b 30 3b 33 37 3b 34 30 6d // ESC [0;37;40m
+CERR-SEQUENCE            1b 5b 30 3b 33 31 3b 34 30 6d // ESC [0;31;40m
+UERR-SEQUENCE            1b 5b 30 3b 33 31 3b 34 30 6d // ESC [0;31;40m
+RESET-SEQUENCE           1b 5b 30 3b 33 37 3b 34 30 6d // ESC [0;37;48m
+CLEAR-EOL-SEQUENCE       //
+CLEAR-EOS-SEQUENCE       //
+Keyboard                 NOCURSES (default)
+LIBREF-0                 /home/dalyw/workspaces
+LIBREF-1                 /home/dalyw/wslib1
+LIBREF-2                 /home/dalyw/wslib2
+LIBREF-6                 /home/dalyw/wslib6
+LIBREF-7                 /dilworth/workspaces
+LIBREF-8                 /mnt/workspaces
+LIBREF-9                 /mnt/wslib1
+@end example
+

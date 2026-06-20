@@ -1,0 +1,181 @@
+@node wblg
+@chapter web_log -- parse web server logs
+
+web_log parses web server logs in the common format.  Web servers keep a
+log of requests made of the server and the servers response.  Analyzing
+those logs may confirm the relative popularity of a site monitoring
+those logs may yield insight into what content changes were well
+received.
+
+   The process of parsing a log is load the log into the current
+workspace with function log∆loadFile, apply several tests to the file
+and remove irrelevant entries, and count the number of entries.
+
+   To that end web_log provides a function, log∆filter_hits, to remove
+entries that I thought were not actual visits to a site.  Each line of
+this function applies a test to each line of the log using one of two
+operators, log∆filter and log∆not_filter.  To use log∆filter_hits call
+it with a left argument of your ip address and a right argument of the
+log returned by log∆loadFile.  viz.:
+
+@example
+      access←log∆loadFile '/dilworth/www.dalywebandedit.com/logs/access_log.2022-06-30'
+      ⍴access
+217
+      ⍴'68.81.178.238' log∆filter_hits access
+53
+@end example
+
+   log∆filter_hits is a good example of how to use this workspace.  It
+applies a series of tests to the log data, removing lines as it does its
+work.
+
+@example
+      ∇log∆filter_hits[⎕]∇
+    ∇
+[0]   new←ip log∆filter_hits old
+[1]     ⍝ Function returns the number of page requests
+[2]     new←200 log∆test_status log∆filter old
+[3]     new←'bot' 'spider' 'google' 'crawler' log∆test_agent_contents log∆not_filter new
+[4]     new←'js' 'css' 'jpg' 'gif' 'ico' 'png' log∆test_suffix log∆not_filter new
+[5]     new←ip log∆test_ip log∆not_filter new
+[6]     new←'/wordpress1/wp-cron.php' log∆test_file log∆not_filter new
+    ∇
+@end example
+
+   log∆filter and log∆not_filter are operators that apply a test to each
+line of the log.  log∆filter returns lines where the test is true while
+log∆not_filter returns lines where the test is false.
+
+   web_log provides a series of tests.  Each test's name starts with
+'log∆test_'.  Provided tests are:
+
+@deffn ∇ bool←string log∆test_agent_contents log_line
+
+Each log line contains an agent field.  This test is true when the
+supplied string can be found in the agent field.  In
+log∆filter_hits we remove requests from spiders, crawlers and bots
+by looking for these name in the agent fields
+
+@end deffn
+
+@deffn ∇ bool←fname log∆test_file log_line
+
+Each log line contains a target field, or what the client
+requested.  This test is true if fname is that target.  The test
+ignores the CGI query that might be included in the target.
+
+@end deffn
+
+@deffn ∇ bool←host log∆test_host log_line
+
+Each log line has a referrer which if present is the URL of the web
+page that contained the link the client clicked on.  The test is
+true if the host matches the host in the URL.
+
+@end deffn
+
+@deffn ∇ bool←ip log∆test_ip log_line
+
+The log line includes the ip address of the client and this test is
+true when the line's ip address is in the set of ip addresses
+supplied.
+
+@end deffn
+
+@deffn ∇ bool←log∆test_not_referred log_line
+
+This test returns true if the referrer field is blank.
+
+@end deffn
+
+@deffn ∇ bool← integer log∆test∆status log_line
+
+The line's status field contains an integer, defined by the
+Hypertext Transfer Protocol (HTTP). A code of 200, OK, means this
+server supplied a page.  Wikipedia has a complete list of codes.
+
+@end deffn
+
+@deffn ∇ bool←suffixes log∆test_suffix log_line
+
+Function tests if the file name from the target field has a suffix
+in the list of supplied suffixes.
+
+@end deffn
+
+   There are ten fields in each log line.  The web_log workspace
+provides a function for each field.
+
+@deffn ∇ log∆ip log_line
+
+Function returns the client's ip address.
+
+@end deffn
+
+@deffn ∇ log∆user log_line
+
+Function returns the client's user name.  This field is populated
+only when the server requires login using HTTP.
+
+@end deffn
+
+@deffn ∇ log∆time log_line
+
+Function returns the time stamp in the log line.  The time stamp is
+generally in coordinated universal time.  The next field, time zone
+is the adjustment to local time.
+
+The workspace also provides log∆ParsedTime which returns a vector
+of five integers: year month day hour second.
+
+@end deffn
+
+@deffn ∇ log∆zone log-line
+
+The adjustment needed to apply to UTC for local time.
+
+@end deffn
+
+@deffn ∇ log∆request log-line
+
+The HTTP request.  An HTTP request is a three part datum.  The
+first part is the HTTP method, the second the requested URL, and
+the third the version of HTTP.
+
+HTTP defines 'POST' 'GET' among others as methods.
+
+web_log provides the functions log∆method and log∆target for the
+first two parts.
+
+@end deffn
+
+@deffn ∇ log∆status log-line
+
+Function returns the HTTP status code that the server used to
+respond to this request.  The status code is an integer defined by
+HTTP. 200, OK and 404, NOT FOUND are the most usual.
+
+@end deffn
+
+@deffn ∇ log∆size log-line
+
+Function returns the count of bytes returned by the server to the
+client.
+
+@end deffn
+
+@deffn ∇ log∆referrer log-line
+
+This function returns the URL of the page the client clicked on to
+make the current request.
+
+@end deffn
+
+@deffn ∇ log∆agent log-line
+
+The agent field contains information about the program on the
+client's computer that made the request.
+
+@end deffn
+

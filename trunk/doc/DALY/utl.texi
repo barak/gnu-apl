@@ -1,0 +1,47 @@
+@node utl
+@chapter utl
+
+Utl is a collection of generally usefull routines.
+
+@deffn ∇ utl∆helpFns FunctionName
+
+Display help about a function.  This routine prints the function
+header and any comments that immediately follow.
+
+@end deffn
+
+@deffn ∇ utl∆numberp item
+
+Tests whether item is a number.  Returns true or false.  See also
+utl∆numberis.
+
+@end deffn
+
+@deffn ∇ t←utl∆numberis item
+
+Tests whether an item can become a number.  IE is utl∆numberp ⍎
+test true?
+
+@end deffn
+
+@deffn ∇ t←utl∆stringp item
+
+Tests whether item is a character vector.
+
+@end deffn
+
+@deffn ∇ new←utl∆stripArraySpaces old
+
+Returns a left justified array of characters with the minimum
+number of trailing spaces.  At least one line of the array will
+have no trailing spaces.
+
+@end deffn
+
+@deffn ∇ cl←utl∆clean txt
+
+Converts all white space to spaces and then removes duplicate
+spaces.
+
+@end deffn
+

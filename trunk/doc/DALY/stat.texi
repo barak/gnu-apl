@@ -1,0 +1,80 @@
+@node stat
+@chapter stat is short for Statistics
+
+The stat workspace provides functions to perform statistical calculation
+and to organize data for statistical analysis.  It is very much a work
+in process.
+
+Current Functions are:
+
+@deffn ∇ int ← stat∆count vector
+
+Returns a count of the items in the vector.
+
+@end deffn
+
+@deffn ∇ amt ←slope stat∆lms∆intercept data
+
+Computes the y intercept of the Least Mean Squares function given
+the slope the that line.
+
+@end deffn
+
+@deffn ∇ slope ← stat∆lms∆slope data
+
+Computes the slope of a least mean square regression.  In the data
+(a level 2 array) data[;1] is the dependent data and data[;2] the
+independent.
+
+@end deffn
+
+@deffn ∇ corr ← stat∆lms∆cor data
+
+Calculates the coefficient of correlation of the regression by use
+of stat∆lms∆slope and stat∆lms∆intercept.
+
+@end deffn
+
+@deffn ∇ high_low ← stat∆range vector
+
+Returns the range of a data set.  The is the highest amount less
+the lowest.
+
+@end deffn
+
+@deffn ∇ var ← stat∆popVar vector
+
+Returns the population variance.
+
+@end deffn
+
+@deffn ∇ sd ← stat∆popSD vector
+
+Returns the population standard deviation.
+
+@end deffn
+
+@deffn ∇ mean ← stat∆mean vector
+
+Returns the sample mean of a vector.
+
+@end deffn
+
+@deffn ∇ var ← stat∆sampleVar vector
+
+Returns the sample variance.
+
+@end deffn
+
+@deffn ∇ sd ← stat∆sampleSD vector
+
+Returns the sample standard deviation.
+
+@end deffn
+
+@deffn ∇ median ← stat∆median vector
+
+Returns the median.
+
+@end deffn
+

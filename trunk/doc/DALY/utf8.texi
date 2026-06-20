@@ -1,0 +1,37 @@
+@node utf8
+@chapter Working with files using utf8 format.
+
+Workspace provides access to utf8 files.
+
+@deffn ∇ err ← text utf8∆write file_name
+
+Function to write text to a new file or replace an existing file.
+
+Function return 0 on success.
+
+@end deffn
+
+@deffn ∇txt ← utf8∆read file_name
+
+Function returns the text of file_name.
+
+@end deffn
+
+@deffn ∇ file_list ← utf8∆dir path
+
+File returns a list of the files in directory path.
+
+@end deffn
+
+@deffn ∇ txt utf8pipe cmd
+
+Functions pipes text to an operating system command.
+
+@end deffn
+
+@deffn ∇ txt ← utf8∆sh cmd
+
+Functions returns the standard out of a command.
+
+@end deffn
+

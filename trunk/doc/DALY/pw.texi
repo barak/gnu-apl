@@ -1,0 +1,40 @@
+@node pw
+@chapter (Pseudo) Randomly generated password
+
+Workspace to generate passwords.
+
+@deffn ∇ password ← length pw∆password character_set
+
+Function returns a pseudo-randomly generated password from the
+given character set.  If length is omitted, eight characters will
+be generated.
+
+@end deffn
+
+@deffn set ← pw∆alpha
+
+Returns a list of alphabetic characters.
+
+@end deffn
+
+@deffn set ← pw∆numeric
+
+Returns the ten digits in Arabic numerals.
+
+@end deffn
+
+@deffn set ← pw∆dingbats
+
+Returns a set of characters that are not alpha-numeric.  Wikipedia
+does not agree with what a dingbat is.  This function can't read
+Wikipedia.
+
+It also can't read the instructions you have from some rogue
+website.  Type them in.  viz:
+
+@example
+pw∆password pw∆alpha,pw∆numeric,'!*%^$'
+@end example
+
+@end deffn
+

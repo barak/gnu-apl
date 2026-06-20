@@ -1,0 +1,46 @@
+@node seq
+@chapter Sequences with Prefixes
+
+Workspace to provide the next entry in a sequence.  Each sequence is a
+prefix and a count.
+
+@deffn ∇ item ← seq∆posting∆ref key
+
+Function returns the next item in a sequence with prefix key,
+'Invoice0001, Invoice0002 ...  for example.
+
+@end deffn
+
+@deffn ∇ key seq∆set value
+
+Function sets the value of a given sequence.  Some do not like to
+start at zero.  Use seq∆set.
+
+@example
+      'foo' seq∆set 10001
+      t1←(⊂seq∆next 'foo'),⊂seq∆next 'foo'
+      t1
+foo10001 f0010002
+@end example
+
+@end deffn
+
+@deffn ∇ count← seq∆next key
+
+Function returns the next integer in the sequence
+
+@end deffn
+
+@deffn ∇ seq∆reset
+
+Function erase existing sequences.
+
+@end deffn
+
+@deffn Variable seq∆items
+
+A lexicon of existing sequences with each prefix as a key and its
+value as the last number generated.
+
+@end deffn
+

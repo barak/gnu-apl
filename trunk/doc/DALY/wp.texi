@@ -1,0 +1,278 @@
+@node wp
+@chapter wp Workspace
+
+This is a workspace for printing arrays (on paper).  It offers control
+over many aspects of the printed page.
+
+   The workspace generates an HTML page which can then be loaded into
+one's browser and printed.
+
+@menu
+* Howto::  Create a report, basic instructions.
+* Init::  Create a blank report.
+* Set data::  Add an array of data.
+* Attributes::  Data must have attributes to describe formatting.
+* Stylesheet::  A style sheet describes formatting for a class of data.
+* Required Classes::  Parts of the report that require their own classes.
+* Other Tweaks::  Other things to try.
+* Distances::  Units of measure in a class.
+@end menu
+
+@node Howto
+@section Howto
+
+Reports are a complex data structure initiated and maintained through
+functions in the wp workspace.
+
+   A report consists of an array, report heading, and stylesheet.  For
+each cell in the array additional attributes can be saved for formatting
+the report cell by cell.
+
+The basic process is:
+
+@itemize @bullet
+@item
+Create the report with wp∆init 'Report Name'
+@item
+Add the array to print with wp∆setData
+@item
+Add attributes to cells in the array.  Attributes identify the
+format strings for numbers and the applicable stylesheet classes.
+@item
+Create or modify a stylesheet.
+@item
+Generate the HTML for the report with wp∆html∆assemble.
+@end itemize
+
+@node Init
+@section Initiating the report
+
+Use the function wp∆init to create a report.  Init requires a short
+character string as its sole argument and will print that string in the
+report as an identifier for the report.
+
+   The report itself is a lexicon of Id, Data, Attributes, Stylesheet,
+Head_ln01 through Head_ln03, and Author.  wp∆init will use the
+environment's USER for the Author.
+
+@node Set data
+@section Adding data to your report
+
+By default, a report's data is a single cell of 0.
+
+   wp requires an array of rank 2 and expects that descriptions of the
+rows and columns will be included in the array.  There is no enforced
+limit on the size of the array.  However, the target browser that
+displays the array may limit what you can put on the screen.
+
+   The HTML coding is designed to allow the browser to determine column
+widths, text wrapping within a cell and other features.  As the browser
+window size is changed the browser should reformat the report.
+
+   Users experienced in cascading style sheets can add style sheet
+classes to establish actual widths, heights and placements for a more
+fixed presentation @ref{Stylesheet}.
+
+@node Attributes
+@section Attributes
+
+An attribute is a name-value pair.  Each cell can have a list of
+attributes.  Two are in general use 'format' and 'class'.  Other
+attributes will be passed to your browser as attributes of the cell.
+For example a cell has three attributes, format, class and passed.  the
+coded HTML would be:
+
+@example
+<td class=''number'' passed=''user-defined''>',
+CF14.2 fmt cell_amount,
+'</td>...</tr>'
+@end example
+
+   The format attribute is used by the workspace to format the number of
+the cell.  APL2's format by example ('55,550.00' ⍕ number) and function
+fmt @ref{fmt} can be used.
+
+   The class attribute selects the style sheet class to use for the cell
+@ref{Stylesheet}.
+
+Accessor functions for attributes have a prefix wp∆attr∆.  They are:
+
+@deffn ∇ report wp∆attr∆getCellAttr row_number column_number
+
+Function returns a lexicon (@ref{lex}) of attributes.
+
+@end deffn
+
+@deffn ∇ report wp∆attr∆setCellAttr row_number Column_number lexicon
+
+Function adds, or replaces the name value pair.  The function
+expects a lexicon of name value pairs.  For example:
+
+@example
+rpt←rpt wp∆attr∆setCellAttr 15 3,⊂lex∆from_alist 'format' 'CF10.2' 'class' 'number'
+@end example
+
+@end deffn
+
+@deffn ∇ report wp∆attr∆getQuadAttr start_row start_column end_row end_column
+
+Function returns a portion of the Attribute array.
+
+@end deffn
+
+@deffn ∇ report wp∆attr∆setQuadAttr start_row start_column end_row end_column encapsulated_lexicon(s)
+
+Funtion sets a rectangular portion of the Attribute array.  If one
+lexicon is given that lexicon will be copied to each cell in the
+rectangle.  If more than one lexicon is given, the size and shape
+of the final argument must match the size and shape of the
+rectangle.
+
+@end deffn
+
+@node Stylesheet
+@section Stylesheet
+
+The style sheet is a lexicon of classes that describe how to present a
+cell in the data.  Each class within the sheet is a lexicon of
+properties.  An example style sheet is returned by the function
+wp∆defaultSS.
+
+   Properties are defined in the global variable wp∆ssp∆propertyList
+which is derived from the W3.com cascading style sheet standards.  The
+standards define what values each property may take.
+
+@itemize @bullet
+@item
+Create a style sheet wp∆ss∆init or wp∆defaultSS.
+@item
+Create classes with wp∆ssc∆init
+@item
+Add properties to the class.
+@item
+Add classes to the spread sheet.
+@item
+Assign the spreadsheet to the report
+@end itemize
+
+@deffn ∇ wp∆ss∆init
+
+Function returns an empty style sheet.
+
+@end deffn
+
+@deffn ∇ wp∆defaultSS
+
+Function returns a style sheet with classes defined for a typical
+array.
+
+@end deffn
+
+@deffn ∇ wp∆ssc∆init
+
+Function returns a new style sheet class.
+
+@end deffn
+
+@deffn class wp∆ssc∆assignProp Property
+
+Function adds a property to a class.  Properties are name-value
+pairs.  For instance:
+
+@example
+r4←wp∆ssr∆init '.page-head'
+r4←r4 wp∆ssr∆assignProp 'font-size' 'large'
+@end example
+
+@end deffn
+
+@deffn ∇ StyleSheet wp∆ss∆assign Class
+
+Assign a class to a stylesheet.  Function will silently replace an
+existing class.
+
+@example
+ss←ss wp∆ss∆assignClass r4
+@end example
+
+@end deffn
+
+@node Required Classes
+@section Required Classes
+
+Parts of the final report require their own class.
+
+@itemize @bullet
+@item
+Body is a global class that applies to whole report.
+@item
+colhead describes how to format the descriptions at the top of each
+column.
+@item
+number describes the formatting for any number in your array.
+@item
+page-head describes how the head lines will appear.
+@item
+initial block is for the report ID, author and creation date that
+appear in a distinctive block.
+@end itemize
+
+   All of these classes are included in the default style sheet.  You
+may not like the results if they are omitted from the published style
+sheet.
+
+@node Other Tweaks
+@section Other Tweaks
+
+@itemize @bullet
+@item
+Initials.  Use 'wp∆setInitialFlag 0' to remove the initial block
+from the report.
+@end itemize
+
+@node Distances
+@section Distances
+
+Many properties are looking for a distance.  Distances can be fixed,
+relative or percentages (a number followed by %).  There should be no
+white space between the amount the the measure.
+
+Fixed distances can be measured in:
+
+@itemize @bullet
+@item
+pt (points) or 1/72 of an inch.  Fonts are measured in points.
+@item
+pc (picas) or 12pt
+@item
+mm (millimeters)
+@item
+cm (centimeters)
+@item
+in (inches)
+@end itemize
+
+Relative units are determined by the font:
+
+@itemize @bullet
+@item
+em is the width of the capital M. This should be the point size of
+the font and the distance between baselines.
+@item
+ex is the height of the letter x.  This should be the base line and
+the mean line of lower case letters.
+@item
+px (pixels).  This is more of a measure for monitors than printers.
+@end itemize
+
+@example
+You may be thinking that because elements on web pages are
+measured in numbers of pixels, and because pixels are
+considered a relative measurement, that they are the answer to
+all font size problems.  It would be nice if the were.  For
+some designers, control over text at the pixel level is
+intoxicating.
+@end example
+
+-- _Jennifer Niederst Robbins, Web Design in a Nutshell, O'Reilly_
+

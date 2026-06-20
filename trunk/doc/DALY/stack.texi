@@ -1,0 +1,52 @@
+@node stack
+@chapter Simple Stack
+
+Workspace to implements a simple stack using functional programming
+constructs.
+
+   This means that whenever the stack changes the function returns a
+modified stack.  Accordingly four functions are required:
+
+@deffn ∇ st∆init
+
+Function returns a new, empty stack.
+
+@end deffn
+
+@deffn ∇ old st∆push item
+
+Function returns stack old with item as the first item on old.
+
+@end deffn
+
+@deffn ∇ old st∆peek item
+
+Function returns the first item on stack old.
+
+@end deffn
+
+@deffn ∇ st∆pop old
+
+Function returns stack old with the first item removed.
+
+@end deffn
+
+To use this library, first initiate the stack:
+
+@example
+my_stack←st∆init
+@end example
+
+Add items to the stack:
+
+@example
+my_stack←my_stack st∆push item
+@end example
+
+Pop items from the stack:
+
+@example
+item←st∆peek my_stack
+my_stack← st∆pop my_stack
+@end example
+

@@ -1,0 +1,31 @@
+@node prompt
+@chapter Seeking answers in a top - quit - done world.
+
+Workspace to seek answers from your users.
+
+@deffn ∇ ans ← prompt 'Query'
+
+Function prints the query and returns the user's answer.  If one of
+the four keywords quit, top, done, or back are entered, prompt will
+return an integer.  1 for quit, 2 for top, 3 from done, and 4 for
+back when ⎕io is set to 1.
+
+This should allow the programmer to react:
+
+@example
+[1] ans←prompt 'Last Name ... '
+[2] →(utl∆numberp ans)/keyword
+[3] ⍝ Deal with actual data
+..
+[n]→0
+[n+1] →(top,quit,done,back)[ans]
+[n+2] top:
+@end example
+
+I use 'top' to return the user to the first prompt in the program;
+'quit' to exit the program making no changes; 'done' to exit the
+program making changes; and 'back' to return the users to the
+previous prompt.
+
+@end deffn
+
