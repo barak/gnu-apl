@@ -398,8 +398,8 @@ UserFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
    if (LO.is_function())   header.LO()->push_function(LO.get_function());
    else                    header.LO()->push_value(LO.get_apl_val());
    if (RO.is_function())   header.RO()->push_function(RO.get_function());
-   if (header.X())         header.X()->push_value(X);
    else                    header.RO()->push_value(RO.get_apl_val());
+   header.X()->push_value(X);
    header                        .B()->push_value(B);
 
    header.eval_common();

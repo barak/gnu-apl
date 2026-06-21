@@ -328,6 +328,8 @@ char * b = buffer;
            {
              for (int d = int_digits.size();;)
                  {
+                   if (d == 0)   // all digits were 9 (10^19 overflow → float)
+                      { need_float = true;   break; }
                    const UTF8 digit = int_digits[--d];
                    if (digit == UNI_9)   // propagate carry
                       {

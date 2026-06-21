@@ -220,7 +220,7 @@ public:
    /// @param len length of the new trailing dimension
    void add_shape_item(ShapeItem len)
       { if (rho_rho >= MAX_RANK)   LIMIT_ERROR_RANK;
-        rho[rho_rho++] = len;   volume *= len; }
+        rho[rho_rho++] = len;   volume *= len; }   // no overflow check: by design
 
    /// possibly increase rank by prepending axes of length 1
    /// @param new_rank desired minimum rank; no-op if already >= new_rank

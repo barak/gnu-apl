@@ -198,7 +198,7 @@ int len;
         return Invalid_Unicode;
       }
 
-char cc[4];
+char cc[8];   // max 6 continuation bytes + NUL, rounded up
    in.get(cc, len + 1);   // read subsequent characters + terminating 0
    if (!in.good())   return Invalid_Unicode;
 

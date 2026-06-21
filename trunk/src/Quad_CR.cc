@@ -1596,11 +1596,11 @@ Quad_CR::do_CR41(const Value * B)
 Value_P Z(B->get_shape(), LOC);
 
 const ShapeItem B_len = B->element_count();
-const uint8_t * bits = reinterpret_cast<const uint8_t *>(&B->get_cfirst());
 
-   loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1ULL << (b & 7)) ? 1 : 0);
+   loop(b, B_len)
+      Z->next_ravel_Int(B->get_cravel(b).get_int_value());
 
-   return Idx0(LOC);
+   return Z;
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P

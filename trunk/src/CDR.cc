@@ -60,6 +60,14 @@ const uint8_t * data = cdr.get_items();
 const uint32_t nelm = get_4_be(data + 8);
 const CDR_type vtype = CDR_type(data[12]);
 const sRank rank = data[13];
+
+   // Guard: rank must not push the shape-dimensions past the buffer end.
+   if ((size_t)(16 + 4*rank) > cdr.size())
+      {
+        MORE_ERROR() << "CDR rank " << rank << " exceeds buffer";
+        LENGTH_ERROR;
+      }
+
 Shape shape;
    loop(r, rank)
       {
@@ -131,6 +139,12 @@ const uint8_t * ravel = data + 16 + 4*rank;
             {
               APL_Integer offset =
                          *reinterpret_cast<const uint32_t *>(ravel + 4*n);
+              if ((size_t)(offset + 14) > cdr.size())
+                 {
+                   MORE_ERROR() << "CDR nested offset " << offset
+                                << " exceeds buffer";
+                   LENGTH_ERROR;
+                 }
               const uint8_t * sub_data = data + offset;
               const uint32_t sub_vtype = sub_data[12];
               const sRank sub_rank = sub_data[13];

@@ -92,6 +92,8 @@ bool
 Shape::fits_into(ShapeItem max_ravel) const
 {
    // must not throw!
+   // overflow of volume is intentional: the product is on a performance-critical
+   // path and overflowing shapes that pass this test will be caught downstream.
 
 ShapeItem volume = 1;
    loop(r, rho_rho)

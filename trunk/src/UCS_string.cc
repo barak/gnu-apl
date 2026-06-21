@@ -1670,7 +1670,7 @@ start_of_sequence:
         if      ((b0 & 0x80) == 0x00)   { more = 0;             }
         else if ((b0 & 0xE0) == 0xC0)   { more = 1; bx &= 0x1F; }
         else if ((b0 & 0xF0) == 0xE0)   { more = 2; bx &= 0x0F; }
-        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x0E; }
+        else if ((b0 & 0xF8) == 0xF0)   { more = 3; bx &= 0x07; }
         else if ((b0 & 0xFC) == 0xF8)   { more = 4; bx &= 0x07; }
         else if ((b0 & 0xFE) == 0xFC)   { more = 5; bx &= 0x03; }
         else   // invalid UTF start byte

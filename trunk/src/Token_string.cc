@@ -72,7 +72,7 @@ int others = 0;
              if (others == 0)   return p;
              --others;
             }
-         else if (at(p).get_tag() == TOK_R_BRACK)   ++others;
+         else if (at(p).get_tag() == TOK_L_BRACK)   ++others;
        }
 
    MORE_ERROR() << "No closing ] for opening ]";
@@ -96,7 +96,7 @@ int others = 0;
              if (others == 0)   return p;
              --others;
             }
-         else if (at(p).get_Class() == TC_R_PARENT)   ++others;
+         else if (at(p).get_Class() == TC_L_PARENT)   ++others;
        }
 
    MORE_ERROR() << "No closing ) for opening (";

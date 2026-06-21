@@ -1208,7 +1208,7 @@ ShapeItem dest_B = 0;
                 }
 
              const Unicode uni_1 = B.get_cravel(src_B + 1).get_char_value();
-             if (string_B[uni_1] == UNI_LF)   // CR/LF
+             if (uni_1 == UNI_LF)   // CR/LF
                 {
                   continue;   // discard CR (don't ++dest_B)
                 }

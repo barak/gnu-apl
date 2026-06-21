@@ -308,7 +308,7 @@ const APL_Float ai = A->get_imag_value();
    if (ar == 0.0 && ai == 0.0)
        {
          if (cval().real() == 0.0)   return IntCell::z1(Z);   // 0⋆0 is 1
-         if (cval().imag()  > 0.0)   return IntCell::z0(Z);   // 0⋆N is 0
+         if (cval().real()  > 0.0)   return IntCell::z0(Z);   // 0⋆N is 0
          return E_DOMAIN_ERROR;                               // 0⋆¯N = 1÷0
        }
 
@@ -944,6 +944,7 @@ const APL_Float diff = val - result;
    if (diff > INTEGER_TOLERANCE)    DOMAIN_ERROR;
    if (diff < -INTEGER_TOLERANCE)   DOMAIN_ERROR;
 
-   return APL_Integer(result + 0.3);
+   if (result > 0.0)   return   APL_Integer(result + 0.3);
+   else                return - APL_Integer(0.3 - result);
 }
 //════════════════════════════════════════════════════════════════════════════
