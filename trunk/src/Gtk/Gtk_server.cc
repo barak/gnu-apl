@@ -843,7 +843,9 @@ const int flags = fcntl(3, F_GETFD);
         return 1;
       }
 
-// cerr << "Flags = " << hex << flags << endl;
+   // prevent any subprocess spawned by GTK/GLib (e.g. via g_spawn_sync for
+   // SVG rendering) from inheriting the TLV socket and corrupting the stream.
+   fcntl(3, F_SETFD, flags | FD_CLOEXEC);
 
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
@@ -930,10 +932,13 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
           if (rx_len != V_len + 8)
              {
-
                cerr << "TLV socket closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
+               cerr << "  first 16 bytes (hex):";
+               for (int hx = 0; hx < 16 && hx < rx_len; ++hx)
+                   cerr << " " << hex << (TLV[hx] & 0xFF) << dec;
+               cerr << endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
