@@ -69,17 +69,18 @@ make DESTDIR=%{buildroot} install
 %{_bindir}/APserver
 %{_bindir}/Gtk_server
 %{_bindir}/apl
+%{_bindir}/integral.py
+
+%{_datadir}/fonts/truetype/apl/*
 
 %{_libdir}/apl/*.0
 %{_libdir}/apl/*.so
 %{_libdir}/apl/*.a
-%{_libdir}/apl/*.la
-%{_libdir}/apl/workspaces/*.apl
-%{_libdir}/apl/wslib3/*.apl
-%{_libdir}/apl/wslib4/*.apl
-%{_libdir}/apl/wslib5/*.apl
-%{_libdir}/apl/wslib5/APLComponentFiles/*
-%{_libdir}/apl/wslib5/iso-apl-cf/*
+%{_libdir}/apl/doc/
+%{_libdir}/apl/workspaces/
+%{_libdir}/apl/wslib3/
+%{_libdir}/apl/wslib4/
+%{_libdir}/apl/wslib5/
 
 %{_sysconfdir}/gnu-apl.d/parallel_thresholds
 %{_sysconfdir}/gnu-apl.d/preferences
@@ -96,24 +97,6 @@ make DESTDIR=%{buildroot} install
 %doc README-7-more-info
 %doc README-8-parallel
 %doc support-files/
-%doc support-files/apl.vim
-%doc support-files/old-Keyboard/apl.loadkeys
-%doc support-files/old-Keyboard/apl.xkb
-%doc support-files/old-Keyboard/apl.xkm
-%doc support-files/old-Keyboard/apl.xmodmap
-%doc support-files/old-Keyboard/keyboard.txt
-%doc support-files/old-Keyboard/keyboard1.txt
-%doc support-files/Dyalog-Keyboard/apl.xmodmap
-%doc support-files/Dyalog-Keyboard/keyboard.txt
-%doc support-files/Dyalog-Keyboard/keyboard1.txt
-%doc support-files/OS-X-Keyboard/MacAplAlt.keylayout
-%doc support-files/Unicomp-Keyboard/apl.xkb
-%doc support-files/Unicomp-Keyboard/apl.xkb.txt
-%doc support-files/Unicomp-Keyboard/Unicomp1.jpg
-%doc support-files/Unicomp-Keyboard/Unicomp2.jpg
-%doc support-files/WASD-Keyboard/apl.xkb
-%doc support-files/WASD-Keyboard/apl.xkb.txt
-%doc support-files/WASD-Keyboard/wasd-inkscape-104-paths.svg.zip
 
 %{_docdir}/*
 %{_infodir}/*

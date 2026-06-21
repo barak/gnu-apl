@@ -1,6 +1,34 @@
 ⍝ Quad_PLOT.tc
 ⍝ ----------------------------------
 
+      ⍝ bug-apl@gnu.org, 6/17/2026 (Dave Alden):
+      ⍝ A ⎕PLOT B always used ASCII driver if any attribute was provided,
+      ⍝ ignoring the compile-time default driver. Explicit ASCII must still work:
+      ⊃⍴⍴(⊂'gui_driver: ASCII') ⎕PLOT ⍳5
+3
+
+      ⍝ ASCII-plot f(x)=sin(x)÷x in the x range where 10≥|f(x)|
+      ⍝ (i.e. all x ≠ 0 with |x|≤10 in steps of 0.1)
+      x ← (¯0.1 × ⌽⍳100), 0.1 × ⍳100
+      y ← (1○x)÷x
+      Z ← ('gui_driver: ASCII' 'terminal_rows: 15' 'terminal_cols: 60') ⎕PLOT (10≥|y)/y
+      ⎕←Z[1;;]
+╔════════╤═════════╤═════════╤═════════╤═════════╤═════════╗
+║        │         │        ●●●●       │         │         ║
+║        │         │       ● │  ●●     │         │         ║
+╟────────┼─────────┼──────●──┼───●●────┼─────────┼─────────╢
+║        │         │     ●   │    ●    │         │         ║
+║        │         │    ●●   │     ●   │         │         ║
+║        │         │   ●●    │     ●●  │         │         ║
+╟────────┼─────────┼───●─────┼──────●──┼─────────┼─────────╢
+║        │         │  ●●     │       ● │         │         ║
+║  ●●●●●●●●●       │ ●●      │        ●│         ●●●●●●●●  ║
+║●●●     │ ●●●     │●●       │        ●●       ●●│      ●●●║
+╟────────┼───●●●──●●●────────┼─────────●●●──●●●──┼─────────╢
+║        │     ●●●●│         │         │ ●●●●    │         ║
+║        │         │         │         │         │         ║
+╚════════╧═════════╧═════════╧═════════╧═════════╧═════════╝
+
       ]NEXTFILE no-GUI   ⍝ done if neither GTK nor XCB is available
 
       ⍝ only checks that ⎕PLOT was compiled

@@ -824,7 +824,7 @@ const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
                  {
                     sm.next(line[multi_pos]);
                  }
-              content.push_back(line.do_escape(true));
+              content.push_back(multi_literal ? line : line.do_escape(true));
             }
 
          if (!sm.inside_multi())   break;
@@ -1992,21 +1992,36 @@ int mode = 0;
    if (apl_fun.front() == '{')
       {
          // looks like the user command is a lambda function.
+         // Collect space-separated tokens until curly braces balance; any
+         // token after the closing } is an explicit mode (e.g. ]USERCMD ]f
+         // {⍵+1} 0).
          UCS_string result;
-         // lambdas could contain spaces, collect all arguments in one string
+         int depth = 0;
+         ShapeItem lambda_end_idx = -1;
          for (ShapeItem i = 1; i < args.ssize(); ++i)
             {
+               for (ShapeItem k = 0; k < args[i].ssize(); ++k)
+                  {
+                    const Unicode uni = args[i][k];
+                    if      (uni == UNI_L_CURLY)   ++depth;
+                    else if (uni == UNI_R_CURLY)   --depth;
+                  }
                result << args[i];
+               if (depth == 0)   { lambda_end_idx = i;   break; }
             }
-         // check if lamda-function closed properly
-         if (result.back() == '}')
+         // check if lambda-function closed properly
+         if (depth == 0 && result.back() == UNI_R_CURLY)
             {
                is_lambda = true;
                apl_fun = result;
-               // determine the mode: if both alpha and omega present then
-               // assume dyadic, otherwise monadic usage
-               mode = (apl_fun.contains(UNI_OMEGA) &&
-                       apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
+               // explicit mode may follow the closing }
+               if (lambda_end_idx + 1 < args.ssize())
+                  mode = args[lambda_end_idx + 1].atoi();
+               else
+                  // determine the mode: if both alpha and omega present then
+                  // assume dyadic, otherwise monadic usage
+                  mode = (apl_fun.contains(UNI_OMEGA) &&
+                          apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
             }
          else
             {

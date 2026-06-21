@@ -69,4 +69,20 @@ B:
 
 ⍝ ==================================
 
+      ⍝ bug-apl@gnu.org, 6/19/2026 (Dave Alden):
+      ⍝ ]USERCMD with lambda and explicit mode gave BAD COMMAND+
+
+      )CLEAR
+CLEAR WS
+
+      ]usercmd ]tc1 {⍵} 0
+      ]usercmd ]tc2 {⍺,⍵} 1
+
+      ]tc1 hello
+]tc1 hello
+
+      ]tc2 world
+ ]tc2 world ]tc2 world¹
+
+      )CHECK BRIEF
 

@@ -307,8 +307,9 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
         DOMAIN_ERROR;
 #endif
       }
-   else if (w_props->get_gui_driver() == "" ||      // no driver requested
-            w_props->get_gui_driver() == "ASCII")   // ASCII requested
+   else if (w_props->get_gui_driver() == "ASCII" ||      // ASCII requested
+            (w_props->get_gui_driver() == "" &&           // no driver requested
+             default_plot_driver == PltDrv_ASCII))        // and no GUI available
       {
         Value_P Z = do_plot_ASCII(*w_props, *data);
         return Token(TOK_APL_VALUE2, Z);

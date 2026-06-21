@@ -79,6 +79,7 @@ xAPL_VERSION←'apl-2.0'
 xTARFILE←xAPL_VERSION,  '.tar.gz'
 xDEBFILE←xAPL_VERSION,  '-1_amd64.deb'
 xSDEBFILE←xAPL_VERSION, '-1.debian.tar.gz'
+xWINFILE←'GNU_APL_2_0_Setup.exe'
 xAPL_TAR←xFTP_GNU, '/', xTARFILE
 xMAIL_GNU←'gnu@gnu.org'
 xMAIL_WEB←'bug-apl@gnu.org'
@@ -111,14 +112,13 @@ I3←⊂     'Change to the newly created directory: <B>cd ', xAPL_VERSION, '</B
 I4←      'Read (and follow) the instructions in files <B>INSTALL</B>'
 I4←⊂ I4, ' and <B>README-*</B>'
 
-I5←      '<B>Caveat:</B> GNU APL used to create full releases every 1-2 years, '
-I5←I5,  'but only up to release 1.9. From release 1.9 on, GNU APL changed '
-I5←I5,  'from releasing tar files to only releasing bug fixes for the 1.9 '
-I5←I5,  'release via the <A href=https://savannah.gnu.org/>GNU Savannah</A> '
-I5←I5,  ' project. This new way of distributing GNU APL made it easier for '
-I5←I5,  'both the GNU APL developers and the GNU APL users to keep their '
-I5←I5,  'GNU APL up-to-date. See topic <I>Subversion (SVN) and Git '
-I5←I5,  'repositories for GNU APL</I> below for details.'
+I5←      '<B>Note:</B> Between releases 1.9 and 2.0, GNU APL distributed only '
+I5←I5,  'incremental bug fixes via its '
+I5←I5,  '<A href=https://savannah.gnu.org/>GNU Savannah</A> repository '
+I5←I5,  'rather than full tar releases. Release 2.0 is again a full release '
+I5←I5,  'with a tar file, Debian package, and Windows installer. '
+I5←I5,  'See topic <I>Subversion (SVN) and Git repositories for GNU APL</I> '
+I5←I5,  'below for how to track ongoing development between releases.'
 I5←⊂I5
 
 yZ←⊃ HTML∆Ol I1, I2, I3, I4, I5
@@ -192,33 +192,15 @@ The <B>simplest</B> (though not the best) way to install GNU APL is this:
 
 <?apl HTML∆H4[''] 'Platforms' ?>
 
-GNU APL compiles under all major platforms (GNU/Linux, BSD, MacOS, Windows).
+GNU APL compiles and runs under all major platforms (GNU/Linux, BSD, MacOS,
+Windows).
 <BR><BR>
-On decent platforms like GNU/Linux does GNU APL runs almost out-of-the-box.
-This is because the fonts needed to display APL characters and the keyboard
-mappings needed to generate APL characters are well supported by the platform.
+On GNU/Linux, GNU APL runs almost out-of-the-box. APL fonts and keyboard
+mappings are well supported by the platform.
 <BR><BR>
-On obsolete platforms like Windows, the user usually needs to install
-additional software in order to compile and use GNU APL. For example, in
-Windows 11 the user needs:
-<UL>
-  <LI> Either <B>CYGWIN</B> or Microsoft's <B>WSL</B> (aka. Windows
-       Subsystem for Linux) for compiling GNU APL.
-  <LI> A suitable APL font to display the APL characters. Even though
-       Windows 11 supports Unicode as a concept, only a subset of Unicode
-       characters (excluding the standard APL characters) is properly
-       displayed without installing additional fonts.
-  <LI> A suitable keyboard layout (a mapping from keyboard keys to APL
-       characters). GNU APL is a terminal application that runs in a Windows
-       Command Prompt (aka. <B>cmd.exe</B>) window. Unfortunately the
-       <B>cmd.exe</B> window ignores the keyboard mappings installed with
-      other Microsoft Windows tools like the <B>Keyboard Manager</B> of
-      the <B>Microsoft PowerTools</B> or Microsoft's <B>IME</B> (Input
-      Method Editor).
-</UL>
-On platforms that are lacking even minimal support for APL characters
-it is the responsibility of the user (i.e. the one who decided to use
-that platform) to install the missing pieces for running GNU APL.
+On Windows, a native installer is now available (see below). The installer
+includes the GNU APL interpreter, the GNU APL font, and sets up the Right-Alt
+key as the APL key — no administrator rights, no Cygwin, no WSL required.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
 
@@ -240,9 +222,27 @@ checkout is:
 and here is <?apl HTML∆x2y xGIT_APL HTML∆A "<EM>more information</EM>" ?>
 about using Git with GNU APL.
 
+<?apl HTML∆H4[''] 'Windows installer for GNU APL' ?>
+
+A native Windows installer is available for GNU APL. Look for the file
+<B><?apl xWINFILE ?></B> on a
+<?apl xMIRRORS HTML∆A 'GNU mirror' ?>
+(in directory <B>apl</B>).
+<BR><BR>
+The installer includes:
+<UL>
+  <LI> The GNU APL interpreter (<B>apl.exe</B>), ready to run in a Windows
+       Command Prompt (<B>cmd.exe</B>) window.
+  <LI> The <B>GNU APL font</B>, which provides correct display of all APL
+       characters in cmd.exe.
+  <LI> A keyboard mapping that uses the <B>Right-Alt key</B> as the APL key,
+       so that e.g. Right-Alt+A types <B>⍺</B>. No administrator rights are
+       needed to install or use this keyboard mapping.
+</UL>
+
 <?apl HTML∆H4[''] 'Debian packages for GNU APL' ?>
 
-For Debian based GNU/Linux distributions we have created source and binary 
+For Debian based GNU/Linux distributions we have created source and binary
 packages for Debian. Look for files <B><?apl xDEBFILE ?></B> (binary Debian
 package) or <B><?apl xSDEBFILE ?></B> (Debian source package).
 If you encounter a problem with these packages, then please report it,
