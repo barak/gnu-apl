@@ -4,8 +4,9 @@ gnu-apl (2.0-1) unstable; urgency=medium
   * Forward port patches
   * Patches for missing *.texi files, build issues, missing src/DiffOut.hh
   * Add dependencies for building documentation
+  * Patch to move integral.py out of /usr/bin/
 
- -- Barak A. Pearlmutter <bap@debian.org>  Sun, 21 Jun 2026 03:37:33 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 22 Jun 2026 18:05:48 +0100
 
 gnu-apl (1.9-3) unstable; urgency=medium
 
