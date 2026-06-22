@@ -19,6 +19,11 @@ Free Documentation License".
 @end quotation
 @end copying
 
+@dircategory GNU programming tools
+@direntry
+* APL-LIBRARY: (apl-library). Collection of useful functions for the APL programmer
+@end direntry
+
 @titlepage
 @title APL Library
 @author Bill Daly
