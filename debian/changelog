@@ -1,3 +1,9 @@
+gnu-apl (2.0-2) unstable; urgency=medium
+
+  * Mark libapl-dev multi-arch:same
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Mon, 22 Jun 2026 22:23:50 +0100
+
 gnu-apl (2.0-1) unstable; urgency=medium
 
   * New upstream version
