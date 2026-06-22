@@ -964,6 +964,8 @@ AC_DEFINE_UNQUOTED(apl_DIR__prefix,      "$apl_prefix",      [--prefix]        )
 AC_DEFINE_UNQUOTED(apl_DIR__sysconf,     "$apl_sysconfdir",  [--sysconfdir])
 AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/apl",
                    [installation directory for GNU APL libraries])
+AC_DEFINE_UNQUOTED(apl_DIR__pkgdata,     "$apl_datarootdir/apl",
+                   [installation directory for GNU APL data files])
 
 if test -n "$SOURCE_DATE_EPOCH"
 then   # reproducible build

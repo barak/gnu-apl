@@ -44,7 +44,6 @@
 #endif // MINGW_SRC
 
 #include "Error_macros.hh"
-#include "LibPaths.hh"
 #include "PythonPipe.hh"
 
 //════════════════════════════════════════════════════════════════════════════
@@ -54,14 +53,16 @@ PythonPipe::PythonPipe(const char * script)
     python_script(script)
 
 {
-   // check that script is readable. We expect in in the current directory, or
-   // else in APL_bin_path.
+   // check that script is readable. We expect it in the current directory
+   // (e.g. when running from the build tree), or else in $(pkgdatadir), where
+   // it is installed (dist_pkgdata_DATA in src/Makefile.am).
    //
 UTF8_string argv1_utf;
    {
-     const char * bin_dir = LibPaths::get_APL_bin_path();
-     UTF8_string path1("./");      // current directory
-     UTF8_string path2(bin_dir);   // where apl shll be installed
+     const char * data_dir = apl_DIR__pkgdata;
+     UTF8_string path1("./");          // current directory
+     UTF8_string path2(data_dir);      // where integral.py is installed
+     path2 << "/";
      path1 << script;
      path2 << script;
      if      (access(path1.c_str(), R_OK) == 0)   argv1_utf = path1;
@@ -69,7 +70,7 @@ UTF8_string argv1_utf;
      else
         {
           MORE_ERROR() << "No python script '" << script
-                       << "' in the current directory or in " << bin_dir;
+                       << "' in the current directory or in " << data_dir;
           DOMAIN_ERROR;
         }
    }
