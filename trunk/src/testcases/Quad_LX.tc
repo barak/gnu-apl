@@ -1,6 +1,9 @@
 ⍝ Quad_LX
 ⍝ ----------------------------------
 
+      )DROP quad_lx
+³
+
       ⎕LX←"'Hello World'"
 
       )WSID quad_lx

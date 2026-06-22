@@ -10,6 +10,10 @@
       ⍝ and checks that the wrapper functions in FILE_IO.apl are working
       ⍝
 
+      z←⎕FIO.unlink 'FILE_IO.test1'
+      z←⎕FIO.unlink 'FILE_IO.test2'
+      z←⎕FIO.unlink 'FILE_IO.test3'
+
       ⍝⍝⍝
       ⍝⍝⍝ If this segfaults then re-install GNU APL !!!
       ⍝⍝⍝

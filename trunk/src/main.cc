@@ -439,6 +439,7 @@ const bool log_startup =
 
 #if ! MINGW_SRC
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
+   signal(SIGPIPE, SIG_IGN);   // APserver TCP socket may close before APL writes to it
 #endif // ! MINGW_SRC
 
 const UserPreferences & uprefs = UserPreferences::uprefs;    

@@ -90,6 +90,8 @@ CLEAR WS
 
       )DROP test.apl
 ³
+      )DROP test.xml
+³
 
       )wsid test
 WAS CLEAR WS

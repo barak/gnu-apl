@@ -4,6 +4,9 @@
    )CLEAR
 CLEAR WS
 
+      )DROP test.xml
+³
+
       ⍝ define some helper functions passed to operators
       ⍝
 ∇Z←NEG B

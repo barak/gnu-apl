@@ -5,6 +5,9 @@
       )CLEAR
 CLEAR WS
 
+      )DROP TEST_ZZ44
+³
+
       FOO←{⍺+LOCAL←⍵;LOCAL}
       ⎕CR 'FOO'
 λ←⍺ λ1 ⍵;LOCAL

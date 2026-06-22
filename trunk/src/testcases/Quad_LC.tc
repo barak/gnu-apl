@@ -105,6 +105,8 @@ J[7]  ∘∘∘∘∘∘
       ⎕LC
 7 5 3 1 1
 
+      )DROP Quad_LC
+³
       )WSID Quad_LC
 WAS ³
       )SAVE

@@ -4,6 +4,8 @@
 )CLEAR
 CLEAR WS
 
+      )DROP COPY_tc
+³
 
 ∇Z←A FUN1 B
  Z←'1'

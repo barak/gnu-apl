@@ -2323,9 +2323,11 @@ NOT_MINGW(
    {
      struct winsize ws;
      ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
-     return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
+     if (ws.ws_col)
+        return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
    }
 ) // NOT_MINGW
+   return Token(TOK_APL_VALUE1, IntScalar(Workspace::get_PW(), LOC));
 }
 //────────────────────────────────────────────────────────────────────────────
 Token

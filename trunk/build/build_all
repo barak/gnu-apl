@@ -1,34 +1,19 @@
 #!/bin/bash
 
-# process command line arguments. By default build all configurations
-# (aka. nightly build)
-   #
-   case "$1" in
+# Source build target definitions (configure options, artifacts, test flags,
+# and DEFAULT_CONFIGS).  The file lives next to this script.
+#
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+source "$SCRIPT_DIR/build_all.cfg"
 
-      "")   # default: build all configurations
-         configs="$configs standard"
-         configs="$configs develop"
-         configs="$configs tar"
-       # configs="$configs git"
-         configs="$configs libxcb"
-         configs="$configs rational"
-         configs="$configs libapl"
-         configs="$configs parallel_bench"
-         configs="$configs erlang"
-         configs="$configs python"
-         ;;
-
-      "clean")   # clean up everything
-         configs=""
-         ;;
-
-      "nightly")   # only refresh /var/www/html/nightly_build_results.html
-         configs=""
-         ;;
-
-      *)
-         configs="$*"
-   esac
+# process command line arguments
+#
+case "$1" in
+   "")        configs="$DEFAULT_CONFIGS" ;;
+   "clean")   configs="" ;;
+   "nightly") configs="" ;;
+   *)         configs="$*" ;;
+esac
 
 echo "configs requested: $configs"
 
@@ -55,7 +40,7 @@ echo "configs requested: $configs"
 # ROOT_dir:
 #    the GNU APL top-level directory. This is the one and only
 #    directory than contains the ./configure script for GNU APL.
-#    Normally #    TOP_BUILD_dir is $ROOT_dir/build.
+#    Normally TOP_BUILD_dir is $ROOT_dir/build.
 #
 #    Example: /home/username/apl-1.9
 #
@@ -64,23 +49,16 @@ echo "configs requested: $configs"
 #
 #    Example: apl-1.9
 #
-# VSRC_dir:
-#    this is (despite of its name 'src' the destination directory for a single
-#    configuration. For example: the VSRC_dir for configuration "standard" is:
-#    $TOP_BUILD_dir/build/builddir_standard/src
-#
-#    Example: /home/username/apl-1.9/src
-#
 START_dir=$(pwd)      # e.g. /etc/cron.daily
 
-cd $(dirname $0)      # e.g. /root/apl-1.9
+cd "$SCRIPT_DIR"
 TOP_BUILD_dir=$(pwd)
 SVN_VERSION=$(svnversion)
 
 # NOTE: -j8 fails with out of memory on small hosts (like those
 # used for nightly builds). By setting J8="" we avoid that
-J8="-j10"
-# J8=""
+J8="-j1"
+# J8="-j10"   # too many parallel jobs for hosts with little RAM
 
 # TOP_LOG_dir="/tmp"       # where to store longer build logs
 TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
@@ -96,7 +74,7 @@ declare -i configs_good=0
 declare -i test_errors=0
 bad_configs=""
 
-# print the.html table row for one build artifact
+# print the .html table row for one build artifact
 # print nothing if the artifact does not exist
 #
 artifact()
@@ -129,6 +107,27 @@ $indent </TR>
 fi
 }
 
+send_results_email()
+{
+   [ -z "$RESULTS_EMAIL" ] && return   # disabled in build_all.cfg
+
+   local html_file="/var/www/html/nightly_build_results.html"
+   if [ ! -f "$html_file" ]
+   then
+      echo "send_results_email: $html_file not found, skipping email" >&2
+      return
+   fi
+
+   {
+      echo "From: build_all@$(hostname)"
+      echo "To: $RESULTS_EMAIL"
+      echo "Subject: GNU APL nightly build result (SVN $SVN_VERSION)"
+      echo "Content-Type: text/html; charset=\"UTF-8\""
+      echo ""
+      cat "$html_file"
+   } | sendmail -t
+}
+
 write_nightly_build_results()
 {
 # produce a .html file with the nightly build result. We do not
@@ -138,7 +137,7 @@ write_nightly_build_results()
 #
    if [ -d /var/www/html ]
    then
-   { 
+   {
 echo "<!DOCTYPE html>
 <html>
 <head>
@@ -168,6 +167,7 @@ echo "<H3>Other</H3>"
 } > /var/www/html/nightly_build_results.html
    fi
 }
+
 # refresh /var/www/html/nightly_build_results.html
 if [ "x$1" = "xnightly" ]
 then
@@ -175,7 +175,7 @@ then
    exit 0
 fi
 
-# new run (takes a long timr)
+# new run (takes a long time)
 
 # remove old build results and start a fresh summary file
 #
@@ -213,7 +213,7 @@ build_one()
    rm -f "$3"   # remove stale build results (should not exist)
    rm -Rf "builddir_$1"
    mkdir "builddir_$1"
-   cd "builddir_$1"   # like  the top-level directory in a non-VPATH build
+   cd "builddir_$1"   # like the top-level directory in a non-VPATH build
    VSRC_dir="$TOP_BUILD_dir/builddir_$1/src"
 
    local time_FROM=$(date +%s)
@@ -302,6 +302,40 @@ test_one()
    fi
 }
 
+###################################################################
+# special build functions (not driven by build_all.cfg)
+#
+
+# build the standard configuration from the GNU APL tar file
+build_tar()
+{
+  echo "building configuration 'standard' from the GNU APL tar file"
+  echo "the APL_VERSION is: $APL_VERSION"
+  cd $TOP_BUILD_dir
+  tar xf $ROOT_dir/$APL_VERSION.tar.gz
+  mv $APL_VERSION builddir_tar
+  cd builddir_tar
+  ./configure
+  make $J8
+  cd $TOP_BUILD_dir
+}
+
+# build from a clean svn export of the local working copy
+# (avoids hitting the Savannah repos, which are already under heavy load)
+build_git()
+{
+  echo "building configuration 'git' from a local svn export of $ROOT_dir"
+  cd $TOP_BUILD_dir
+  svn export "$ROOT_dir" builddir_git
+  cd builddir_git
+  autoreconf
+  ./configure
+  make $J8
+}
+
+###################################################################
+# main build loop
+#
 cd $ROOT_dir
 echo "running autoreconf in $ROOT_dir..."
 autoreconf
@@ -311,135 +345,42 @@ if [ "$?" != 0 ]; then
 fi
 echo "  ├─── autoreconf done (OK)."
 
-# some shortcuts for various configure options
-#
-STD="--enable-maintainer-mode"
-LIBAPL="--with-libapl"
-PYTHON="--with-python"
-ERLANG="--with-erlang"
-DEV="DEVELOP_WANTED=yes"
-RAT="RATIONAL_NUMBERS_WANTED=yes"
-
-PERF="PERFORMANCE_COUNTERS_WANTED=yes"
-DYLO="DYNAMIC_LOG_WANTED=yes"
-XCB="--without-gtk3"
-CC_3="CORE_COUNT_WANTED=-3"		# ⎕SYL controls the number of cores
-noVC="VALUE_CHECK_WANTED=no"
-noVH="VALUE_HISTORY_WANTED=no"
-AL0="ASSERT_LEVEL_WANTED=0"             # no ASSERTions
-FAST="$noVC $noVH $AL0"
-
-################################################################################
-# build the standard configuration
-#
-build_standard()
 {
-  build_one "standard" "$STD" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-# build the standard configuration from the GNU APL tar file
-build_tar()
-{
-  echo "building configuration 'standard' from the GNU APL tar file"
-  echo "the APL_VERSION is: $APL_VERSION"
-  cd $TOP_BUILD_dir
-  tar xf $ROOT_dir/$APL_VERSION.tar.gz 
-  mv $APL_VERSION builddir_tar
-  cd builddir_tar
-  ./configure
-  make $J8
-  cd $TOP_BUILD_dir
-}
-
-# build the standard configuration from a git checkout
-build_git()
-{
-  echo "building configuration 'standard' from the git repository"
-  git clone https://git.savannah.gnu.org/git/apl.git builddir_git
-  cd builddir_git
-  ./configure
-  make $J8
-}
-
-#
-build_libxcb()
-{
-  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-################################################################################
-# build the standard configuration with libxcb (even if GTK3 is present)
-#
-build_libxcb()
-{
-  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-# build the developer configuration with rational number support
-#
-build_rational()
-{
-  build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
-}
-################################################################################
-# build apl as a library
-#
-build_libapl()
-{
-  build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
-}
-################################################################################
-# build the python interface to APL
-#
-build_python()
-{
-  build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
-}
-################################################################################
-# build apl for parallel benchmarking
-#
-build_parallel_bench()
-{
- build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
-}
-################################################################################
-# build the erlang interface to APL
-#
-build_erlang()
-{
-  build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
-}
-################################################################################
-# build the developer configuration.
-#
-build_develop()
-{
-  build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
-  test_one "develop"
-}
-
-# build all relevant configurations
-{
-  # clear the summary files
-  #
   echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
   echo "Build Summary Errors:" 2> "$TOP_LOG_dir/summary.log2"
 
   for config in $configs
   do
-        echo -n "  ├─── building configuration $config..." > /dev/stderr
-        build_$config
-        echo " done" > /dev/stderr
+     echo -n "  ├─── building configuration $config..." > /dev/stderr
+
+     cfg_var="build_cfg_${config}"
+     art_var="build_art_${config}"
+     tst_var="build_test_${config}"
+
+     if [ -n "${!cfg_var+set}" ]
+     then
+        # config defined in build_all.cfg: use the generic path
+        VSRC_dir="$TOP_BUILD_dir/builddir_${config}/src"
+        build_one "$config" "${!cfg_var}" "$VSRC_dir/${!art_var}"
+        [ "${!tst_var}" = "yes" ] && test_one "$config"
+
+     elif declare -f "build_${config}" > /dev/null
+     then
+        # special build function defined in this script (tar, git, …)
+        build_${config}
+
+     else
+        echo "*** unknown configuration: $config (no build_cfg_${config} in build_all.cfg and no build_${config}() function)"
+     fi
+
+     echo " done" > /dev/stderr
   done
   echo "  └─── DONE." > /dev/stderr
 
   echo
   echo  "$build_errors build errors"
   echo "$missing_files missing files (build results)"
-  [ ! -z "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
+  [ -n "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
   echo  "$configs_good configurations succeeded"
   echo   "$test_errors testcases failed"
 } >> "$TOP_LOG_dir/summary.log" 2>> "$TOP_LOG_dir/summary.log2"
@@ -447,7 +388,7 @@ build_develop()
 cat "$TOP_LOG_dir/summary.log"
 
 write_nightly_build_results
+send_results_email
 
 cd $START_dir     # undo all cds in this script
 stty sane         # in case some testcase failed badly
-
