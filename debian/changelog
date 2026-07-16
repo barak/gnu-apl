@@ -1,8 +1,9 @@
 gnu-apl (2.0-2) unstable; urgency=medium
 
   * Mark libapl-dev multi-arch:same
+  * Fix reproducible build date issue (closes: #1142256)
 
- -- Barak A. Pearlmutter <bap@debian.org>  Mon, 22 Jun 2026 22:23:50 +0100
+ -- Barak A. Pearlmutter <bap@debian.org>  Fri, 17 Jul 2026 00:12:07 +0100
 
 gnu-apl (2.0-1) unstable; urgency=medium
 
