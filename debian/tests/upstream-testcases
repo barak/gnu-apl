@@ -7,10 +7,9 @@ cd "$AUTOPKGTEST_TMP"
 cp -r "$OLDPWD/src/testcases" .
 
 # Testcases that already fail with upstream 2.0 when run in isolation,
-# skipped so the rest can catch regressions.  MatrixInverse.tc
-# segfaults in QR factorization (⌹[⎕CT]B); ZZZZ.tc dies of SIGPIPE.
+# skipped so the rest can catch regressions.  ZZZZ.tc dies of SIGPIPE.
 skip="
-APnnn.tc COPY.tc DumpLoad.tc File_IO.tc Macro.tc MatrixInverse.tc
+APnnn.tc COPY.tc DumpLoad.tc File_IO.tc Macro.tc
 MultiLineLiterals.tc NativeFunctions.tc Polynomials.tc Quad_AI.tc
 Quad_ARG.tc Quad_ES.tc Quad_FIO.tc Quad_LX.tc Rank.tc SaveLoad.tc
 Transpose.tc ZZ01_Invariants.tc ZZ14_Regression.tc ZZ35_Regression.tc
