@@ -10,3 +10,5 @@
 0010-no-debian-subdir.patch
 0011-Atomic_word-sparc64.patch
 0012-QR-const-members.patch
+0013-CDR-byte-order.patch
+0014-packed-boolean-byte-order.patch

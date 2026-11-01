@@ -16,6 +16,14 @@ Transpose.tc ZZ01_Invariants.tc ZZ14_Regression.tc ZZ35_Regression.tc
 ZZ44_Regression.tc ZZ59_Regression.tc ZZZZ.tc
 "
 
+# The expected output of these assumes x87 80-bit long double: with a
+# wider long double (e.g. 128-bit on arm64, s390x, sparc64) large
+# integers such as 2⋆70 are formatted with more correct digits.
+case "$(dpkg --print-architecture)" in
+    amd64|i386) ;;
+    *) skip="$skip Format_by_spec.tc ZZZ0_Standard_20x.tc" ;;
+esac
+
 pass=0; fail=0; skipped=0; failed=""
 for tc in testcases/*.tc; do
     name=${tc#testcases/}

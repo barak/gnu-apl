@@ -1,0 +1,177 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 1 Nov 2026 17:00:00 +0000
+Subject: =?utf-8?q?packed_Boolean_ravels=3A_fix_byte_order=2C_=29SAVE/=29LO?=
+ =?utf-8?q?AD=2C_41_=E2=8E=95CR?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+All readers of packed Boolean ravels (Value::packed_fetcher(),
+Value::explode(), the workspace archive, 41 ⎕CR) access them bytewise:
+item b is bit b&7 of byte b>>3.  The writers (Value::try_implode() and
+40 ⎕CR) assembled 64-bit chunks and stored them as host-order uint64_t,
+which matches only on little-endian hosts.  On big-endian hosts packed
+values read back scrambled, e.g. Q ≡ 40 ⎕CR QP fails in Quad_CR.tc.
+Store chunks little endian via a new Value::store_packed_chunk().
+
+Also fix two readers that located the packed bits via &get_cfirst():
+for a packed value that is a reference to a static boolean Cell returned
+by packed_fetcher(), not the ravel, so 41 ⎕CR and )SAVE (XML archive)
+read unrelated memory -- on all architectures a saved packed variable
+came back as garbage after )LOAD.  Add Value::get_packed_bytes() and
+use it there.  Loading packed values from an XML workspace was broken
+too: Value::next_ravel_Byte() always wrote byte 0, single hex digits
+were emitted for bytes < 0x10, and the ⁹ on continuation lines (values
+longer than 512 bits) ended parsing; write each byte at its index via
+a new Value::set_packed_byte(), emit two hex digits, and skip ⁹.
+And make 41 ⎕CR return the unpacked value it builds
+rather than Idx0 (an empty vector).
+
+Forwarded: yes
+---
+ src/Archive.cc | 10 ++++++----
+ src/Quad_CR.cc |  9 +++++----
+ src/Value.cc   |  4 ++--
+ src/Value.hh   | 23 +++++++++++++++++++++++
+ 4 files changed, 36 insertions(+), 10 deletions(-)
+
+diff --git a/src/Archive.cc b/src/Archive.cc
+index 5e73734..a3c14eb 100644
+--- a/src/Archive.cc
++++ b/src/Archive.cc
+@@ -234,7 +234,7 @@ const Cell * C = &v.get_cfirst();
+ int space = do_indent();
+    if (v.is_packed())   // Value has a packed (non-Cell) ravel
+       {
+-        const uint8_t * bytes = reinterpret_cast<const uint8_t *>(C);
++        const uint8_t * bytes = v.get_packed_bytes();
+         const ShapeItem byte_count = (len + 7)/8;
+ 
+         // print the start of the XML element
+@@ -252,7 +252,7 @@ int space = do_indent();
+         loop(b, byte_count)   // print with max. 64 bytes per line
+             {
+               if (b && (b & 0x3F) == 0)   outf << "\n    " << UNI_PAD_U9;
+-              outf << (bytes[b] & 0xFF);
++              outf << setw(2) << (bytes[b] & 0xFF);
+             }
+         outf << nohex << "\"/>" << endl;
+         --indent;
+@@ -1952,11 +1952,13 @@ char **pend = reinterpret_cast<char **>(&end);
+ 
+         case UNI_PAD_U9: // packed boolean,         e.g. ⁹
+              Assert(Z.is_packed());
+-             for (;;)
++             for (ShapeItem byte_idx = 0;;)
+                  {
+                    const uint8_t c0 = input[0];
+                    const uint8_t c1 = input[1];
+                    if (c0 <= ' ')    { ++input;   continue; }   // whitespace
++                   if (c0 == 0xE2 && c1 == 0x81 && uint8_t(input[2]) == 0xB9)
++                      { input += 3;   continue; }   // ⁹ on continuation line
+                    if (c0 == '"')   return input + 1;   // end of ravel
+ 
+                    const char cc[3] = { char(c0), char(c1), 0 };
+@@ -1966,7 +1968,7 @@ char **pend = reinterpret_cast<char **>(&end);
+ 
+                    const int converted = end - cc;
+                    if (converted == 0)   return input;   // nothing converted
+-                   Z.next_ravel_Byte(byte);              // > 0 bytes converted
++                   Z.set_packed_byte(byte_idx++, byte);   // > 0 bytes converted
+                    if (converted == 1)   return input + 1;
+                  }
+ 
+diff --git a/src/Quad_CR.cc b/src/Quad_CR.cc
+index 0fa4a59..69dcb64 100644
+--- a/src/Quad_CR.cc
++++ b/src/Quad_CR.cc
+@@ -1645,13 +1645,13 @@ uint64_t bit  = 1;
+          bit += bit;
+          if (bit == 0)   // uint64_t bit complete
+             {
+-              bits[b >> 6] = chunk;
++              Value::store_packed_chunk(bits + (b >> 6), chunk);
+               chunk = 0;
+               bit = 1;
+             }
+        }
+ 
+-    if (chunk)   bits[Z_len - 1] = chunk;   // rest bits
++    if (chunk)   Value::store_packed_chunk(bits + Z_len - 1, chunk);   // rest bits
+ 
+ Value_P Z(B->get_shape(), bits, LOC);
+    return Z;
+@@ -1669,11 +1669,12 @@ Quad_CR::do_CR41(const Value * B)
+ Value_P Z(B->get_shape(), LOC);
+ 
+ const ShapeItem B_len = B->element_count();
+-const uint8_t * bits = reinterpret_cast<const uint8_t *>(&B->get_cfirst());
++const uint8_t * bits = B->get_packed_bytes();
+ 
+    loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1ULL << (b & 7)) ? 1 : 0);
+ 
+-   return Idx0(LOC);
++   Z->check_value(LOC);
++   return Z;
+ }
+ //----------------------------------------------------------------------------
+ Value_P
+diff --git a/src/Value.cc b/src/Value.cc
+index 600f5a9..145a48e 100644
+--- a/src/Value.cc
++++ b/src/Value.cc
+@@ -3108,11 +3108,11 @@ ShapeItem z = 0;
+ 
+          zbit += zbit;                   // next bit
+          if (zbit)   continue;           // more bits in same chunk
+-         bits[z++] = zchunk;
++         store_packed_chunk(bits + z++, zchunk);
+          zchunk = 0;
+        }
+ 
+-   if (zchunk)   bits[Z_len - 1] = zchunk;   // rest bits
++   if (zchunk)   store_packed_chunk(bits + Z_len - 1, zchunk);   // rest bits
+ 
+    if (error_reason)
+       {
+diff --git a/src/Value.hh b/src/Value.hh
+index 5e0ebff..ef16b70 100644
+--- a/src/Value.hh
++++ b/src/Value.hh
+@@ -534,6 +534,21 @@ public:
+    static const Cell & cell_fetcher(ShapeItem offset, const Cell * ravel)
+       { return ravel[offset]; }
+ 
++   /// store a 64-bit chunk of a packed ravel at \b dest. Packed ravels
++   /// are accessed bytewise (bit b is bit b&7 of byte b>>3), so the
++   /// chunk is stored little endian regardless of the host byte order.
++   static void store_packed_chunk(uint64_t * dest, uint64_t chunk)
++      {
++        uint8_t * bytes = reinterpret_cast<uint8_t *>(dest);
++        loop(b, 8)   { bytes[b] = chunk & 0xFF;   chunk >>= 8; }
++      }
++
++   /// return the bytes of a packed ravel. Note that get_cfirst() and
++   /// friends of a packed value return static boolean cells, not a
++   /// pointer into the ravel.
++   const uint8_t * get_packed_bytes() const
++      { Assert(is_packed());   return reinterpret_cast<const uint8_t *>(ravel); }
++
+    /// return the offset'th ravel cell (of an pack'ed ravel)
+    static const Cell & packed_fetcher(ShapeItem offset, const Cell * ravel)
+       { return 1 << (offset & 7) &
+@@ -607,6 +622,14 @@ public:
+    /// case ravel is a uint8_t * and not a Cell * !!!
+    inline void next_ravel_Byte(uint8_t byte);
+ 
++   /// set byte \b idx of a packed ravel to \b byte
++   void set_packed_byte(ShapeItem idx, uint8_t byte)
++      {
++        Assert(is_packed());
++        Assert(idx < (nz_element_count() + 7) >> 3);
++        reinterpret_cast<uint8_t *>(ravel)[idx] = byte;
++      }
++
+    /// initialize the next ravel cell with a pointer to another Cell
+    inline void next_ravel_Lval(Cell * target, Value * target_owner);
+ 
