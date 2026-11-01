@@ -40,6 +40,10 @@ execute_after_dh_auto_install:
 	find debian/tmp/usr/lib -name "*.apl" | \
 	    xargs grep -lP '^#!\s*/usr/local/bin/apl' | \
 	    xargs -r sed -i 's|^#!\s*/usr/local/bin/apl|#!/usr/bin/apl|'
+	@echo 'Also "#!/usr/bin/env -S apl", which lintian flags as unusual-interpreter'
+	find debian/tmp/usr/lib -name "*.apl" | \
+	    xargs grep -lP '^#!\s*/usr/bin/env\s+-S\s+apl\b' | \
+	    xargs -r sed -i -E 's|^#!\s*/usr/bin/env\s+-S\s+apl\b|#!/usr/bin/apl|'
 	@echo "APL workspace files are library files loaded via )LOAD, not standalone scripts;"
 	@echo "ensure they are not executable"
 	find debian/tmp/usr/lib -name "*.apl" -executable -exec chmod --changes 644 {} +

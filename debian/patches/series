@@ -7,3 +7,5 @@
 0007-lintian-info-document-missing-dir-entry-section.patch
 0008-move-integral.py.patch
 0009-date.patch
+0010-no-debian-subdir.patch
+0011-Atomic_word-sparc64.patch

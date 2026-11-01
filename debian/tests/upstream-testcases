@@ -1,0 +1,37 @@
+#!/bin/sh
+# Run the upstream src/testcases/*.tc files against the installed
+# interpreter, each in a fresh interpreter so one failure does not
+# cascade into the following files.
+set -u
+cd "$AUTOPKGTEST_TMP"
+cp -r "$OLDPWD/src/testcases" .
+
+# Testcases that already fail with upstream 2.0 when run in isolation,
+# skipped so the rest can catch regressions.  MatrixInverse.tc
+# segfaults in QR factorization (⌹[⎕CT]B); ZZZZ.tc dies of SIGPIPE.
+skip="
+APnnn.tc COPY.tc DumpLoad.tc File_IO.tc Macro.tc MatrixInverse.tc
+MultiLineLiterals.tc NativeFunctions.tc Polynomials.tc Quad_AI.tc
+Quad_ARG.tc Quad_ES.tc Quad_FIO.tc Quad_LX.tc Rank.tc SaveLoad.tc
+Transpose.tc ZZ01_Invariants.tc ZZ14_Regression.tc ZZ35_Regression.tc
+ZZ44_Regression.tc ZZ59_Regression.tc ZZZZ.tc
+"
+
+pass=0; fail=0; skipped=0; failed=""
+for tc in testcases/*.tc; do
+    name=${tc#testcases/}
+    case " $(echo $skip) " in
+        *" $name "*) skipped=$((skipped+1)); continue ;;
+    esac
+    if timeout 300 apl --noCIN --noColor -q -T "$tc" \
+            > "$tc.out" 2>&1 < /dev/null; then
+        pass=$((pass+1))
+    else
+        fail=$((fail+1)); failed="$failed $name"
+        echo "FAIL: $name"
+        cat "$tc.log" 2>/dev/null | tail -n 40
+    fi
+done
+
+echo "passed: $pass  failed: $fail  skipped: $skipped"
+[ $fail -eq 0 ] || { echo "failed:$failed"; exit 1; }

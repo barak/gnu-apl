@@ -1,0 +1,28 @@
+#!/bin/sh
+# Basic smoke test: run a small APL script and check its output.
+set -e
+cd "$AUTOPKGTEST_TMP"
+
+cat > smoke.apl <<'APL'
+2+3
+×/⍳5
+⍴2 3⍴⍳6
++/⍳100
+'Hello, world'
+)OFF
+APL
+
+cat > expected <<'OUT'
+5
+120
+2 3
+5050
+Hello, world
+OUT
+
+apl --script -f smoke.apl > actual
+# drop trailing blank line printed by )OFF
+sed -i '/^$/d' actual
+diff -u expected actual
+apl --version
+echo "smoke test passed"

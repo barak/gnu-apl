@@ -1,0 +1,37 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 1 Nov 2026 13:45:00 +0000
+Subject: do not redefine libstdc++ _Atomic_word
+
+When PARALLEL_ENABLED is not defined, Parallel.hh does
+"typedef int _Atomic_word", but _Atomic_word is a reserved identifier
+already defined by libstdc++ via <bits/atomic_word.h>, as "long" on
+some architectures.  This causes a build failure on sparc64:
+
+  Parallel.hh:70:13: error: conflicting declaration 'typedef int _Atomic_word'
+  atomic_word.h:29:16: note: previous declaration as 'typedef long int _Atomic_word'
+
+Only provide the fallback typedef when not using libstdc++.
+
+Forwarded: no
+---
+ src/Parallel.hh | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/src/Parallel.hh b/src/Parallel.hh
+index b3d0eec..99e6bde 100644
+--- a/src/Parallel.hh
++++ b/src/Parallel.hh
+@@ -67,7 +67,13 @@
+    //
+    // parallel execution disabled, no need for atomicity
+    //
++   // _Atomic_word is reserved and already defined by libstdc++, with
++   // an architecture-dependent type (e.g. long on sparc64), so only
++   // define it when not using libstdc++.
++   //
++# ifndef __GLIBCXX__
+ typedef int _Atomic_word;
++# endif
+ 
+ inline int atomic_fetch_add(volatile _Atomic_word & counter, int increment)
+    { const int ret = counter;   counter += increment;   return ret; }

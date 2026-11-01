@@ -1,0 +1,7 @@
+Tests: smoke
+Depends: apl
+Restrictions: allow-stderr
+
+Tests: upstream-testcases
+Depends: apl
+Restrictions: allow-stderr

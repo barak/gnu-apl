@@ -1,0 +1,42 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Sun, 1 Nov 2026 13:32:54 +0000
+Subject: do not configure debian/ subdirectory
+
+Upstream ships debian/Makefile.am and debian/source/Makefile.am so
+that its own debian/ directory is included in "make dist".  The Debian
+packaging replaces that directory, and a Makefile.am in debian/source/
+is a lintian error (unknown-file-in-debian-source), so stop treating
+debian/ as an automake subdirectory.
+
+Forwarded: not-needed
+---
+ Makefile.am  | 2 +-
+ configure.ac | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 1f52aac..8af9802 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -7,7 +7,7 @@ APL_DIRS	= workspaces wslib3 wslib4 wslib5
+ SUBDIRS		= $(APL_DIRS)
+ SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
+ SUBDIRS		+= src support-files tools websock
+-DIST_SUBDIRS	= $(SUBDIRS) rpm debian
++DIST_SUBDIRS	= $(SUBDIRS) rpm
+ 
+ dist_doc_DATA = 							\
+ 		README								\
+diff --git a/configure.ac b/configure.ac
+index 8a91ddb..6f4f4b6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -489,8 +489,6 @@ m4_include([m4/apl_TARGETs.m4])
+ 
+ AC_CONFIG_FILES([Makefile
+                  build/Makefile
+-                 debian/Makefile
+-                 debian/source/Makefile
+                  doc/Makefile
+                  doc/DALY/Makefile
+                  erlang/Makefile
