@@ -1,3 +1,26 @@
+gnu-apl (2.0-3) unstable; urgency=medium
+
+  * Patch to stop configuring upstream debian/ subdirectory
+  * Remove unused patch 0003-deconstruct-info-to-texi.patch
+  * Drop superfluous debian/copyright stanzas for removed m4 files
+  * Rewrite "#!/usr/bin/env -S apl" shebangs to /usr/bin/apl
+  * Patch to not redefine libstdc++ _Atomic_word, fixes sparc64 FTBFS
+  * Bump to debhelper compat level 14
+  * Add autopkgtests: smoke test, and upstream src/testcases (each run
+    in a fresh interpreter, skipping those that fail in 2.0)
+  * Cherry-pick upstream fix for QR factorization (⌹[⎕CT]B) segfault,
+    and enable MatrixInverse.tc in autopkgtest
+  * Patch CDR decoding (11/12 ⎕CR, ⎕TF, shared variables, AP210) to use
+    the little-endian byte order it is encoded in; fixes corruption on
+    big-endian architectures, and of nested Unicode scalars everywhere
+  * Patch packed Boolean ravels: host-independent byte order, fix
+    )SAVE/)LOAD of packed values (garbage on all architectures), and 41
+    ⎕CR
+  * autopkgtest: skip two testcases whose expected output assumes x87
+    80-bit long double, except on amd64 and i386
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Sun, 01 Nov 2026 13:38:12 +0000
+
 gnu-apl (2.0-2) unstable; urgency=medium
 
   * Mark libapl-dev multi-arch:same
