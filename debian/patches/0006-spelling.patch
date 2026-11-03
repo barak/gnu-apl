@@ -4,12 +4,6 @@ Subject: correct spelling
 
 Correct misspellings in comments and strings across src/ and the
 testcases directory.
-
-# Conflicts:
-#	src/Executable.cc
-#	src/Help.def
-#	src/QuadFunction.cc
-#	src/SystemVariable.def
 ---
  doc/apl.texi             | 2 +-
  src/Archive.cc           | 2 +-

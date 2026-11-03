@@ -1,9 +1,9 @@
-0002-out-of-tree-Isql.patch
-0008-doc-info-html.patch
-0004-reconstructed-texi-files.patch
+0001-out-of-tree-Isql.patch
+0002-doc-info-html.patch
+0003-reconstructed-texi-files.patch
 0004-missing-includes.patch
 0005-missing-DiffOut.hh.patch
-0007-spelling.patch
+0006-spelling.patch
 0007-lintian-info-document-missing-dir-entry-section.patch
 0008-move-integral.py.patch
 0009-date.patch
