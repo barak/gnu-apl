@@ -1,0 +1,152 @@
+#!/bin/sh
+# Import a snapshot of upstream's SVN trunk, as pushed by upstream to
+# the trunk/ directory of their git repository, onto the upstream-trunk
+# branch, cleaned up for packaging:
+#
+#  - trunk/ becomes the top level, so everything else upstream keeps
+#    at the top level (branches/, tags/, release tarballs, ...) is gone,
+#  - files matching the Files-Excluded patterns in debian/copyright are
+#    dropped (upstream's debian/, autoreconf output, configure and build
+#    output, non-free files, ...), with the semantics of uscan and
+#    mk-origtargz: patterns are anchored at the top level, * and ? also
+#    match /, and a pattern matching a directory drops all of it,
+#  - Makefile.in next to each Makefile.am is dropped, and so is every
+#    file next to a template of the same name plus .in (Makefile,
+#    gnu-apl.d/preferences, rpm/apl.spec, ...), made by configure,
+#  - ELF objects and executables are dropped.
+#
+# The import commit has two parents: the previous tip of the
+# upstream-trunk branch (initially the upstream branch with the
+# imported release tarballs, so that the debian branch can simply merge
+# it), and the upstream commit it was made from, so that "git log"
+# shows what was imported.
+# It is tagged upstream/<version>, with <version> made from AC_INIT in
+# configure.ac and the SVN revision in config.h, e.g. 2.0+svn3894.
+#
+# Nothing is checked out: the tree is built in a temporary index, so
+# this can be run from any branch, with a dirty working tree.
+#
+# Usage: debian/import-trunk [--dry-run] [REF]
+#   REF defaults to up/master.  With --dry-run, print the version and
+#   the files that would be dropped, but create no commit or tag.
+#
+# Afterwards: git merge upstream/<version> into the debian branch, and
+# dch -v <version>-1.
+
+set -eu
+
+dry_run=false
+if [ "${1-}" = --dry-run ]; then dry_run=true; shift; fi
+ref=${1:-up/master}
+branch=upstream-trunk
+first_parent=upstream
+
+top=$(git rev-parse --show-toplevel)
+cd "$top"
+copyright=debian/copyright
+
+src=$(git rev-parse --verify "$ref^{commit}")
+
+# version: AC_INIT([GNU APL],[2.0],...) and "... / SVN: 3894", ... in
+# config.h, which upstream commits; fall back to exported_from
+# ("exported from SVN version  3894M").
+base=$(git show "$src:trunk/configure.ac" |
+       sed -n 's/^AC_INIT(\[[^]]*\], *\[\([^]]*\)\].*/\1/p')
+rev=$(git show "$src:trunk/config.h" 2>/dev/null |
+      sed -n 's/.*SVN: *\([0-9][0-9]*\).*/\1/p' | head -n 1)
+[ -n "$rev" ] ||
+    rev=$(git show "$src:trunk/exported_from" 2>/dev/null |
+          sed -n 's/.*SVN version *\([0-9][0-9]*\).*/\1/p')
+if [ -z "$base" ] || [ -z "$rev" ]; then
+    echo "$0: cannot determine version of $ref" >&2
+    exit 1
+fi
+version="$base+svn$rev"
+tag="upstream/$version"
+echo "$ref = $src: $version"
+
+if ! $dry_run && git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    echo "$0: tag $tag already exists" >&2
+    exit 1
+fi
+
+GIT_INDEX_FILE=$(mktemp)
+export GIT_INDEX_FILE
+trap 'rm -f "$GIT_INDEX_FILE"' EXIT
+git read-tree "$src:trunk"
+
+drop=$(mktemp)
+stems=$(mktemp)
+globs=$(mktemp)
+paths=$(mktemp)
+trap 'rm -f "$GIT_INDEX_FILE" "$drop" "$stems" "$globs" "$paths"' EXIT
+
+# Files-Excluded from the header paragraph of debian/copyright, one
+# pattern per line
+awk '/^$/ { exit }
+     /^#/ { next }
+     /^[^ \t]/ { f = (tolower($1) == "files-excluded:"); sub(/^[^:]*:/, "") }
+     f { for (i = 1; i <= NF; i++) print $i }' "$copyright" > "$globs"
+if [ ! -s "$globs" ]; then
+    echo "$0: no Files-Excluded in $copyright" >&2
+    exit 1
+fi
+if grep -q '\\' "$globs"; then
+    echo "$0: backslash in Files-Excluded is not supported" >&2
+    exit 1
+fi
+
+# a glob as an extended regular expression matching "top/path", like
+# mk-origtargz matching paths in a tarball
+glob2ere() {
+    sed -e 's/[].[^$(){}|+]/\\&/g' -e 's/\*/.*/g' -e 's/?/./g' \
+        -e 's|.*|^([^/]*/)?(&)(/.*)?$|'
+}
+git ls-files | sed 's|^|top/|' > "$paths"
+while read -r glob; do
+    printf '%s\n' "$glob" | glob2ere | grep -E -q -f - "$paths" ||
+        echo "$0: warning: no files match Files-Excluded pattern $glob" >&2
+done < "$globs"
+
+{
+    glob2ere < "$globs" | grep -E -f - "$paths" | sed 's|^top/||' |
+        tr '\n' '\0'
+    git ls-files -z -- '*Makefile.am' |
+        tr '\0' '\n' | sed -n 's/\.am$/.in/p' | tr '\n' '\0'
+    git ls-files -- '*.in' | sed -n 's/\.in$//p' > "$stems"
+    git ls-files | grep -Fx -f "$stems" | tr '\n' '\0'
+    git ls-files -z --stage | tr '\0' '\n' |
+        while read -r mode blob stage path; do
+            [ "$(git cat-file blob "$blob" | head -c 4 | od -An -c |
+                 tr -d ' ')" = '177ELF' ] && printf '%s\0' "$path"
+        done
+} | sort -zu > "$drop"
+git update-index -z --force-remove --stdin < "$drop"
+
+if $dry_run; then
+    echo "would drop:"
+    tr '\0' '\n' < "$drop" | sed 's/^/  /'
+    echo "would keep $(git ls-files | wc -l) files"
+    exit 0
+fi
+
+tree=$(git write-tree)
+if parent=$(git rev-parse -q --verify "refs/heads/$branch") ||
+   parent=$(git rev-parse -q --verify "refs/heads/$first_parent"); then
+    if [ "$(git rev-parse "$parent^{tree}")" = "$tree" ]; then
+        echo "$0: $ref has no changes from $branch" >&2
+        exit 1
+    fi
+    parents="-p $parent -p $src"
+else
+    parent=
+    parents="-p $src"
+fi
+
+commit=$(printf 'New upstream version %s\n\nSVN trunk r%s, imported from %s by debian/import-trunk.\n' \
+                "$version" "$rev" "$src" |
+         git commit-tree "$tree" $parents)
+old=$(git rev-parse -q --verify "refs/heads/$branch" || true)
+git update-ref -m "import-trunk: $version" "refs/heads/$branch" "$commit" $old
+git tag -a -m "Upstream version $version" "$tag" "$commit"
+echo "$branch = $commit, tagged $tag"

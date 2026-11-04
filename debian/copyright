@@ -2,6 +2,53 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: GNU APL
 Upstream-Contact: bug-apl@gnu.org
 Source: https://www.gnu.org/software/apl/
+Files-Excluded:
+ debian
+ configure
+ aclocal.m4
+ config.h.in
+ compile
+ config.guess
+ config.sub
+ depcomp
+ install-sh
+ ltmain.sh
+ missing
+ texinfo.tex
+ config.rpath
+ m4/libtool.m4
+ m4/lt*.m4
+ autom4te.cache
+ exported_from
+ config.h
+ config.log
+ config.status
+ stamp-h1
+ libtool
+ */.deps
+ */.libs
+ */.dirstamp
+ *.o
+ *.lo
+ *.la
+ *.lai
+ *.a
+ *.so
+ *.so.*
+ doc/*.info
+ doc/*.html
+ doc/texinfo.tex
+ HOWTOs/GNU-APL-Designers-Guide.pdf
+ HOWTOs/Bible/Bible-Preview.pdf
+ *~
+ */.apl.history
+Comment: Files-Excluded are dropped from upstream's SVN trunk by
+ debian/import-trunk, which also drops Makefile.in, files generated
+ from a .in template, and ELF objects.  They are upstream's own debian/;
+ files made by autoreconf, configure and make, including the info and
+ HTML manuals and the Designers Guide PDF; editor and interpreter
+ leftovers; and HOWTOs/Bible/Bible-Preview.pdf, an excerpt of a book
+ with neither license nor sources.
 
 Files: *
 Copyright: 2008-2019 Dr. Jürgen Sauermann <bug-apl@gnu.org>
