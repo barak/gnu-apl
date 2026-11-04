@@ -1,3 +1,27 @@
+gnu-apl (2.0-4) unstable; urgency=medium
+
+  * Patch ⎕RVAL to build random floats independently of byte order;
+    fixes garbage random numbers on big-endian architectures
+  * Patch configure to compute the socket constants of FIO∆SockHelper
+    (wslib5/FILE_IO.apl) from the target's headers instead of shipping
+    x86 values, wrong on alpha, hppa, mips and sparc; and File_IO.tc and
+    Quad_FIO.tc to use them instead of hard-coding SOL_SOCKET etc.; the
+    test run hung there
+  * Patch configure to expand ${prefix} in --libdir, and take the
+    LIBREF-3/4/5 library paths in /etc/gnu-apl.d/preferences from
+    libdir; fixes )LOAD 5 FILE_IO and friends, broken by the multiarch
+    libdir
+  * Patch ⎕FIO ¯8/¯9 (screen size) to not return garbage when stdin is
+    not a terminal
+  * Fix Quad_ES.tc expected output, broken by the spelling patch
+  * Take fixes of MultiLineLiterals.tc and ZZ59_Regression.tc from
+    upstream trunk
+  * autopkgtest: set up the environment of upstream's make test (--id
+    1010, $HOME, library 0 with ASSERT.apl), allowing most previously
+    skipped testcases to run
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 15:23:39 +0000
+
 gnu-apl (2.0-3) unstable; urgency=medium
 
   * Patch to stop configuring upstream debian/ subdirectory

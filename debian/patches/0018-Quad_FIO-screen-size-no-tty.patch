@@ -1,0 +1,43 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Tue, 3 Nov 2026 22:30:00 +0000
+Subject: ⎕FIO ¯8/¯9: do not return garbage when stdin is not a terminal
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+⎕FIO ¯8 (screen width) and ⎕FIO ¯9 (screen height) ignored the result
+of ioctl(TIOCGWINSZ) and returned uninitialised stack contents when
+stdin is not a terminal, e.g. in a pipe, under cron, or in autopkgtest,
+which made the output of ZZ59_Regression.tc unpredictable.  Return ⎕PW
+as the width (as trunk does when the width is 0) and 0 as the height.
+
+Forwarded: no
+---
+--- a/src/Quad_FIO.cc
++++ b/src/Quad_FIO.cc
+@@ -1185,17 +1185,19 @@
+         case -10: // slow new
+              return Token(TOK_APL_VALUE1,
+                           IntScalar(Value::slow_new_count, LOC));
+-        case -9: // screen height
++        case -9: // screen height (0 if stdin is not a terminal)
+              {
+-               struct winsize ws;
++               struct winsize ws = {};
+                ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+                return Token(TOK_APL_VALUE1, IntScalar(ws.ws_row, LOC));
+              }
+-        case -8: // screen width
++        case -8: // screen width (⎕PW if stdin is not a terminal)
+              {
+-               struct winsize ws;
+-               ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+-               return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
++               struct winsize ws = {};
++               if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col)
++                  return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
++               return Token(TOK_APL_VALUE1,
++                            IntScalar(Workspace::get_PW(), LOC));
+              }
+         case -7: // throw a segfault
+              {

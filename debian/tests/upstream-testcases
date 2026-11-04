@@ -6,14 +6,22 @@ set -u
 cd "$AUTOPKGTEST_TMP"
 cp -r "$OLDPWD/src/testcases" .
 
-# Testcases that already fail with upstream 2.0 when run in isolation,
-# skipped so the rest can catch regressions.  ZZZZ.tc dies of SIGPIPE.
+# Set up the environment that upstream's "make test" provides:
+# interpreter id 1010 as the first command line options (⎕AI, ⎕ARG),
+# a private $HOME, and library 0 ($PWD/workspaces) for )SAVE and )LOAD,
+# containing ASSERT.apl.
+export HOME="$AUTOPKGTEST_TMP"
+mkdir -p workspaces
+cp "$(apl --show_lib_dir)/wslib5/ASSERT.apl" workspaces/
+
+# Testcases that cannot work against the installed package:
+# APnnn.tc runs a helper script that is not in the source tarball,
+# NativeFunctions.tc and SaveLoad.tc need the lib_template_*.so native
+# function examples and Quad_FIO.tc needs tools/TLV_server, none of
+# which are installed, and ZZZZ.tc checks for leaks after all other
+# testcases ran in the same interpreter.
 skip="
-APnnn.tc COPY.tc DumpLoad.tc File_IO.tc Macro.tc
-MultiLineLiterals.tc NativeFunctions.tc Polynomials.tc Quad_AI.tc
-Quad_ARG.tc Quad_ES.tc Quad_FIO.tc Quad_LX.tc Rank.tc SaveLoad.tc
-Transpose.tc ZZ01_Invariants.tc ZZ14_Regression.tc ZZ35_Regression.tc
-ZZ44_Regression.tc ZZ59_Regression.tc ZZZZ.tc
+APnnn.tc NativeFunctions.tc Quad_FIO.tc SaveLoad.tc ZZZZ.tc
 "
 
 # The expected output of these assumes x87 80-bit long double: with a
@@ -30,7 +38,7 @@ for tc in testcases/*.tc; do
     case " $(echo $skip) " in
         *" $name "*) skipped=$((skipped+1)); continue ;;
     esac
-    if timeout 300 apl --noCIN --noColor -q -T "$tc" \
+    if timeout 300 apl --id 1010 --noCIN --noColor -q -T "$tc" \
             > "$tc.out" 2>&1 < /dev/null; then
         pass=$((pass+1))
     else
