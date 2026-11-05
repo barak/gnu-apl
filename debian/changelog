@@ -1,3 +1,18 @@
+gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
+
+  * New upstream snapshot of SVN trunk r3894, imported from upstream's
+    git mirror of SVN by new script debian/import-trunk, which removes
+    generated and built files, and the files listed in Files-Excluded in
+    debian/copyright
+  * Drop patches applied or otherwise fixed upstream: out-of-tree -Isql,
+    reconstructed texi files, missing includes, missing DiffOut.hh,
+    spelling, info dir entry, move integral.py, SOURCE_DATE_EPOCH date,
+    _Atomic_word on sparc64, QR const members, CDR and packed Boolean
+    byte order, ⎕RVAL byte order, socket constants (now ⎕FIO[62]), and
+    testcases from trunk
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
+
 gnu-apl (2.0-4) unstable; urgency=medium
 
   * Patch ⎕RVAL to build random floats independently of byte order;
