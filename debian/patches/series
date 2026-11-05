@@ -1,4 +1,4 @@
-0002-doc-info-html.patch
-0010-no-debian-subdir.patch
+0001-doc-info-html.patch
+0002-no-debian-subdir.patch
 0017-expand-libdir.patch
-0018-Quad_FIO-screen-size-no-tty.patch
+0004-Quad_FIO-screen-size-no-tty.patch

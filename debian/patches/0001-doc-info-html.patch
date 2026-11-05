@@ -2,33 +2,36 @@ From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
 Date: Sun, 7 Jun 2026 15:17:18 +0100
 Subject: generate HTML and info from texi in builddir doc/
 
-Replace the hand-rolled info install/uninstall targets and pre-built
-file approach with standard automake idioms.
+doc/Makefile.am and doc/DALY/Makefile.am do not build the info and
+HTML manuals: they leave info_TEXINFOS empty and install pre-built
+apl.info, libapl.info and apl-library.info from the source directory
+with hand-written install-info-am rules.  Their own rules for
+regenerating these files write into the source tree and, if makeinfo
+fails, silently "touch" an empty file instead.  The pre-built files
+are not in the imported source (see debian/import-trunk).
 
-Set info_TEXINFOS to the Texinfo source files (apl.texi, libapl.texi)
-so automake handles .info generation and installation automatically.
+Either keep shipping the pre-built manuals, or let automake build them
+from the Texinfo sources.  The latter is done here.
 
-Add makeinfo --html rules controlled by
-AM_MAKEINFOHTMLFLAGS=--no-split to produce single-file HTML output.
-
-Use nodist_doc_DATA for the generated HTML files so they are installed
-to $(docdir) but not distributed in source tarballs.  Move the PNG
-images to dist_doc_DATA.  Add CLEANFILES to remove all generated files
-on make clean.
-
-Add AM_INIT_AUTOMAKE info-in-builddir option so generated .info
-files are written to the build directory rather than the source tree.
+info_TEXINFOS lists apl.texi, libapl.texi and apl-library.texi, with
+the files apl-library.texi includes in apl_library_TEXINFOS, and the
+info-in-builddir option keeps the generated .info files out of the
+source tree.  makeinfo --html --no-split rules build the HTML versions,
+installed as dist_doc_DATA so that, like the info files, they are in
+the release tarball and building from it does not need makeinfo; they
+are removed by make maintainer-clean.  apl-info.css and apl.1, no
+longer in dist_doc_DATA, are distributed by EXTRA_DIST and
+dist_man1_MANS.  The Texinfo sources of Bill Daly's library documentation are no
+longer installed below $(pkglibdir).
 ---
  configure.ac         |  2 +-
  doc/DALY/Makefile.am | 45 +++++--------------------------------
  doc/Makefile.am      | 63 +++++++++++-----------------------------------------
  3 files changed, 20 insertions(+), 90 deletions(-)
 
-diff --git a/configure.ac b/configure.ac
-index 0856575..898176d 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -101,7 +101,7 @@ AC_USE_SYSTEM_EXTENSIONS
+@@ -101,7 +101,7 @@
  #
  # enable_dependency_tracking=no
  
@@ -37,11 +40,9 @@ index 0856575..898176d 100644
  AM_MAINTAINER_MODE([disable])
  AC_CONFIG_SRCDIR([src])
  AC_CONFIG_MACRO_DIR([m4])
-diff --git a/doc/DALY/Makefile.am b/doc/DALY/Makefile.am
-index a6787de..d86cbe8 100644
 --- a/doc/DALY/Makefile.am
 +++ b/doc/DALY/Makefile.am
-@@ -1,42 +1,9 @@
+@@ -1,54 +1,43 @@
 +info_TEXINFOS = apl-library.texi
 +MAKEINFOFLAGS = --no-split
  
@@ -49,6 +50,7 @@ index a6787de..d86cbe8 100644
 -                        apl-library.info        \
 -                        apl-library.texi        \
 -                        apl-pkg-mgr.texi        \
+-                        aparse.texi             \
 -                        arg_parser.texi         \
 -                        assert.texi             \
 -                        cfg.texi                \
@@ -63,13 +65,22 @@ index a6787de..d86cbe8 100644
 -                        import.texi             \
 -                        lex1.texi               \
 -                        lex.texi                \
--                        lpr.texi
-+apl-library.html: apl-library.texi
-+	$(MAKEINFO) --html $(MAKEINFOFLAGS) $<
- 
+-                        lpr.texi                \
+-                        pref.texi               \
+-                        prompt.texi             \
+-                        pw.texi                 \
+-                        seq.texi                \
+-                        stack.texi              \
+-                        stat.texi               \
+-                        utf8.texi               \
+-                        utl.texi                \
+-                        wblg.texi               \
+-                        wp.texi                 \
+-                        xml.texi
+-
 -doc_DALYdir = $(pkglibdir)/doc/DALY
 -
-- NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
+-# NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
 -# to be deleted on 'make clean' That is bad for people not having a
 -# $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
 -# install info stuff manually below.
@@ -87,24 +98,61 @@ index a6787de..d86cbe8 100644
 -	@       rm -f $(DESTDIR)$(infodir)/apl.info
 -	@echo " rm -f $(DESTDIR)$(infodir)/libapl.info"
 -	@       rm -f $(DESTDIR)$(infodir)/libapl.info
-+CLEANFILES = apl-library.html apl-library.info
++# included by apl-library.texi
++apl_library_TEXINFOS =	\
++	apl_kbd.texi	\
++	apl-pkg-mgr.texi	\
++	aparse.texi	\
++	arg_parser.texi	\
++	assert.texi	\
++	cfg.texi	\
++	cl.texi		\
++	date.texi	\
++	dom.texi	\
++	export.texi	\
++	fdl-1.3.texi	\
++	finance.texi	\
++	fmt.texi	\
++	html.texi	\
++	import.texi	\
++	lex1.texi	\
++	lex.texi	\
++	lpr.texi	\
++	pref.texi	\
++	prompt.texi	\
++	pw.texi		\
++	seq.texi	\
++	stack.texi	\
++	stat.texi	\
++	utf8.texi	\
++	utl.texi	\
++	wblg.texi	\
++	wp.texi		\
++	xml.texi
++
++apl-library.html: apl-library.texi $(apl_library_TEXINFOS)
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) -I $(srcdir) $<
++
++# distributed, like apl-library.info, so that building from a release
++# tarball does not need makeinfo
++MAINTAINERCLEANFILES = apl-library.html
  
-+nodist_doc_DATA = apl-library.html
-diff --git a/doc/Makefile.am b/doc/Makefile.am
-index 17b1639..14c2f5d 100644
++dist_doc_DATA = apl-library.html
 --- a/doc/Makefile.am
 +++ b/doc/Makefile.am
-@@ -7,59 +7,22 @@ SUBDIRS = DALY
- # $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
- # install info stuff manually below.
- #
+@@ -2,64 +2,25 @@
+ # Bill Daly's APL library
+ SUBDIRS = DALY
+ 
+-# NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
+-# to be deleted on 'make clean' That is bad for people not having a
+-# $MAKEINFOHTML installed. We therefore leave info_TEXINFOS empty and instead
+-# install info stuff manually below.
+-#
 -info_TEXINFOS = 
-+info_TEXINFOS = apl.texi libapl.texi
- 
- man1_MANS = apl.1
-+HTMLFILES = apl.html libapl.html
-+MAKEINFOFLAGS = --no-split
- 
+-
+-man1_MANS = apl.1
+-
 -# info_TEXINFOS = fails for more than one .info file. We therefore install
 -# libapl.info explicitly
 -#
@@ -124,17 +172,12 @@ index 17b1639..14c2f5d 100644
 -#
 -apl.html:   apl.texi apl-info.css
 -	@$(MAKEINFOHTML) $< -o $@ --no-split --css-include=apl-info.css || touch $@
-+apl.html: apl.texi apl-info.css
-+	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
-+libapl.html: libapl.texi apl-info.css
-+	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=apl-info.css $<
- 
+-
 -# apl.texi in info format
 -#
 -apl.info:   apl.texi
 -	@$(MAKEINFO) $< -o $@ --no-split || touch $@
-+CLEANFILES = $(HTMLFILES) apl.info libapl.info
- 
+-
 -# libapl.texi in HTML format
 -#
 -libapl.html: libapl.texi
@@ -161,9 +204,25 @@ index 17b1639..14c2f5d 100644
 -	PLOT_zigzag.png			\
 -    MX_distributions.png	\
 -	libapl.html
-+nodist_doc_DATA = $(HTMLFILES)
++info_TEXINFOS = apl.texi libapl.texi
  
++dist_man1_MANS = apl.1
++HTMLFILES = apl.html libapl.html
++MAKEINFOFLAGS = --no-split
++
++apl.html: apl.texi apl-info.css
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=$(srcdir)/apl-info.css $<
++libapl.html: libapl.texi apl-info.css
++	$(MAKEINFO) --html $(MAKEINFOFLAGS) --css-include=$(srcdir)/apl-info.css $<
++
++# the HTML manuals are distributed, like the info manuals, so that
++# building from a release tarball does not need makeinfo
++MAINTAINERCLEANFILES = $(HTMLFILES)
++
++EXTRA_DIST = apl-info.css
++
 +dist_doc_DATA =		\
++	$(HTMLFILES)	\
 +	PLOT_circle.png	\
 +	PLOT_zigzag.png	\
 +	MX_distributions.png

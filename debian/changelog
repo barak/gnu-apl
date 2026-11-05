@@ -10,6 +10,10 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
     _Atomic_word on sparc64, QR const members, CDR and packed Boolean
     byte order, ⎕RVAL byte order, socket constants (now ⎕FIO[62]), and
     testcases from trunk
+  * Forward-port the remaining patches, and rewrite their descriptions
+  * Distribute the HTML manuals, the stylesheet, the man page and the
+    files included by apl-library.texi in the doc/ patch, and build the
+    HTML manuals with the stylesheet from the source directory
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 

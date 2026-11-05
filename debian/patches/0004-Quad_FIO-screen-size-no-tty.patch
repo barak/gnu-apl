@@ -1,0 +1,41 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Tue, 3 Nov 2026 22:30:00 +0000
+Subject: ⎕FIO ¯8/¯9: do not return garbage when stdin is not a terminal
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+
+⎕FIO ¯8 (screen width) and ⎕FIO ¯9 (screen height) ignore the result
+of ioctl(TIOCGWINSZ), and return uninitialised stack contents when
+stdin is not a terminal, e.g. in a pipe, under cron, or in autopkgtest.
+This made the output of ZZ59_Regression.tc unpredictable.
+
+Zero-initialise the struct winsize, and make ⎕FIO ¯8 also fall back to
+⎕PW (as it already does for a width of 0) when ioctl() fails.  ⎕FIO ¯9
+then returns 0.
+
+Forwarded: no
+---
+--- a/src/Quad_FIO.cc
++++ b/src/Quad_FIO.cc
+@@ -3066,9 +3066,8 @@
+ {
+ NOT_MINGW(
+    {
+-     struct winsize ws;
+-     ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+-     if (ws.ws_col)
++     struct winsize ws = {};   // ⎕PW if stdin is not a terminal
++     if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col)
+         return Token(TOK_APL_VALUE1, IntScalar(ws.ws_col, LOC));
+    }
+ ) // NOT_MINGW
+@@ -3080,7 +3079,7 @@
+ {
+ NOT_MINGW(
+    {
+-     struct winsize ws;
++     struct winsize ws = {};   // 0 if stdin is not a terminal
+      ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+      return Token(TOK_APL_VALUE1, IntScalar(ws.ws_row, LOC));
+    }

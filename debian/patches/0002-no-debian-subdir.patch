@@ -2,11 +2,14 @@ From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
 Date: Sun, 1 Nov 2026 13:32:54 +0000
 Subject: do not configure debian/ subdirectory
 
-Upstream ships debian/Makefile.am and debian/source/Makefile.am so
-that its own debian/ directory is included in "make dist".  The Debian
-packaging replaces that directory, and a Makefile.am in debian/source/
-is a lintian error (unknown-file-in-debian-source), so stop treating
-debian/ as an automake subdirectory.
+configure.ac and Makefile.am treat debian/ as an automake subdirectory,
+so that upstream's own debian/ directory is included in "make dist".
+That directory is not in the imported source (see debian/import-trunk)
+and the Debian packaging replaces it, so automake fails with "required
+file 'debian/Makefile.in' not found".
+
+Drop debian/Makefile and debian/source/Makefile from AC_CONFIG_FILES
+and debian from DIST_SUBDIRS.
 
 Forwarded: not-needed
 ---
@@ -14,27 +17,23 @@ Forwarded: not-needed
  configure.ac | 2 --
  2 files changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 1f52aac..8af9802 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -7,7 +7,7 @@ APL_DIRS	= workspaces wslib3 wslib4 wslib5
+@@ -7,7 +7,7 @@
  SUBDIRS		= $(APL_DIRS)
- SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
+ SUBDIRS		+= build Claude doc erlang gnu-apl.d HOWTOs
  SUBDIRS		+= src support-files tools websock
 -DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 +DIST_SUBDIRS	= $(SUBDIRS) rpm
  
  dist_doc_DATA = 							\
  		README								\
-diff --git a/configure.ac b/configure.ac
-index 8a91ddb..6f4f4b6 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -489,8 +489,6 @@ m4_include([m4/apl_TARGETs.m4])
- 
+@@ -471,8 +471,6 @@
  AC_CONFIG_FILES([Makefile
                   build/Makefile
+                  Claude/Makefile
 -                 debian/Makefile
 -                 debian/source/Makefile
                   doc/Makefile
