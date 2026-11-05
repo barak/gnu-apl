@@ -24,6 +24,9 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
   * Patch configure to locate pkg-config with PKG_PROG_PKG_CONFIG, so
     that it finds the host's pkg-config when cross compiling
   * Install the new demo workspaces, bash completion and libapl.pc
+  * Do not install GNU_APL.ttf, a modified BQN386 font for the Windows
+    console; Debian's monospace fonts already cover the APL glyphs
+  * debian/copyright: add the Unlicense, for the font sources
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 

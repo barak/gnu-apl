@@ -1,0 +1,4 @@
+# GNU_APL.ttf is a modified BQN386 font made for the Windows console;
+# fonts belong in a separate fonts-* package.
+usr/share/fonts/truetype/apl/GNU_APL.ttf
+usr/share/fonts/truetype/apl/COPYRIGHT_NOTICE
