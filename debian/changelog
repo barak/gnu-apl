@@ -14,6 +14,10 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
   * Distribute the HTML manuals, the stylesheet, the man page and the
     files included by apl-library.texi in the doc/ patch, and build the
     HTML manuals with the stylesheet from the source directory
+  * Replace the patch expanding ${prefix} in configure by one passing the
+    installation directories to the compiler and into the preferences
+    file at make time; install the preferences file only once, and do not
+    distribute it
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 

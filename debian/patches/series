@@ -1,4 +1,4 @@
 0001-doc-info-html.patch
 0002-no-debian-subdir.patch
-0017-expand-libdir.patch
+0003-install-dirs-at-make-time.patch
 0004-Quad_FIO-screen-size-no-tty.patch
