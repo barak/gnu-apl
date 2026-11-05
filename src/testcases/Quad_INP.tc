@@ -1,6 +1,8 @@
 ⍝ Quad_INP.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ monadic ⎕INP
       ⍝
       Q←⎕INP 'END-OF-⎕INP'

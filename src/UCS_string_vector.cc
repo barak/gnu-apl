@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,14 +21,15 @@
 /** @file
 */
 
+#include <vector>
 #include "Avec.hh"
 #include "UCS_string_vector.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
 
-//----------------------------------------------------------------------------
-UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
+//════════════════════════════════════════════════════════════════════════════
+UCS_string_vector::UCS_string_vector(const cValue & val, bool surrogate)
 {
   // val is a simple text matrix with var_count rows and name_len columns.
   // Each row of val is one or two variable names.
@@ -43,7 +44,7 @@ const ShapeItem name_len = val.get_cols();
         UCS_string name;   // name of the (left) variable
         loop(n, name_len)
            {
-             const Unicode uni = val.get_cravel(start++).get_char_value();
+             const Unicode uni = val.get_char_value(start++);
 
              if (n == 0)   // first char of the variable name
                 {
@@ -87,7 +88,7 @@ const ShapeItem name_len = val.get_cols();
              // skip spaces from start and subsequent spaces
              //
              while (start < end &&
-                    val.get_cravel(start).get_char_value() == UNI_SPACE)
+                    val.get_char_value(start) == UNI_SPACE)
                    ++start;
 
 
@@ -102,12 +103,12 @@ const ShapeItem name_len = val.get_cols();
 
              // 'last' is true thus to_varnames() was called from ⎕SVO and
              // the line may contains two variable names.
-             // Return the second (i.e. surrogate name)
+             // Return the second (i.e. surrogate name). NOTE: do not
+             // clear 'surrogate' here, since it applies to all rows.
              //
-             surrogate = false;
              while (start < end)
                 {
-                  const Unicode uni = val.get_cravel(start++).get_char_value();
+                  const Unicode uni = val.get_char_value(start++);
                   if (Avec::is_symbol_char(uni))   // valid symbol char
                      {
                        name << uni;
@@ -127,87 +128,7 @@ const ShapeItem name_len = val.get_cols();
         push_back(name);
       }
 }
-//----------------------------------------------------------------------------
-void
-UCS_string_vector::compute_column_width(int tab_size,
-                                        std::vector<int> & result)
-{
-const int quad_PW = Workspace::get_PW();
-
-   result.clear();
-
-   if (size() < 2)
-      {
-        if (size())   result.push_back(front().size());
-        else          result.push_back(quad_PW);
-        return;
-      }
-
-   // compute block counts (one block having tab_size characters)
-   //
-const int max_blocks = (quad_PW + 1) / tab_size;
-std::vector<int> name_blocks;
-   loop(n, size())   name_blocks.push_back(1 + (1 + at(n).size()) / tab_size);
-
-   // compute max number of column blocks based on first line blocks
-   //
-int max_col = -1;
-   {
-     int blocks = 0;
-     loop(n, size())
-         {
-           if ((blocks + name_blocks[n]) < max_blocks)   // name_blocks[n] fits
-              blocks += name_blocks[n];
-           else                                          // max_blocks exceeded
-             {
-               max_col = n - 1;
-               break;
-             }
-         }
-
-     if (max_col == -1)   // all blocks fit
-        {
-          result.clear();
-          loop(n, size())   result.push_back(name_blocks[n]);
-          return;
-        }
-   }
-
-   // decrease max_col until all names fit...
-   //
-   for (;max_col > 1; --max_col)
-      {
-        result.clear();
-        int free_blocks = max_blocks;
-        loop(n, size())   // try to fit blocks into result
-            {
-              const int col_n = n % max_col;
-              const int bn = name_blocks[n];
-              if (n < max_col)   // first row: append column
-                 {
-                   free_blocks -= bn;
-                   if (free_blocks < 0)   break;
-                   result.push_back(bn);
-                 }
-              else if (bn > result[col_n])
-                 {
-                   free_blocks -= bn - result[col_n];
-                   if (free_blocks < 0)   break;
-                   result[col_n] = bn;
-                 }
-            }
-
-        if (free_blocks >= 0)   return;   // success
-      }
-
-   // single colums
-   //
-   result.clear();
-int max_nb = 0;
-   loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
-   result.push_back(max_nb);
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
@@ -224,7 +145,7 @@ ShapeItem ret = 0;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 std::ostream & 
 UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
 {
@@ -232,7 +153,8 @@ UCS_string_vector::print_table(std::ostream & out, size_t column_count) const
    /// starting at \b col
 
 const ShapeItem column_count1 = column_count - 1;
-ShapeItem * column_widths = ALLOCA(ShapeItem, column_count);
+std::vector<ShapeItem> column_widths_v(column_count);
+ShapeItem * column_widths = column_widths_v.data();
    loop(col, column_count)   column_widths[col] = max_width(col, column_count);
 
 const UCS_string frame(U"╔╤╗╚╧╝═║│");
@@ -287,4 +209,93 @@ const UCS_string frame(U"╔╤╗╚╧╝═║│");
 
    return out;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+void
+UCS_string_vector::compute_column_width(int tab_size,
+                                        std::vector<int> & result)
+{
+const int quad_PW = Workspace::get_PW();
+
+   result.clear();
+
+   if (size() < 2)
+      {
+        if (size())   result.push_back(front().size());
+        else          result.push_back(quad_PW);
+        return;
+      }
+
+   // compute block counts (one block having tab_size characters)
+   //
+const int max_blocks = (quad_PW + 1) / tab_size;
+std::vector<int> name_blocks;
+   loop(n, size())   name_blocks.push_back(1 + (1 + at(n).size()) / tab_size);
+
+   // compute max number of column blocks based on first line blocks
+   //
+int max_col = -1;
+bool overflowed = false;   // -1 was reused as both "not set" and a
+                           // genuinely computed "n-1" (== -1 when even
+                           // the very first name already overflows
+                           // max_blocks, n==0) -- indistinguishable, so
+                           // a single over-wide name took the "all
+                           // blocks fit" branch below instead of the
+                           // column-width-reduction path. Track it with
+                           // its own flag instead of overloading -1.
+   {
+     int blocks = 0;
+     loop(n, size())
+         {
+           if ((blocks + name_blocks[n]) < max_blocks)   // name_blocks[n] fits
+              blocks += name_blocks[n];
+           else                                          // max_blocks exceeded
+             {
+               max_col = n - 1;
+               overflowed = true;
+               break;
+             }
+         }
+
+     if (!overflowed)   // all blocks fit
+        {
+          result.clear();
+          loop(n, size())   result.push_back(name_blocks[n]);
+          return;
+        }
+   }
+
+   // decrease max_col until all names fit...
+   //
+   for (;max_col > 1; --max_col)
+      {
+        result.clear();
+        int free_blocks = max_blocks;
+        loop(n, size())   // try to fit blocks into result
+            {
+              const int col_n = n % max_col;
+              const int bn = name_blocks[n];
+              if (n < max_col)   // first row: append column
+                 {
+                   free_blocks -= bn;
+                   if (free_blocks < 0)   break;
+                   result.push_back(bn);
+                 }
+              else if (bn > result[col_n])
+                 {
+                   free_blocks -= bn - result[col_n];
+                   if (free_blocks < 0)   break;
+                   result[col_n] = bn;
+                 }
+            }
+
+        if (free_blocks >= 0)   return;   // success
+      }
+
+   // single colums
+   //
+   result.clear();
+int max_nb = 0;
+   loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
+   result.push_back(max_nb);
+}
+//════════════════════════════════════════════════════════════════════════════

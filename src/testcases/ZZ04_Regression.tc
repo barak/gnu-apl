@@ -1,6 +1,8 @@
 ⍝ ZZZ4_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ stale value in failed ⎕EA
 
       4 ⎕CR B←⍳10
@@ -15,6 +17,6 @@ OK      - no stale indices
 OK      - no duplicate parents
 
 
- '2+3' ⎕EA 'A←B)←2)'  ⍝ Causes a syntax error, print 5
+      '2+3' ⎕EA 'A←B)←2)'  ⍝ Causes a syntax error, print 5
 5
 

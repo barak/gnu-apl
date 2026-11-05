@@ -1,6 +1,8 @@
 ⍝ Quad_LC.tc vim: syntax=apl
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE G
 ∇ G
  'G LINE 1'
@@ -45,7 +47,7 @@ J:  6 5 3
 J LINE 7
 H LINE 6
 
-⍝ Suspended/halted function ----------------------------------
+      ⍝ Suspended/halted function ----------------------------------
 
 ∇J
 [6.1] ∘∘∘∘∘∘
@@ -62,29 +64,33 @@ H LINE 6
 [6]   'J: ',⎕LC
 [7]   ∘∘∘∘∘∘
 [8]   'J LINE 7'
-    ∇
+    ∇  ³
 
       )ERASE FACTR
 ∇Z←FACTR A
- Z←!A
+      Z←!A
 ∇
 
       FACTR ¯3
 DOMAIN ERROR
 FACTR[1]  Z←!A
-            ^^
+            ^
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕LC/⎕NL depend on the test harness
       ⎕LC
 1
 
+      ]FILE_CTL NO_SKIP
       FACTR ¯6
 DOMAIN ERROR
 FACTR[1]  Z←!A
-            ^^
+            ^
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕LC/⎕NL depend on the test harness
       ⎕LC
 1 1
 
+      ]FILE_CTL NO_SKIP
       G
 G LINE 1
 G:  2 1 1
@@ -100,11 +106,14 @@ J LINE 5
 J:  6 5 3 1 1
 SYNTAX ERROR+
 J[7]  ∘∘∘∘∘∘
-          ^^
+           ^
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕LC/⎕NL depend on the test harness
       ⎕LC
 7 5 3 1 1
 
+      )DROP Quad_LC
+³
       )WSID Quad_LC
 WAS ³
       )SAVE
@@ -112,32 +121,32 @@ WAS ³
 
       )SIS
 J[7]  ∘∘∘∘∘∘
-          ^^
+           ^
 H[5]  J
       ^
 G[3]  H
       ^
-⋆  G
+*  G
    ^
 FACTR[1]  Z←!A
-            ^^
-⋆  FACTR ¯6
+            ^
+*  FACTR ¯6
    ^
 FACTR[1]  Z←!A
-            ^^
-⋆  FACTR ¯3
+            ^
+*  FACTR ¯3
    ^
 
       →
       →
       →
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
-   )ERASE FACTR
-   )ERASE G
-   )ERASE H
-   )ERASE J
+      )ERASE FACTR
+      )ERASE G
+      )ERASE H
+      )ERASE J
 
-⍝ ==================================
+      ⍝ ==================================
 

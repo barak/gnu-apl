@@ -1,13 +1,19 @@
 ⍝ Quad_TS.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       ⎕TS
 ⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
 
+      ]FILE_CTL NO_SKIP
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       T1←⎕DL 0.01 ◊ T1←⎕TS
       T2←⎕DL 0.01 ◊ T2←⎕TS
       T3←⎕DL 0.01 ◊ T3←⎕TS
 
+      ]FILE_CTL NO_SKIP
       T1 = T2   ⍝ same day
 1 1 1 ⁰ ⁰ ⁰ ⁰
       (24 60 60 1000⊥¯4↑T1) < 24 60 60 1000⊥¯4↑T2
@@ -24,5 +30,5 @@
       T2 ≡ T3
 0
 
-⍝ ==================================
+      ⍝ ==================================
 

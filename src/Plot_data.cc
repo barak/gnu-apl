@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,37 +23,54 @@
 
 #include "Plot_data.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Color
 Plot_data::Color_from_str(const char * str, const char * & error)
 {
    error = 0;   // assume no error
 
 uint32_t r, g, b;
-   if (3 == sscanf(str, " %u %u %u", &r, &b, &g))
+   if (3 == sscanf(str, " %u %u %u", &r, &g, &b))
       return (r & 0xFF) << 16 | (g & 0xFF) << 8 | (b & 0xFF);
 
    if (const char * h = strchr(str, '#'))
       {
+        // '#' is located anywhere in str via strchr(), and the length
+        // checks below are relative to h -- but the digits used to be
+        // parsed from str + 1, which is only correct when '#' happens to
+        // be str[0]. For any attribute value where it is not (e.g.
+        // "color_level-50: x#FF8000"), strtoll() was handed a string
+        // starting with '#', parsed no digits, returned 0, and the
+        // colour was silently accepted as black instead of erroring
+        // (Blake McBride, Bugs16 #9). Parse from h + 1 instead, and use
+        // strtoll()'s endptr to detect exactly that "no digits consumed"
+        // case and report it instead of silently returning black.
+        //
+        char * end = 0;
         if (strlen(h) == 4)   // #RGB
            {
-             const int v = strtoll(str + 1, 0, 16);
+             const int v = strtoll(h + 1, &end, 16);
+             if (end == h + 1)   { error = "Bad color format"; return 0; }
              return (0x11*(v >> 8 & 0x0F)) << 16
                   | (0x11*(v >> 4 & 0x0F)) << 8
                   | (0x11*(v      & 0x0F)  << 0);
            }
         else if (strlen(h) == 7)   // #RRGGBB
            {
-             return strtoll(str + 1, 0, 16);
+             const Color v = strtoll(h + 1, &end, 16);
+             if (end == h + 1)   { error = "Bad color format"; return 0; }
+             return v;
            }
         else if (strlen(h) == 9)   // #xxRRGGBB
            {
-             return strtoll(str + 1, 0, 16);
+             const Color v = strtoll(h + 1, &end, 16);
+             if (end == h + 1)   { error = "Bad color format"; return 0; }
+             return v;
            }
       }
 
    error = "Bad color format";
    return 0;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

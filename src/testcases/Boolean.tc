@@ -1,6 +1,8 @@
 ⍝ Boolean.tc
 
       L←0 0 1 1
+⍝@ test3.
+
       R←0 1 0 1
 
       0 ∧ R
@@ -55,8 +57,8 @@
 0
 
 
-      ⍝ two complex numbers close to 1.
-      ⍝ They are equal because ⎕CT is scaled to 1*⎕CT
+      ⍝ two complex numbers near 1: equal because ⎕CT is scaled to the
+      ⍝ largest component (~1), making the imaginary difference (9E¯15) tolerant
       ⍝
       1J1E¯15 = 1J1E¯14
 1
@@ -72,6 +74,12 @@
       ⍝
       1E¯15 = 1E¯14
 0
+
+      ⍝ $XXXX hex-literal syntax below is a GNU APL extension real APL2
+      ⍝ can't even tokenize (unlike the ∧/∨ LCM/GCD case, a genuine
+      ⍝ syntax gap, not just a differing runtime domain/answer) -- see
+      ⍝ project_apl2_and_or_boolean_only.md
+      ]FILE_CTL SKIP_APL2
 
       ⍝ bitwise boolean
       ⍝

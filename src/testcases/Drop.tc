@@ -1,14 +1,16 @@
 ⍝ Drop.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
+⍝@ test3.
+
+      ⍝ ----------------------------------
 
       3↓12 31 45 10 57
 10 57
       ¯3↓12 31 45 10 57
 12 31
 
-⍝ nonscalar right argument ----------------------------------
+      ⍝ nonscalar right argument ----------------------------------
 
       A←3 5ρ'STRIPERODEPLANT'
       B←'STOREFIRSTMIGHTHATER'
@@ -63,7 +65,7 @@ h
       ρZ
 1 1 1
 
-⍝ dropping none ----------------------------------
+      ⍝ dropping none ----------------------------------
 
       0↓'INTACT'
 INTACT
@@ -72,7 +74,7 @@ INTACT
  8  9 10
 13 14 15
 
-⍝ overdrop ----------------------------------
+      ⍝ overdrop ----------------------------------
 
       W←5↓23 41 73 26
       ρW
@@ -86,7 +88,7 @@ INTACT
       ρM
 0 0
 
-⍝ scalar right argument ----------------------------------
+      ⍝ scalar right argument ----------------------------------
 
       J←0↓4
       J
@@ -99,7 +101,7 @@ INTACT
       ρK
 1 1 1
 
-⍝ effect on depth ----------------------------------
+      ⍝ effect on depth ----------------------------------
 
       D←'A' 'AN'('ANT' 'ANTE')
       D
@@ -121,7 +123,7 @@ A
       ≡T
 1
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
 
       U←'ABCDE'
@@ -140,3 +142,90 @@ IJKL
 A B C D
 1 2 3 H
 4 5 6 L
+
+      )ERASE U V
+
+      ⍝ regression (Blake McBride, Bugs31 #25): (1↓V)←B on a scalar V
+      ⍝ used to be SYNTAX ERROR ("mal-formed selective specification")
+      ⍝ instead of the empty-selection no-op it was before r2127 --
+      ⍝ identical in spirit to the still-working vector over-drop
+      ⍝ (5↓V)←9. Root cause: the scalar-drop branch of Bif_F12_DROP::
+      ⍝ eval_AB() copied B's own LvalCell into Z's prototype, then (for
+      ⍝ the empty, i.e. fully-dropped, case) called to_type(false),
+      ⍝ which rewrites that cell into a plain type-appropriate cell --
+      ⍝ but Z was still separately marked set_left_value(), so
+      ⍝ check_lval_consistency() (now called before assign_cellrefs()'s
+      ⍝ dest_count==0 early return, Bugs30 #29) correctly rejected the
+      ⍝ contradiction. Fixed by using an invalid/placeholder LvalCell(0,0)
+      ⍝ prototype instead of to_type(false) whenever B is itself a left
+      ⍝ value, matching the no-op pattern used elsewhere for "nothing
+      ⍝ real to select".
+      ⍝
+      V←5
+      (1↓V)←9
+      V
+5
+
+      V←5
+      (1↓V)←9 9
+      V
+5
+
+      V←5
+      (1↓V)←⍬
+      V
+5
+
+      V←5
+      (2↓V)←9
+      V
+5
+
+      V←5
+      (¯1↓V)←9
+      V
+5
+
+      ⍝ control: the vector over-drop no-op already worked
+      ⍝
+      V←5
+      (5↓V)←9
+      V
+5
+
+      )ERASE V
+
+      ⍝ regression (Blake McBride, Bugs28 #67, 2026-08-11): A↓[X]B with an
+      ⍝ empty X used to return B unchanged without even looking at A --
+      ⍝ its "no axes" shortcut ran before A was type- or length-checked
+      ⍝ against X, unlike A↑[X]B (Bif_F12_TAKE::eval_AXB), which checks
+      ⍝ first. So e.g. a wrongly-shaped or wrongly-typed A silently did
+      ⍝ nothing instead of failing with LENGTH ERROR like ↑ does.
+      ⍝
+      M←2 3⍴⍳6
+      2↓[⍬]M
+LENGTH ERROR+
+      2↓[⍬]M
+      ^^
+
+      'abc'↓[⍬]M
+LENGTH ERROR+
+      'abc'↓[⍬]M
+      ^    ^
+
+      ⍝ control: ↑ already got this right
+      ⍝
+      2↑[⍬]M
+LENGTH ERROR+
+      2↑[⍬]M
+      ^^
+
+      )SIC
+
+      ⍝ control: matching (empty) A and X still work
+      ⍝
+      ⍬↓[⍬]M
+1 2 3
+4 5 6
+
+      )ERASE M

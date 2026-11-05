@@ -21,8 +21,11 @@
 /** @file
 */
 
+#include "config.h"
+
 #include "Common.hh"
 #include "Command.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -114,12 +117,12 @@ enum {
    KEYPAD_rows = sizeof(KEYPAD_template) / sizeof(char *),
      };
 
-static_assert(MAIN_rows == KEYPAD_rows);
-static_assert(MAIN_rows == CURSOR_rows);
+static_assert(MAIN_rows == KEYPAD_rows, "MAIN_rows == KEYPAD_rows");
+static_assert(MAIN_rows == CURSOR_rows, "MAIN_rows == CURSOR_rows");
 
 Cmd_KEYB::map_item Cmd_KEYB::key_map[];
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_KEYB::cmd_KEYB(ostream & out, const UCS_string_vector & args)
 {
@@ -199,11 +202,7 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
                          ! (no_mode && UserPreferences::uprefs.no_xmodmap);
    if (do_xmodmap)
       {
-        // reset SIGCHLD to its default so that pclose() works as expected
-        //
-        signal(SIGCHLD, SIG_DFL);
         const bool xmodmap_error = parse_xmodmap();
-        signal(SIGCHLD, SIG_IGN);
 
         if (mode != MO_ALL)
            {
@@ -247,13 +246,14 @@ const bool do_xmodmap = (mode & MO_XMODMAP) &&
               UserPreferences::uprefs.keyboard_layout_file;
         if (filename.size())
            {
-             if (FILE * layout = fopen(filename.c_str(), "r"))
+             FileReader reader(filename.c_str());
+             if (+reader)
                 {
                   out << "User-defined Keyboard Layout.    Source: "
                       << filename << "\n";
                   for (;;)
                       {
-                         const int cc = fgetc(layout);
+                         const int cc = reader.fgetc();
                          if (cc == EOF)   break;
                          out << char(cc);
                       }
@@ -296,7 +296,7 @@ UTF8_string_vector utf(
    loop(u, utf.size())   out << utf[u] << endl << flush;
    out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap()
 {
@@ -323,8 +323,8 @@ Cmd_KEYB::parse_xmodmap()
       }
 
    errno = 0;
-FILE * xm = popen("xmodmap -pke", "r");
-   if (xm == 0)
+PipeReader reader("xmodmap -pke");
+   if (!reader)
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error starting xmodmap: "
                      << strerror(errno);
@@ -338,11 +338,11 @@ int bad_lines  = 0;
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         if (!fgets(buffer, BUFSIZE, xm))   break;
+         if (!reader.fgets(buffer, BUFSIZE))   break;
 
          buffer[BUFSIZE] = 0;
          ssize_t len = strlen(buffer);
-         if (buffer[len - 1] == '\n')   buffer[--len] = 0;
+         if (len && buffer[len - 1] == '\n')   buffer[--len] = 0;
          if (parse_xmodmap_line(buffer, line))   ++bad_lines;
          else                                    ++good_lines;
        }
@@ -351,7 +351,6 @@ int bad_lines  = 0;
       {
         // xmodmap was started, but then something went wrong.
         //
-        pclose(xm);
         return true;
       }
 
@@ -381,7 +380,7 @@ int bad_lines  = 0;
         }
    }
 
-   if (pclose(xm) && (errno != ECHILD))
+   if (reader.close())
       {
         MORE_ERROR() << "Command ]KEYB SCAN: Error running xmodmap: "
                      << strerror(errno);
@@ -413,7 +412,7 @@ int bad_lines  = 0;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap_line(const char * buffer, int line)
 {
@@ -475,7 +474,7 @@ int Ucount = 0;
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if HAVE_X11_XKBLIB_H
 
 bool
@@ -492,7 +491,7 @@ Cmd_KEYB::read_xkbd_map()
 
    return false;   // OK
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 Cmd_KEYB::read_xkbd_Ksym(_XDisplay * display, int keycode, int level)
 {
@@ -507,7 +506,7 @@ KeySym symbol = XkbKeycodeToKeysym(display, keycode, 0, level);
    if ((symbol & 0xFFFF0000) == 0x01000000)   return Unicode(symbol & 0xFFFF);
    return Unicode_0;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::read_xkbd_template(const char ** lines, int line_count)
 {
@@ -588,7 +587,7 @@ Cmd_KEYB::read_xkbd_map()
 }
 #endif   // do/don't HAVE_X11_XKBLIB_H
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_KEYB::parse_xmodmap_Unicode(Keycode keycode, const char * & p,
                                 uint32_t & unicode)
@@ -679,8 +678,10 @@ static const struct symkey
 { "brokenbar",      0x00A6 },
 { "section",        0x00A7 },
 { "diaeresis",      0x00A8 },
+{ "guillemetleft",  0x00AB },
 { "guillemotleft",  0x00AB },
 { "macron",         0x00AF },
+{ "guillemetright", 0x00BB },
 { "guillemotright", 0x00BB },
 { "Odiaeresis",     0x00D6 },
 { "multiply",       0x00D7 },
@@ -718,7 +719,7 @@ static const struct symkey
    while (*p > ' ')   ++p;
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::get_template(UCS_string_vector & result, KB_Area area)
 {
@@ -755,7 +756,7 @@ Cmd_KEYB::get_template(UCS_string_vector & result, KB_Area area)
              }
         }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Cmd_KEYB::print_keycodes(ostream & out, KB_Area area)
 {
@@ -769,7 +770,7 @@ UCS_string_vector lines;
    out << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Cmd_KEYB::print_keymap(ostream & out, KB_Area area)
 {
@@ -879,12 +880,12 @@ bool data_coming = false;
    for (int y = 0; y < rows; ++y)   out << lines[y] << endl;
    return out;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_KEYB::copy_text(Unicode & start, const char * text)
 {
 Unicode * p = &start;
    while (*text)   *p++ = Unicode(*text++);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // EOF

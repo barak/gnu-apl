@@ -27,10 +27,10 @@ partner dictates the role of the other:
 [options="header"]
 [width="60%"]
 |===============
-| GNU APL | Partner 
-| Client  | Server 
-| Server  | Client 
-| Peer    | Peer 
+| GNU APL | Partner
+| Client  | Server
+| Server  | Client
+| Peer    | Peer
 |===============
 
 If GNU APL is the client or a peer in a communication then the communication
@@ -62,13 +62,13 @@ Role
 | Notes
 
 | libapl
-| Server 
+| Server
 | -
 | low
 | -
 
 | Shared Variables +
-(Workspace-to-Workspace) 
+(Workspace-to-Workspace)
 | Peer
 | ⎕SVC ⎕SVO ⎕SVQ +
   ⎕SVR ⎕SVS
@@ -86,7 +86,7 @@ Role
   not to be used in new programs
 
 | SQL Interface
-| Client 
+| Client
 | ⎕SQL
 | low
 | Server is PostgreSQL or SQLite
@@ -205,7 +205,7 @@ for workspace-to-workspace shared variables in the directory
 The GNU APL implementation of shared variables is a separate process running
 the program *APserver* (which comes with GNU APL). APserver currently
 implements only AP100 and AP210, but the source code of APserver is open, so
-that a user can add more APs. Is seems, however, that most of the APs that
+that a user can add more APs. It seems, however, that most of the APs that
 were not implemented have been superseded by more modern interfaces (most
 of which are sub-functions of ⎕FIO) that are easier to use than shared
 variables.
@@ -426,7 +426,7 @@ line 170 of the test case file).
 
 If the capabilities provided by sockets are still not enough, then one
 can get complete control by means of GNU APL native functions. A native
-function is a function that can be called from APL (and returns results back
+function is a function that can be called from APL and returns results back
 to APL, but has an implementation in a different language (typically C or
 Cpp).
 
@@ -438,7 +438,7 @@ First of all, preparation of a dynamic library that contains implementations
 for those function signatures that the native function shall support. For
 example, suppose a function FOO shall support the 3 signatures
 
- - dyadic function call, i.e. *Z←A FOO B*, 
+ - dyadic function call, i.e. *Z←A FOO B*,
  - monadic function call, i.e. *Z←FOO B*, and
  - monadic function with axis call, i.e. *Z←FOO[X] B*.
 
@@ -452,8 +452,8 @@ the dynamic library, with:
       'FOO.so' ⎕FX 'FOO'
 ----
 
-That makes the 3 signatures implemented *FOO.so* available in APL (for the
-same signatures). 
+That makes the 3 signatures implemented in *FOO.so* available in APL (for the
+same signatures).
 
 *Note:* Native functions were not primarily intended for communication purposes.
 But since they import the full power of C/Cpp into GNU APL they are a last
@@ -493,7 +493,7 @@ the APL application, and GNU APL provides a few system functions that can
 be used to *frame* (read: encode) an item at the sender side into a sequence
 of bytes, and to *de-frame* (read: decode) the received byte stream back into
 the item that was sent at the receiver side. The *frame* and *de-frame*
-functions cooperate in such a way that;
+functions cooperate in such a way that:
 
 ----
       item ≡ decode encode item
@@ -533,7 +533,7 @@ while its inverse function *¯33 ⎕CR* (or *34 ⎕CR*) converts a TLV back to
 === Lines terminated by line feeds
 
 Many programs, in particular operating system commands, write their output
-line-by-line to their *stdout*. If these programs are started from APL with 
+line-by-line to their *stdout*. If these programs are started from APL with
 *Handle←24 ⎕FIO[24] Bs* (aka. popen(Bs, "r") then the handle returned to APL
 is a stream of lines that are terminated by line feeds (ASCII 10 or *\n*).
 The first step in the processing of such a stream in APL is usually to split

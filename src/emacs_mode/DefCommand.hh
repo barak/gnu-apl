@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "def" network command: define one or more functions/variables from
+/// a block of lines sent by the client, via ⎕FX
 class DefCommand : public NetworkCommand {
 public:
+    /// constructor
     DefCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,36 +30,43 @@
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// a pipe to a process running python
 class PythonPipe
 {
 public:
+   /// @param script path to the python script to launch
    PythonPipe(const char * script);
    ~PythonPipe()   { close(); }
 
    /// read one line from python
+   /// @param keep_LF true to retain the trailing newline character
    UCS_string read(bool keep_LF = false);
 
    /// write to python
+   /// @param cmd command string to send
+   /// @param no_LF true to suppress appending a newline
    void write(UTF8_string cmd, bool no_LF = false);
 
    /// write one line and get one line back
+   /// @param cmd command string to send to python
    UCS_string wr_rd(const char * cmd);
 
 protected:
    /// close the connection to python
    void close();
 
-   /// name of the python script
-   const char * python_script;
+   /// socket to the python process
+   int fd;
 
    /// PID of the python process
    pid_t pid;
 
-   /// socket to the python process
-   int fd;
+   /// name of the python script
+   const char * python_script;
 
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PYTHONPIPE_HH_DEFINED__
 // EOF

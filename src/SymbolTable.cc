@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "Function.hh"
 #include "IndexExpr.hh"
 #include "IntCell.hh"
+#include "Macro.hh"
 #include "Output.hh"
 #include "PrintOperator.hh"
 #include "Symbol.hh"
@@ -41,7 +42,7 @@
 
 #include "Workspace.icc"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Symbol *
 SymbolTable::lookup_symbol(const UCS_string & sym_name)
 {
@@ -50,6 +51,42 @@ SymbolTable::lookup_symbol(const UCS_string & sym_name)
       {
         CERR << "Symbol is: '" << sym_name << "' at " << LOC << endl;
         FIXME;
+      }
+
+   // μN (N a decimal integer): one of Macro::mue_symbols' fixed
+   // pre-created argument/local-var symbols (see Macro::Macro_arg_num)
+   // rather than an ordinary user-creatable name -- return the existing
+   // Symbol * directly, no hash-table walk and no create-if-missing,
+   // since Macro::init() already created all of them upfront. Guarded by
+   // Macro::mue_ready: init() itself looks up these same names (through
+   // this very function, via Workspace::lookup_symbol()) while still
+   // filling mue_symbols in, and must fall through to the ordinary path
+   // below exactly as before this feature existed, or it would read back
+   // the not-yet-assigned slot it is in the middle of writing.
+   //
+   // μ¯N (negative, the former macro-name range) is deliberately NOT
+   // special-cased here anymore: no macro body contains "μ¯N" text since
+   // every macro's own header name became plain Macro.def-local text
+   // (see Macro_arg_num's comment in Macro.hh), and mue_symbols no
+   // longer even has a slot for it (see Macro::mue_symbols and
+   // Macro::init()). A stray "μ¯N" lookup instead falls through to the
+   // ordinary path below, which safely creates an ordinary new Symbol
+   // on demand like any other never-before-seen name.
+   //
+   if (Macro::mue_ready && sym_name.size() >= 2 && sym_name[0] == UNI_MUE
+       && sym_name[1] != UNI_OVERBAR)
+      {
+        ShapeItem p = 1;
+        if (p < sym_name.ssize() && Avec::is_digit(sym_name[p]))
+           {
+             int32_t N = 0;
+             while (p < sym_name.ssize() && Avec::is_digit(sym_name[p]))
+                   N = 10*N + (sym_name[p++] - UNI_0);
+
+             if (p == sym_name.ssize() &&   // the whole name was μdigits
+                 N >= 1 && N <= Macro::MARG_COUNT)
+                return Macro::mue_symbols[N];
+           }
       }
 
 const uint32_t hash = compute_hash(sym_name);
@@ -88,7 +125,7 @@ Symbol * sym = new Symbol(sym_name, ID_USER_SYMBOL);
    add_symbol(sym);
    return sym;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 SymbolTable::find_lambda_name(const UserFunction * lambda)
 {
@@ -97,6 +134,19 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
          for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
                if (sym->is_erased())   continue;
+
+               // skip macros' own internal parameter symbols (μ1, μ2, ...
+               // -- same convention as list()'s "hide macros" above). A
+               // lambda passed as an operand to a macro-implemented
+               // operator (e.g. {...}¨B, EACH) is invoked from inside the
+               // macro's own body via such a symbol, which would
+               // otherwise win here and show up as e.g. "μ3[1]" in error
+               // messages / )SI instead of the lambda's own λN identity
+               // -- an internal implementation detail leaking into
+               // user-visible output. See Bugs27 #56.
+               //
+               if (sym->get_name()[0] == UNI_MUE)   continue;
+
                if (sym->get_exec_ufun_depth(lambda) != -1)
                   return sym->get_name();
              }
@@ -104,34 +154,7 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
 
    return UCS_string();
 }
-//----------------------------------------------------------------------------
-ostream &
-SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
-{
-UCS_string buf(buf1);
-   buf.remove_leading_and_trailing_whitespaces();
-   if (buf1.size() == 1)   switch(buf1[0])
-      {
-        case UNI_ALPHA:  return Workspace::get_v_ALPHA().print_verbose(out);
-        case UNI_ALPHA_UNDERBAR:
-                         return Workspace::get_v_ALPHA_U().print_verbose(out);
-        case UNI_OMEGA:  return Workspace::get_v_OMEGA().print_verbose(out);
-        case UNI_CHI:    return Workspace::get_v_CHI().print_verbose(out);
-        case UNI_OMEGA_UNDERBAR:
-                         return Workspace::get_v_OMEGA_U().print_verbose(out);
-        case UNI_LAMBDA: return Workspace::get_v_LAMBDA().print_verbose(out);
-        default:         break;
-      }
-
-const Symbol * sym = Workspace::lookup_existing_symbol(buf);
-
-   if (sym)   return sym->print_verbose(out);
-
-   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
-
-   return out << "no symbol '" << buf1 << "'" << endl;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SymbolTable::list(ostream & out, ListCategory which, UCS_string from_to) const
 {
@@ -239,7 +262,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SymbolTable::unmark_all_values() const
 {
@@ -251,7 +274,7 @@ SymbolTable::unmark_all_values() const
              }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 SymbolTable::show_owners(ostream & out, const Value & value) const
 {
@@ -265,19 +288,48 @@ int count = 0;
        }
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
+SymbolTable::clear(ostream & out)
 {
-   loop(s, SYMBOL_HASH_TABLE_SIZE)
+   // SymbolTable::clear() should only be called after Workspace::clear_SI()
+   //
+   Assert(Workspace::SI_entry_count() == 0);
+
+   loop(hash, max_symbol_count)   clear_slot(out, hash);
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+SymbolTable::clear_slot(ostream & out, int hash)
+{
+Symbol * sym = symbol_table[hash];
+   if (sym == 0)   return;   // no symbol with this hash
+
+   symbol_table[hash] = 0;
+
+Symbol * next;   // the symbol after sym
+   for (; sym; sym = next)
        {
-         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
-             {
-               sym->write_OUT(out, seq);
-             }
+         next = sym->next;
+
+         // keep system-defined symbols, and the μ and name symbols of the
+         // macros (which live as long as the interpreter): a suspended
+         // macro frame still uses them, e.g. Workspace::is_bound_as_operand()
+         //
+         if (sym->is_user_defined() && sym->get_name()[0] != UNI_MUE &&
+             !Macro::is_macro_name(sym))
+            {
+              sym->call_monitor_callback(SEV_ERASED);
+              delete sym;
+            }
+         else
+            {
+              sym->next = symbol_table[hash];
+              symbol_table[hash] = sym;
+            }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
 {
@@ -294,45 +346,112 @@ size_t error_count = 0;
 
    if (error_count)   out << endl;
 }
-//----------------------------------------------------------------------------
-void
-SymbolTable::clear(ostream & out)
+//────────────────────────────────────────────────────────────────────────────
+ostream &
+SymbolTable::list_symbol(ostream & out, const UCS_string & buf1) const
 {
-   // SymbolTable::clear() should only be called after Workspace::clear_SI()
-   //
-   Assert(Workspace::SI_entry_count() == 0);
+UCS_string buf(buf1);
+   buf.remove_leading_and_trailing_whitespaces();
+   if (buf1.size() == 1)   switch(buf1[0])
+      {
+        case UNI_ALPHA:  return Workspace::get_v_ALPHA().print_verbose(out);
+        case UNI_ALPHA_UNDERBAR:
+                         return Workspace::get_v_ALPHA_U().print_verbose(out);
+        case UNI_OMEGA:  return Workspace::get_v_OMEGA().print_verbose(out);
+        case UNI_CHI:    return Workspace::get_v_CHI().print_verbose(out);
+        case UNI_OMEGA_UNDERBAR:
+                         return Workspace::get_v_OMEGA_U().print_verbose(out);
+        case UNI_LAMBDA: return Workspace::get_v_LAMBDA().print_verbose(out);
+        default:         break;
+      }
 
-   loop(hash, max_symbol_count)   clear_slot(out, hash);
+const Symbol * sym = Workspace::lookup_existing_symbol(buf);
+
+   if (sym)   return sym->print_verbose(out);
+
+   if (buf1[0] == UNI_Quad_Quad)   return out << "System Function" << endl;
+
+   return out << "no symbol '" << buf1 << "'" << endl;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
-SymbolTable::clear_slot(ostream & out, int hash)
+SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 {
-Symbol * sym = symbol_table[hash];
-   if (sym == 0)   return;   // no symbol with this hash
-
-   symbol_table[hash] = 0;
-
-Symbol * next;   // the symbol after sym
-   for (; sym; sym = next)
+   loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
-         next = sym->next;
-
-         // keep system-defined symbols
-         //
-         if (sym->is_user_defined() && sym->get_name()[0] != UNI_MUE)
-            {
-              sym->call_monitor_callback(SEV_ERASED);
-              delete sym;
-            }
-         else
-            {
-              sym->next = symbol_table[hash];
-              symbol_table[hash] = sym;
-            }
+         for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
+             {
+               sym->write_OUT(out, seq);
+             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+std::vector<const Symbol *>
+SymbolTable::get_all_symbols() const
+{
+std::vector<const Symbol *> ret;
+   ret.reserve(1000);
+
+   loop(hash, SYMBOL_HASH_TABLE_SIZE)
+      {
+        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              ret.push_back(sym);
+            }
+      }
+
+   return ret;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
+{
+std::vector<const Symbol *> symbols;
+   loop(hash, SYMBOL_HASH_TABLE_SIZE)
+      {
+        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
+            {
+              if (sym->is_erased())              continue;
+              if (sym->value_stack_size() < 1)   continue;
+              symbols.push_back(sym);
+            }
+      }
+
+   // sort symbols by name
+   //
+   loop(d, symbols.size())
+      {
+        for (ShapeItem j = d + 1; j < ShapeItem(symbols.size()); ++j)
+            {
+              if (symbols[d]->get_name().compare(symbols[j]->get_name()) > 0)
+                 {
+                   const Symbol * ss = symbols[d];
+                   symbols[d] = symbols[j];
+                   symbols[j] = ss;
+                 }
+            }
+      }
+
+   // pass 1: defined functions and operators
+   //
+   loop(s, symbols.size())
+      {
+        const Symbol & sym = *symbols[s];
+        const ValueStackItem & vs = sym[0];
+         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
+         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
+      }
+
+   // pass 2: variables
+   //
+   loop(s, symbols.size())
+      {
+        const Symbol & sym = *symbols[s];
+        const ValueStackItem & vs = sym[0];
+        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 SymbolTable::erase_one_symbol(const UCS_string & sym)
 {
@@ -430,73 +549,7 @@ ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
     Assert(0 && "Bad name_class in SymbolTable::erase_one_symbol()");
    return true;
 }
-//----------------------------------------------------------------------------
-std::vector<const Symbol *>
-SymbolTable::get_all_symbols() const
-{
-std::vector<const Symbol *> ret;
-   ret.reserve(1000);
-
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)
-      {
-        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
-            {
-              ret.push_back(sym);
-            }
-      }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-void
-SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
-{
-std::vector<const Symbol *> symbols;
-   loop(hash, SYMBOL_HASH_TABLE_SIZE)
-      {
-        for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
-            {
-              if (sym->is_erased())              continue;
-              if (sym->value_stack_size() < 1)   continue;
-              symbols.push_back(sym);
-            }
-      }
-
-   // sort symbols by name
-   //
-   loop(d, symbols.size())
-      {
-        for (ShapeItem j = d + 1; j < ShapeItem(symbols.size()); ++j)
-            {
-              if (symbols[d]->get_name().compare(symbols[j]->get_name()) > 0)
-                 {
-                   const Symbol * ss = symbols[d];
-                   symbols[d] = symbols[j];
-                   symbols[j] = ss;
-                 }
-            }
-      }
-
-   // pass 1: defined functions and operators
-   //
-   loop(s, symbols.size())
-      {
-        const Symbol & sym = *symbols[s];
-        const ValueStackItem & vs = sym[0];
-         if      (vs.get_NC() == NC_FUNCTION)   { ++fcount;   sym.dump(out); }
-         else if (vs.get_NC() == NC_OPERATOR)   { ++fcount;   sym.dump(out); }
-      }
-
-   // pass 2: variables
-   //
-   loop(s, symbols.size())
-      {
-        const Symbol & sym = *symbols[s];
-        const ValueStackItem & vs = sym[0];
-        if (vs.get_NC() == NC_VARIABLE)   { ++vcount;   sym.dump(out); }
-      }
-}
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 SystemSymTab::clear(ostream & out)
 {
@@ -506,7 +559,7 @@ SystemSymTab::clear(ostream & out)
 
    loop(hash, max_symbol_count)   clear_slot(out, hash);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SystemSymTab::clear_slot(ostream & out, int hash)
 {
@@ -523,7 +576,7 @@ SystemName * sym = symbol_table[hash];
          sym = next;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
                        QuadFunction * function, SystemVariable * variable)
@@ -539,4 +592,4 @@ SystemName * dist_name = new SystemName(name, id, function, variable);
    add_symbol(dist_name);
    if (max_name_len < name.ssize())   max_name_len = name.size();
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

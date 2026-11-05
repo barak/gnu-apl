@@ -1,6 +1,8 @@
 ⍝ Interval.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕IO←1
       ι6
 1 2 3 4 5 6
@@ -9,7 +11,7 @@
       ι6
 0 1 2 3 4 5
 
-⍝ zero argument----------------------------------
+      ⍝ zero argument----------------------------------
 
       Z←ι0
       Z
@@ -17,7 +19,7 @@
       ρZ
 0
 
-⍝ artihmetic progressions ----------------------------------
+      ⍝ artihmetic progressions ----------------------------------
 
       ⎕IO←0
       ι5
@@ -34,7 +36,7 @@
       ⍝ Regression
       ⍝
       ⍳¯1
-DOMAIN ERROR
+DOMAIN ERROR+
       ⍳¯1
       ^
 

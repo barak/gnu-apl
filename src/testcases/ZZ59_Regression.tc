@@ -1,13 +1,15 @@
 ⍝ ZZ59_Regression.tc
 ⍝ ══════════════════
 
+⍝@ test3.
+
       ⍝ bug-apl@gnu.org, 5/27/2023 (Christian Rober) ...
 
       )CLEAR
 CLEAR WS
 
 ∇z←alpha
- z←,⎕ucs 65+(0 32)∘.+⎕io-⍨⍳26
+z←,⎕ucs 65+(0 32)∘.+⎕io-⍨⍳26
 ∇
 
 ∇df;names;func;lambda;⎕pw;t;sort_order

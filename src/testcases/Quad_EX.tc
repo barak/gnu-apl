@@ -1,6 +1,8 @@
 ⍝ Quad_EX.tc
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
+⍝@ test3.
+
 
       RUNS←3
       ⎕EX 'RUNS'
@@ -31,7 +33,7 @@ HITS
       ⎕EX 3 4ρ'HITSRUNSERRS'
 1 1 1
 
-⍝ system variable ----------------------------------
+      ⍝ system variable ----------------------------------
 
        ⎕IO
 1
@@ -42,7 +44,7 @@ HITS
        ⎕IO
 1
 
-⍝ suspended function ----------------------------------
+      ⍝ suspended function ----------------------------------
 
       )SIS
 
@@ -60,32 +62,32 @@ SQUARE[1]  Z←R⋆2
       )SIS
 SQUARE[1]  Z←R⋆2
              ^^
-⋆  SQUARE T
+*  SQUARE T
    ^
 
       ⎕EX 'SQUARE'
-1
+0
 
 
       )SIS
 SQUARE[1]  Z←R⋆2
              ^^
-⋆  SQUARE T
+*  SQUARE T
    ^
 
       SQUARE 5
-VALUE ERROR+
+25
       SQUARE 5
-             ^
+25
 
       R←5
       →⎕LC
 25
 
       SQUARE 5
-VALUE ERROR+
+25
       SQUARE 5
-             ^
+25
 
       →
 
@@ -94,12 +96,56 @@ VALUE ERROR+
       ⎕ex 5 5 ⍴ '3 3   '
 0 0 0 0 0
 
-      ⍝ SQUARE is expected to be stale
+      ⍝ SQUARE is still suspended on )SI, so ⎕EX 'SQUARE' above refused
+      ⍝ (Bugs27 #58) and left it bound -- nothing is stale.
+      ⍝
             )CHECK
-WARNING - 1 stale functions (erased)
+OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ Bugs28 #48 regression: ⎕EX of a NESTED vector of names (e.g.
+      ⍝ ⎕EX 'ZZ48XX' 'ZZ48YY', two multi-character names -- unlike
+      ⍝ single-CHARACTER names, which strand-collapse into one simple
+      ⍝ flat vector and never exercise this code path at all) flattened
+      ⍝ the nested value into a single garbage name via
+      ⍝ UCS_string_vector's get_char_value() calls on PointerCell
+      ⍝ items, always returning the scalar 1 (or misreading pointer
+      ⍝ bytes as a bogus Unicode code point) regardless of how many
+      ⍝ names B actually held, and expunging nothing. Fixed in
+      ⍝ QuadFunction.cc's new quad_EX_NC_names(): detect nesting and,
+      ⍝ if present, disclose one name per top-level item (fully, not
+      ⍝ just one level -- ⊂⊂'ABCDE' nests TWICE, since the first ⊂ of
+      ⍝ a genuine (non-scalar) vector isn't a no-op the way ⊂⊂'X' is
+      ⍝ for a single-CHARACTER 'X') instead of flattening B outright.
+      ⍝
+      ZZ48XX←1 ⋄ ZZ48YY←2
+      ⎕NC 'ZZ48XX' 'ZZ48YY'
+2 2
+
+      ⎕EX 'ZZ48XX' 'ZZ48YY'
+1 1
+
+      ⎕NC 'ZZ48XX' 'ZZ48YY'
+0 0
+
+      ⍝ control: a scalar B (however deeply self-enclosed) still gives
+      ⍝ a scalar result
+      ⍝
+      ZZ48X←9
+      ⎕EX ⊂⊂'ZZ48X'
+1
+
+      ⎕NC 'ZZ48X'
+0
+
+      ⍝ regression (Bugs28 #88): same fix as ⎕NC (see Quad_NC.tc) -- a
+      ⍝ 0-row character matrix B used to give ⎕EX a scalar Z with its
+      ⍝ one cell never written, instead of a 0-element vector.
+      ⍝
+      ⍴⎕EX 0 3⍴'A'
+0
+
+      ⍝ ==================================
 

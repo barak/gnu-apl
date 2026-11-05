@@ -1,0 +1,19 @@
+⍝ RavelAxis.tc
+⍝ ════════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: X simple scalar fraction or integer; implicit ⎕IO
+      ⍝ inv: ⍴⍴Z ←→ 1+⍴⍴B  (rank increases by 1 with fractional X)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ,[0.5]B                             ⍝ laminate along new first axis
+      (⍴⍴Z) ≡ 1+⍴⍴B
+1
+      ⍝ inv: ,B ←→ ,[⍳⍴⍴B]B   (ravel all axes = ravel)
+      (,B) ≡ ,[⍳⍴⍴B]B
+1
+      ⍝ inv: ,[⍳0]B ←→ ,[2.5]B  (ravel no axes = add new last axis)
+      (,[⍳0]B) ≡ ,[2.5]B
+1

@@ -1,7 +1,9 @@
 ⍝ Quad_RE.tc
 ⍝ ----------------------------------
 
-]NEXTFILE not-⎕RE   ⍝ done if ⎕RE is not available
+⍝@ test3.
+
+      ]NEXTFILE no-⎕RE   ⍝ done if ⎕RE is not available
 
 ⍝ simple match (no axis = first/string)
 ⍝
@@ -31,7 +33,7 @@
 4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━┓
 ┃2 3┃
-┗━━━┛
+┗∼━━┛
 
 ⍝ simple match (all/pos+len result)
 ⍝
@@ -39,7 +41,7 @@
 ┏→━━━━━━━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→━━┓ ┏→━━━┓┃
 ┃┃2 3┃ ┃8 3┃ ┃15 3┃┃
-┃┗━━━┛ ┗━━━┛ ┗━━━━┛┃
+┃┗∼━━┛ ┗∼━━┛ ┗∼━━━┛┃
 ┗ϵ━━━━━━━━━━━━━━━━━┛
 
 ⍝ simple match (first/partition result)
@@ -47,28 +49,28 @@
 4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⍝ simple match (multiple/partition result)
 ⍝
 4 ⎕CR 'f..' ⎕RE['⊂g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 2 2 2 0 0 0 0 3 3 3┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⍝ simple match (first/compress result)
 ⍝
 4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⍝ simple match (compress)
 ⍝
 4 ⎕CR 'f..' ⎕RE['/g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 ⍝ ==================================
 
@@ -98,7 +100,7 @@
 ┏→━━━━━━━━━━━━━━┓
 ┃2 3 ┏→━━┓ ┏→━━┓┃
 ┃    ┃3 1┃ ┃4 1┃┃
-┃    ┗━━━┛ ┗━━━┛┃
+┃    ┗∼━━┛ ┗∼━━┛┃
 ┗ϵ━━━━━━━━━━━━━━┛
 
 ⍝ complex match (all/pos+len result)
@@ -108,7 +110,51 @@
 ┃┏→━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━━━┓┃
 ┃┃2 3 ┏→━━┓ ┏→━━┓┃ ┃8 3 ┏→━━┓ ┏→━━━┓┃ ┃15 3 ┏→━━━┓ ┏→━━━┓┃┃
 ┃┃    ┃3 1┃ ┃4 1┃┃ ┃    ┃9 1┃ ┃10 1┃┃ ┃     ┃16 1┃ ┃17 1┃┃┃
-┃┃    ┗━━━┛ ┗━━━┛┃ ┃    ┗━━━┛ ┗━━━━┛┃ ┃     ┗━━━━┛ ┗━━━━┛┃┃
+┃┃    ┗∼━━┛ ┗∼━━┛┃ ┃    ┗∼━━┛ ┗∼━━━┛┃ ┃     ┗∼━━━┛ ┗∼━━━┛┃┃
 ┃┗ϵ━━━━━━━━━━━━━━┛ ┗ϵ━━━━━━━━━━━━━━━┛ ┗ϵ━━━━━━━━━━━━━━━━━┛┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ regression (Blake McBride, Bugs28 #72, 2026-08-11): a genuine PCRE
+      ⍝ runtime error (e.g. the match limit being exceeded on a
+      ⍝ pathological pattern) was reported to the caller exactly like an
+      ⍝ ordinary "no match" -- an empty result, no way to tell the two
+      ⍝ apart -- instead of raising DOMAIN ERROR with the libpcre error
+      ⍝ text. Fixed in RegexpMatch::RegexpMatch() (Regexp.cc):
+      ⍝ PCRE2_ERROR_NOMATCH is still silently ⍬ (that one really is "no
+      ⍝ match", not an error), but any OTHER negative match_result now
+      ⍝ raises DOMAIN ERROR instead of falling through to the same
+      ⍝ empty-result path.
+      ⍝
+      '(a+)+$' ⎕RE 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'
+DOMAIN ERROR+
+      '(a+)+$' ⎕RE 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'
+      ^        ^
+      )MORE
+libpcre error: match limit exceeded
+      )SIC
+
+      ⍝ control: a genuine (non-error) non-match is still silently ⍬
+      ⍝
+      'xyz' ⎕RE 'abc'
+
+      )MORE
+NO )MORE ERROR INFO
+
+      ⍝ regression (Bugs28 #98): A ⎕RE['g'] B was quadratic in the
+      ⍝ number of matches -- the pattern is compiled with PCRE2_UTF, so
+      ⍝ pcre2_match() re-validated the UTF-32 encoding of the *entire*
+      ⍝ subject on every single call unless told not to, on top of a
+      ⍝ result-accumulation loop that also rebuilt/copied the growing
+      ⍝ result on every doubling. Both fixed (RegexpMatch now passes
+      ⍝ PCRE2_NO_UTF_CHECK once the first call has already validated
+      ⍝ the subject, and Quad_RE::regex_results() collects matches in a
+      ⍝ plain std::vector instead); this checks correctness (result
+      ⍝ count and content) over enough matches to exercise the
+      ⍝ multi-match accumulation path, not timing.
+      ⍝
+      ≢'a' ⎕RE['g'] 500⍴'a'
+500
+
+      ∧/'a'=∊'a' ⎕RE['g'] 500⍴'a'
+1
 

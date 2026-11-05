@@ -1,0 +1,308 @@
+⍝ FORMAT_PARENS.tc
+⍝ ----------------------------------
+
+⍝ the display of nested values with STRICT_IBM_APL2_FORMATTING parentheses:
+⍝ nested items in (multi-line) parentheses instead of blanks.
+⍝ Run with: apl --id 1010 --strict_IBM_APL2_formatting parentheses -T ...
+⍝ (make testPARENS)
+
+
+      ⍝ one-line nested items: ( ) instead of the nesting blanks
+      ⍝
+
+      (1 2) 3
+(1 2) 3
+
+
+
+
+
+      (1 2) (1 2)
+(1 2) (1 2)
+
+
+
+
+
+      'AB' 'CD' 'EF'
+(AB) (CD) (EF)
+
+
+
+
+
+      'AB' (1 2) 'EF'
+(AB) (1 2) (EF)
+
+
+
+
+
+      'ONE' 1111 22 'TWO'
+(ONE) 1111 22 (TWO)
+
+
+
+
+
+      ⊂1 2
+(1 2)
+
+
+
+
+
+      (⊂1 2) 3
+((1 2)) 3
+
+
+
+
+
+      (⊂⊂1 2) 3
+(((1 2))) 3
+
+
+
+
+
+      1 (2 (3 (4 5)))
+1 (2 (3 (4 5)))
+
+
+
+
+
+      ⍝ multi-line nested items: ⎛ ⎜ ⎝ and ⎞ ⎟ ⎠, no blank lines between rows
+      ⍝
+
+      A←2 2⍴⍳4
+
+
+
+
+
+      A A
+⎛1 2⎞ ⎛1 2⎞
+⎝3 4⎠ ⎝3 4⎠
+
+
+
+
+
+      (2 3⍴'ABCDEF') 'GH'
+⎛ABC⎞ (GH)
+⎝DEF⎠     
+
+
+
+
+
+      ⊂3 1⍴⍳3
+⎛1⎞
+⎜2⎟
+⎝3⎠
+
+
+
+
+
+      ⍪(1 2) (2 2⍴⍳4) (3 1⍴⍳3)
+(1 2)
+⎛1 2⎞
+⎝3 4⎠
+⎛1⎞
+⎜2⎟
+⎝3⎠
+
+
+
+
+
+      2 2⍴(1 2) 'x' A 5
+(1 2) x
+⎛1 2⎞ 5
+⎝3 4⎠  
+
+
+
+
+
+      ⊂⊂A
+⎛⎛1 2⎞⎞
+⎝⎝3 4⎠⎠
+
+
+
+
+
+      1 (2 2⍴(1 2) 3 4 (5 6))
+1 ⎛(1 2)     3⎞
+  ⎝    4 (5 6)⎠
+
+
+
+
+
+      ⊂2 2 2⍴⍳8
+⎛1 2⎞
+⎜3 4⎟
+⎜   ⎟
+⎜5 6⎟
+⎝7 8⎠
+
+
+
+
+
+      B←4 4⍴⍳16 ◊ B[2;2]←⊂3 3⍴⎕CC 3 ◊ B
+ 1     2  3  4
+ 5 ⎛abc⎞  7  8
+   ⎜def⎟      
+   ⎝ghi⎠      
+ 9    10 11 12
+13    14 15 16
+
+
+
+
+
+      ⍝ empty items: parentheses around one row of prototype blanks
+      ⍝
+
+      1 ⍬ 2
+1 () 2
+
+
+
+
+
+      'AB' '' 'CD'
+(AB) () (CD)
+
+
+
+
+
+      1 (0 3⍴0) 2
+1 (     ) 2
+
+
+
+
+
+      1 (3 0⍴0) 2
+1 () 2
+
+
+
+
+
+      ⊂⍬
+()
+
+
+
+
+
+      ⍝ simple values and the column rules are not affected
+      ⍝
+
+      1 2 3
+1 2 3
+
+
+
+
+
+      2 2⍴⍳4
+1 2
+3 4
+
+
+
+
+
+      'ABC'
+ABC
+
+
+
+
+
+      ⎕PP←5
+
+
+
+
+
+      3 1⍴600 (⊂1 2) 4.2E¯9
+    600
+((1 2))
+ 4.2E¯9
+
+
+
+
+
+      3 1⍴600 'A' 0.25
+600
+     A
+  0.25
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ monadic ⍕ gives the same characters
+      ⍝
+
+      ⍕(1 2) 3
+(1 2) 3
+
+
+
+
+
+      ⍴⍕(1 2) 3
+7
+
+
+
+
+
+      ⍕A A
+⎛1 2⎞ ⎛1 2⎞
+⎝3 4⎠ ⎝3 4⎠
+
+
+
+
+
+      ⍴⍕A A
+2 11
+
+
+
+
+
+      ⍝ boxed displays keep their frames
+      ⍝
+
+      4 ⎕CR (1 2) 3
+┏→━━━━━━┓
+┃┏→━━┓ 3┃
+┃┃1 2┃  ┃
+┃┗∼━━┛  ┃
+┗ϵ━━━━━━┛
+
+
+
+
+

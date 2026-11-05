@@ -1,9 +1,14 @@
 ⍝ Branch.tc
 ⍝ ----------------------------------
 
-      ⍝ monadic → as expression (GNU APL extension).
+⍝@ test3.
+
+      ⍝ monadic →B (standard APL)
+      ⍝ dyadic A→B (GNU APL extension)
+
+      ⍝ monadic → as expression
       ⍝
-)ERASE FOO
+      )ERASE FOO
 
 ∇FOO
  N←4
@@ -56,8 +61,247 @@ DONE
 3
 ∇
 
-FOO
+      FOO
 1
 2
 3
+
+      ⍝ → and A→B: simple coverage of every variant (monadic/dyadic,
+      ⍝ literal/label) in every context (defined function, lambda,
+      ⍝ immediate execution, ⍎). Each candidate line prints its own
+      ⍝ ⎕LC so a branch landing on the wrong line shows up immediately
+      ⍝ as a wrong number, rather than needing to be inferred from a
+      ⍝ side effect.
+      ⍝
+
+      ⍝ dyadic, literal A: relative to the current line, as always
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ 2→1
+ ⎕←⎕LC
+ ⎕←⎕LC
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+4
+5
+
+      ⍝ dyadic, A a direct label reference: absolute, jumps to LAB's
+      ⍝ own line
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ TARGET→1
+ ⎕←⎕LC
+ ⎕←⎕LC
+TARGET: ⎕←⎕LC
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+5
+6
+
+      ⍝ a label's value laundered through a variable is no longer a
+      ⍝ direct label reference, so it stays relative (not absolute) --
+      ⍝ X→1 here is 5 (TARGET's line) relative to line 3, i.e. line 8:
+      ⍝ TARGET's own line (5) is never reached.
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ X←TARGET
+ X→1
+ ⎕←⎕LC
+TARGET: ⎕←⎕LC
+ ⎕←⎕LC
+ ⎕←⎕LC
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+8
+
+      ⍝ dyadic, out-of-range target: a DOMAIN ERROR, unlike monadic →N
+      ⍝ (below) -- A→B's relative offset silently points somewhere
+      ⍝ different every time a line is added or removed between the
+      ⍝ branch and its intended target, so staying quiet about it (as
+      ⍝ plain →N does, by returning) would hide exactly the kind of
+      ⍝ mistake that's hardest to catch after the fact.
+      ⍝
+      )ERASE FOO
+∇R←FOO
+ R←0
+ 100→1
+ R←R+10
+∇
+
+      FOO
+DOMAIN ERROR+
+FOO[2]  100→1
+        ^  ^
+
+      ⍝ monadic, out-of-range target: still just returns, unaffected --
+      ⍝ →0/→N is the standard, deliberate "return" idiom and must stay
+      ⍝ backward compatible; only dyadic A→B gets the stricter check
+      ⍝ above.
+      ⍝
+      )SIC
+      )ERASE FOO
+∇R←FOO
+ R←0
+ →1000
+ R←R+10
+∇
+
+      FOO
+0
+
+      ⍝ monadic, bare → as a lambda statement: still not allowed
+      ⍝ (unaffected by any of the above -- only the dyadic form is
+      ⍝ supported inside a lambda)
+      ⍝
+      { →1 }
+DEFN ERROR+
+
+      ⍝ dyadic A→B with A=0 (the "retry this statement" idiom) still
+      ⍝ works from inside a defined function
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ N←3
+ ⍎'0→0<N←N-1'
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+4
+
+      ⍝ dyadic A→B with nonzero A, evaluated via ⍎ from inside a defined
+      ⍝ function: A is relative to the line CONTAINING the ⍎ call (line
+      ⍝ 2 here), exactly as if A→B had been written directly on that
+      ⍝ line -- found by walking up the )SI to the nearest enclosing
+      ⍝ real function (this used to be an unconditional SYNTAX ERROR,
+      ⍝ and, before that, silently computed the wrong target line)
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ ⍎'2→1'
+ ⎕←⎕LC
+ ⎕←⎕LC
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+4
+5
+
+      ⍝ same, but A a direct label reference: absolute, same as writing
+      ⍝ TARGET→1 directly on the ⍎'d line
+      ⍝
+      )ERASE FOO
+∇FOO
+ ⎕←⎕LC
+ ⍎'TARGET→1'
+ ⎕←⎕LC
+TARGET: ⎕←⎕LC
+ ⎕←⎕LC
+∇
+
+      FOO
+1
+4
+5
+
+      ⍝ out-of-range A→B via ⍎ is a DOMAIN ERROR too, same as writing
+      ⍝ A→B directly -- unaffected by being evaluated indirectly via ⍎
+      ⍝
+      )SIC
+      )ERASE FOO
+∇R←FOO
+ R←0
+ ⍎'100→1'
+ R←R+10
+∇
+
+      FOO
+DOMAIN ERROR+
+      100→1
+      ^  ^
+
+      ⍝ dyadic A→B with nonzero A, jumping between ⋄-separated
+      ⍝ statements inside a lambda: also a clean DOMAIN ERROR (a
+      ⍝ lambda has no real multi-line structure of its own for a
+      ⍝ cross-statement jump to land in -- this used to crash the
+      ⍝ interpreter outright instead of erroring)
+      ⍝
+      )SIC
+      { ⎕←⎕LC ⋄ 2→1 ⋄ ⎕←⎕LC }
+1
+DOMAIN ERROR+
+λ1[1]  2→1
+       ^^
+
+      ⍝ same two ⍎ A→B cases again, but at top-level immediate
+      ⍝ execution (no enclosing function at all) -- A=0 still works,
+      ⍝ nonzero A is still a SYNTAX ERROR
+      ⍝
+      )SIC
+      N←3
+      ⍎'0→0<N←⎕←N-1'
+2
+1
+0
+      ⍎'2→1'
+SYNTAX ERROR+
+      2→1
+      ^ ^
+
+      ⍝ Bugs28 #13 regression: a branch introduced into a lambda at run
+      ⍝ time by ⍎ (impossible to write literally -- {→0} is rejected at
+      ⍝ fix time already) used to end the whole session -- either an
+      ⍝ internal "should never be called" reduce/FIXME, or a dangling
+      ⍝ TOK_SI_PUSHED left in the caller once the lambda's own )SI level
+      ⍝ was popped without ever supplying it a result. Both are now a
+      ⍝ clean VALUE ERROR (the lambda has no result), the same as the
+      ⍝ statement gives in immediate execution (Bugs37 #46), and the
+      ⍝ session stays usable.
+      ⍝
+      ⎕EC '{⍎''→0''}1'
+ 0  3 1  VALUE ERROR+                                        
+               {⍎'→0'}1                                      
+                ^                                            
+         No assignment to result variable Z in e.g. ∇Z←... ? 
+
+      ⎕EC '{⍎''→2''}1'
+ 0  3 1  VALUE ERROR+                                        
+               {⍎'→2'}1                                      
+                ^                                            
+         No assignment to result variable Z in e.g. ∇Z←... ? 
+
+      ⎕FX 'Z←FBR B' 'Z←⍎''→0'''
+FBR
+
+      FBR 1
+
+      ⍝ the )SI stays usable afterward
+      ⍝
+      )ERASE FBR
+
+      )SIC
+      )ERASE FOO
+      )ERASE N
+      )ERASE X
+      )CHECK BRIEF
 

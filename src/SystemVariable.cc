@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <sys/resource.h>   // for ⎕WA
 #include <sys/time.h>
 
 // FreeBSD 8.x lacks utmpx.h
@@ -32,6 +31,7 @@
 #endif
 
 #include "Bif_F12_FORMAT.hh"
+#include "Bif_F1_EXECUTE.hh"
 #include "CDR.hh"
 #include "CharCell.hh"
 #include "Command.hh"
@@ -56,14 +56,33 @@
 
 UCS_string Quad_QUOTE::buffer;
 
-ShapeItem Quad_SYL::si_depth_limit = 0;
+// Bugs28 #6: a shipped default of 0 (no limit) means runaway recursion
+// (e.g. L←{L ⍵} ⋄ L 1) only stops via std::bad_alloc once memory is
+// already exhausted (around 1.2 million SI frames observed) -- and the
+// bad_alloc recovery path (Workspace::immediate_execution()) itself
+// needs to allocate to report WS FULL, so with that many frames still
+// held it typically throws bad_alloc again, ending in std::terminate
+// or a corrupted heap rather than a clean WS FULL. A generous but
+// bounded default lets the already-reliable LIMIT_ERROR_SIDEPTH check
+// in Workspace::push_SI() stop the recursion at a normal (non-OOM)
+// depth instead, well before memory pressure is even a concern for any
+// realistic recursive program; users needing deeper recursion can still
+// raise or clear ⎕SYL[1;2] explicitly.
+ShapeItem Quad_SYL::si_depth_limit = 100000;
 ShapeItem Quad_SYL::value_count_limit = 0;
 ShapeItem Quad_SYL::ravel_count_limit = 0;
 ShapeItem Quad_SYL::print_length_limit = 0;
+ShapeItem Quad_SYL::pack_min_length = cfg_PACKED_MINIMUM_LENGTH_WANTED;
 
 Unicode Quad_AV::qav[Avec::MAX_AV];
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+ostream &
+SystemVariable::print(ostream & out) const
+{
+   return out << get_Id();
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 SystemVariable::assign(Value_P B, bool clone, const char * loc)
 {
@@ -71,21 +90,18 @@ SystemVariable::assign(Value_P B, bool clone, const char * loc)
         << get_Id() << endl;
    FIXME;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-SystemVariable::assign_indexed(const Value * X, Value_P B)
+SystemVariable::assign_indexed(const cValue * X, Value_P B)
 {
-   CERR << "SystemVariable::assign_indexed() not (yet) implemented for "
-        << get_Id() << endl;
-   FIXME;
+   // Every system variable reaching this base-class fallback (i.e. not
+   // overriding assign_indexed() itself) is a scalar, so indexed
+   // assignment is always invalid the same way X[1]←10 is for an
+   // ordinary scalar variable X.
+   //
+   RANK_ERROR;
 }
-//----------------------------------------------------------------------------
-ostream &
-SystemVariable::print(ostream & out) const
-{
-   return out << get_Id();
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 SystemVariable::get_attributes(int mode, Value & Z) const
 {
@@ -117,8 +133,8 @@ SystemVariable::get_attributes(int mode, Value & Z) const
         case 4: {
                   Value_P val = get_apl_value();
                   const CDR_type cdr_type = val->get_CDR_type();
-                  const int brutto = val->total_CDR_size_brutto(cdr_type);
-                  const int data = val->CDR_data_size(cdr_type);
+                  const ShapeItem brutto = val->total_CDR_size_brutto(cdr_type);
+                  const ShapeItem data = val->CDR_data_size(cdr_type);
 
                   Z.next_ravel_Int(brutto);
                   Z.next_ravel_Int(data);
@@ -129,7 +145,56 @@ SystemVariable::get_attributes(int mode, Value & Z) const
       }
 
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+Quad_AI::Quad_AI()
+   : RO_SystemVariable(ID_Quad_AI),
+     session_start(now()),
+     user_wait(0)
+{
+   Symbol::assign(get_apl_value(), false, LOC);
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Quad_AI::get_apl_value() const
+{
+const int total_ms = (now() - session_start)/1000;
+const int user_ms  = user_wait/1000;
+
+Value_P Z(5, LOC);
+   Z->next_ravel_Int(ProcessorID::get_own_ID());
+   Z->next_ravel_Int(total_ms - user_ms);
+   Z->next_ravel_Int(total_ms);
+   Z->next_ravel_Int(user_ms);
+   Z->next_ravel_Int(Command::get_APL_expression_count());
+
+   Z->check_value(LOC);
+   return Z;
+}
+//════════════════════════════════════════════════════════════════════════════
+Quad_ARG::Quad_ARG()
+   : RO_SystemVariable(ID_Quad_ARG)
+{
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Quad_ARG::get_apl_value() const
+{
+const ShapeItem argc = UserPreferences::uprefs.expanded_args.size();
+
+Value_P Z(argc, LOC);
+   loop(a, argc)
+      {
+        const char * arg = UserPreferences::uprefs.expanded_args[a];
+        UTF8_string utf(arg);
+        UCS_string ucs(utf);
+        Value_P sub(ucs, LOC);
+        Z->next_ravel_Pointer(sub.get());
+      }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//════════════════════════════════════════════════════════════════════════════
 Quad_AV::Quad_AV()
    : RO_SystemVariable(ID_Quad_AV)
 {
@@ -155,69 +220,20 @@ Value_P AV(Avec::MAX_AV, LOC);
 
    Symbol::assign(AV, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 Quad_AV::indexed_at(uint32_t pos)
 {
    if (pos < Avec::MAX_AV)   return qav[pos];
    return UNI_AV_MAX;
 }
-//============================================================================
-Quad_AI::Quad_AI()
-   : RO_SystemVariable(ID_Quad_AI),
-     session_start(now()),
-     user_wait(0)
-{
-   Symbol::assign(get_apl_value(), false, LOC);
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_AI::get_apl_value() const
-{
-const int total_ms = (now() - session_start)/1000;
-const int user_ms  = user_wait/1000;
-
-Value_P Z(5, LOC);
-   Z->next_ravel_Int(ProcessorID::get_own_ID());
-   Z->next_ravel_Int(total_ms - user_ms);
-   Z->next_ravel_Int(total_ms);
-   Z->next_ravel_Int(user_ms);
-   Z->next_ravel_Int(Command::get_APL_expression_count());
-
-   Z->check_value(LOC);
-   return Z;
-}
-//============================================================================
-Quad_ARG::Quad_ARG()
-   : RO_SystemVariable(ID_Quad_ARG)
-{
-}
-//----------------------------------------------------------------------------
-Value_P
-Quad_ARG::get_apl_value() const
-{
-const ShapeItem argc = UserPreferences::uprefs.expanded_args.size();
-
-Value_P Z(argc, LOC);
-   loop(a, argc)
-      {
-        const char * arg = UserPreferences::uprefs.expanded_args[a];
-        UTF8_string utf(arg);
-        UCS_string ucs(utf);
-        Value_P sub(ucs, LOC);
-        Z->next_ravel_Pointer(sub.get());
-      }
-
-   Z->check_value(LOC);
-   return Z;
-}
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_CT::Quad_CT()
    : SystemVariable(ID_Quad_CT)
 {
    Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_CT::assign(Value_P B, bool clone, const char * loc)
 {
@@ -227,7 +243,8 @@ Quad_CT::assign(Value_P B, bool clone, const char * loc)
         else                         LENGTH_ERROR;
       }
 
-const Cell & cell = B->get_cfirst();
+Cell cache;
+const Cell & cell = B->get_cfirst(cache);
    if (!cell.is_numeric())             DOMAIN_ERROR;
    if (cell.get_imag_value() != 0.0)   DOMAIN_ERROR;
 
@@ -246,7 +263,7 @@ APL_Float val = cell.get_real_value();
         Symbol::assign(B, clone, LOC);
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_EM::get_apl_value() const
 {
@@ -282,7 +299,7 @@ Value_P Z(pb, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_ET::get_apl_value() const
 {
@@ -309,13 +326,13 @@ done:
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_FC::Quad_FC() : SystemVariable(ID_Quad_FC)
 {
 Value_P Z(6, LOC);
    Z->next_ravel_Char(UNI_FULLSTOP);
    Z->next_ravel_Char(UNI_COMMA);
-   Z->next_ravel_Char(UNI_STAR_OPERATOR);
+   Z->next_ravel_Char(UNI_ASTERISK);
    Z->next_ravel_Char(UNI_0);
    Z->next_ravel_Char(UNI_UNDERSCORE);
    Z->next_ravel_Char(UNI_OVERBAR);
@@ -323,7 +340,7 @@ Value_P Z(6, LOC);
 
    Symbol::assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FC::push()
 {
@@ -332,7 +349,7 @@ Quad_FC::push()
 Value_P QFC(6, LOC);
    QFC->next_ravel_Char(UNI_FULLSTOP);
    QFC->next_ravel_Char(UNI_COMMA);
-   QFC->next_ravel_Char(UNI_STAR_OPERATOR);
+   QFC->next_ravel_Char(UNI_ASTERISK);
    QFC->next_ravel_Char(UNI_0);
    QFC->next_ravel_Char(UNI_UNDERSCORE);
    QFC->next_ravel_Char(UNI_OVERBAR);
@@ -340,7 +357,7 @@ Value_P QFC(6, LOC);
 
    Symbol::assign(QFC, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_FC::assign(Value_P B, bool clone, const char * loc)
 {
@@ -350,15 +367,15 @@ ShapeItem value_len = B->element_count();
    if (value_len > 6)   value_len = 6;
 
    loop(c, value_len)
-       if (!B->get_cravel(c).is_character_cell())   DOMAIN_ERROR;
+       if (!B->is_character_cell(c))   DOMAIN_ERROR;
 
    // new value is correct. 
    //
-Unicode fc[6] = { UNI_FULLSTOP, UNI_COMMA,      UNI_STAR_OPERATOR,
+Unicode fc[6] = { UNI_FULLSTOP, UNI_COMMA,      UNI_ASTERISK,
                   UNI_0,        UNI_UNDERSCORE, UNI_OVERBAR };
 
    loop(c, 6)   if (c < value_len)
-         fc[c] = B->get_cravel(c).get_char_value();
+         fc[c] = B->get_char_value(c);
 
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
    //
@@ -369,23 +386,14 @@ UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
    Symbol::assign(new_val, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Quad_FC::assign_indexed(const IndexExpr & IX, Value_P B)
+Quad_FC::assign_indexed(const cValue * X, Value_P B)
 {
-   if (!IX.is_axis())   INDEX_ERROR;
+   // X is 0 for the elided-index form ⎕FC[]←B, which is a whole-value
+   // assignment (same as ⎕FC←B), not an indexed one.
+   if (X == 0)   { assign(B, true, LOC);   return; }
 
-   // at this point we have a one dimensional index. It it were non-empty,
-   // then assign_indexed(Value) would have been called instead. Therefore
-   // IX must be an elided index (like in ⎕FC[] ← B)
-   //
-   Assert1(!IX.values[0]);
-   assign(B, true, LOC);   // ⎕FC[]←value
-}
-//----------------------------------------------------------------------------
-void
-Quad_FC::assign_indexed(const Value * X, Value_P B)
-{
    // we don't do scalar extension but require indices to match the value.
    //
 ShapeItem ec = X->element_count();
@@ -399,16 +407,20 @@ const APL_Integer qio = Workspace::get_IO();
 Unicode fc[6];
    {
      Value_P old = get_apl_value();
-     loop(e, 6)   fc[e] = old->get_cravel(e).get_char_value();
+     loop(e, 6)   fc[e] = old->get_char_value(e);
    }
 
    loop(e, ec)
       {
-        const APL_Integer idx = X->get_cravel(e).get_near_int() - qio;
-        if (idx < 0)   continue;
-        if (idx > 5)   continue;
+        const APL_Integer idx = X->get_near_int(e) - qio;
+        // an out-of-range index used to be silently ignored here, unlike
+        // a REFERENCE to the same index (⎕FC[7], say), which already
+        // correctly gives INDEX ERROR -- an assignment must be at least
+        // as strict as a read (Blake McBride, Bugs28 #73).
+        //
+        if (idx < 0 || idx > 5)   INDEX_ERROR;
 
-        fc[idx] = B->get_cravel(e).get_char_value();
+        fc[idx] = B->get_char_value(e);
       }
 
    // 0123456789,. are forbidden for ⎕FC[4 + ⎕IO]
@@ -420,13 +432,26 @@ UCS_string ucs(fc, 6);
 Value_P new_val(ucs, LOC);
    Symbol::assign(new_val, false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+void
+Quad_FC::assign_indexed(const IndexExpr & IX, Value_P B)
+{
+   if (!IX.is_axis())   INDEX_ERROR;
+
+   // at this point we have a one dimensional index. It it were non-empty,
+   // then assign_indexed(Value) would have been called instead. Therefore
+   // IX must be an elided index (like in ⎕FC[] ← B)
+   //
+   Assert1(!IX.values[0]);
+   assign(B, true, LOC);   // ⎕FC[]←value
+}
+//════════════════════════════════════════════════════════════════════════════
 Quad_IO::Quad_IO()
    : SystemVariable(ID_Quad_IO)
 {
    Symbol::assign(IntScalar(1, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_IO::assign(Value_P B, bool clone, const char * loc)
 {
@@ -436,18 +461,18 @@ Quad_IO::assign(Value_P B, bool clone, const char * loc)
         else                         LENGTH_ERROR;
       }
 
-   if (B->get_cfirst().get_near_bool())
+   if (B->get_near_bool(0))
       Symbol::assign(IntScalar(1, LOC), false, LOC);
    else
       Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_L::Quad_L()
  : NL_SystemVariable(ID_Quad_L)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_L::assign(Value_P B, bool clone, const char * loc)
 {
@@ -460,7 +485,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_L(B);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_L::get_apl_value() const
 {
@@ -485,13 +510,13 @@ Quad_L::get_apl_value() const
    MORE_ERROR() << "⎕L: no )SI line with a matching error";
    VALUE_ERROR;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_LC::Quad_LC()
    : RO_SystemVariable(ID_Quad_LC)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_LC::get_apl_value() const
 {
@@ -517,13 +542,13 @@ Value_P Z(len, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_LX::Quad_LX()
    : NL_SystemVariable(ID_Quad_LX)
 {
    Symbol::assign(Str0(LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_LX::assign(Value_P B, bool clone, const char * loc)
 {
@@ -532,30 +557,68 @@ Quad_LX::assign(Value_P B, bool clone, const char * loc)
 
    Symbol::assign(B, clone, LOC);
 }
-//============================================================================
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_LX::assign_indexed(const cValue * X, Value_P B)
+{
+   // X is 0 for the elided-index form ⎕LX[]←B, which is a whole-value
+   // assignment (same as ⎕LX←B), not an indexed one.
+   if (X == 0)   { assign(B, true, LOC);   return; }
+
+   if (!B->is_char_string())   DOMAIN_ERROR;
+
+   // we don't do scalar extension but require indices to match the value.
+   //
+const ShapeItem ec = X->element_count();
+   if (ec != B->element_count())   INDEX_ERROR;
+
+const APL_Integer qio = Workspace::get_IO();
+Value_P old = get_apl_value();
+const ShapeItem len = old->element_count();
+UCS_string lx(*old);
+
+   loop(e, ec)
+      {
+        const APL_Integer idx = X->get_near_int(e) - qio;
+        // Bugs28 #100(a): ⎕LX[idx]←B was silently ignored (empty inline
+        // body); an out-of-range idx must be rejected just like it is
+        // for a plain reference (⎕LX[idx]), matching the ⎕FC/⎕PS/⎕SYL
+        // indexed-assignment fixes above (Bugs28 #73 et al).
+        //
+        if (idx < 0 || idx >= len)   INDEX_ERROR;
+
+        lx[idx] = B->get_char_value(e);
+      }
+
+Value_P new_val(lx, LOC);
+   Symbol::assign(new_val, false, LOC);
+}
+//════════════════════════════════════════════════════════════════════════════
 Quad_PP::Quad_PP()
    : SystemVariable(ID_Quad_PP)
 {
 Value_P Qpp = IntScalar(DEFAULT_Quad_PP, LOC);
    Symbol::assign(Qpp, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PP::assign(Value_P B, bool clone, const char * loc)
 {
+// a scalar or a one-item vector, like ⎕IO and ⎕CT (Bugs37 #78)
+   if (B->get_rank() > 1)   RANK_ERROR;
 APL_Integer pp = B->get_sole_integer();
    if (pp < MIN_Quad_PP)   DOMAIN_ERROR;
    if (pp > MAX_Quad_PP)   pp = MAX_Quad_PP;
 
    Symbol::assign(IntScalar(pp, LOC), false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_PR::Quad_PR()
    : SystemVariable(ID_Quad_PR)
 {
    Symbol::assign(CharScalar(UNI_SPACE, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PR::assign(Value_P B, bool clone, const char * loc)
 {
@@ -565,10 +628,13 @@ UCS_string ucs = B->get_UCS_ravel();
 
    Symbol::assign(B, clone, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+// ⎕PS is a session variable that survives )CLEAR and )LOAD (both items:
+// ⎕PS[2] lives in Command::boxing_format, ⎕PS[1] here). Bugs37 #60.
+bool Quad_PS::print_quotients = false;
+
 Quad_PS::Quad_PS()
    : SystemVariable(ID_Quad_PS),
-     print_quotients(false),
      style(Command::boxing_format)
 {
 Value_P Z(2, LOC);
@@ -577,7 +643,7 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    Symbol::assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PS::assign(Value_P B, bool clone, const char * loc)
 {
@@ -589,22 +655,24 @@ APL_Integer B_style = 0;
    if (B->element_count() < 1)   LENGTH_ERROR;
    if (B->element_count() > 2)   LENGTH_ERROR;
 
-   if (!B->get_cfirst().is_near_bool())
-      {
-        MORE_ERROR() << "Bad quot in ⎕PS←quot style: quot is not near bool";
-        DOMAIN_ERROR;
-      }
-
    if (B->element_count() == 1)
       {
         // for compatibility with old workspaces
         //
-        B_style = B->get_cfirst().get_near_int();
+        B_style = B->get_near_int(0);
       }
    else
       {
-        B_quot  = B->get_cfirst().get_near_bool();
-        B_style = B->get_cravel(1).get_near_int();
+        // only in ⎕PS←quot style is B[1] the quot flag (Bugs37 #33)
+        //
+        if (!B->is_near_bool(0))
+           {
+             MORE_ERROR() << "Bad quot in ⎕PS←quot style: quot is not"
+                             " near bool";
+             DOMAIN_ERROR;
+           }
+        B_quot  = B->get_near_bool(0);
+        B_style = B->get_near_int(1);
       }
 
    switch(B_style) // boxing format
@@ -623,7 +691,7 @@ APL_Integer B_style = 0;
 
         default: MORE_ERROR() <<
                  "Invalid style in ⎕PS←quot style or ⎕PS←style:\n"
-                 "style is not ± 0, 2-4, 7-9, 20-25, or 29";
+                 "style is not 0, N, or ¯N with N ϵ 2-4, 7-9, 20-25, or 29";
                   DOMAIN_ERROR;
       }
 
@@ -641,10 +709,28 @@ Value_P B2(2, LOC);
    Symbol::assign(B2, false, LOC);
    return;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Quad_PS::assign_indexed(const Value * X, Value_P B)
+Quad_PS::set_style(int new_style)
 {
+   // new_style was validated by ]BOXING
+   //
+   Command::boxing_format = new_style;
+   style = new_style;
+
+Value_P Z(2, LOC);
+   Z->next_ravel_Int(print_quotients);
+   Z->next_ravel_Int(style);
+   Z->check_value(LOC);
+   Symbol::assign(Z, false, LOC);
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_PS::assign_indexed(const cValue * X, Value_P B)
+{
+   // X is 0 for the elided-index form ⎕PS[]←B: whole-value assignment.
+   if (X == 0)   { assign(B, true, LOC);   return; }
+
    if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
    if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
    if (X->element_count() != B->element_count())      LENGTH_ERROR;
@@ -656,8 +742,8 @@ APL_Integer Z_quot = print_quotients;
 APL_Integer Z_style = style;
    loop(e, ec)
       {
-        const APL_Integer x = X->get_cravel(e).get_near_int() - qio;
-        const APL_Integer b = B->get_cravel(e).get_near_int();
+        const APL_Integer x = X->get_near_int(e) - qio;
+        const APL_Integer b = B->get_near_int(e);
 
         if (x == 0)   // display quotients
            {
@@ -678,12 +764,12 @@ APL_Integer Z_style = style;
              case 20: case  21: case  22:
              case 23: case  24: case  25:
              case 29: Z_style = b;
-                  Command::boxing_format = b;
                   break;
  
              default:
                   MORE_ERROR() <<
-                       "Invalid print style (try 0, 2-4, 7-9, 20-25, or 29)";
+                       "Invalid print style (try 0, N, or ¯N with N ϵ 2-4, 7-9, "
+                       "20-25, or 29)";
                   DOMAIN_ERROR;
            }
         else
@@ -692,13 +778,16 @@ APL_Integer Z_style = style;
            }
       }
 
+   // all items of X and B are valid. assign() (rather than Symbol::assign())
+   // also updates print_quotients, style, and ]BOXING. Bugs37 #8.
+   //
 Value_P Z(2, LOC);
    Z->next_ravel_Int(Z_quot);
    Z->next_ravel_Int(Z_style);
    Z->check_value(LOC);
-   Symbol::assign(Z, false, LOC);
+   assign(Z, false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_PW::Quad_PW()
    : SystemVariable(ID_Quad_PW)
 {
@@ -710,37 +799,37 @@ int pw = UserPreferences::uprefs.initial_PW;
 
    Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PW::assign(Value_P B, bool clone, const char * loc)
 {
-const APL_Integer pw = B->get_sole_integer();
+// a scalar or a one-item vector, like ⎕IO and ⎕CT (Bugs37 #78)
+   if (B->get_rank() > 1)   RANK_ERROR;
+APL_Integer pw = B->get_sole_integer();
 
-   // min. ⎕PW is 30. Ignore smaller values.
-   if (pw < MIN_Quad_PW)   return;
+   // min. ⎕PW is 30. A smaller value used to be silently ignored
+   // (⎕PW←29 / ⎕PW←5 left ⎕PW unchanged with no diagnostic at all),
+   // unlike ⎕PP←0, which correctly raises DOMAIN_ERROR -- mirror that
+   // same convention here instead. (APL2 raises LIMIT ERROR for this,
+   // a distinct error class GNU APL does not define; DOMAIN_ERROR
+   // matches how the sibling ⎕PP already reports its own out-of-range
+   // case.) See Bugs27 #59(c).
+   //
+   if (pw < MIN_Quad_PW)   DOMAIN_ERROR;
 
-   // max val is system specific. Ignore larger values.
-   if (pw > MAX_Quad_PW)   return;
+   // max val is system specific. Clamp larger values, same as ⎕PP.
+   if (pw > MAX_Quad_PW)   pw = MAX_Quad_PW;
 
    Symbol::assign(IntScalar(pw, LOC), false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_Quad::Quad_Quad()
  : SystemVariable(ID_Quad_Quad)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Quad_Quad::assign(Value_P B, bool clone, const char * loc)
-{
-   // write pending LF from  ⍞ (if any)
-   Quad_QUOTE::done(true, LOC);
-
-   B->print(COUT);
-}
-//----------------------------------------------------------------------------
-void
-Quad_Quad::resolve_right(Token & token, Function_PC & PC) const
+Quad_Quad::resolve_right(Token & token, const Token_loc & tl) const
 {
    // write pending LF from  ⍞ (if any)
    Quad_QUOTE::done(true, LOC);
@@ -757,7 +846,28 @@ UCS_string line;
 Token tok_exec(Bif_F1_EXECUTE::execute_statement(line));
    token.move_from(tok_exec, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+void
+Quad_Quad::assign(Value_P B, bool clone, const char * loc)
+{
+   // ⎕←X is defined as identical to the default display of X (lrm
+   // p.190) -- StateIndicator::statement_result(), the default-display
+   // path, calls done(false, ...) (no forced LF, so text right after a
+   // pending ⍞← continues on the same line); this explicit ⎕←X path
+   // used to pass true here instead, breaking that equivalence (⍞←'a'
+   // ⋄ ⎕←5 printed "a" and "5" on separate lines instead of "a5").
+   // See Bugs27 #51.
+   //
+   Quad_QUOTE::done(false, LOC);
+
+   // same display as the default display (print length limit), but never
+   // boxed: ]BOXING affects only the display of statement results. ⎕←
+   // was never meant to box its argument, and boxing it would change the
+   // output of the many existing ⎕← in applications (Bugs37 #35).
+   //
+   StateIndicator::display_value(B, false);
+}
+//════════════════════════════════════════════════════════════════════════════
 Quad_QUOTE::Quad_QUOTE()
  : SystemVariable(ID_QUOTE_Quad)
 {
@@ -767,7 +877,7 @@ Value_P dummy(UCS_ASCII_string(LOC), LOC);
    dummy->set_complete();
    Symbol::assign(dummy, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_QUOTE::done(bool with_LF, const char * loc)
 {
@@ -781,7 +891,7 @@ Quad_QUOTE::done(bool with_LF, const char * loc)
         buffer.clear();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_QUOTE::assign(Value_P B, bool clone, const char * loc)
 {
@@ -823,7 +933,7 @@ PrintBuffer pb(*B, pctx, /* print directly to COUT*/ 0);
       CERR << "Quad_QUOTE::assign() done, buffer = ["
            << buffer << "]" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_QUOTE::get_apl_value() const
 {
@@ -863,13 +973,13 @@ Value_P Z(line, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_R::Quad_R()
  : NL_SystemVariable(ID_Quad_R)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_R::assign(Value_P B, bool clone, const char * loc)
 {
@@ -882,7 +992,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_R(B);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_R::get_apl_value() const
 {
@@ -907,21 +1017,215 @@ Quad_R::get_apl_value() const
    MORE_ERROR() << "⎕R: no )SI line with a matching error";
    VALUE_ERROR;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_SYL::assign(Value_P B, bool clone, const char * loc)
 {
    // Quad_SYL is mostly read-only, so we only allow assign_indexed() with
    // certain values.
    //
-   if (+B)   SYNTAX_ERROR;
+   if (B)   SYNTAX_ERROR;
 
    // this assign is called from the constructor in order to trigger the
    // creation of a symbol for Quad_SYL.
    //
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_SYL::assign_indexed(const cValue * X, Value_P B)
+{
+   // X is 0 for the elided-index form ⎕SYL[]←B: whole-value assignment.
+   if (X == 0)   { assign(B, true, LOC);   return; }
+
+   // try to assign ⎕SYL[X;2]
+   //
+   if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
+   if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
+
+   // a one-element B is scalar-extended (Bugs37 #77)
+   //
+const bool extend_B = B->element_count() == 1;
+   if (!extend_B && X->element_count() != B->element_count())   LENGTH_ERROR;
+
+const ShapeItem ec = X->element_count();
+const APL_Integer qio = Workspace::get_IO();
+
+   // check all indices before assigning any of them, so that e.g.
+   // ⎕SYL[;2]←B does not assign some rows and then fail (Bugs37 #77)
+   //
+   loop(e, ec)
+      {
+        const APL_Integer x = X->get_near_int(e) - qio;
+        switch(x)
+           {
+             case SYL_SI_DEPTH_LIMIT:
+             case SYL_VALUE_COUNT_LIMIT:
+             case SYL_RAVEL_BYTES_LIMIT:
+             case SYL_CURRENT_CORES:
+             case SYL_PRINT_LIMIT:
+             case SYL_WA_MARGIN:
+             case SYL_WA_SCALE:
+             case SYL_PACK_MIN_LENGTH:   continue;   // writable
+             default:                    break;
+           }
+
+        MORE_ERROR() << "Bad ⎕SYL index " << (x + qio)
+                     << " (not a writable limit)";
+        INDEX_ERROR;
+      }
+
+   loop(e, ec)
+      {
+        const APL_Integer x = X->get_near_int(e) - qio;
+        const APL_Integer b = B->get_near_int(extend_B ? 0 : e);
+
+        if (x == SYL_SI_DEPTH_LIMIT)   // SI depth limit
+           {
+             const int depth = Workspace::SI_entry_count();
+             if (b && (b < (depth + 4)))   // limit too low
+                {
+                  MORE_ERROR() << "Bad SI depth limit " << b << " in ⎕SYL["
+                               << (x + qio) << ";" << (qio + 1)
+                               << "] (expecting 0 for no limit or at least "
+                               << (depth + 4) << ")";
+                  DOMAIN_ERROR;
+                }
+             si_depth_limit = b;
+           }
+        else if (x == SYL_VALUE_COUNT_LIMIT)   // value count limit
+           {
+             if (b && (b < APL_Integer(Value::value_count + 10)))    // too low
+                {
+                  MORE_ERROR() << "Bad value count limit " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting 0 for no limit"
+                                  " or at least "
+                               << (Value::value_count + 10) << ")";
+                  DOMAIN_ERROR;
+                }
+             value_count_limit = b;
+           }
+        else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
+           {
+             // ShapeItem, not int: limits ≥ 2⋆35 bytes wrapped (Bugs37 #49)
+             const ShapeItem cells = b / sizeof(Cell);
+             if (cells &&
+                 cells < APL_Integer(Value::total_ravel_count + 1000))
+                {
+                  MORE_ERROR() << "Bad ravel bytes limit " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting 0 for no limit"
+                                  " or at least "
+                               << ((Value::total_ravel_count + 1000)
+                                   * sizeof(Cell)) << ")";
+                  DOMAIN_ERROR;
+                }
+
+             ravel_count_limit = cells;
+           }
+        else if (x == SYL_CURRENT_CORES)   // number of cores
+           {
+#if PARALLEL_ENABLED
+             if (CPU_pool::change_core_count(CoreCount(b), false))
+                {
+                  MORE_ERROR() << "Bad core count " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "]";
+                  DOMAIN_ERROR;
+                }
+#else
+             MORE_ERROR() << "⎕SYL[" << (x + qio) << ";" << (qio + 1)
+                          << "] (cores used) cannot be changed because "
+                             "PARALLEL_ENABLED was not ./configure'd";
+             DOMAIN_ERROR;
+#endif
+           }
+        else if (x == SYL_PRINT_LIMIT)   // print length limit
+           {
+             // 0 means no limit, other values must be at least 1000
+             //
+             if (b < 0 || (b && b < 1000))
+                {
+                  MORE_ERROR() << "Bad print length limit " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting 0 for no "
+                                  "limit or at least 1000)";
+                  DOMAIN_ERROR;
+                }
+             print_length_limit = b;
+           }
+        else if (x == SYL_WA_MARGIN)   // ⎕WA safety margin
+           {
+             if (b < 1000000)
+                {
+                  MORE_ERROR() << "Bad ⎕WA safety margin " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting at least"
+                                  " 1000000 bytes)";
+                  DOMAIN_ERROR;
+                }
+
+             // a larger margin that makes the workspace full right away
+             // would make every subsequent statement (including the
+             // one lowering the margin again) a WS FULL. Bugs37 #5.
+             //
+             const int64_t old_margin = Quad_WA::WA_margin;
+             Quad_WA::WA_margin = b;
+             if (b > old_margin && Value::check_WS_FULL("⎕SYL", 0, LOC))
+                {
+                  Quad_WA::WA_margin = old_margin;
+                  MORE_ERROR() << "⎕WA safety margin " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] is too large (it"
+                                  " leaves no free workspace memory)";
+                  DOMAIN_ERROR;
+                }
+           }
+        else if (x == SYL_WA_SCALE)   // ⎕WA memory scale (45% - 200% %
+           {
+             if (b < 45 || b > 200)
+                {
+                  MORE_ERROR() << "Bad ⎕WA memory scale " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting 45-200 %)";
+                  DOMAIN_ERROR;
+                }
+
+             // same as for SYL_WA_MARGIN above, but for a smaller scale
+             //
+             const int old_scale = Quad_WA::WA_scale;
+             Quad_WA::WA_scale = b;
+             if (b < old_scale && Value::check_WS_FULL("⎕SYL", 0, LOC))
+                {
+                  Quad_WA::WA_scale = old_scale;
+                  MORE_ERROR() << "⎕WA memory scale " << b
+                               << "% in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] is too small (it"
+                                  " leaves no free workspace memory)";
+                  DOMAIN_ERROR;
+                }
+           }
+        else if (x == SYL_PACK_MIN_LENGTH)   // min. element count for packed ravels
+           {
+             if (b < 1)
+                {
+                  MORE_ERROR() << "Bad minimum packed length " << b
+                               << " in ⎕SYL[" << (x + qio) << ";"
+                               << (qio + 1) << "] (expecting at least 1)";
+                  DOMAIN_ERROR;
+                }
+             pack_min_length = b;
+           }
+        else
+           {
+             MORE_ERROR() << "Bad ⎕SYL index " << (x + qio)
+                          << " (not a writable limit)";
+             INDEX_ERROR;
+           }
+      }
+}
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
 {
@@ -932,15 +1236,15 @@ Quad_SYL::assign_indexed(const IndexExpr & IDX, Value_P B)
    // The only point of getting X2 is to check that it is not elided
    // but quasi-scalar qio + 1
    //
-const Value * X2 = IDX.get_axis_value(1);
+const cValue * X2 = IDX.get_axis_value(1);
 const APL_Integer qio = Workspace::get_IO();
 
    if (!X2)                                          INDEX_ERROR;
    if (X2->element_count() != 1)                     INDEX_ERROR;
-   if (!X2->get_cfirst().is_near_int())              INDEX_ERROR;
-   if (X2->get_cfirst().get_near_int() != qio + 1)   INDEX_ERROR;
+   if (!X2->is_near_int(0))              INDEX_ERROR;
+   if (X2->get_near_int(0) != qio + 1)   INDEX_ERROR;
 
-   if (const Value * X1 = IDX.get_axis_value(0))   // normal index
+   if (const cValue * X1 = IDX.get_axis_value(0))   // normal index
       {
         assign_indexed(X1, B);
       }
@@ -955,83 +1259,7 @@ const APL_Integer qio = Workspace::get_IO();
         assign_indexed(E1.get(), B);
       }
 }
-//----------------------------------------------------------------------------
-void
-Quad_SYL::assign_indexed(const Value * X, Value_P B)
-{
-   // try to assign ⎕SYL[X;2]
-   //
-   if (!(X->is_int_scalar() || X->is_int_vector()))   INDEX_ERROR;
-   if (!(B->is_int_scalar() || B->is_int_vector()))   DOMAIN_ERROR;
-   if (X->element_count() != B->element_count())      LENGTH_ERROR;
-
-const ShapeItem ec = X->element_count();
-const APL_Integer qio = Workspace::get_IO();
-
-   loop(e, ec)
-      {
-        const APL_Integer x = X->get_cravel(e).get_near_int() - qio;
-        const APL_Integer b = B->get_cravel(e).get_near_int();
-
-        if (x == SYL_SI_DEPTH_LIMIT)   // SI depth limit
-           {
-             const int depth = Workspace::SI_entry_count();
-             if (b && (b < (depth + 4)))   DOMAIN_ERROR;    // limit too low
-             si_depth_limit = b;
-           }
-        else if (x == SYL_VALUE_COUNT_LIMIT)   // value count limit
-           {
-             if (b && (b < APL_Integer(Value::value_count + 10)))    // too low
-                DOMAIN_ERROR;
-             value_count_limit = b;
-           }
-        else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
-           {
-             const int cells = b / sizeof(Cell);
-             if (cells &&
-                 cells < APL_Integer(Value::total_ravel_count + 1000))
-                DOMAIN_ERROR;
-
-             ravel_count_limit = cells;
-           }
-        else if (x == SYL_CURRENT_CORES)   // number of cores
-           {
-#if PARALLEL_ENABLED
-             if (CPU_pool::change_core_count(CoreCount(b), false))
-                {
-                  MORE_ERROR() << "Bad core count " << b
-                               << " in ⎕SYL[" << x << "] ";
-                  DOMAIN_ERROR;
-                }
-#else
-             MORE_ERROR() << "PARALLEL_ENABLED not set in ⎕SYL[" << x << "] ";
-             DOMAIN_ERROR;
-#endif
-           }
-        else if (x == SYL_PRINT_LIMIT)   // print length limit
-           {
-             if (b < 1000)   DOMAIN_ERROR;
-             print_length_limit = b;
-           }
-        else if (x == SYL_WA_MARGIN)   // ⎕WA safety margin
-           {
-             if (b < 1000000)   DOMAIN_ERROR;
-             Quad_WA::WA_margin = b;
-           }
-        else if (x == SYL_WA_SCALE)   // ⎕WA memory scale (45% - 200% %
-           {
-             if (b <  45)   DOMAIN_ERROR;
-             if (b > 200)   DOMAIN_ERROR;
-             Quad_WA::WA_scale = b;
-           }
-        else
-           {
-             MORE_ERROR() << "Bad ⎕SYL index " << x;
-             INDEX_ERROR;
-           }
-      }
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_SYL::get_apl_value() const
 {
@@ -1048,7 +1276,7 @@ Value_P Z(sh, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_TC::Quad_TC()
    : RO_SystemVariable(ID_Quad_TC)
 {
@@ -1060,13 +1288,13 @@ Value_P Z(3, LOC);
 
    Symbol::assign(Z, false, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_TS::Quad_TS()
    : RO_SystemVariable(ID_Quad_TS)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_TS::get_apl_value() const
 {
@@ -1085,7 +1313,7 @@ Value_P Z(7, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_TZ::Quad_TZ()
    : SystemVariable(ID_Quad_TZ)
 {
@@ -1096,9 +1324,9 @@ Quad_TZ::Quad_TZ()
    if (offset_seconds % 3600 == 0)   // full hour
       Symbol::assign(IntScalar(offset_seconds/3600, LOC), false, LOC);
    else
-      Symbol::assign(FloatScalar(offset_seconds/3600, LOC), false, LOC);
+      Symbol::assign(FloatScalar(offset_seconds/3600.0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Quad_TZ::compute_offset()
 {
@@ -1128,15 +1356,28 @@ int diff_minutes = local_minutes - gm_minutes;
 
    return 60*diff_minutes;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+std::string
+Quad_TZ::gmt_label(int64_t offset)
+{
+const char sign = offset < 0 ? '-' : '+';
+const int64_t abs_offset = offset < 0 ? -offset : offset;
+const int hours   = abs_offset / 3600;
+const int minutes = (abs_offset % 3600) / 60;
+char cc[40];
+   if (minutes)   snprintf(cc, sizeof(cc), "(GMT%c%d:%02d)", sign, hours,
+                           minutes);
+   else           snprintf(cc, sizeof(cc), "(GMT%c%d)", sign, hours);
+   return cc;
+}
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Quad_TZ::print_timestamp(ostream & out, APL_time_us when) const
 {
 const APL_time_us offset = get_offset();
 const YMDhmsu time(when + 1000000*offset);
 
-char gmt[40];
-   SPRINTF(gmt, "(GMT%+2d)", int(offset/3600));
+const std::string gmt = gmt_label(offset);
 
 ostringstream os;
    os << setfill('0') << time.year  << "-"
@@ -1149,20 +1390,40 @@ ostringstream os;
 
    return out << os.str();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_TZ::assign(Value_P B, bool clone, const char * loc)
 {
-   if (!B->is_scalar())   RANK_ERROR;
+   // a scalar or a one-item vector, like ⎕IO and ⎕CT (Bugs37 #78)
+   //
+   if (!B->is_scalar_or_len1_vector())
+      {
+        if (B->get_rank() > 1)   RANK_ERROR;
+        else                     LENGTH_ERROR;
+      }
 
-   // ignore values outside [-12 ... 14], DOMAIN ERROR for bad types.
+   // Bugs28 #100(k): an out-of-range offset used to be silently
+   // ignored (⎕TZ←¯13 / ⎕TZ←1E20 left ⎕TZ unchanged with no
+   // diagnostic at all) -- unlike a bad TYPE, which already correctly
+   // falls through to DOMAIN_ERROR below. No real-world timezone lies
+   // outside [-12 ... 14] hours (UTC-12 to Kiribati's UTC+14), so
+   // there is no sensible value to clamp to the way ⎕PP/⎕PW clamp an
+   // over-large request to the system's actual capacity; reject
+   // instead, matching how every other out-of-range assignment in
+   // this file is either clamped (with a real fallback value) or
+   // rejected, never silently swallowed.
 
-const Cell & cell = B->get_cfirst();
+Cell cache;
+const Cell & cell = B->get_cfirst(cache);
    if (cell.is_integer_cell())
       {
         const APL_Integer ival = cell.get_near_int();
-        if (ival < -12)   return;
-        if (ival > 14)    return;
+        if (ival < -12 || ival > 14)
+           {
+             MORE_ERROR() << "⎕TZ←" << ival << ": expecting -12 ≤ ⎕TZ ≤ 14"
+                             " (hours UTC offset)";
+             DOMAIN_ERROR;
+           }
         offset_seconds = ival*3600;
         Symbol::assign(B, clone, LOC);
         return;
@@ -1171,22 +1432,26 @@ const Cell & cell = B->get_cfirst();
    if (cell.is_float_cell())
       {
         const double hours = cell.get_real_value();
-        if (hours < -12.1)   return;
-        if (hours > 14.1)    return;
-        offset_seconds = int(0.5 + hours*3600);
+        if (hours < -12.1 || hours > 14.1)
+           {
+             MORE_ERROR() << "⎕TZ←" << hours << ": expecting -12 ≤ ⎕TZ ≤ 14"
+                             " (hours UTC offset)";
+             DOMAIN_ERROR;
+           }
+        offset_seconds = int(lround(hours*3600));   // not 0.5+: ¯3.5 (Bugs35 #70)
         Symbol::assign(B, clone, LOC);
         return;
       }
 
    DOMAIN_ERROR;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_UL::Quad_UL()
    : RO_SystemVariable(ID_Quad_UL)
 {
    Symbol::assign(get_apl_value(), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_UL::get_apl_value() const
 {
@@ -1213,13 +1478,13 @@ Value_P Z(LOC);
    Z->check_value(LOC);
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_X::Quad_X()
  : NL_SystemVariable(ID_Quad_X)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_X::assign(Value_P B, bool clone, const char * loc)
 {
@@ -1232,7 +1497,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    si->set_X(B);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_X::get_apl_value() const
 {
@@ -1256,4 +1521,4 @@ Quad_X::get_apl_value() const
    MORE_ERROR() << "⎕X: no )SI line with a matching error";
    VALUE_ERROR;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

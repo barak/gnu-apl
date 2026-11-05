@@ -1,8 +1,10 @@
 ⍝ Compress_with_axis.tc
 ⍝ ----------------------------------
 
-    N←3 2 4ρ'HIGHLOW HOT COLD UP DOWN'
-    N
+⍝@ test3.
+
+      N←3 2 4ρ'HIGHLOW HOT COLD UP DOWN'
+      N
 HIGH
 LOW 
 
@@ -27,7 +29,7 @@ LOW
  UP 
 DOWN
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       M←3 2ρι6
       M

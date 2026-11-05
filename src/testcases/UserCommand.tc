@@ -1,9 +1,11 @@
 ⍝ UserCommand.tc
 ⍝ ----------------------------------
 
-   ]USERCMD ]FOO BAR 1
+⍝@ test3.
 
-∇ A BAR B
+      ]USERCMD ]FOO UCBAR 1
+
+∇ A UCBAR B
  'A:' ◊ 4 ⎕CR A
  'B:' ◊ 4 ⎕CR B
 ∇
@@ -46,7 +48,7 @@ B:
 ┃]FOO arg1 ┃
 ┗━━━━━━━━━━┛
 
-   ]FOO
+      ]FOO
 A:
 ┏→━━━┓
 ┃]FOO┃
@@ -56,8 +58,8 @@ B:
 ┃]FOO┃
 ┗━━━━┛
 
-   ⍝ trailing spaces in arg are preserved in B (but not in  A)
-   ]FOO 
+      ⍝ trailing spaces in arg are preserved in B (but not in  A)
+      ]FOO 
 A:
 ┏→━━━┓
 ┃]FOO┃
@@ -67,6 +69,22 @@ B:
 ┃]FOO ┃
 ┗━━━━━┛
 
-⍝ ==================================
+      ⍝ ==================================
 
+      ⍝ bug-apl@gnu.org, 6/19/2026 (Dave Alden):
+      ⍝ ]USERCMD with lambda and explicit mode gave BAD COMMAND+
+
+      )CLEAR
+CLEAR WS
+
+      ]usercmd ]tc1 {⍵} 0
+      ]usercmd ]tc2 {⍺,⍵} 1
+
+      ]tc1 hello
+]tc1 hello
+
+      ]tc2 world
+ ]tc2 world ]tc2 world¹
+
+      )CHECK BRIEF
 

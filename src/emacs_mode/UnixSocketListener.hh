@@ -26,20 +26,44 @@
 
 #include "Listener.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// a Listener accepting connections on a Unix domain socket
 class UnixSocketListener : public Listener {
 public:
+    /// constructor
     UnixSocketListener() : server_socket( 0 ), initialised( false ), closing( false ) {};
+
+    /// destructor
     virtual ~UnixSocketListener();
+
+    /// see Listener::start()
     virtual std::string start( void );
+
+    /// see Listener::wait_for_connection()
     virtual void wait_for_connection( void );
+
+    /// see Listener::close_connection()
     virtual void close_connection( void );
 
 private:
+    /// the listening server socket
     int server_socket;
+
+    /// path of the socket file (unlink()ed on close)
     std::string filename;
+
+    /// true once start() has completed successfully; guards
+    /// close_connection()'s cleanup against a partially-initialised state
     bool initialised;
+
+    /// set by close_connection() so wait_for_connection() can tell a
+    /// deliberate shutdown from a real accept() error
     bool closing;
+
+    /// write end of a self-pipe used to wake a blocked
+    /// wait_for_connection() on close_connection()
     int notification_fd;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

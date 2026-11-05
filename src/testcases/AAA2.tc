@@ -1,7 +1,9 @@
 ⍝ AAA2.tc
 ⍝ ----------------------------------
 
-⍝ FUNCTION RETURN VALUE
+⍝@ test3.
+
+      ⍝ FUNCTION RETURN VALUE
 
       )ERASE FOO
 ∇Z←FOO
@@ -22,9 +24,9 @@ FOO-RESULT
       Y
 FOO-RESULT
 
-   )ERASE FOO
+      )ERASE FOO
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       )ERASE FOO
 ∇Z←FOO B
@@ -36,6 +38,6 @@ FOO-RESULT
 13
 
 
-⍝ ==================================
+      ⍝ ==================================
 
 

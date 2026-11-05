@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2022  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,18 +36,20 @@ typedef uint32_t Color;
 
 typedef std::string String;
 
-//============================================================================
-
+//════════════════════════════════════════════════════════════════════════════
 /// a window coordinate in pixels
 struct Pixel_XY
 {
    /// constructor
+   /// @param px horizontal pixel coordinate
+   /// @param py vertical pixel coordinate
    Pixel_XY(Pixel_X px, Pixel_Y py)
    : x(px),
      y(py)
    {}
 
    /// the square of the distance between \b this and other
+   /// @param other the other pixel coordinate
    const double distance2(const Pixel_XY other) const
       { const double dx = x - other.x;
         const double dy = y - other.y;
@@ -56,13 +58,14 @@ struct Pixel_XY
 
 
    /// the distance between \b this and other
+   /// @param other the other pixel coordinate
    const double distance(const Pixel_XY other) const
       { return sqrt(distance2(other)); }
 
    Pixel_X x;   ///< horizontal pixels
    Pixel_Y y;   ///< vertical pixels
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// data for one plot line, aka. data row. The plot line consists of N
 /// data points, each with coordinates X, Y, and Z.
 class Plot_data_row
@@ -73,10 +76,23 @@ public:
        rows are put into the same double * and our ~Plot_data_row() destructor
        is responsible for deleting it (when row 0 is destructed).
     **/
+   /// @param pX pointer to X coordinate array (may be null for implicit 1-based index)
+   /// @param pY pointer to Y coordinate array
+   /// @param pZ pointer to Z coordinate array (may be null for implicit row index)
+   /// @param idx row index within the containing Plot_data
+   /// @param len number of data points in this row
    Plot_data_row(const double * pX, const double * pY, const double * pZ,
                  uint32_t idx, uint32_t len)
    : X(pX), Y(pY), Z(pZ), row_num(idx), N(len)
    {
+     if (N == 0)   // no data points: X[0]/Y[0]/Z[0] below would be OOB
+        {
+          min_X = max_X = 0.0;
+          min_Y = max_Y = 0.0;
+          min_Z = max_Z = 0.0;
+          return;
+        }
+
      min_X = max_X = get_X(0);
      min_Y = max_Y = get_Y(0);
      min_Z = max_Z = get_Z(0);
@@ -100,9 +116,14 @@ public:
    /// destructor
    ~Plot_data_row()
    {
-     // all rows belong to the same double *, so we only delete row 0
+     // all rows belong to the same double *, so we only delete row 0.
+     // That block is always allocated through X -- except for a 1-plane
+     // (Y-only) surface plot, which has no X and allocates the block
+     // through Y instead (Quad_PLOT.cc, setup_data_3D()'s planes==1
+     // branch); deleting only X there leaked the block (Blake McBride,
+     // Bugs14 #6).
      //
-     if (row_num == 0)   delete[] X;
+     if (row_num == 0)   delete[] (X ? X : Y);
    }
 
    /// return the number of data points
@@ -110,14 +131,17 @@ public:
       { return N; }
 
    /// return the n-th X coordinate
+   /// @param n zero-based data point index
    double get_X(uint32_t n) const
       { return X ? X[n] : n + 1; }
 
    /// return the n-th Y coordinate
+   /// @param n zero-based data point index
    double get_Y(uint32_t n) const
       { return Y[n]; }
 
    /// return the n-th Z coordinate
+   /// @param n zero-based data point index
    double get_Z(uint32_t n) const
       { return Z ? Z[n] : row_num + 1; }
 
@@ -179,7 +203,7 @@ protected:
    /// the largest value in Z
    double max_Z;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// data for all plot lines
 
 struct level_color
@@ -193,10 +217,17 @@ class Plot_data
 {
 public:
    /// constructor
+   /// @param rows number of plot data rows to allocate
    Plot_data(uint32_t rows)
    : surface(false),
      row_count(rows),
-     idx(0)
+     idx(0),
+     min_X(0.0),
+     max_X(0.0),
+     min_Y(0.0),
+     max_Y(0.0),
+     min_Z(0.0),
+     max_Z(0.0)
      {
         data_rows = new const Plot_data_row *[row_count];
       }
@@ -205,7 +236,7 @@ public:
    ~Plot_data()
    {
      loop(r, idx)   delete data_rows[r];
-     delete data_rows;
+     delete[] data_rows;
    }
 
    /// return the number of plot lines
@@ -213,6 +244,10 @@ public:
       { return row_count; }
 
    /// return the X and Y values of the data matrix row/col
+   /// @param X receives the X coordinate
+   /// @param Y receives the Y coordinate
+   /// @param row row index in the data matrix
+   /// @param col column index in the data matrix
    void get_XY(double & X, double & Y, uint32_t row, uint32_t col) const
        {
           Assert(row < idx);
@@ -245,14 +280,20 @@ public:
       { return max_Z; }
 
    /// return the X coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_X(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_X(col); }
 
    /// return the Y coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_Y(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_Y(col); }
 
    /// return the Z coordinate at row and col
+   /// @param row row index in the data matrix
+   /// @param col column (data point) index within the row
    double get_Z(uint32_t row, uint32_t col) const
       { return data_rows[row]->get_Z(col); }
 
@@ -260,6 +301,7 @@ public:
    bool is_surface_plot() const       { return surface; }
 
    /// add a row to the data matrix
+   /// @param row pointer to the row to append
    void add_row(const Plot_data_row * row)
       {
         Assert(idx < row_count);
@@ -270,8 +312,8 @@ public:
              max_X = row->get_max_X();
              min_Y = row->get_min_Y();
              max_Y = row->get_max_Y();
-             min_Z = row->get_min_Y();
-             max_Z = row->get_max_Y();
+             min_Z = row->get_min_Z();
+             max_Z = row->get_max_Z();
            }
         else
            {
@@ -285,6 +327,7 @@ public:
       }
 
    /// convert integer to a string
+   /// @param val unsigned integer value to convert
    static const char * uint32_t_to_str(uint32_t val)
       {
         static char ret[40];
@@ -294,6 +337,7 @@ public:
       }
 
    /// val as string with unit 'pixel'
+   /// @param val horizontal pixel value to convert
    static const char * Pixel_X_to_str(Pixel_X val)
       {
         static char ret[40];
@@ -303,6 +347,7 @@ public:
       }
 
    /// val as string with unit 'pixel'
+   /// @param val vertical pixel value to convert
    static const char * Pixel_Y_to_str(Pixel_Y val)
       {
         static char ret[40];
@@ -312,6 +357,7 @@ public:
       }
 
    /// convert a double to a string
+   /// @param val floating-point value to convert
    static const char * double_to_str(double val)
       {
         static char ret[40];
@@ -321,6 +367,7 @@ public:
       }
 
    /// convert a Color to a string
+   /// @param val color as a packed RGB integer
    static const char * Color_to_str(Color val)
       {
         static char ret[40];
@@ -331,35 +378,57 @@ public:
       }
 
    /// convert a String to a string
+   /// @param val string value to return
    static String String_to_str(String val)
       {
         return val;
       }
 
-   /// return the idx'th row
-   const Plot_data_row & operator[](ShapeItem idx) const
-      { Assert(idx < row_count);   return *data_rows[idx]; }
+   /// return the row'th row
+   /// @param row zero-based row index
+   const Plot_data_row & operator[](ShapeItem row) const
+      {
+        // bound-check against idx (rows actually filled by add_row()),
+        // not row_count (the allocated capacity) -- the parameter used
+        // to be named idx too, shadowing the member and checking the
+        // wrong bound (Blake McBride, Bugs14 #14a). data_rows itself is
+        // uninitialised past idx until add_row() fills it.
+        Assert(row < idx);
+        return *data_rows[row];
+      }
 
    /// convert a string to a Pixel
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static Pixel_X Pixel_X_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a Pixel
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static Pixel_Y Pixel_Y_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a double
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static double double_from_str(const char * str, const char * & error)
       { error = 0;   return strtod(str, 0); }
 
    /// convert a string like "#RGB" or "#RRGGB" to a color
+   /// @param str null-terminated color string (e.g. "#FF0000")
+   /// @param error receives an error message, or null on success
    static Color Color_from_str(const char * str, const char * & error);
 
   /// convert a string to a uint32_t
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
    static uint32_t uint32_t_from_str(const char * str, const char * & error)
       { error = 0;   return strtoll(str, 0, 10); }
 
    /// convert a string to a String
+   /// @param str null-terminated string to wrap
+   /// @param error receives an error message, or null on success
    static String String_from_str(const char * str, const char * & error)
       { error = 0;   return str; }
 
@@ -394,7 +463,7 @@ protected:
    /// the largest value in Z
    double max_Z;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PLOT_DATA_HH_DEFINED__
 

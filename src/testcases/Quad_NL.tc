@@ -1,18 +1,34 @@
 ⍝ Quad_NL.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
+      ⍝ regression (Blake McBride, Bugs12.md #9, 2026-08-06): QuadFunction.cc
+      ⍝ used to test a per-symbol NameClass (e.g. NC_VARIABLE == 2050,
+      ⍝ NC_FUNCTION == 4099, NC_OPERATOR == 8196 -- NamedObject.hh) against
+      ⍝ the requested-classes bitmap via "1 << nc" directly; shifting an int
+      ⍝ by >= 32 is UB and only produced the right answer on x86 because the
+      ⍝ hardware masks the shift count to 5 bits and every NameClass happens
+      ⍝ to be a multiple of 32. The V1/V2/V3 (⎕NL 2), FOO (⎕NL 3) and OP1
+      ⍝ (⎕NL 4) checks below already exercise exactly those NameClass values
+      ⍝ end-to-end, so they double as the regression test for this fix
+      ⍝ (masking the shift amount with NC_case_mask); UBSan is clean on all
+      ⍝ of them after the fix.
+      ⍝
       )CLEAR
 CLEAR WS
 
-   V1←1
-   V2←2
-   V3←3
+      V1←1
+      V2←2
+      V3←3
 
       )ERASE OP1
+      ]FILE_CTL SKIP_APL2   ⍝ GNU APL-only function header
 ∇ (LO OP1 RO) B
 ∇
 
       )ERASE FOO
+      ]FILE_CTL NO_SKIP
 ∇FOO
 L1:
 L2:
@@ -24,7 +40,7 @@ L3:
  '⎕NL 1 3:' ◊ ⎕NL 1 3
 ∇
 
-⍝ monadic ----------------------------------
+      ⍝ monadic ----------------------------------
 
       FOO
 ⎕NL 1:
@@ -45,19 +61,21 @@ L1
 L2 
 L3 
 
-⍝ dyadic ----------------------------------
+      ⍝ dyadic ----------------------------------
 
-   ⎕NL 2 3
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕LC/⎕NL depend on the test harness
+      ⎕NL 2 3
 FOO
 V1 
 V2 
 V3 
 
-   'V' ⎕NL 2 3
+      ]FILE_CTL NO_SKIP
+      'V' ⎕NL 2 3
 V1
 V2
 V3
 
-⍝ ==================================
+      ⍝ ==================================
 
 

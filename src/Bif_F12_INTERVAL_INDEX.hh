@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2020-2022  Dr. Jürgen Sauermann
+    Copyright © 2020-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** System function interval index (⍸) */
 /// The class implementing ⍸
 class Bif_F12_INTERVAL_INDEX: public NonscalarFunction
@@ -37,20 +37,25 @@ public:
    : NonscalarFunction(TOK_F12_INTERVAL_INDEX)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value (sorted interval boundaries)
+   /// @param B right argument APL value (values to locate in intervals)
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
+
+   /// overloaded Function::eval_B()
+   virtual Token eval_B(cValue_R B) const;
 
    static Bif_F12_INTERVAL_INDEX  fun;   ///< Built-in function
 
 protected:
    /// find cell in ranges defined by ranges and range_count
-   static ShapeItem find_range(const Cell & cell, const Cell * ranges,
+   /// @param cell the cell value to locate
+   /// @param ranges pointer to the sorted array of interval-boundary cells
+   /// @param range_count number of elements in ranges
+   static ShapeItem find_range(const Cell & cell, cValue_R A,
                                ShapeItem range_count);
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Bif_F12_INTERVAL_INDEX_HH_DEFINED__
 

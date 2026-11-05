@@ -1,6 +1,8 @@
 ⍝ ZZ58_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       ⍝ bug-apl@gnu.org, 4/4/2023 (Robert Haberkorn) ...
 
       )CLEAR

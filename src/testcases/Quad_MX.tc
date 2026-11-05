@@ -1,0 +1,200 @@
+⍝ Quad_MX.tc
+⍝ ----------------------------------
+
+⍝@ test3.
+
+      ]NEXTFILE NO-GSL   ⍝ done if ⎕MX is not available (no GSL)
+
+      ⎕CT ← 1E¯9
+      ⎕PP ← 6
+
+      ⍝ determinant
+      ⍝
+      ⎕mx[1] 3 3⍴1 8 5 9 4 8 5 1 6
+¯151
+
+      ⍝ monadic cross product
+      ⍝
+      4 ⎕cr ⎕mx[2] 2 3⍴((⍳6)-⎕io)
+┏→━━━━━━┓
+┃¯3 6 ¯3┃
+┗∼━━━━━━┛
+
+      ⍝ dyadic cross product
+      ⍝
+      4 ⎕cr 1 2 3 ⎕mx[2] 4 5 6
+┏→━━━━━━┓
+┃¯3 6 ¯3┃
+┗∼━━━━━━┛
+
+      ⍝ vector angle
+      ⍝
+      1 2 3 ⎕mx[3] 4 5 6
+0.225726
+
+      ⍝ eigenvectors (the rows of ⎕mx[4]). An eigenvector is only defined
+      ⍝ up to its sign, and GSL chooses different signs on different
+      ⍝ platforms (e.g. 32-bit Debian, Bill Heagy): compare their magnitudes
+      ⍝
+      4 ⎕cr |⎕mx[4] 3 3⍴((⍳9)-⎕io)
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━┓
+↓0.164764 0.505774 0.846785┃
+┃0.7997   0.104206 0.591288┃
+┃0.408248 0.816497 0.408248┃
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝eigenvalues. The eigenvalue 0 comes out as a platform-dependent
+      ⍝ rounding residue (¯1.8E¯15, ¯4.2E¯16, ...)
+      ⍝
+      ⎕mx[5] 3 3⍴((⍳9)-⎕io)
+13.3485 ¯1.34847 ²
+
+      ⍝ ident
+      ⍝
+      4 ⎕CR ⎕MX[6] 6
+┏→━━━━━━━━━━┓
+↓1 0 0 0 0 0┃
+┃0 1 0 0 0 0┃
+┃0 0 1 0 0 0┃
+┃0 0 0 1 0 0┃
+┃0 0 0 0 1 0┃
+┃0 0 0 0 0 1┃
+┗∼━━━━━━━━━━┛
+
+      ⍝ rotation
+      ⍝
+      4 ⎕cr ⎕mx[7] ○.25
+┏→━━━━━━━━━━━━━━━━━┓
+↓0.707107 ¯0.707107┃
+┃0.707107  0.707107┃
+┗∼━━━━━━━━━━━━━━━━━┛
+
+      ⍝ homogeneous matrix
+      ⍝
+      4⎕cr 1 2 3 ⎕mx[8] (○45÷180), (○45÷180), (○45÷180)
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+↓ 0.5      ¯0.146447  0.853553 0┃
+┃ 0.5       0.853553 ¯0.146447 0┃
+┃¯0.707107  0.5       0.5      0┃
+┃ 1         2         3        1┃
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+      ⍝norm
+      ⍝
+      4⎕cr ⎕mx[9] 1 2 3 4
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃0.182574 0.365148 0.547723 0.730297┃
+┗∼━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ monadic covariance
+      ⍝
+      4 ⎕cr ⎕mx[11] 6+2 3⍴6 7 4 9 5 2
+┏→━━━━━━━━━━━━━━━━┓
+↓1        0.590301┃
+┃0.590301 1       ┃
+┗∼━━━━━━━━━━━━━━━━┛
+
+      ⍝ dyadic covariance
+      ⍝
+      (1 2 3) ⎕mx[11] 1 2 4
+1.5
+
+      ⍝ histogram
+      ⍝
+      4 ⎕cr 4 ⎕mx[12] (⍳101)-⎕io
+┏→━━━━━━━━━━┓
+┃25 25 25 26┃
+┗∼━━━━━━━━━━┛
+
+      ⍝ ramdoms
+      ⍝
+      ⊣⎕mx[14] 3
+      4 ⎕cr 0 4 ⍕ 4 ⎕mx[10] 1
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃¯1.3583J.0000 ¯1.7518J.0000 ¯2.0094J.0000 ¯.5168J.0000┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ Bugs11 regression tests (Blake McBride, 2026-08-04)
+      ⍝
+      ⍝ #1: ⎕MX[6] (ident) with negative B used to build a Value with an
+      ⍝ uninitialized ravel (Shape(¯N,¯N) has a positive volume) instead
+      ⍝ of rejecting it -- fatal on printing the result.
+      ⍝
+      ⎕MX[6] ¯5
+DOMAIN ERROR+
+      ⎕MX[6]¯5
+      ^
+
+      ⎕MX[6] ¯1
+DOMAIN ERROR+
+      ⎕MX[6]¯1
+      ^
+
+      ⍝ #2: ⎕MX[4]/[5] (eigenvector/eigenvalue) on an empty square matrix
+      ⍝ used to call gsl_eigen_nonsymmv_alloc(0), which aborts the whole
+      ⍝ interpreter via GSL's default error handler.
+      ⍝
+      ⎕MX[4] 0 0⍴0
+LENGTH ERROR+
+      ⎕MX[4]0 0⍴0
+      ^
+
+      ⎕MX[5] 0 0⍴0
+LENGTH ERROR+
+      ⎕MX[5]0 0⍴0
+      ^
+
+      ⍝ #3: ⎕MX[1] (determinant) of a 1×1 matrix used to return 0 instead
+      ⍝ of the single element (getDet() had no rows()==1 base case).
+      ⍝
+      ⎕MX[1] 1 1⍴5
+5
+
+      ⍝ #4: the 100...103 axes (documented shorthands for ⎕MX[10, D])
+      ⍝ were unreachable monadically and in the vector-X form of the
+      ⍝ dyadic case, because the subfun_count range check treated the
+      ⍝ .def row count as a maximum axis number; axis 104 was also
+      ⍝ wrongly registered for t_dist (should be 103, and 104 is not a
+      ⍝ valid axis at all). Verify: 104 is correctly rejected, and a
+      ⍝ shorthand axis is equivalent to its ⎕MX[10, D] expansion.
+      ⍝
+      3 ⎕MX[104] 1.5
+DOMAIN ERROR+
+      3 ⎕MX[104]1.5
+      ^ ^
+      )MORE
+A ⎕MX[X] B: invalid subfunction number X (= 104).
+See: ⎕MX '' or: ⎕MX ⍬ for a list of valid numbers.
+
+      ⊣⎕MX[14] 7
+      Z1←⎕MX[100] 1 2 3
+      ⊣⎕MX[14] 7
+      Z2←⎕MX[10 0] 1 2 3
+      Z1≡Z2
+1
+
+      ⍝ chi-squared and student-t (dist 2 and 3) require a strictly
+      ⍝ positive degrees-of-freedom parameter; B≤0 used to be undefined
+      ⍝ behaviour (observed as corrupt, non-UTF8 output) instead of a
+      ⍝ clean error -- found while verifying #4, not one of Blake's
+      ⍝ numbered findings.
+      ⍝
+      3 ⎕MX[10 2] 0
+DOMAIN ERROR+
+      3 ⎕MX[10 2]0
+      ^ ^
+
+      3 ⎕MX[10 3] ¯1
+DOMAIN ERROR+
+      3 ⎕MX[10 3]¯1
+      ^ ^
+
+      ⍝ clear the SI left behind by the DOMAIN/LENGTH ERRORs above
+      ⍝
+      )SIC
+
+
+      ⍝ restore the default for the testcases that follow (see --TR)
+      ⍝
+      ⎕PP←10 ◊ ⎕CT←1E¯13
+
+

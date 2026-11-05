@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <memory>
 #include <sys/types.h>
 
 #include "Bif_F12_PARTITION_PICK.hh"
@@ -28,8 +29,10 @@
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Common.hh"
+#include "ConstCell_P.hh"
 #include "Error.hh"
 #include "FloatCell.hh"
+#include "Heapsort.hh"
 #include "IndexExpr.hh"
 #include "IndexIterator.hh"
 #include "IntCell.hh"
@@ -42,6 +45,7 @@
 #include "PrintOperator.hh"
 #include "Quad_XML.hh"
 #include "StateIndicator.hh"
+#include "Symbol.hh"
 #include "SystemVariable.hh"
 #include "UCS_string.hh"
 #include "UserFunction.hh"
@@ -68,211 +72,16 @@ uint64_t Value::slow_new_count = 0;
 
 uint64_t Value::alloc_size = 0;
 
-//----------------------------------------------------------------------------
-void
-Value::init_ravel()
-{
-   owner_count = 0;
-   fetcher = &cell_fetcher;
-   pointer_cell_count = 0;
-   nz_subcell_count = 0;
-   check_ptr = 0;
-   IntCell::z0(short_value);
-   ravel = short_value;
-
-   ++value_count;
-   if (Quad_SYL::value_count_limit &&
-       Quad_SYL::value_count_limit < APL_Integer(value_count))
-      {
-        MORE_ERROR() <<
-"the system limit on the APL value count (as set in ⎕SYL["
-<< (Quad_SYL::SYL_VALUE_COUNT_LIMIT + Workspace::get_IO())
-<< ";2]) was reached\n"
-"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
-
-        // reset the limit so that we don't get stuck here.
-        //
-        Quad_SYL::value_count_limit = 0;
-        InterruptContext::set_attention_raised(LOC);
-        InterruptContext::set_interrupt_raised(LOC);
-      }
-
-const ShapeItem length = shape.get_volume();
-
-   // small values always succeed...
-   //
-   if (length <= cfg_SHORT_VALUE_LENGTH_WANTED)
-      {
-        check_ptr = charP(this) + 7;
-        return;
-      }
-
-   // large Value. If the compiler uses 4-byte pointers, then do not allow APL
-   // values that are too large. The reason is that new[] may return
-   // a non-0 pointer (thus pretending everything is OK), but a subsequent
-   // attempt to initialize the value might then throw a segfault.
-   //
-   enum { MAX_LEN = 2000000000 / sizeof(Cell) };
-   if (length > MAX_LEN && sizeof(void *) < 6)
-      throw_apl_error(E_WS_FULL, alloc_loc);
-
-   if (Quad_SYL::ravel_count_limit &&
-       Quad_SYL::ravel_count_limit < APL_Integer(total_ravel_count + length))
-      {
-CERR << "*** Quad_SYL::ravel_count_limit hit ***" << endl;
-        // make sure that the value is properly initialized
-        //
-        new (&shape) Shape();
-        ravel = short_value;
-        IntCell::zI(ravel, 42);
-
-        MORE_ERROR() <<
-"the system limit on the total ravel size (as set in ⎕SYL["
-<< (Quad_SYL::SYL_RAVEL_BYTES_LIMIT + Workspace::get_IO())
-<< ";2]) was reached\n"
-"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
-        // reset the limit so that we don't get stuck here.
-        //
-        Quad_SYL::ravel_count_limit = 0;
-        InterruptContext::set_attention_raised(LOC);
-        InterruptContext::set_interrupt_raised(LOC);
-      }
-
-   alloc_size = length * sizeof(Cell);
-   ravel = reinterpret_cast<Cell *>(new char[alloc_size]);
-
-/*
-   ravel = 0;   // assume new() fails
-// try
-//    {
-        ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
-        if (ravel == 0)   // new failed (without trowing an exception)
-           {
-              Log(LOG_Value_alloc)
-                 CERR << "new char[" << (length * sizeof(Cell))
-                      << "] (aka. long ravel allocation) returned 0 at " LOC
-                      << endl;
-
-              MORE_ERROR() << "The instatiation of a Value object succeeded, "
-                              "but allocation of its (large) ravel failed.";
-              new (&shape) Shape();
-              ravel = short_value;
-              throw_apl_error(E_WS_FULL, alloc_loc);
-           }
-      }
-   catch (...)
-      {
-        // for some unknown reason, this object gets cleared after
-        // throwing the E_WS_FULL below (which destroys the prev and
-        // next pointers. We therefore unlink() the object here (where
-        // prev and next pointers are still intact).
-        //
-        unlink();
-
-        Log(LOG_Value_alloc)
-           {
-             CERR << "new char[" << (length * sizeof(Cell))
-                  << "] (aka. long ravel allocation) threw an exception at " LOC
-                  << endl;
-           }
-
-        MORE_ERROR() << "The instatiation of a Value object succeeded, "
-                        "but allocation of its (large) ravel failed.";
-        new (&shape) Shape();
-        ravel = short_value;
-        throw_apl_error(E_WS_FULL, alloc_loc);
-      }
-*/
-
-   // init the first ravel element to (prototype) 0 so that we can avoid
-   // many empty checks all over the place
-   //
-   IntCell::z0(&get_wproto());
-   check_ptr = charP(this) + 7;
-   total_ravel_count += length;
-}
-//----------------------------------------------------------------------------
-bool
-Value::check_WS_FULL(const char * args, ShapeItem requested_cell_count,
-                     const char * loc)
-{
-const int64_t used_memory
-               = (total_ravel_count + requested_cell_count) * sizeof(Cell)
-               + (value_count + 1) * sizeof(Value)
-               + Workspace::SI_entry_count() * sizeof(StateIndicator);
-
-   if (int64_t((Quad_WA::total_memory*Quad_WA::WA_scale/100)) >
-       (used_memory + Quad_WA::WA_margin))   return false;   // OK
-
-   Log(LOG_Value_alloc) CERR
-   << "    value_count:       " << value_count             << endl
-   << "    total_ravel_count: " << total_ravel_count       << " cells" << endl
-   << "    new cell_count:    " << requested_cell_count    << " cells" << endl
-   << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << endl
-   << "    used_memory:       " << used_memory             << " bytes" << endl
-   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
-   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
-
-           << " at " << LOC << endl;
-   return true;
-}
-//----------------------------------------------------------------------------
-void
-Value::catch_Error(const Error & error, const char * args, const char * loc)
-{
-   Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
-   MORE_ERROR() << "new Value(" << args
-                << ") failed (APL error in ravel allocation)";
-   throw error;   // rethrow
-}
-//----------------------------------------------------------------------------
-void
-Value::catch_exception(const exception & ex, const char * args,
-                      const char * caller,  const char * loc)
-{
-const int64_t used_memory
-               = total_ravel_count * sizeof(Cell)
-               + value_count * sizeof(Value)
-               + Workspace::SI_entry_count() * sizeof(StateIndicator);
-
-   Log(LOG_Value_alloc)
-      CERR << "Value_P::Value_P(" << args << ") failed at " << loc
-           << " (caller: "        << caller << ")" << endl
-           << " what: "           << ex.what() << endl
-           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
-           << " current sbrk(): 0x" << top_of_memory() << endl
-           << " alloc_size:     0x" << alloc_size << dec << " ("
-                                    << alloc_size << ")" << endl
-           << " used memory:    0x" << hex  << used_memory << dec
-                                    << " (" << used_memory << ")" << endl;
-
-   MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
-   WS_FULL;
-}
-//----------------------------------------------------------------------------
-void
-Value::catch_ANY(const char * args, const char * caller, const char * loc)
-{
-   Log(LOG_Value_alloc)
-      CERR << "Value_P::Value_P(Shape " << args << " failed at " << loc
-           << " (caller: " << caller << ")" << endl;
-   MORE_ERROR() << "new Value(" << args << ") failed (ANY)";
-   WS_FULL;
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value::Value(const char * loc)
-   : DynamicObject(loc, &all_values),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Cell & cell, const char * loc)
-   : DynamicObject(loc, &all_values),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
@@ -280,109 +89,118 @@ Value::Value(const Cell & cell, const char * loc)
    set_ravel_Cell(0, cell);
    check_value(LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(ShapeItem len, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(len),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(len);
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(ShapeItem rows, ShapeItem cols, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(rows, cols),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(rows, cols);
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Shape & sh, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(sh),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = sh;
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const Shape & sh, uint64_t * bits, const char * loc)
    : DynamicObject(loc, &all_values),
-     shape(sh),
-     fetcher(&packed_fetcher),
-     owner_count(0),
-     pointer_cell_count(0),
-     flags(VF_packed),
-     valid_ravel_items(sh.get_nz_volume()),
-     nz_subcell_count(0),
-     ravel(reinterpret_cast<Cell *>(bits))
+     owner_count(0)
 {
+   sh.checked_volume();   // throw WS_FULL if sh's true volume overflows
+   shape = sh;
+   pointer_cell_count = 0;
+   ravel.fetcher = &Ravel::bool_fetcher;
+   flags = {}; flags.ravel_type = RPT_BOOL;
+   ravel.valid_ravel_items = sh.get_nz_volume();
+   ravel.cells = reinterpret_cast<Cell *>(bits);
    ADD_EVENT(this, VHE_Create, 0, loc);
    check_ptr = charP(this) + 7;
 
-   if (ravel)   return;   // caller has allocated 
+   // this constructor bypasses init_ravel() entirely, but ~Value()'s
+   // RPT_BOOL branch always does --value_count (unconditionally) and,
+   // since ravel.cells here is always heap (this constructor never uses
+   // ravel.short_value), always total_ravel_count -= nz_element_count()
+   // too -- without mirroring init_ravel()'s ++value_count/
+   // total_ravel_count here, both counters silently underflow over
+   // repeated )LOADs of bit-packed values, corrupting WS-FULL decisions
+   // that depend on them.
+   ++value_count;
+   total_ravel_count += sh.get_nz_volume();
+
+   if (ravel.cells)   { set_complete();   return; }   // caller has
+                                                       // allocated -- this
+                                                       // value is already
+                                                       // fully populated
+                                                       // too, just like
+                                                       // the self-
+                                                       // allocated branch
+                                                       // below, which
+                                                       // already called
+                                                       // set_complete().
 
    // round the size up to the next 64 bit boundary.
 const size_t uint64_count = (sh.get_nz_volume() + 63) >> 6;
    bits = new uint64_t[uint64_count];
    loop(u, uint64_count)   bits[u] = 0;
-   ravel = reinterpret_cast<Cell *>(bits);
+   ravel.cells = reinterpret_cast<Cell *>(bits);
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const UCS_string & ucs, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(ucs.size()),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(ucs.size());
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
    set_proto_Spc();                          // prototype
    loop(l, ucs.size())   next_ravel_Char(ucs[l]);
    set_complete();
+   try_pack();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const UTF8_string & utf, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(utf.size()),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(utf.size());
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
    set_proto_Spc();                          // prototype
    loop(l, utf.size())   next_ravel_Char(Unicode(utf[l] & 0xFF));
    set_complete();
+   try_pack();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const CDR_string & ui8, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(ui8.size()),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(ui8.size());
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
    set_proto_Spc();                          // prototype
    loop(l, ui8.size())   next_ravel_Char(Unicode(ui8[l]));
    set_complete();
+   try_pack();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const PrintBuffer & pb, const char * loc)
-   : DynamicObject(loc, &all_values),
-     shape(pb.get_row_count(), pb.get_column_count()),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(pb.get_row_count(), pb.get_column_count());
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
@@ -396,13 +214,11 @@ const ShapeItem width = pb.get_column_count();
 
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::Value(const char * loc, const Shape * sh)
-   : DynamicObject(loc, &all_values),
-     shape(ShapeItem(sh->get_rank())),
-     flags(VF_NONE),
-     valid_ravel_items(0)
+   : DynamicObject(loc, &all_values)
 {
+   shape = Shape(ShapeItem(sh->get_rank()));
    ADD_EVENT(this, VHE_Create, 0, loc);
    init_ravel();
 
@@ -412,17 +228,31 @@ Value::Value(const char * loc, const Shape * sh)
 
    set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value::~Value()
 {
    ADD_EVENT(this, VHE_Destruct, 0, LOC);
    unlink();
 
-   if (flags & VF_packed)
+   if (flags.ravel_type == (RPT_BOOL))
       {
-        uint8_t * bits = reinterpret_cast<uint8_t *>(ravel);
-        delete[] bits;
-        ravel = 0;
+        --value_count;
+        if (ravel.cells != ravel.short_value)   // don't free embedded buffer
+           {
+             // mirror the value_count/total_ravel_count bookkeeping of the
+             // long-value branch below, and (like that branch) deallocate
+             // via std::allocator<Cell>, matching how init_ravel() actually
+             // allocated the buffer via std::allocator<Cell>::allocate().
+             // Uses ravel.alloc_cells (the count actually passed to
+             // allocate()), not nz_element_count() (the current, possibly
+             // shrunk-in-place, logical count) -- see ravel.alloc_cells's
+             // own comment (Ravel.hh) and finding #3 of Blake McBride's
+             // Bugs12.md.
+             //
+             total_ravel_count -= ravel.alloc_cells;
+             std::allocator<Cell>{}.deallocate(ravel.cells, ravel.alloc_cells);
+           }
+        ravel.cells = 0;
         Assert(check_ptr == charP(this) + 7);
         check_ptr = 0;
         return;
@@ -453,21 +283,46 @@ const ShapeItem length = nz_element_count();
 
    --value_count;
 
-   if (ravel == 0)   return;   // new() failed
+   if (ravel.cells == 0)   return;   // new() failed
 
-   if (ravel != short_value)   // long value
+   if (ravel.cells != ravel.short_value)   // long value
       {
-        total_ravel_count -= length;
-        delete [] ravel;
+        // ravel.alloc_cells (the count originally passed to allocate()),
+        // NOT length (== nz_element_count(), the current logical count,
+        // which several primitives shrink in place after allocating a
+        // worst-case ravel -- see ravel.alloc_cells's own comment).
+        //
+        total_ravel_count -= ravel.alloc_cells;
+        std::allocator<Cell>{}.deallocate(ravel.cells, ravel.alloc_cells);
       }
 
    Assert(check_ptr == charP(this) + 7);
    check_ptr = 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Value::get_cellrefs(const char * loc)
 {
+   // Defense in depth for depth-cache invalidation (see plan.txt's
+   // 2026-09-01 analysis): every caller that reaches this point is about
+   // to hand out direct write access into this value's ravel, so this is
+   // always at least a *candidate* mutation site. The real invalidation
+   // guarantee comes from isolate_deep() (called upstream of every left-
+   // value construction, unconditionally, over the whole tree) -- this
+   // call is deliberately redundant with that, not a replacement for it:
+   // it costs one already-cache-resident byte write here, in exchange for
+   // catching any future left-value mechanism that reaches a nested
+   // sub-value via get_cellrefs() without having gone through
+   // isolate_deep() first.
+   //
+   invalidate_depth();
+
+   // LvalCell stores a Cell * address; that requires an unpacked (Cell-array)
+   // ravel.  Explode here so that every get_wravel() below returns a valid
+   // Cell reference regardless of how the value was constructed.
+   //
+   explode_to_Cells();
+
    /* Create a non-nested (!) (left-) value left_Z from this (right-) value.
       left_Z has the same shape and consists entirely of LvalCells that point
       to the corresponding cells of this value.
@@ -506,32 +361,186 @@ Value_P left_Z(get_shape(), loc);
         left_Z->set_ravel_Cell(0, LvalCell(&get_wproto(), this));
       }
 
+   left_Z->set_left_value();
    left_Z->check_value(LOC);
    return left_Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::neutralize_lval_cells(const char * loc)
+{
+   // nz_element_count(), not element_count(): an empty value has its
+   // LvalCell in its prototype, e.g. ⍳0↑V. And LvalCells can also sit in
+   // nested items, e.g. under ⊂ in (⊂V)←9 9 (Blake McBride, Bugs32 #25).
+   // Only LvalCells are changed, so recursing into the items of an
+   // ordinary (right-) value has no effect.
+   //
+   // A packed ravel has neither LvalCells nor PointerCells (and no Cells
+   // at all, so get_wravel() must not be used on it). Bugs37 #4.
+   //
+   if (is_packed())   return;
+
+   loop(d, nz_element_count())
+       {
+         Cell & cell = get_wravel(d);
+         if (cell.is_lval_cell())
+            {
+              cell.release(loc);
+              new (&cell)   IntCell(0);
+            }
+         else if (cell.is_pointer_cell())
+            {
+              cell.get_pointer_value()->neutralize_lval_cells(loc);
+            }
+       }
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::assign_cellrefs(Value_P new_value)
 {
    // assign new_value to this (left-) value
 
-const ShapeItem new_value_count = new_value->nz_element_count();
+   // LRM: "Pick with an empty left argument ... causes the whole array
+   // associated with the assigned name to be replaced", e.g.
+   // ((⍳0)⊃A)←new_value ←→ A←new_value, with none of the shape/count
+   // conformance that an ordinary selective specification requires. This
+   // marker (see set_lval_whole_symbol()) only survives an unbroken chain
+   // of empty-Pick applications straight from Symbol::resolve_lv() through
+   // to this assignment; anything else in between returns a fresh Value
+   // that never carries it, so the ordinary per-cell path below still
+   // applies to every other selective specification.
+   //
+   if (Symbol * sym = get_lval_whole_symbol())
+      {
+        sym->assign(new_value, true, LOC);
+        return;
+      }
+
+   // (A⊃B)←new_value where B[...A...] was already nested: replace the
+   // whole item wholesale, ignoring the old item's own shape (Blake
+   // McBride, Bugs28 #30) -- see set_lval_pick_slot(). Like the
+   // lval_whole_symbol marker above, this only survives an unbroken chain
+   // straight from Bif_F12_PICK::pick() through to this assignment; any
+   // outer selector narrowing this value (e.g. (1 0/A⊃B)←new_value) built
+   // a fresh Value for its own narrowed result and never copied the
+   // marker, so the ordinary per-cell path below still applies there.
+   //
+   if (Cell * slot = get_lval_pick_slot())
+      {
+        // no owner: Pick from a value assembled across several nested
+        // items, e.g. (1⊃∊⌽¨N)←9 for a depth-3 N (Blake McBride, Bugs32 #1)
+        //
+        if (get_lval_pick_owner() == 0)   LvalCell::throw_no_owner();
+
+        Value & owner = *get_lval_pick_owner();
+        owner.depth_update_for_overwrite(slot - owner.ravel.cells,
+                                new_value->is_simple_scalar() ? -1 : 0);
+        slot->release(LOC);
+        // init_from_value() enclose-wraps new_value in a fresh PointerCell
+        // unless it is itself a simple scalar, in which case it places a
+        // plain copy of that scalar's cell instead (⊂ of a simple scalar
+        // is a no-op) -- a bare PointerCell(new_value, owner) here would
+        // fail Assert(!sub_val->is_simple_scalar()) for e.g. (2⊃A)←7.
+        //
+        slot->init_from_value(new_value.get(), owner, LOC);
+        return;
+      }
+
+   // (S.a)←new_value with nothing selecting from S.a first, for either a
+   // scalar or an array member (Bugs30 #14): a bare member reference
+   // used directly as a selective-specification target looks exactly
+   // like a broken/incomplete selective specification -- unlike a plain
+   // symbol, where (X)←new_value is legitimately just X←new_value
+   // (handled by the lval_whole_symbol marker above), member variables
+   // are a GNU-APL-only construct free to reject this outright. Like the
+   // other two markers above, this only survives an unbroken chain
+   // straight from Prefix::reduce_D_V__()'s member-access reduction
+   // through to this assignment; a genuinely selective form such as
+   // (⌽S.a)←new_value or (2↑S.a)←new_value builds a fresh Value for its
+   // own (narrowed) result and never copies the marker, so those are
+   // unaffected.
+   //
+   if (get_lval_bare_member_ref())
+      {
+        MORE_ERROR() << "(S.member)←B: a bare member reference is not a "
+                        "valid selective-specification target -- select "
+                        "something from it first (e.g. (⌽S.member)←B), or "
+                        "assign to the member directly (S.member←B)";
+        neutralize_lval_cells(LOC);   // Bugs30 #14 (same as #28)
+        SYNTAX_ERROR;
+      }
+
+const ShapeItem new_value_count = new_value->element_count();
 const ShapeItem dest_count  = element_count();
-   if (dest_count == 0)   return;   // nothing to assign
 
-const int dest_incr = (dest_count == 1)                    ? 0 : 1;
-const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
+   // check_lval_consistency() (see its own definition, cValue.cc) rejects
+   // any ravel item that is neither an LvalCell nor a PointerCell -- the
+   // very mechanism that already correctly SYNTAX_ERRORs a non-empty
+   // plain constant used as an assignment target (e.g. 1 2 3←7). But
+   // dest_count == 0 used to return right here, before ever reaching
+   // that check below, so the empty-vector constant ⍬ (dest_count == 0,
+   // and not an lvalue either) slipped through as a silent no-op instead
+   // of being rejected the same way (Bugs30 #29: ⍬←2, (0⍴0)←2). Run the
+   // check first -- it uses nz_element_count() ("at least 1, for the
+   // prototype"), so it still sees ⍬'s own (non-lval) prototype cell
+   // even though dest_count itself is 0, while a genuinely empty
+   // *lvalue* selection (e.g. (0↑V)←⍬ for a real variable V, whose
+   // prototype cell is itself an LvalCell) still passes and returns as
+   // the legitimate no-op it always was.
+   //
+   check_lval_consistency();
+   if (dest_count == 0)   return;   // nothing to assign; established
+                                     // (Bugs28 #52) leniency for a
+                                     // genuinely empty selection, e.g.
+                                     // (V[⍬])←1 2 3 -- unlike dest_count
+                                     // >= 1 below, this is NOT narrowed
+                                     // to also require new_value_count
+                                     // to be 0 or 1; see Bracket_Index.tc.
+                                     // A[⍬]←B for a plain (unparenthesized)
+                                     // variable still correctly LENGTH
+                                     // ERRORs via the completely separate
+                                     // Symbol::assign_indexed() path.
 
-   if (src_incr  &&   // this is not a acalar or 1-element value, and
-       dest_incr &&   // new_value  is not a acalar or 1-element value, and
+   // nz_element_count() (used here previously) is "at least 1, for the
+   // prototype" -- a real, empty new_value made it look exactly like a
+   // legitimate 1-element (scalar-extendable) one below, silently
+   // zero-filling every selected cell with the prototype instead of
+   // raising the LENGTH ERROR that plain indexed assignment (A[...]←⍬)
+   // already correctly gives for the same shape mismatch (Bugs28 #31).
+   //
+   // Unconditionally now, not just when dest_count > 1 (Bugs30 #13/#16):
+   // a dest_count of exactly 1 used to be treated as inherently ambiguous
+   // between "select exactly one cell/item" (a 1-element ↑/⌷/..., or a
+   // member-array bracket index like S.b[1]) and "replace this whole
+   // slot wholesale" (Pick, or an ordinary, non-selective "V←B" lvalue)
+   // -- but the latter is now always reached via one of the dedicated
+   // markers above (lval_whole_symbol, lval_pick_slot) instead, which
+   // return long before this point, so anything still here with
+   // dest_count == 1 is a genuine 1-item *selection*, not a wholesale
+   // replace, and must enforce the same conformance as any other count:
+   // (1↑V)←⍬ was wrongly accepted (zero-filling the one selected item)
+   // exactly like plain indexed A[1]←⍬ is correctly LENGTH ERROR.
+   //
+   if (new_value_count == 0)
+      {
+        MORE_ERROR() << "(f Z)←B: B is empty; expecting ⍴,B to be 1 or "
+                     << dest_count << " (the number of selected items)";
+        neutralize_lval_cells(LOC);   // Bugs30 #28
+        LENGTH_ERROR;
+      }
+
+const int src_incr  = (new_value_count == 1)  ? 0 : 1;
+
+   if (src_incr  &&   // new_value is not a scalar or 1-element value, and
        !this->conforms_to(*new_value))   // non-trivial shape mismatch
       {
         // NOTE:  M←3 2ρι6 ◊ (1 0/M) ← 'abc' succeeds in IBM APL2, even
         //        though the shapes of 1 0/M and 'abc' differ. We therefore
         //
-        MORE_ERROR() << "in (f Z)←B: length(X⊃F Z) is " << dest_count
-                     << ", but length(X⊃V) is " << new_value_count
-                     << " (for some X)";
+        MORE_ERROR() << "(f Z)←B: expecting ⍴,B to be 1 or " << dest_count
+                     << " (the number of selected items); ⍴,B is "
+                     << new_value_count;
+        neutralize_lval_cells(LOC);   // Bugs30 #28
         LENGTH_ERROR;
       }
 
@@ -545,18 +554,26 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
 
     */
 
-   // consistency check: all items are LvalCells or PointerCells.
+   // consistency check (all items are LvalCells or PointerCells) already
+   // done above, before the dest_count == 0 check (Bugs30 #29).
    //
-   check_lval_consistency();
-
-   if (is_scalar() && !new_value->is_scalar())
+   // Bugs31 #18 (Blake McBride): LRM p.43 rule 2 ("if the right is a
+   // scalar, or an array with empty shape when ones are removed") means
+   // a 1-ELEMENT new_value (e.g. ,9, shape ,1) is exempt from rule 1's
+   // enclosure just as much as a genuine scalar is -- checking
+   // new_value->is_scalar() (rank == 0) instead of new_value_count == 1
+   // wrongly enclosed a 1-item non-scalar RHS like ,9 into (V[1])←,9,
+   // instead of scalar-extending it the same way (V[1])←9 already does.
+   //
+   if (is_scalar() && new_value_count != 1)
       {
-        const Cell * C0 = &get_cscalar();
+        Cell cache;
+        const Cell * C0 = &get_cscalar(cache);
         if (!C0->is_lval_cell())   LEFT_SYNTAX_ERROR;
-        const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
-        if (Cell * target = LVC0->get_lval_value())   // valid right Cell
+        if (Cell * target = C0->try_lval_value())   // valid right Cell
            {
-             Value & owner = *LVC0->get_cell_owner();
+             Value & owner = *C0->get_cell_owner();
+             owner.depth_update_for_overwrite(target - owner.ravel.cells, 0);
              target->release(LOC);   // free sub-values etc (if any)
              new (target)   PointerCell(new_value.get(), owner);
            }
@@ -565,7 +582,8 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
 
    loop(d, dest_count)
       {
-        const Cell & src = new_value->get_cravel(d * src_incr);
+        Cell src_cache;
+        const Cell & src = new_value->get_cravel(d * src_incr, src_cache);
         Cell & dest = get_wravel(d);
         if (dest.is_pointer_cell())
            {
@@ -582,28 +600,37 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
                 then all sub-values of dest must also be Lval Cells.
               */
               Value_P left_sub = dest.get_pointer_value();
+
+              // the item is the result of A⊃ (e.g. (1⊃¨N)←B): replace the
+              // picked item wholesale (as (A⊃N)←B does, LRM), not cell by
+              // cell with the shape of the old item (Bugs34 #18)
+              //
+              if (left_sub->get_lval_pick_slot())
+                 {
+                   left_sub->assign_cellrefs(src.is_pointer_cell()
+                                             ? src.get_pointer_value()
+                                             : src.to_value(LOC));
+                   continue;
+                 }
+
               Value_P right_sub;
               if (src.is_pointer_cell())   right_sub = src.get_pointer_value();
-              if (+right_sub)
+              if (right_sub)
                  {
                    if (left_sub->get_rank() != right_sub->get_rank())
                       {
-                        MORE_ERROR() <<
-                        "In selective specification: left rank is " <<
-                        left_sub->get_rank() << ", but right rank is " <<
-                        right_sub->get_rank();
+                        MORE_ERROR() << "(f Z)←B: expecting ⍴⍴B = "
+                                     << left_sub->get_rank()
+                                     << " (⍴⍴ of the selected item); ⍴⍴B is "
+                                     << right_sub->get_rank();
                         RANK_ERROR;
                       }
                    if (left_sub->get_shape() != right_sub->get_shape())
                       {
-                        const Shape & left_shape = left_sub->get_shape();
-                        const Shape & right_shape = right_sub->get_shape();
-
-                        MORE_ERROR()                                      <<
-                            "In selective specification: left shape is: " <<
-                            left_shape                                    <<
-                            ", but right shape is: "                      <<
-                            right_shape;
+                        MORE_ERROR() << "(f Z)←B: expecting ⍴B = "
+                                     << left_sub->get_shape()
+                                     << " (⍴ of the selected item); ⍴B is "
+                                     << right_sub->get_shape();
                         LENGTH_ERROR;
                       }
                  }
@@ -611,74 +638,38 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
                   {
                     Cell * Csub = &left_sub->get_wravel(s);
                     if (!Csub->is_lval_cell())   LEFT_SYNTAX_ERROR;
-              
-                    const LvalCell * LVC =
-                          reinterpret_cast<const LvalCell *>(Csub);
-                    Cell * target = LVC->get_lval_value();
-                    if (target)   // target can be 0!
-                       {
-                         target->release(LOC);   // free sub-values etc.
-                         Value & owner = *LVC->get_cell_owner();
 
+                    if (Cell * target = Csub->try_lval_value())   // 0 possible!
+                       {
+                         Value & owner = *Csub->get_cell_owner();
                          // if src is simple, then scalar extend it.
                          // Otherwise use item s of src.
                          //
-                         const Cell & right_cell = +right_sub ?
-                                     right_sub->get_cravel(s) : src;
-                         target->init(right_cell, owner, LOC);
+                         Cell right_cache;
+                         const Cell & right_cell = right_sub ?
+                                     right_sub->get_cravel(s, right_cache) : src;
+                         owner.depth_update_for_overwrite(target - owner.ravel.cells,
+                                    right_cell.is_pointer_cell() ? 0 : -1);
+                         target->release(LOC);   // free sub-values etc.
+                         right_cell.init_other(target, owner, LOC);
                        }
                   }
            }
         else if (dest.is_lval_cell())
            {
-             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(dest);
              if (Cell * target = dest.get_lval_value())   // target can be 0!
                 {
+                  Value & owner = *dest.get_cell_owner();
+                  owner.depth_update_for_overwrite(target - owner.ravel.cells,
+                                    src.is_pointer_cell() ? 0 : -1);
                   target->release(LOC);   // free sub-values etc (if any)
-
-                  // erase the pointee when overriding a pointer-cell.
-                  //
-                  Value & owner = *LVC.get_cell_owner();
-                  target->init(src, owner, LOC);
+                  src.init_other(target, owner, LOC);
                 }
            }
         else   LEFT_SYNTAX_ERROR;
       }
 }
-//----------------------------------------------------------------------------
-void
-Value::check_lval_consistency() const
-{
-const ShapeItem ec = nz_element_count();
-
-   /* check the following left value rules:
-     
-      1. every ravel item is either an LvalCell, or a PointerCell
-
-      2. for every LvalCells:
-      2a. either cell is 0 and owner is 0,
-      2b. or cell is ≠0 and owner is ≠0 and cell lies in the ravel of owner
-    */
-   loop(e, ec)
-       {
-         const Cell * cell = &get_cravel(e);   // rarely
-         if (cell->is_pointer_cell())
-            {
-              cell->get_pointer_value()->check_lval_consistency();
-            }
-         else if (cell->is_lval_cell())
-            {
-              const LvalCell * LVC = reinterpret_cast<const LvalCell *>(cell);
-              LVC->check_consistency();
-            }
-         else       // error, e.g. 3{⍺+2←⍵}4
-            {
-              MORE_ERROR() << "mal-formed selective specification";
-              SYNTAX_ERROR;
-            }
-       }
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_member(const vector<const UCS_string *> & members,
                   Value * & owner, bool throw_error)
@@ -765,231 +756,7 @@ Value::get_member(const vector<const UCS_string *> & members,
 
    FIXME;   // not reached
 }
-//----------------------------------------------------------------------------
-const Cell *
-Value::get_existing_member(const vector<const UCS_string *> & members) const
-{
-const Value * parent = this;
-
-   // members[members.size() - 1] == this
-   //
-   for (int m = members.size() - 2; m >= 0; --m)
-       {
-         if (!parent->is_member())
-            {
-              UCS_string & more = MORE_ERROR()
-                  << "member access: non-structured variable "
-                  << *members.back() << " has no member ";
-              more.append_members(members, 0);
-              DOMAIN_ERROR;
-            }
-
-         const UCS_string & member_ucs = *members[m];
-         if (parent->get_rank() != 2)
-            {
-              UCS_string & more = MORE_ERROR() << "member access: the rank of ";
-              more.append_members(members, m);
-              more << " is not 2.\n"
-                      "Expecting an N×2 matrix of member,value pairs.";
-              RANK_ERROR;
-            }
-
-         if (parent->get_cols() != 2)
-            {
-              UCS_string & more = MORE_ERROR()
-                 << "member access: the number of columns of ";
-              more.append_members(members, m);
-              more << " is not 2.\n"
-                      "Expecting an N×2 matrix of member,value pairs.";
-              LENGTH_ERROR;
-            }
-
-         const Cell * member_cell = parent->get_member_data(member_ucs);
-         if (member_cell)   // existing member
-            {
-              if (m == 0)   return member_cell; // final member
-
-              // more members coming. Then member_cell should point to a
-              // structured sub-member
-              //
-              if (!member_cell->is_pointer_cell() ||
-                  !member_cell->get_pointer_value()->is_member())
-                 {
-                   UCS_string & more = MORE_ERROR()
-                                << "member access: member " << member_ucs
-                                << " exists in ";
-                   more.append_members(members, m);
-                   more << " but its (internal) value is not nested";
-                   DOMAIN_ERROR;
-                 }
-
-              // next member
-              //
-              parent = member_cell->get_pointer_value().get();
-            }
-         else   // member does not exist
-            {
-              UCS_string & more = MORE_ERROR()
-                                       << "member access: structure ";
-              more.append_members(members, m + 1);
-              more << " has no member '" << member_ucs << "'.";
-              VALUE_ERROR;
-            }   // if (member_cell == 0)
-       }
-
-   FIXME;   // not reached
-}
-//----------------------------------------------------------------------------
-ShapeItem
-Value::get_all_members_count() const
-{
-   Assert(is_structured());
-
-ShapeItem count = 0;
-const ShapeItem rows = get_rows();
-   loop(r, rows)
-       {
-         const Cell & member_name_cell = get_cravel(2*r);
-         if (!member_name_cell.is_pointer_cell())   continue;  // unused row
-            {
-              ++count;
-              const Cell & member_data_cell = get_cravel(2*r + 1);
-              if (member_data_cell.is_pointer_cell())   // nested value
-                 {
-                   const Value & subval = *member_data_cell.get_pointer_value();
-                   if (!subval.is_structured())   continue;
-                   count += subval.get_all_members_count();
-                 }
-            }
-       }
-
-   return count;
-}
-//----------------------------------------------------------------------------
-void
-Value::used_members(std::vector<ShapeItem> & result, bool sorted) const
-{
-   Assert(is_structured());
-
-   // 1. colllect the used columns...
-   //
-const ShapeItem rows = get_rows();
-   result.reserve(rows);
-   loop(r, rows)
-       {
-         const Cell & member_name_cell = get_cravel(2*r);
-         if (!member_name_cell.is_pointer_cell())   continue;   // unused
-
-         result.push_back(r);
-       }
-
-   if (!sorted)   return;
-
-   // make result[m] ≤ result[m+k] for all k > 0 and all m ≥ 0
-   //
-   loop(m, result.size())   // for all m
-       {
-         ShapeItem small = m;   // assume that m is already the smallest
-         for (size_t j = m + 1; j < result.size(); ++j)   // for all j = m + k
-             {
-               if (get_cravel(2*result[small]).greater(get_cravel(2*result[j])))
-                  small = j;
-             }
-
-         if (small != m)   // there was an even smaller item above m
-            {
-              const ShapeItem tmp = result[m];
-              result[m] = result[small];
-              result[small] = tmp;
-            }
-       }
-
-}
-//----------------------------------------------------------------------------
-void
-Value::sorted_members(std::vector<ShapeItem> & result,
-                      const Unicode * filters) const
-{
-   // we take advantage of the fact that the positions in the member
-   // prefixes are limited, so we can sort them in linear time.
-   //
-   // CAUTION: This function works only for members with a _NNN prefix
-   // indication the sorting order (as produced by ⎕XML) @@@
-   //
-   Assert(is_structured());
-
-const Unicode filters_all[] = { UNI_DELTA_UNDERBAR, UNI_DELTA,
-                                UNI_UNDERSCORE,     Unicode_0 };
-
-   if (filters == 0)   filters = filters_all;
-
-const ShapeItem rows = get_rows();
-const ShapeItem max_member_count = get_all_members_count() + 1;   // ⎕IO←0 or 1
-const ShapeItem alloc = 2*max_member_count; // one for ⍙, one for ∆ and _
-ShapeItem * sorted = new ShapeItem[alloc];
-   if (sorted == 0)   WS_FULL;
-
-ShapeItem * sorted_attributes = sorted;      // ⍙
-ShapeItem * sorted_nodes = sorted + max_member_count;   // ∆ and _
-
-   loop(a, alloc)   sorted[a] = -1;
-
-   loop(r, rows)
-       {
-         const Cell & member_name_cell = get_cravel(2*r);
-         if (!member_name_cell.is_pointer_cell())   continue;   // unused
-
-         const Value & val = *member_name_cell.get_pointer_value();
-         ShapeItem member_pos;     // the position in the XML file
-         Unicode category;
-         UCS_string name;
-         Quad_XML::split_name(&category, &member_pos, &name, val);
-
-         Assert(member_pos <= max_member_count);
-         loop(f, 4)   // at most filters ⍙, ∆, and _
-             {
-               const Unicode filter = filters[f];
-               if (filter == Unicode_0)   break;
-               if (filter == category)
-                  {
-                    if (category == UNI_DELTA_UNDERBAR)
-                       sorted_attributes[member_pos] = r;
-                    else
-                       sorted_nodes[member_pos] = r;
-                    break;
-                  }
-             }
-       }
-
-   loop(a, alloc)
-       {
-         if (sorted[a] != -1)   result.push_back(sorted[a]);
-       }
-
-   delete [] sorted;
-}
-//----------------------------------------------------------------------------
-const Cell *
-Value::get_member_data(const UCS_string & member) const
-{
-const ShapeItem rows = get_rows();
-
-ShapeItem row = member.FNV_hash() % rows;
-   loop(r, rows)   // loop over member rows
-       {
-         if (++row >= rows)   row = 0;
-         const Cell & name_cell = get_cravel(2*row);
-
-         if (name_cell.is_pointer_cell() &&
-             name_cell.get_pointer_value()->equal_string(member))
-            return &get_cravel(2*row + 1);
-       }
-
-   // member row not found
-   //
-   return 0;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_member_data(const UCS_string & member_name)
 {
@@ -1004,7 +771,8 @@ ShapeItem row = member_name.FNV_hash() % rows;
    loop(r, rows)
        {
          if (++row >= rows)   row = 0;
-         const Cell & name_cell = get_cravel(2*row);
+         Cell cache;
+         const Cell & name_cell = get_cravel(2*row, cache);
 
          if (name_cell.is_pointer_cell() &&
              name_cell.get_pointer_value()->equal_string(member_name))
@@ -1015,67 +783,7 @@ ShapeItem row = member_name.FNV_hash() % rows;
    //
    return 0;
 }
-//----------------------------------------------------------------------------
-ShapeItem
-Value::get_member_count() const
-{
-   // this function shall only be called for values that have the same
-   // layout as structured variables.
-   //
-   // it checks if the first column of this value looks OK and returns
-   // the number of used rows.
-   //
-   Assert(get_cols() == 2);
-
-const ShapeItem rows = get_rows();
-ShapeItem valid_rows = 0;
-
-   loop(r, rows)
-      {
-        const Cell & name_cell = get_cravel(2*r);
-
-        /*
-           name_cell must  be:
-
-           i.   integer 0       for unused rows, or
-           ii.  any character   for 1-character member names, or else
-           iii. any string      for other member names
-
-         */
-        if (name_cell.is_integer_cell())   // maybe i.
-           {
-             if (name_cell.get_int_value() != 0)   // invalid unused
-                {
-                   MORE_ERROR() << "invalid member name in row "
-                                << r << " (integer)";
-                   DOMAIN_ERROR;
-                }
-           }
-        else
-           {
-             ++valid_rows;    // assume ii. or iii.
-
-             if (name_cell.is_pointer_cell())   // maybe iii ?
-                {
-                  if (!name_cell.get_pointer_value()->is_char_string())   // no.
-                     {
-                       MORE_ERROR() << "invalid member name in row "
-                                    << r << " (nested non-string)";
-                      DOMAIN_ERROR;
-                     }
-                }
-             else if (!name_cell.is_character_cell())   // unexpected type
-                     {
-                       MORE_ERROR() << "invalid member name in row "
-                                    << r << " (type)";
-                       DOMAIN_ERROR;
-                     }
-           }
-      }
-
-   return valid_rows;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Cell *
 Value::get_new_member(const UCS_string & new_member_name)
 {
@@ -1093,6 +801,17 @@ Value::get_new_member(const UCS_string & new_member_name)
                    cell->get_int_value() == 0)   // unused row
                   {
                     Value_P name_val(new_member_name, LOC);
+                    // member names are read-only, always short, and only
+                    // ever compared -- pack unconditionally (bypassing
+                    // the general pack_min_length threshold, which exists
+                    // to avoid packing overhead for values that might not
+                    // stay short) and, for anything that ends up heap
+                    // ravel'd, use the MemberNameRavel vtable instead of
+                    // plain Char16Ravel so character-wise access is
+                    // caught instead of silently allowed.
+                    name_val->try_pack(true);
+                    name_val->upgrade_member_name();
+                    invalidate_depth();   // growing an existing value
                     new (cell) PointerCell(name_val.get(), *this);
                     return cell + 1;
                   }
@@ -1122,15 +841,18 @@ Value::get_new_member(const UCS_string & new_member_name)
          double_ravel(LOC);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::double_ravel(const char * loc)
 {
-Cell * const old_ravel = ravel;
+Cell * const old_ravel = ravel.cells;
 
    Assert(is_member());
 const char * del = 0;
-   if (ravel != short_value)   del = reinterpret_cast<char *>(ravel);
+   if (ravel.cells != ravel.short_value)   // heap ravel
+      {
+        del = reinterpret_cast<const char *>(ravel.cells);
+      }
 
    Assert(get_rank() == 2);
    Assert(get_cols() == 2);
@@ -1138,12 +860,28 @@ const char * del = 0;
 const ShapeItem old_rows  = get_rows();
 const ShapeItem new_rows  = 2*old_rows;
 const ShapeItem new_cells = 2*new_rows;
+const ShapeItem old_alloc_cells = ravel.alloc_cells;   // for deallocate() below
 
-Cell * doubled = new Cell[new_cells];
+   // std::allocator<Cell>, not new Cell[]: init_ravel()/~Value() use
+   // std::allocator<Cell> throughout, and mixing allocator families is
+   // alloc-dealloc-mismatch UB (Blake McBride, Bugs12.md #4). The
+   // following loop placement-constructs every cell via IntCell::z0(),
+   // matching allocate()'s raw/uninitialized-memory contract exactly --
+   // no change needed there.
+   //
+Cell * doubled = std::allocator<Cell>{}.allocate(new_cells);
    loop(n, new_cells)   IntCell::z0(doubled + n);
-   valid_ravel_items = new_cells;
+   ravel.valid_ravel_items = new_cells;
+   ravel.alloc_cells = new_cells;
    shape.set_shape_item(0, new_rows);
-   ravel = doubled;
+   ravel.cells = doubled;
+
+   // keep total_ravel_count in sync with the grown ravel so that ~Value()
+   // (which subtracts ravel.alloc_cells, just updated above) does not
+   // under- or over-subtract and drift/underflow total_ravel_count.
+   //
+   if (del)   total_ravel_count += new_cells - old_alloc_cells; // was long already
+   else       total_ravel_count += new_cells;                  // was short, now long
 
    loop(r, old_rows)
        {
@@ -1164,41 +902,17 @@ Cell * doubled = new Cell[new_cells];
          memcpy(dest, old_member_data_cell, sizeof(Cell));
        }
 
-   delete [] del;   // del is char *, so no cell destructor is called
+   // del is char *, so std::allocator<Cell>::deallocate() does not (and
+   // must not -- these cells were memcpy()'d out or released() above,
+   // not destructed) call any cell destructors.
+   //
+   if (del)
+      std::allocator<Cell>{}.deallocate(
+          reinterpret_cast<Cell *>(const_cast<char *>(del)), old_alloc_cells);
 }
-//----------------------------------------------------------------------------
-Value *
-Value::get_lval_cellowner() const
-{
-   /* this Value may or may not be a left value. If it is, then its
-      top-level (!) ravel is a mix of:
-
-      1.  PointerCells pointing to (not yet get_cellrefs()ed) right Values,
-      2a. valid LvalCells (from get_cellrefs()), or
-      2b. invalid LvalCells(0, 0) (e.g. from ↑ overtake).
-
-      The first case 1. or 2a. (if any) determines the cellowner
-    */
-   loop(e, nz_element_count())
-      {
-        const Cell * cell = &get_cravel(e);
-        if (cell->is_pointer_cell())   // case 1.
-           {
-             return  cell->get_pointer_value()->get_lval_cellowner();
-           }
-
-        if (cell->is_lval_cell())      // case 2a. or 2b.
-           {
-             const LvalCell * lval = reinterpret_cast<const LvalCell *>(cell);
-             if (lval->get_cell_owner())   return lval->get_cell_owner();
-           }
-      }
-
-   return 0;   // not found (this is most likely not a left value)
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
-Value::is_or_contains(const Value * value, const Value * sub)
+Value::is_or_contains(const cValue * value, const cValue * sub)
 {
    if (value == 0)     return false;   // value is not a valid value
    if (value == sub)   return true;    // value is sub
@@ -1211,49 +925,14 @@ Value::is_or_contains(const Value * value, const Value * sub)
 
    return false;
 }
-//----------------------------------------------------------------------------
-void
-Value::flag_info(const char * loc, ValueFlags flag, const char * flag_name,
-                 bool set) const
-{
-const char * sc = set ? " SET " : " CLEAR ";
-const int new_flags = set ? flags | flag : flags & ~flag;
-const char * chg = flags == new_flags ? " (no change)" : " (changed)";
-
-   CERR << "Value " << voidP(this)
-        << sc << flag_name << " (" << HEX(flag) << ")"
-        << " at " << loc << " now = " << HEX(new_flags)
-        << chg << endl;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::init()
 {
    Log(LOG_startup)
       CERR << "Max. Rank            is " << MAX_RANK << endl;
 };
-//----------------------------------------------------------------------------
-bool
-Value::is_structured() const
-{
-   if (!is_member())      return false;
-   if (get_rank() != 2)   return false;
-   if (get_cols() != 2)   return false;
-
-const ShapeItem rows = get_rows();
-   loop(r, rows)
-       {
-         const Cell & key = get_cravel(2*r);
-         if (key.is_integer_cell() &&
-             key.get_int_value() == 0)                    ;   // OK: unused row
-         else if (key.is_pointer_cell() &&
-             key.get_pointer_value()->is_char_vector())   ;   // OK: key
-         else return false;
-       }
-
-   return true;    // OK: all rows were OK
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::add_member(const UCS_string & member_name, Value * member_value)
 {
@@ -1272,9 +951,26 @@ Value * member_owner = 0;
 Cell * data = get_member(members, member_owner, false);
    Assert(member_owner);
    Assert(member_owner == this);
+
+   // check before releasing/overwriting data: PointerCell's own
+   // constructor does the equivalent check internally, but by then
+   // data has already been release()'d below -- if the constructor
+   // then throws (e.g. LIMIT_ERROR_NESTING), data is left released but
+   // never reconstructed, a half-dead Cell that crashes the next code
+   // to walk this value's ravel (its own destructor included). See
+   // Bugs28 #9.
+   //
+   PointerCell::check_nesting_depth(member_value);
+
+   // get_member() can return an EXISTING (already-populated) member's
+   // cell, not just an unused slot -- placement-new over it without
+   // releasing first leaked the old sub-tree's reference (never
+   // decremented) and could double-count pointer_cell_count.
+   data->release(LOC);
+   invalidate_depth();   // (re-)setting an existing value's member
    new (data) PointerCell(member_value, *this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::mark_all_dynamic_values()
 {
@@ -1284,22 +980,7 @@ Value::mark_all_dynamic_values()
          dob->rValue().set_marked();
        }
 }
-//----------------------------------------------------------------------------
-void
-Value::unmark() const
-{
-   clear_marked();
-   if (is_packed())   return;
-
-const ShapeItem ec = nz_element_count();
-const Cell * C = &get_cfirst();
-   loop(e, ec)
-      {
-        if (C->is_pointer_cell())   C->get_pointer_value()->unmark();
-        ++C;
-      }
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::rollback(ShapeItem items, const char * loc)
 {
@@ -1310,23 +991,74 @@ Value::rollback(ShapeItem items, const char * loc)
    //
    while (more())   next_ravel_0();
 
-   const_cast<Value *>(this)->alloc_loc = loc;
+   alloc_loc = loc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Value::erase_all(ostream & out)
+Value::check_value(const char * loc)
 {
-   for (const DynamicObject * dob = DynamicObject::all_values.get_next();
-        dob != &DynamicObject::all_values; dob = dob->get_next())
+#ifdef cfg_VALUE_CHECK_WANTED
+
+   // if value was initialized by means of a next_ravel_XXX() mechanism,
+   // then all cells are supposed to be OK.
+   //
+   if (ravel.valid_ravel_items && ravel.valid_ravel_items >= element_count())
+      {
+        set_complete();
+        return;
+      }
+
+uint32_t error_count = 0;
+// this walks the ravel as an array of real Cell objects via pointer
+// arithmetic below, which is only valid for an unpacked (RPT_CELLS)
+// ravel -- same as ravel.cells itself, so read it directly rather than
+// through a fetcher/cache that may materialise a packed element.
+const Cell * C = ravel.cells;
+
+const ShapeItem ec = nz_element_count();
+    loop(c, ec)
        {
-         const Value & value = dob->rValue();
-         out << "erase_all() sees Value:" << endl
-             << "  Allocated by " << value.where_allocated() << endl
-             << "  ";
-         value.list_one(CERR, false);
+         const CellType ctype = C->get_cell_type();
+         switch(ctype)
+            {
+              case CT_CHAR:
+              case CT_POINTER:
+              case CT_CELLREF:
+              case CT_INT:
+              case CT_FLOAT:
+              case CT_COMPLEX:   break;   // OK
+
+              default:
+                 CERR << endl
+                      << "*** check_value(" << loc << ") detects:" << endl
+                      << "   bad ravel[" << c << "] (CellType "
+                      << ctype << ")" << endl;
+
+                 ++error_count;
+            }
+
+         if (error_count >= 10)
+            {
+              CERR << endl << "..." << endl;
+              break;
+            }
+
+         ++C;
        }
+
+   if (error_count)
+      {
+        CERR << "Shape: " << get_shape() << endl;
+        print(CERR) << endl
+           << "************************************************"
+           << endl;
+        Assert(0 && "corrupt ravel ");
+      }
+#endif
+
+   set_complete();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::erase_stale(const char * loc)
 {
@@ -1382,40 +1114,21 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
-ostream &
-Value::list_one(ostream & out, bool show_owners) const
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::erase_all(ostream & out)
 {
-   if (flags)
-      {
-        out << "   Flags =";
-        char sep = ' ';
-        if (is_member())     { out << sep << "MEMBER";     sep = '+'; }
-        if (is_complete())   { out << sep << "COMPLETE";   sep = '+'; }
-        if (is_marked())     { out << sep << "MARKED";     sep = '+'; }
-        if (is_packed())     { out << sep << "PACKED";     sep = '+'; }
-      }
-   else
-      {
-        out << "   Flags = NONE";
-      }
-
-   out << ", ⍴" << get_shape() << " ≡" << compute_depth() << ":" << endl;
-   print(out);
-   out << endl;
-
-   if (!show_owners)   return out;
-
-   // print owners...
-   //
-   out << "Owners of " << voidP(this) << ":" << endl;
-
-   Workspace::show_owners(out, *this);
-
-   out << "---------------------------" << endl << endl;
-   return out;
+   for (const DynamicObject * dob = DynamicObject::all_values.get_next();
+        dob != &DynamicObject::all_values; dob = dob->get_next())
+       {
+         const Value & value = dob->rValue();
+         out << "erase_all() sees Value:" << endl
+             << "  Allocated by " << value.where_allocated() << endl
+             << "  ";
+         value.list_one(CERR, false);
+       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 Value::list_all(ostream & out, bool show_owners)
 {
@@ -1429,1270 +1142,28 @@ int num = 0;
 
    return out << endl;
 }
-//----------------------------------------------------------------------------
-ShapeItem
-Value::get_enlist_count() const
-{
-const ShapeItem ec = element_count();
-ShapeItem count = ec;
-
-   // take care of non-simple cells...
-   //
-   loop(c, ec)
-       {
-         const Cell & cell = get_cravel(c);
-         if (cell.is_pointer_cell())
-            {
-               count--;   // deduct the pointer cell
-               count += cell.get_pointer_value()->get_enlist_count();
-            }
-         else if (cell.is_lval_cell())
-            {
-              if (Cell * cp = cell.get_lval_value())   // valid Lval cell
-                 {
-                   if (cp->is_pointer_cell())
-                      {
-                        count--;   // deduct the pointer cell
-                        count += cp->get_pointer_value()->get_enlist_count();
-                      }
-
-                   // otherwise the Lval cell points to a cell and was
-                   // counted correctly
-                 }
-              else   // invalid Lval cel
-                 {
-                   count--;   // deduct the Lval cell
-                 }
-            }
-       }
-
-   return count;
-}
-//----------------------------------------------------------------------------
-void
-Value::enlist_right(Value & Z) const
-{
-   // Z is a new (un-initialized) Value that shall be (recursively)
-   // initialized with the (non-pointer) items of this (right-) value
-   //
-   //
-   loop(c, element_count())
-       {
-         const Cell & cell = get_cravel(c);
-         if (cell.is_pointer_cell())
-            {
-              cell.get_pointer_value()->enlist_right(Z);
-            }
-         else if (!cell.is_lval_cell())
-            {
-              Z.next_ravel_Cell(cell);
-            }
-         else   FIXME;
-       }
-}
-//----------------------------------------------------------------------------
-void
-Value::enlist_left(Value & Z) const
-{
-   // Z is a new (un-initialized) Value that shall be (recursively)
-   // initialized with the (non-pointer) items of this (left-) value
-   //
-   loop(c, element_count())
-       {
-         const Cell & cell = get_cravel(c);
-         if (cell.is_pointer_cell())
-            {
-              cell.get_pointer_value()->enlist_left(Z);
-            }
-         else if (cell.is_lval_cell())
-            {
-              Cell * target = cell.get_lval_value();
-              if (target == 0)
-                 {
-                   CERR << "0-pointer at " LOC << endl;
-                 }
-              else if (target->is_pointer_cell())
-                 {
-                   reinterpret_cast<PointerCell *>(target)->isolate(LOC);
-                   target->get_pointer_value()->enlist_left(Z);
-                 }
-              else 
-                 {
-                   Z.next_ravel_Cell(cell);
-                 }
-            }
-         else   // neither PointerCell nor LvalCell
-            {
-              /* cell is a right hand cell in a left expression.
-                 This happens when assign_cellrefs() is flat (i.e. always)
-                 and this left-value contains pointer-cells (supposedly
-                 created AFTER get_celrefs() was called).
-
-                 test with:
-
-                 A←'ZIPPITY' 'DOO' 'DAH' ◊ (ϵA[2])←0 ◊ A
-                 A←(10 20 30) 'AB'       ◊ (ϵA)←⍳5   ◊ A
-                 A←''                    ◊ (↑A)←33   ◊ ↑A
-
-
-              */
-
-              // cannot use Z->next_ravel_Cell() since then the cell owner
-              // would be Z and not this!
-              //
-              LvalCell z(const_cast<Cell *>(&cell),
-                         const_cast<Value *>(this));
-              Z.next_ravel_Cell(z);
-            }
-       }
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_apl_char_vector() const
-{
-   if (get_rank() != 1)   return false;
-
-   loop(c, get_shape_item(0))
-      {
-        if (!get_cravel(c).is_character_cell())   return false;
-
-        const Unicode uni = get_cravel(c).get_char_value();
-        if (Avec::find_char(uni) == Avec::Invalid_CHT)   // not in ⎕AV
-           return false;
-      }
-
-   return true;
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_char_array() const
-{
-const Cell * C = &get_cfirst();
-   loop(c, nz_element_count())   // also check prototype
-      if (!C++->is_character_cell())   return false;   // not char
-   return true;
-}
-//----------------------------------------------------------------------------
-bool
-Value::NOTCHAR() const
-{
-   // always test element 0.
-   if (!get_cfirst().is_character_cell())   return true;
-
-const ShapeItem ec = element_count();
-   for (ShapeItem e = 1; e < ec; ++e)
-       if (!get_cravel(e).is_character_cell())   return true;
-
-   // all ravel items are (single) characters.
-   return false;
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_int_array() const
-{
-const ShapeItem ec = nz_element_count();
-   loop(c, ec)
-       {
-         if (!get_cravel(c).is_near_int())   return false;
-       }
-
-   return true;   // all ravel items are near-int
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_complex(bool check_numeric) const
-{
-const ShapeItem ec = nz_element_count();
-
-   loop(e, ec)
-      {
-        const Cell & cell = get_cravel(e);
-        if (!cell.is_numeric())
-           {
-             if (check_numeric)    DOMAIN_ERROR;
-             else                  continue;
-           }
-        if (!cell.is_near_real())   return true;
-      }
-
-   return false;   // all cells numeric and not complex
-}
-//----------------------------------------------------------------------------
-bool
-Value::can_be_compared() const
-{
-const ShapeItem count = nz_element_count();
-   loop(c, count)
-      {
-       const Cell & cell = get_cravel(c);
-       const CellType ctype = cell.get_cell_type();
-       if (ctype & (CT_CHAR | CT_INT | CT_FLOAT))   continue;
-       if (cell.is_near_real())                     continue;
-       if (cell.is_pointer_cell() &&
-           cell.get_pointer_value()->can_be_compared())   continue;
-       return false;
-      }
-
-   return true;
-}
-//----------------------------------------------------------------------------
-bool
-Value::equal_string(const UCS_string & ucs) const
-{
-   if (get_rank() == 1)        // most likely: char vector
-      {
-        const ShapeItem len = element_count();
-        if (ucs.ssize() != len)   return false;   // wrong length
-        loop(u, len)
-            if (ucs[u] != get_cravel(u).get_char_value())   // mismatch
-               return false;
-        return true;
-      }
-   else if (get_rank() == 0)   // rarely: char scalar
-      {
-        if (ucs.size() != 1)   return false;   // wrong length
-        return ucs[0] == get_cfirst().get_char_value();
-      }
-
-   RANK_ERROR;            // never
-}
-//----------------------------------------------------------------------------
-bool
-Value::get_sole_bool() const
-{
-   if (element_count() != 1)
-      {
-        if (element_count())
-           MORE_ERROR() << "Boolean array has length " << element_count()
-                        << " (expecting length 1).";
-        else
-           MORE_ERROR() << "Boolean array is empty (expecting length 1).";
-        LENGTH_ERROR;
-      }
-
-const Cell & c0 = get_cfirst();
-   if (c0.is_near_one())    return true;
-   if (c0.is_near_zero())   return false;
-
-   MORE_ERROR() << "array is not Boolean (expecting 0 or 1).";
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_simple() const
-{
-   if (flags & VF_packed)   return true;
-
-const ShapeItem count = element_count();
-const Cell * C = &get_cfirst();
-
-   loop(c, count)
-       {
-         if (C->is_pointer_cell())   return false;
-         if (C->is_lval_cell())      return false;
-         ++C;
-       }
-
-   return true;
-}
-//----------------------------------------------------------------------------
-bool
-Value::is_one_dimensional() const
-{
-   // lrm would not return false if the value itself is, e.g. a matrix.
-   // That is wrong, however
-   //
-   if (get_rank() > 1)   return false;
-
-const ShapeItem count = nz_element_count();
-const Cell * C = &get_cfirst();
-
-   loop(c, count)
-       {
-         if (C->is_pointer_cell())
-            {
-             Value_P sub_val = C->get_pointer_value();
-             if (sub_val->get_rank() > 1)                return false;
-             if (!sub_val->is_one_dimensional())         return false;
-            }
-         ++C;
-       }
-
-   return true;   // all items are scalars or vectors
-}
-//----------------------------------------------------------------------------
-APL_types::Depth
-Value::compute_depth() const
-{
-   if (is_scalar())
-      {
-        if (get_cfirst().is_pointer_cell())
-           {
-             APL_types::Depth d = get_cfirst().get_pointer_value()
-                                     ->compute_depth();
-             return 1 + d;
-           }
-
-        return 0;
-      }
-
-const ShapeItem count = nz_element_count();
-
-APL_types::Depth sub_depth = 0;
-   loop(c, count)
-       {
-         APL_types::Depth d = 0;
-         if (get_cravel(c).is_pointer_cell())
-            {
-              d = get_cravel(c).get_pointer_value()->compute_depth();
-            }
-         if (sub_depth < d)   sub_depth = d;
-       }
-
-   return sub_depth + 1;
-}
-//----------------------------------------------------------------------------
-CellType
-Value::flat_cell_types() const
-{
-int32_t ctypes = 0;
-
-const ShapeItem count = nz_element_count();
-   loop(c, count)   ctypes |= get_cravel(c).get_cell_type();
-
-   return CellType(ctypes);
-}
-//----------------------------------------------------------------------------
-CellType
-Value::flat_cell_subtypes() const
-{
-int32_t ctypes = 0;
-
-const ShapeItem count = nz_element_count();
-   loop(c, count)   ctypes |= get_cravel(c).get_cell_subtype();
-
-   return CellType(ctypes);
-}
-//----------------------------------------------------------------------------
-CellType
-Value::deep_cell_types() const
-{
-int32_t ctypes = 0;
-
-const ShapeItem count = nz_element_count();
-   loop(c, count)
-      {
-       const Cell & cell = get_cravel(c);
-        ctypes |= cell.get_cell_type();
-        if (cell.is_pointer_cell())
-            ctypes |= cell.get_pointer_value()->deep_cell_types();
-      }
-
-   return CellType(ctypes);
-}
-//----------------------------------------------------------------------------
-CellType
-Value::deep_cell_subtypes() const
-{
-int32_t ctypes = 0;
-
-const ShapeItem count = nz_element_count();
-   loop(c, count)
-      {
-       const Cell & cell = get_cravel(c);
-        ctypes |= cell.get_cell_subtype();
-        if (cell.is_pointer_cell())
-           ctypes |= cell.get_pointer_value()->deep_cell_subtypes();
-      }
-
-   return CellType(ctypes);
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::index(const IndexExpr & IX) const
-{
-   // if IX.value_count() were 1 (as in A[X] as opposed to A[X1;...]) then
-   // it should have been parsed as an axis and Value::index(Value_P X) should
-   // have been called instead of this one. This is an internal error.
-
-   if (is_member())
-      {
-         // for a structured variable VAR, we only allow VAR[1;] to obtain
-         // the valid member names...
-         //
-         if (IX.get_rank() != 2)   RANK_ERROR;
-         if (+IX.values[1])   // not elided
-            {
-              MORE_ERROR() << "member access: second index is not elided";
-              LENGTH_ERROR;   // not elided
-            }
-
-         if (IX.values[0]->element_count() != 1)
-            {
-              MORE_ERROR() << "member access: first index too long";
-              LENGTH_ERROR;   // not 1 columns
-            }
-
-         const APL_Integer col = IX.values[0]->get_cfirst().get_int_value();
-         if (col != Workspace::get_IO())           INDEX_ERROR;
-
-         // count the number of member names.
-         //
-         ShapeItem member_count = 0;
-         const ShapeItem rows = get_rows();
-         loop(row, rows)
-             {
-               if (get_cravel(2*row).is_pointer_cell())   ++member_count;
-             }
-
-         Value_P Z(member_count, LOC);
-         loop(row, rows)
-             {
-               if (get_cravel(2*row).is_pointer_cell())
-                  Z->next_ravel_Cell(get_cravel(2*row));
-             }
-
-         if (member_count == 0)   // no valid members (last member )ERASEd)
-            new (&Z->get_wfirst()) PointerCell(Idx0(LOC).get(), *Z);
-
-         Z->check_value(LOC);
-         return Z;
-      }
-
-   Assert(!IX.is_axis());   // should have called index(Value_P X)
-
-   if (get_rank() != IX.get_rank())   RANK_ERROR;   // ISO p. 158
-
-   // Notes:
-   //
-   // 1.  IX is parsed from right to left:    B[I2;I1;I0]  --> I0 I1 I2
-   //     the shapes of this and IX are then related as follows:
-   //
-   //     this     IX
-   //     ---------------
-   //     0        rank-1   (rank = IX->value_count())
-   //     1        rank-2
-   //     ...      ...
-   //     rank-2   1
-   //     rank-1   0
-   //     ---------------
-   //
-   // 2.  shape Z is the concatenation of all shapes in IX
-   // 3.  rank Z is the sum of all ranks in IX
-
-   // construct result rank_Z and shape_Z.
-   // We go from higher indices of IX to lower indices (Note 1.)
-   //
-Shape shape_Z;
-   loop(this_r, get_rank())
-       {
-         const ShapeItem idx_r = get_rank() - this_r - 1;
-
-         Value_P I = IX.values[idx_r];
-         if (!I)
-            {
-              shape_Z.add_shape_item(this->get_shape_item(this_r));
-            }
-         else
-            {
-              loop(s, I->get_rank())
-                shape_Z.add_shape_item(I->get_shape_item(s));
-            }
-       }
-
-   // check that all indices are valid
-   //
-   IX.check_index_range(get_shape());
-
-MultiIndexIterator mult(get_shape(), IX);
-
-Value_P Z(shape_Z, LOC);
-const ShapeItem ec_z = Z->element_count();
-
-   if (ec_z == 0)   // empty result
-      {
-        Z->set_default(*this, LOC);
-        Z->check_value(LOC);
-        return Z;
-      }
-
-   // construct iterators.
-   // We go from lower indices to higher indices in IX, which
-   // means from higher indices to lower indices in this and Z
-   //
-   loop(z, ec_z)
-       Z->next_ravel_Cell(get_cravel(mult++));
-
-   Assert(!mult.has_more());
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::index(const Value * X) const
-{
-   if (!X)   // A[] (1-item elided index)
-      {
-        return CLONE(const_cast<Value *>(this), LOC);
-      }
-
-   if (is_member())
-      {
-
-        const UCS_string name(*X);
-
-        if (const Cell * data = get_member_data(name))   // member exists
-           {
-             if (data->is_pointer_cell())
-                {
-                  return CLONE_P(data->get_pointer_value(), LOC);
-                }
-             Value_P Z(LOC);
-             Z->next_ravel_Cell(*data);
-             Z->check_value(LOC);
-             return Z;
-           }
-
-        // construct a )MORE error...
-        //
-        UCS_string & more = MORE_ERROR();
-        more << "member access: member " << name
-             << " not found. The valid members are:";
-        const ShapeItem rows = get_rows();
-        loop(r, rows)
-            {
-              const Cell & cell_r = get_cravel(2*r);
-              if (cell_r.is_pointer_cell())
-                 {
-                   more << "\n      "
-                        << UCS_string(*cell_r.get_pointer_value());
-                 }
-            }
-        INDEX_ERROR;
-      }
-
-const ShapeItem max_idx = element_count();
-const APL_Integer qio = Workspace::get_IO();
-
-   // important (since frequent) special case: A[X] with scalar X and vector A
-   //
-   if (get_rank() == 1 && X->is_scalar())
-      {
-        const APL_Integer idx0 = X->get_cscalar().get_near_int() - qio;
-        if (idx0 >= 0 && idx0 < max_idx)
-           {
-             Value_P Z(LOC);
-             Z->next_ravel_Cell(get_cravel(idx0));
-             Z->check_value(LOC);
-             return Z;
-           }
-
-        // fall through re-using the verbose INDEX_ERROR below
-      }
-
-   if (get_rank() != 1)   RANK_ERROR;
-
-   // ⍴A[X] = ⍴X
-   //
-Value_P Z(X->get_shape(), LOC);
-
-const Cell * cI = &X->get_cfirst();
-
-   while (Z->more())
-      {
-         const ShapeItem idx0 = cI++->get_near_int() - qio;
-         if (idx0 < 0 || idx0 >= max_idx)
-            {
-              MORE_ERROR() << "min index=⎕IO (=" << qio
-                           <<  "), offending index=" << (idx0 + qio)
-                           << ", max index=⎕IO+" << (max_idx - 1)
-                           << " (=" << (max_idx + qio - 1) << ")";
-              Z->rollback(Z->valid_ravel_items, LOC);
-              INDEX_ERROR;
-            }
-
-         Z->next_ravel_Cell(get_cravel(idx0));
-      }
-
-   Z->set_default(*this, LOC);
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-sRank
-Value::get_single_axis(const Value * val, sRank max_axis)
-{
-   if (val == 0)   AXIS_ERROR;
-
-   if (!val->is_scalar_or_len1_vector())     AXIS_ERROR;
-
-   if (!val->get_cfirst().is_near_int())   AXIS_ERROR;
-
-   // if axis becomes (signed) negative then it will be (unsigned) too big.
-   // Therefore we need not test for < 0.
-   //
-const int axis = val->get_cfirst().get_near_int() - Workspace::get_IO();
-   if (axis >= max_axis)   AXIS_ERROR;
-
-   return axis;
-}
-//----------------------------------------------------------------------------
-Shape
-Value::to_shape(const Value * val)
-{
-   if (val == 0)
-      {
-        MORE_ERROR() << "illegal elided index [].";
-        INDEX_ERROR;   // elided index ?
-      }
-
-const ShapeItem xlen = val->element_count();
-const APL_Integer qio = Workspace::get_IO();
-
-Shape shape;
-     loop(x, xlen)
-        shape.add_shape_item(val->get_cravel(x).get_near_int() - qio);
-
-   return shape;
-}
-//----------------------------------------------------------------------------
-AxesBitmap
-Value::to_bitmap(const char * where, uRank rank_B) const
-{
-const APL_Integer qio = Workspace::get_IO();
-AxesBitmap ret = 0;
-
-   if (get_rank() > 1)
-      {
-         MORE_ERROR() << "In " << where
-                      << ": invalid ⍴⍴X ( = " << get_rank() << ")";
-         AXIS_ERROR;
-      }
-
-   // note: length error on X will either produce a range error or a
-   // duplicte error below.
-   //
-   loop(e, element_count())
-       {
-         const Cell & cX = get_cravel(e);
-         if (!cX.is_near_int())
-            {
-              MORE_ERROR() << "In " << where << ": X[" << (e + qio)
-                           << "] is not integral.";
-              AXIS_ERROR;
-            }
-
-         const APL_Integer axis = cX.get_near_int() - qio;
-         if (axis < 0)
-            {
-              MORE_ERROR() << "In " << where << " : X[" << (e + qio)
-                           << "] = " << (axis + qio)
-                           << " is too small (note: ⎕IO is " << qio << ").";
-              AXIS_ERROR;
-            }
-
-         if (axis >= rank_B)
-            {
-              MORE_ERROR() << "In " << where << " : X[" << (e + qio)
-                           << "] = " << (axis + qio)
-                           << " is too large (note: ⍴⍴B is " << rank_B << ").";
-              AXIS_ERROR;
-            }
-
-         if (ret & 1 << axis)   // aready set
-            {
-              MORE_ERROR() << "In " << where << " : duplicate axis X["
-                           << (e + qio) << "] = " << (axis + qio);
-              AXIS_ERROR;
-            }
-
-         ret |= 1 << axis;
-       }
-
-   return ret;
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::glue(const Token & token_A, const Token & token_B, const char * loc)
-{
-Value_P A = token_A.get_apl_val();
-Value_P B = token_B.get_apl_val();
-
-const bool strand_A = token_A.get_tag() == TOK_APL_VALUE3;
-const bool strand_B = token_B.get_tag() == TOK_APL_VALUE3;
-
-   // in this context, a strand is an (open) strand, i.e. a strand to which
-   // another item can be glued. The result is always an open strand (so
-   // the caller must put it into an TOK_APL_VALUE3).
-   //
-   if (strand_A)   // A is a strand
-      {
-        if (strand_B)   return glue_strand_strand(*A, *B, loc);
-        else            return glue_strand_item(*A, *B, loc);
-      }
-   else            // A is an item
-      {
-        if (strand_B)   return glue_item_strand(*A, *B, loc);
-        else            return glue_item_item(*A, *B, loc);
-      }
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::glue_strand_strand(const Value & strand_A, const Value & strand_B,
-                          const char * loc)
-{
-   // glue two strands A and B together
-   //
-const ShapeItem len_A = strand_A.element_count();
-const ShapeItem len_B = strand_B.element_count();
-
-   Log(LOG_glue)
-      {
-        CERR << "gluing strands " << endl << strand_A
-             << "with shape " << strand_A.get_shape() << endl
-             << " and " << endl << strand_B << endl
-             << "with shape " << strand_B.get_shape() << endl;
-      }
-
-   Assert(strand_A.is_scalar_or_vector());
-   Assert(strand_B.is_scalar_or_vector());
-
-Value_P Z(len_A + len_B, LOC);
-
-   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
-   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
-
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::glue_strand_item(const Value & strand_A, Value & item_B,
-                        const char * loc)
-{
-   // glue a strand A to new item B
-   //
-   Log(LOG_glue)
-      {
-        CERR << "gluing strand " << endl << strand_A
-             << " to item " << endl << item_B << endl;
-      }
-
-   Assert(strand_A.is_scalar_or_vector());
-
-const ShapeItem len_A = strand_A.element_count();
-Value_P Z(len_A + 1, LOC);
-
-   loop(a, len_A)   Z->next_ravel_Cell(strand_A.get_cravel(a));
-   Z->next_ravel_Value(&item_B);
-
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::glue_item_strand(Value & item_A, const Value & strand_B,
-                        const char * loc)
-{
-   // glue a new item A to the strand B
-   //
-const ShapeItem len_A = item_A.element_count();
-const ShapeItem len_B = strand_B.element_count();
-   Log(LOG_glue)
-      {
-        CERR << "gluing item[" << len_A << "] " << endl << item_A
-             << " to strand[" << len_B << "] " << endl << strand_B << endl;
-      }
-
-   Assert(strand_B.is_scalar_or_vector());
-
-Value_P Z(len_B + 1, LOC);
-   Z->next_ravel_Value(&item_A);
-
-   loop(b, len_B)   Z->next_ravel_Cell(strand_B.get_cravel(b));
-
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-Value_P
-Value::glue_item_item(Value & item_A, Value & item_B, const char * loc)
-{
-   // glue two items together, starting a strand
-   //
-   Log(LOG_glue)
-      {
-        CERR << "gluing two items " << endl << item_A
-             << " and " << endl << item_B << endl;
-      }
-
-Value_P Z(2, LOC);
-   Z->next_ravel_Value(&item_A);
-   Z->next_ravel_Value(&item_B);
-
-   Z->check_value(LOC);
-   return Z;
-}
-//----------------------------------------------------------------------------
-void
-Value::check_value(const char * loc)
-{
-#ifdef cfg_VALUE_CHECK_WANTED
-
-   // if value was initialized by means of a next_ravel_XXX() mechanism,
-   // then all cells are supposed to be OK.
-   //
-   if (valid_ravel_items && valid_ravel_items >= element_count())
-      {
-        set_complete();
-        return;
-      }
-
-uint32_t error_count = 0;
-const Cell * C = &get_cfirst();
-
-const ShapeItem ec = nz_element_count();
-    loop(c, ec)
-       {
-         const CellType ctype = C->get_cell_type();
-         switch(ctype)
-            {
-              case CT_CHAR:
-              case CT_POINTER:
-              case CT_CELLREF:
-              case CT_INT:
-              case CT_FLOAT:
-              case CT_COMPLEX:   break;   // OK
-
-              default:
-                 CERR << endl
-                      << "*** check_value(" << loc << ") detects:" << endl
-                      << "   bad ravel[" << c << "] (CellType "
-                      << ctype << ")" << endl;
-
-                 ++error_count;
-            }
-
-         if (error_count >= 10)
-            {
-              CERR << endl << "..." << endl;
-              break;
-            }
-
-         ++C;
-       }
-
-   if (error_count)
-      {
-        CERR << "Shape: " << get_shape() << endl;
-        print(CERR) << endl
-           << "************************************************"
-           << endl;
-        Assert(0 && "corrupt ravel ");
-      }
-#endif
-
-   set_complete();
-}
-//----------------------------------------------------------------------------
-int
-Value::total_CDR_size_netto(CDR_type cdr_type) const
-{
-   if (cdr_type != 7)   // not nested
-      return 16 + 4*get_rank() + CDR_data_size(cdr_type);
-
-   // nested: header + offset-array + sub-values.
-   //
-const ShapeItem ec = nz_element_count();
-int size = 16 + 4*get_rank() + 4*ec;   // top_level size
-   size = (size + 15) & ~15;           // rounded up to 16 bytes
-
-   loop(e, ec)
-      {
-        const Cell & cell = get_cravel(e);
-        if (cell.is_simple_cell())
-           {
-             // a non-pointer sub value consisting of its own 16 byte header,
-             // and 1-16 data bytes, padded up to 16 bytes,
-             //
-             size += 32;
-           }
-        else if (cell.is_pointer_cell())
-           {
-             Value_P sub_val = cell.get_pointer_value();
-             const CDR_type sub_type = sub_val->get_CDR_type();
-             size += sub_val->total_CDR_size_brutto(sub_type);
-           }
-         else
-           DOMAIN_ERROR;
-      }
-
-   return size;
-}
-//----------------------------------------------------------------------------
-int
-Value::CDR_data_size(CDR_type cdr_type) const
-{
-const ShapeItem ec = nz_element_count();
-   
-   switch (cdr_type) 
-      {
-        case 0: return (ec + 7) / 8;   // 1/8 byte bit, rounded up
-        case 1: return 4*ec;           //   4 byte integer
-        case 2: return 8*ec;           //   8 byte float
-        case 3: return 16*ec;          // two 8 byte floats
-        case 4: return ec;             // 1 byte char
-        case 5: return 4*ec;           // 4 byte Unicode char
-        case 7: break;                 // nested: continue below.
-             
-        default: FIXME;
-      }      
-             
-   // compute size of a nested CDR.
-   // The top level consists of structural offsets that do not count as data.
-   // We therefore simly add up the data sizes for the sub-values.
-   //
-int size = 0;
-   loop(e, ec)
-      {
-        const Cell & cell = get_cravel(e);
-        if (cell.is_simple_cell())
-           {
-             size += cell.CDR_size();
-           }
-        else if (cell.is_pointer_cell())
-           {
-             Value_P sub_val = cell.get_pointer_value();
-             const CDR_type sub_type = sub_val->get_CDR_type();
-             size += sub_val->CDR_data_size(sub_type);
-           }
-         else
-           DOMAIN_ERROR;
-      }
-
-   return size;
-}
-//----------------------------------------------------------------------------
-CDR_type
-Value::get_CDR_type() const
-{
-const ShapeItem ec = nz_element_count();
-const Cell & cell_0 = get_cfirst();
-
-   // if all cells are characters (8 or 32 bit), then return 4 or 5.
-   // if all cells are numeric (1, 32, 64, or 128 bit, then return  0 ... 3
-   // otherwise return 7 (nested) 
-
-   if (cell_0.is_character_cell())   // 8 or 32 bit characters.
-      {
-        bool has_big = false;   // assume 8-bit char
-        loop(e, ec)
-           {
-             const Cell & cell = get_cravel(e);
-             if (!cell.is_character_cell())   return CDR_NEST32;
-             const Unicode uni = cell.get_char_value();
-             if (uni < 0)      has_big = true;
-             if (uni >= 256)   has_big = true;
-           }
-
-        return has_big ? CDR_CHAR32 : CDR_CHAR8;   // 8-bit or 32-bit char
-      }
-
-   if (cell_0.is_numeric())
-      {
-        bool has_int     = false;
-        bool has_float   = false;
-        bool has_complex = false;
-
-        loop(e, ec)
-           {
-             const Cell & cell = get_cravel(e);
-             if (cell.is_integer_cell())
-                {
-                  const APL_Integer i = cell.get_int_value();
-                  if (i == 0)                   ;
-                  else if (i == 1)              ;
-                  else if (i >  0x7FFFFFFFLL)   has_float = true;
-                  else if (i < -0x80000000LL)   has_float = true;
-                  else                          has_int   = true;
-                }
-             else if (cell.is_float_cell())
-                {
-                  has_float  = true;
-                }
-             else if (cell.is_complex_cell())
-                {
-                  has_complex  = true;
-                }
-             else return CDR_NEST32;   // mixed: return 7
-           }
-
-        if (has_complex)   return CDR_CPLX128;
-        if (has_float)     return CDR_FLT64;
-        if (has_int)       return CDR_INT32;
-        return CDR_BOOL1;
-      }
-
-   return CDR_NEST32;
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print(ostream & out) const
-{
-   if (is_member())   return print_member(out, UCS_string());
-
-PrintContext pctx = Workspace::get_PrintContext(PR_APL);
-   if (get_rank() == 0)   // scalar
-      {
-        pctx.set_style(PR_APL_MIN);
-      }
-   else if (get_rank() == 1)   // vector
-      {
-        if (element_count() == 0 &&   // empty vector
-            (get_cfirst().is_simple_cell()))
-           {
-             return out << endl;
-           }
-
-        pctx.set_style(PR_APL_MIN);
-      }
-   else                  // matrix or higher
-      {
-        pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
-      }
-
-PrintBuffer pb(*this, pctx, &out);   // constructor prints it
-   return out;
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print_brief(ostream & out) const
-{
-   // shape
-   //
-   out << "⍴";
-   loop(r, shape.get_rank())
-       {
-         r && out << ";";
-         out << shape.get_shape_item(r);
-       }
-
-   // depth
-   //
-   out << "≡" << compute_depth() << " ";
-
-   // ravel
-   //
-const int count = min(3, int(element_count()));
-   if (count == 0)   out << "⌽";   // empty
-   loop(c, count)
-      {
-        if (c)    out << " ";
-        const Cell & cell = get_cravel(c);
-        if (cell.is_integer_cell())        out << cell.get_int_value();
-        else if (cell.is_float_cell())     out << "FLT";
-        else if (cell.is_complex_cell())   out << "CPLX";
-        else if (cell.is_pointer_cell())   out << "⊂";
-        if (element_count() > count)       out << "...";
-      }
-
-   return out;
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print_member(ostream & out, UCS_string member_prefix) const
-{
-const ShapeItem rows = get_rows();
-
-   // figure the longest member name...
-   //
-ShapeItem longest_name = 0;
-   loop(r, rows)
-      {
-        const Cell & cell = get_cravel(2*r);   // (nested) member-name or 0
-        if (cell.is_pointer_cell())
-           {
-              Value_P member_name = cell.get_pointer_value();
-              const ShapeItem name_len = member_name->element_count();
-              if (longest_name < name_len)  longest_name = name_len;
-           }
-      }
-
-const size_t indent = member_prefix.size() + longest_name + 3;
-
-   loop(r, rows)
-       {
-         const Cell * cell = &get_cravel(2*r);   // (nested) member-name or 0
-         if (!cell->is_pointer_cell())       continue;
-
-         Value_P cell_sub = cell->get_pointer_value();
-         Assert(cell_sub->is_char_string());
-
-         // print the member name
-         //
-         const UCS_string member_name = cell_sub->get_UCS_ravel();
-         const size_t pad = longest_name - member_name.size();
-         UCS_string member = member_prefix;   // ancestor.ancestor ...
-         member << UNI_FULLSTOP << member_name;
-         out << member << ": ";
-         out << UCS_string(pad, UNI_SPACE);
-
-         // print the member value
-         //
-         ++cell;   // member value
-         if (cell->is_pointer_cell())   // sub-member or leaf
-            {
-              bool printed = false;
-              Value_P sub = cell->get_pointer_value();
-              if (sub->is_member())
-                 {
-                   out << "□" << endl;
-                   sub->print_member(out, member);
-                   printed = true;
-                 }
-              else if (sub->is_char_vector())   // maybe multi-line with \n
-                 {
-                   Value_P sub1 = Quad_CR::do_CR35(sub.get());
-                   Value_P sub2 = Bif_F12_PICK::disclose(sub1, false);
-                   if (sub2->get_rows() > 1)
-                      {
-                        sub2->print_boxed(out, indent);
-                        printed = true;
-                      }
-
-                   // for obscure reasons we need to release the lines in sub1
-                   //
-                   loop(c, sub1->nz_element_count())
-                       {
-                         Cell & cell = sub1->get_wravel(c);
-                         cell.release(LOC);
-                         IntCell::z0(&cell);
-                       }
-                 }
-
-              if (!printed)
-                 {
-                   sub->print_boxed(out, indent);
-                 }
-            }
-         else                           // simple member value
-            {
-              Value_P sub(*cell, LOC);
-              sub->print_boxed(out, indent);
-            }
-       }
-
-   return out;
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print1(ostream & out, PrintContext pctx) const
-{
-int style = pctx.get_style();
-   if (get_rank() < 2)   // scalar or vector
-      {
-        style = PR_APL_MIN;
-      }
-   else                  // matrix or higher
-      {
-        style |= PST_NO_FRACT_0;
-      }
-
-   pctx.set_style(PrintStyle(style));
-
-PrintBuffer pb(*this, pctx, &out);
-   return out;
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print_properties(ostream & out, int indent, bool help) const
-{
-UCS_string ind(indent, UNI_SPACE);
-   if (help)
-      {
-        out << ind << "Rank:  " << get_rank()  << endl
-            << ind << "Shape:";
-        loop(r, get_rank())   out << " " << get_shape_item(r);
-        out << endl
-            << ind << "Depth: " << compute_depth()   << endl
-            << ind << "Type:  ";
-
-       const CellType types = deep_cell_types();
-       if (!(types & CT_CHAR))           // no chars in this value
-          out << "numeric";
-       else if (!(types & CT_NUMERIC))   // no numbers in this value
-          out << "character";
-       else                              // chars and numbers in this value
-          out << "mixed";
-      }
-   else
-      {
-        out << ind << "Addr:    " << voidP(this) << endl
-            << ind << "Rank:    " << get_rank()  << endl
-            << ind << "Shape:   " << get_shape() << endl
-            << ind << "Flags:   " << get_flags();
-        if (is_complete())    out << " VF_complete";
-        if (is_marked())      out << " VF_marked";
-        if (is_member())      out << " VF_member";
-        if (is_packed())      out << " VF_packed";
-        out << endl
-             << ind << "First:   " << get_cfirst()  << endl
-             << ind << "Dynamic: ";
-
-        DynamicObject::print(out);
-      }
-   return out;
-}
-//----------------------------------------------------------------------------
-void
-Value::debug(const char * info) const
-{
-const PrintContext pctx = Workspace::get_PrintContext(PR_APL);
-PrintBuffer pb(*this, pctx, 0);
-   pb.debug(CERR, info);
-}
-//----------------------------------------------------------------------------
-ostream &
-Value::print_boxed(ostream & out, int indent) const
-{
-const PrintContext pctx(PST_NONE);
-
-Value_P Z = Quad_CR::do_CR(8, this, pctx);
-   Assert(Z->get_rank() == 2);
-const ShapeItem rows = Z->get_rows();
-const ShapeItem cols = Z->get_cols();
-   loop(r, rows)
-       {
-         if (indent && r)   out << UCS_string(indent, UNI_SPACE);
-         loop(c, cols)   out << Z->get_cravel(c + r*cols).get_char_value();
-         out << endl;
-       }
-   out << endl;
-   return out;
-}
-//----------------------------------------------------------------------------
-UCS_string
-Value::get_UCS_ravel() const
-{
-UCS_string ucs;
-
-const ShapeItem ec = element_count();
-   loop(e, ec)   ucs << get_cravel(e).get_char_value();
-
-   return ucs;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Value::to_type(bool force_numeric)
 {
-   loop(e, nz_element_count())
+   // set_ravel_Char()/set_ravel_Int() below placement-new a full 24-byte
+   // Cell at Cell stride; a packed (non-RPT_CELLS) ravel's elements are
+   // narrower and more closely spaced, so writing Cells directly into one
+   // without unpacking first overruns adjacent elements and leaves the
+   // (still-installed) packed fetcher reinterpreting Cell internals (e.g.
+   // a vtable pointer) as packed data. explode_to_Cells() is a no-op if
+   // the ravel is already RPT_CELLS.
+   explode_to_Cells();
+
+const ShapeItem ec = nz_element_count();
+
+   loop(e, ec)
       {
         Cell & cell = get_wravel(e);
         if (cell.is_pointer_cell())
            {
-             PointerCell & ptr_cell = reinterpret_cast<PointerCell &>(cell);
-             ptr_cell.isolate(LOC);
-             ptr_cell.get_pointer_value()->to_type(force_numeric);
+             cell.isolate(LOC);
+             cell.get_pointer_value()->to_type(force_numeric);
            }
         else if (cell.is_character_cell() && ! force_numeric)
            {
@@ -2704,164 +1175,818 @@ Value::to_type(bool force_numeric)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Value::print_structure(ostream & out, int indent, ShapeItem idx) const
+Value::explode_to_Cells()
 {
-   loop(i, indent)   out << "    ";
-   if (indent)   out << "[" << idx << "] ";
-   out << "addr=" << voidP(this)
-       << " ≡" << compute_depth()
-       << " ⍴" << get_shape()
-       << " flags: " << HEX4(get_flags()) << "   "
-       << get_flags()
-       << " " << where_allocated()
-       << endl;
+   if (!is_packed())   return;
 
-const ShapeItem ec = nz_element_count();
-const Cell * c = &get_cfirst();
-   loop(e, ec)
+   /*
+      Unpack in reverse index order so that reading packed[i] (at a low offset)
+      never conflicts with the Cell[i] we are about to write (at a higher
+      offset). sizeof(Cell)=24 >= sizeof(any packed element), so Cell[i]
+      at i×24 is always placed at or beyond packed[i], and already-written
+      Cells at i+1..N-1 are entirely above the packed data for 0..i-1.
+    */
+
+   // length 1 Cells are necer exploded: no need for nz_element_count()
+const ShapeItem N = element_count();
+Cell * dst = ravel.cells + N;
+
+   switch (get_ravel_type())
       {
-        if (c->is_pointer_cell())
-           c->get_pointer_value()->print_structure(out, indent + 1, e);
-        ++c;
+        case RPT_BOOL:
+             rev_loop(i, N)
+                 {
+                   new (--dst) IntCell(Ravel::get_packed_bit(ravel.cells, i));
+                 }
+             break;
+
+        case RPT_INT64:
+             {
+               const int64_t * src =
+                     reinterpret_cast<const int64_t *>(ravel.cells) + N;
+               loop(i, N)   new (--dst) IntCell(*--src);
+             }
+             break;
+
+        case RPT_FLOAT64:
+             {
+               const double * src =
+                     reinterpret_cast<const double *>(ravel.cells) + N;
+             loop(i, N)   new (--dst) FloatCell(*--src);
+             }
+             break;
+
+        case RPT_COMPLEX:
+             {
+               const double * src =
+                     reinterpret_cast<const double *>(ravel.cells) + 2*N;
+               loop(i, N)
+                  {
+                    const double imag = *--src;
+                    const double real = *--src;
+                    new (--dst) ComplexCell(real, imag);
+                  }
+             }
+             break;
+
+        case RPT_UNICODE16:
+             {
+               const uint16_t * src =
+                     reinterpret_cast<const uint16_t *>(ravel.cells) + N;
+               loop(i, N)   new (--dst) CharCell(Unicode(*--src));
+             }
+             break;
+
+        case RPT_UNICODE32:
+             {
+               const uint32_t * src =
+                     reinterpret_cast<const uint32_t *>(ravel.cells) + N;
+               loop(i, N) new (--dst) CharCell(Unicode(*--src));
+                 }
+             break;
+
+        default:   return;
       }
+
+   flags.ravel_type        = RPT_CELLS;
+   ravel.fetcher           = &Ravel::cell_fetcher;
+   ravel.valid_ravel_items = N;
+   // Packing installs a subclass vtable via placement-new (IntRavel(),
+   // BoolRavel(), Char16Ravel(), ...) for heap ravels; reinstall the base
+   // Ravel vtable here so indexed accessors (get_int_value(),
+   // is_integer_cell(), apply_fast_dyadic(), ...) stop dispatching through
+   // the stale subclass and decoding the old packed layout as Cells.
+   if (ravel.cells != ravel.short_value)
+      new (&ravel) Ravel(Ravel::upgrade_tag{});
 }
-//----------------------------------------------------------------------------
-Value_P
-Value::clone(const char * loc) const
+//────────────────────────────────────────────────────────────────────────────
+RavelType
+Value::explode_to_UNICODE32()
 {
-#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
-const uint64_t start_1 = cycle_counter();
-#endif
+   Assert(get_ravel_type() == RPT_UNICODE16);
 
-Value_P Z(get_shape(), loc);
-   Z->flags |= flags & VF_member;   // propagate member flag
+   /*
+      Unpack in reverse index order so that reading packed[i] (at a low offset)
+      never conflicts with the Cell[i] we are about to write (at a higher
+      offset). sizeof(Cell)=24 >= sizeof(any packed element), so Cell[i]
+      at i×24 is always placed at or beyond packed[i], and already-written
+      Cells at i+1..N-1 are entirely above the packed data for 0..i-1.
+    */
 
-   // NOTE: if something fails in the allocation of Z (⎕SYL etc.) then
-   // Z->get_shape() may differ from this->get_shape(). We therefore use
-   // the (in that case smaller) Z->element_count() here.
+const ShapeItem N = nz_element_count();
+auto dst = reinterpret_cast<uint32_t *>(ravel.cells) + N;
+auto src = reinterpret_cast<const uint16_t *>(ravel.cells) + N;
+   loop(i, N)   *--dst = *--src;
+
+   flags.ravel_type        = RPT_UNICODE32;
+   ravel.fetcher           = &Ravel::char32_fetcher;
+   ravel.valid_ravel_items = N;
+   // see explode_to_Cells() for why this vtable reinstall is needed.
+   if (ravel.cells != ravel.short_value)   new (&ravel) Char32Ravel();
+   return RPT_UNICODE32;
+}
+//────────────────────────────────────────────────────────────────────────────
+RavelType
+Value::explode_to_COMPLEX()
+{
+   /*
+      Unpack in reverse index order so that reading packed[i] (at a low offset)
+      never conflicts with the Cell[i] we are about to write (at a higher
+      offset). sizeof(Cell)=24 >= sizeof(any packed element), so Cell[i]
+      at i×24 is always placed at or beyond packed[i], and already-written
+      Cells at i+1..N-1 are entirely above the packed data for 0..i-1.
+    */
+
+const ShapeItem N = nz_element_count();
+auto dst = reinterpret_cast<double *>(ravel.cells) + 2 * N;
+
+   switch(get_ravel_type())
+      {
+        case RPT_BOOL:
+             {
+               rev_loop(i, N)
+                   {
+                     *--dst = 0.0;
+                     *--dst = double(Ravel::get_packed_bit(ravel.cells, i));
+                   }
+             }
+        break;
+
+        case RPT_INT64:
+             {
+               auto src = reinterpret_cast<const int64_t *>(ravel.cells) + N;
+               loop(i, N)
+                   {
+                     *--dst = 0.0;
+                     *--dst = double(*--src);
+                   }
+             }
+        break;
+
+        case RPT_FLOAT64:
+             {
+               auto src = reinterpret_cast<const double *>(ravel.cells) + N;
+               loop(i, N)
+                   {
+                     *--dst = 0.0;
+                     *--dst = *--src;
+                   }
+             }
+        break;
+
+        default: FIXME;
+      }
+
+   flags.ravel_type        = RPT_COMPLEX;
+   ravel.fetcher           = &Ravel::complex_fetcher;
+   ravel.valid_ravel_items = N;
+   // see explode_to_Cells() for why this vtable reinstall is needed.
+   if (ravel.cells != ravel.short_value)   new (&ravel) ComplexRavel();
+   return RPT_COMPLEX;
+}
+//────────────────────────────────────────────────────────────────────────────
+RavelType
+Value::explode_to_FLOAT64()
+{
+   /*
+      Unpack in reverse index order so that reading packed[i] (at a low offset)
+      never conflicts with the Cell[i] we are about to write (at a higher
+      offset). sizeof(Cell)=24 >= sizeof(any packed element), so Cell[i]
+      at i×24 is always placed at or beyond packed[i], and already-written
+      Cells at i+1..N-1 are entirely above the packed data for 0..i-1.
+    */
+
+const ShapeItem N = nz_element_count();
+auto dst = reinterpret_cast<double *>(ravel.cells) + N;
+
+   switch(get_ravel_type())
+      {
+        case RPT_BOOL:
+             {
+               rev_loop(i, N)
+                   {
+                     *--dst = double(Ravel::get_packed_bit(ravel.cells, i));
+                   }
+             }
+        break;
+
+        case RPT_INT64:
+             {
+               auto src = reinterpret_cast<const int64_t *>(ravel.cells) + N;
+               loop(i, N)   *--dst = double(*--src);
+             }
+        break;
+
+        default: FIXME;
+      }
+
+   flags.ravel_type        = RPT_FLOAT64;
+   ravel.fetcher           = &Ravel::float64_fetcher;
+   ravel.valid_ravel_items = N;
+   // see explode_to_Cells() for why this vtable reinstall is needed.
+   if (ravel.cells != ravel.short_value)   new (&ravel) FloatRavel();
+   return RPT_FLOAT64;
+}
+//────────────────────────────────────────────────────────────────────────────
+RavelType
+Value::explode_to_INT64()
+{
+   /*
+      Unpack in reverse index order so that reading packed[i] (at a low offset)
+      never conflicts with the Cell[i] we are about to write (at a higher
+      offset). sizeof(Cell)=24 >= sizeof(any packed element), so Cell[i]
+      at i×24 is always placed at or beyond packed[i], and already-written
+      Cells at i+1..N-1 are entirely above the packed data for 0..i-1.
+    */
+
+const ShapeItem N = nz_element_count();
+auto dst = reinterpret_cast<int64_t *>(ravel.cells) + N;
+
+   Assert1(get_ravel_type() == RPT_BOOL);
+   rev_loop(i, N)
+      {
+        *--dst = int64_t(Ravel::get_packed_bit(ravel.cells, i));
+      }
+
+   flags.ravel_type        = RPT_INT64;
+   ravel.fetcher           = &Ravel::int64_fetcher;
+   ravel.valid_ravel_items = N;
+   // see explode_to_Cells() for why this vtable reinstall is needed.
+   if (ravel.cells != ravel.short_value)   new (&ravel) IntRavel();
+   return RPT_INT64;
+}
+//────────────────────────────────────────────────────────────────────────────
+const char *
+Value::try_implode()
+{
+   if (is_packed())          return "value already packed";
+   if (pointer_cell_count)   return "value not simple";
+   if (element_count() == 0) return "empty value — prototype only";
+
+   /*
+ *    Pack boolean bits in-place into the existing Cell buffer (front-to-back,
+      64 bits per chunk).  The Cell buffer is always large enough: one uint64
+      covers 64 cells × 24 bytes each.  We accumulate each chunk fully before
+      writing, so the write at chunk c (byte c×8) never overlaps the cells we
+      are still reading (which start at byte c×64×24 = c×1536).
+    */
+const ShapeItem N = element_count();
+const ShapeItem Z_len = (N + 63) >> 6;   // number of uint64 chunks
+
+   // validate before packing (two-pass): the packing loop below writes
+   // each fully-accumulated 64-bit chunk into the Cell buffer *before* it
+   // can discover a non-boolean cell in a *later* chunk, so a single-pass
+   // version corrupts the ravel on its own failure path -- with ≥65
+   // elements where the first 64 are boolean and a later one is not,
+   // dst[0] would already have overwritten the first 8 bytes of
+   // ravel.cells[0] by the time the non-boolean item is found, and the
+   // function returns leaving flags.ravel_type unchanged, i.e. a
+   // RPT_CELLS value whose first Cell has been destroyed (Bugs18 #11).
    //
-   if (const ShapeItem count = Z->element_count())   // non-empty
-      {
-        loop(c, count)   Z->next_ravel_Cell(get_cravel(c));
-      }
-   else                                              // empty
-      {
-        get_cproto().init_other(&Z->get_wproto(), *Z, LOC);
-      }
+   loop(b, N)
+      if (!ravel.cells[b].is_near_bool())
+         return "value has non-boolean items";
 
-   Z->check_value(LOC);
+auto dst = reinterpret_cast<uint64_t *>(ravel.cells);
 
-#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
-const uint64_t end_1 = cycle_counter();
-const uint64_t count1 = nz_element_count();
-   Performance::fs_clone_B.add_sample(end_1 - start_1, count1);
-#endif
+   loop(c, Z_len)
+       {
+         uint64_t chunk = 0;   // 64 packed bits
+         const ShapeItem base = c << 6;
+         const ShapeItem lim  = std::min(base + 64, N);
+         for (ShapeItem b = base; b < lim; ++b)
+             {
+               if (ravel.cells[b].get_near_bool())
+                  chunk |= uint64_t(1) << (b - base);
+             }
+         dst[c] = chunk;
+       }
 
-   return Z;
+   ravel.fetcher           = &Ravel::bool_fetcher;
+   ravel.valid_ravel_items = N;
+   flags.ravel_type        = RPT_BOOL;
+   if (ravel.cells != ravel.short_value)
+      new (&ravel) BoolRavel();
+   return 0;
 }
-//----------------------------------------------------------------------------
-Value_P
-Value::prototype(const char * loc) const
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::try_pack(bool force)
 {
-   /** lrm p.46:
+   if (is_packed())          return;   // already packed
+   if (pointer_cell_count)   return;   // nested sub-values → cannot pack
 
-       The type of an array is an array with the same structure, but with
-      all numbers replaced with 0 and all characters replaced with ' '.
-
-      The prototype of an array is the type of the first element of the array.
-
-      type B        ←→   ↑0⍴⊂B
-      prototype B   ←→   ↑0⍴⊂↑B
-
-      Since ↑B is a scalar the prototype of B is also a scalar.
-    **/
-
-const Cell & first = get_cfirst();
-   if (first.is_numeric())          return IntScalar(0, LOC);
-   if (first.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
-   if (first.is_pointer_cell())
+const ShapeItem N = element_count();
+   if (N < Quad_SYL::pack_min_length)
       {
-        const PointerCell & sub = reinterpret_cast<const PointerCell &>(first);
-        Value_P Z = CLONE(sub.get_pointer_value().get(), LOC);
-        Z->to_type(false);
-        return Z;
+        if (N == 0)   return;   // empty arrays have only a prototype — don't pack
+        if (!force)   return;
+        /* fall through */
       }
 
-   DOMAIN_ERROR;
+   // determine packing type from the first cell
+   //
+const Cell & c0 = ravel.cells[0];
+RavelType t;
+   if (c0.is_integer_cell())
+      { const APL_Integer v = c0.get_int_value();
+        t = (v == 0 || v == 1) ? RPT_BOOL : RPT_INT64;
+      }
+   else if (c0.is_float_cell())      t = RPT_FLOAT64;
+   else if (c0.is_complex_cell())    t = RPT_COMPLEX;
+   else if (c0.is_character_cell())
+      t = c0.get_char_value() <= Unicode(0xFFFF) ? RPT_UNICODE16 : RPT_UNICODE32;
+   else return;   // LvalCell or unknown → stay mixed
+
+   // scan remaining cells; escalate t as needed
+   //
+   for (ShapeItem i = 1; i < N; ++i)
+       {
+         const Cell & c = ravel.cells[i];
+         switch(c.get_cell_type())
+            {
+              case CT_INT:
+                   { const APL_Integer v = c.get_int_value();
+                     const RavelType item_t = (v == 0 || v == 1) ? RPT_BOOL : RPT_INT64;
+                     if (t == RPT_BOOL && item_t == RPT_INT64)   t = RPT_INT64;
+                     else if (t == RPT_FLOAT64)
+                        // an INT mixed into an otherwise-all-float
+                        // ravel would demote it to a packed double,
+                        // silently losing its exact-integer type on
+                        // readback for any later exact-integer
+                        // primitive (!, *, ...) -- same class of bug
+                        // as the CT_FLOAT case below, just the mirror
+                        // direction (Blake McBride, Bugs22 #5).
+                        return;
+                     else if (t == RPT_COMPLEX)
+                        // an INT cell mixed into an otherwise-all-
+                        // complex ravel (this cell's own IntCell
+                        // identity, not just precision, is what would
+                        // be lost by packing it as a complex double
+                        // pair) -- same class of bug as the CT_COMPLEX
+                        // case below, just the mirror direction (Blake
+                        // McBride, Bugs23 #2). Regardless of magnitude:
+                        // leave the whole ravel unpacked.
+                        return;
+                     else if (t != RPT_BOOL && t != RPT_INT64)
+                        return;   // numeric + char → mixed
+                   }
+                   break;
+
+              case CT_FLOAT:
+                   if (t == RPT_BOOL || t == RPT_INT64)
+                      {
+                        // don't escalate an int-only ravel to
+                        // RPT_FLOAT64 just because one float cell
+                        // showed up: that would silently demote every
+                        // exact IntCell already seen to a packed
+                        // double, losing exact-integer results from
+                        // later primitives (!, *, ...) that stay exact
+                        // only for a genuine IntCell -- observable by
+                        // crossing ⎕SYL[34;2] (Blake McBride, Bugs22
+                        // #5). Leave the whole ravel unpacked instead.
+                        return;
+                      }
+                   else if (t == RPT_COMPLEX)
+                        // FloatCell mixed into an otherwise-all-complex
+                        // ravel -- same mirror-direction bug as the INT
+                        // case above (Blake McBride, Bugs23 #2).
+                        return;
+                   else if (t != RPT_FLOAT64)   return;
+                   break;
+
+              case CT_COMPLEX:
+                   // an INT or FLOAT cell mixed into an otherwise-all-
+                   // complex ravel would pack as RPT_COMPLEX, silently
+                   // losing its IntCell/FloatCell identity on readback:
+                   // every element then reads back as a ComplexCell
+                   // (26 ⎕CR reports it complex; ⌹/⍟/etc. take the
+                   // complex code path even for a real value with a
+                   // zero imaginary part), and that wrong type identity
+                   // persists through )SAVE/)LOAD and ⎕TF. Same class of
+                   // bug as the CT_INT/CT_FLOAT arms above, just the
+                   // complex direction (Blake McBride, Bugs23 #2) --
+                   // leave the whole ravel unpacked instead of
+                   // escalating to RPT_COMPLEX.
+                   if (t == RPT_BOOL || t == RPT_INT64 || t == RPT_FLOAT64)
+                      return;
+                   else if (t != RPT_COMPLEX)   return;   // char + complex → mixed
+                   break;
+
+              case CT_CHAR:
+                   { const Unicode u = c.get_char_value();
+                     if      (t == RPT_UNICODE16 && u > Unicode(0xFFFF))   t = RPT_UNICODE32;
+                     else if (t != RPT_UNICODE16 && t != RPT_UNICODE32)     return;
+                   }
+                   break;
+
+              default: return;   // LvalCell → stay mixed
+            }
+       }
+
+   // pack in place (front-to-back is safe:
+   // dst offset 8i < src offset 24i for all i≥0)
+   //
+const bool heap_ravel = ravel.cells != ravel.short_value;
+   switch (t)
+      {
+        case RPT_BOOL:
+             try_implode();   // packs in place, no reallocation; flags.ravel_type set inside
+             return;
+
+        case RPT_INT64:
+             {
+               auto dst = reinterpret_cast<int64_t *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_int_value();
+               ravel.fetcher           = &Ravel::int64_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_INT64;
+               if (heap_ravel)   // heap ravel: Cell() doesn't touch packed data
+                  new (&ravel) IntRavel();
+             }
+             return;
+
+        case RPT_FLOAT64:
+             {
+               auto dst = reinterpret_cast<double *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_real_value();
+               ravel.fetcher           = &Ravel::float64_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_FLOAT64;
+               if (heap_ravel)   new (&ravel) FloatRavel();
+             }
+             return;
+
+        case RPT_COMPLEX:
+             {
+               auto dst = reinterpret_cast<double *>(ravel.cells);
+               loop(i, N)
+                  { const double r = ravel.cells[i].get_real_value();
+                    const double m = ravel.cells[i].get_imag_value();
+                    dst[2*i]   = r;
+                    dst[2*i+1] = m;
+                  }
+               ravel.fetcher           = &Ravel::complex_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_COMPLEX;
+               if (heap_ravel)   new (&ravel) ComplexRavel();
+             }
+             return;
+
+        case RPT_UNICODE32:
+             {
+               auto dst = reinterpret_cast<uint32_t *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_char_value();
+               ravel.fetcher           = &Ravel::char32_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_UNICODE32;
+               if (heap_ravel)   new (&ravel) Char32Ravel();
+             }
+             return;
+
+        case RPT_UNICODE16:
+             {
+               auto dst = reinterpret_cast<uint16_t *>(ravel.cells);
+               loop(i, N)   dst[i] = uint16_t(ravel.cells[i].get_char_value());
+               ravel.fetcher           = &Ravel::char16_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_UNICODE16;
+               if (heap_ravel)   new (&ravel) Char16Ravel();
+             }
+             return;
+
+        default: return;
+      }
 }
-//----------------------------------------------------------------------------
-/* lrp p.138: S←⍴⍴A + NOTCHAR (per column)
-
-   lrm defines NOTCHAR as (comments by jsa)
-
-   ∇ Z←NOTCHAR R
-   [1] Z←1              ⍝ assume NOTCHAR
-   [2] →(1<≡R)/0        ⍝ NOTCHAR if R is nested
-   [3] Z←' '∨.≠,↑0⍴⊂R   ⍝ all characters ?
-   ∇
-
-  IOW: NOTCHAR returns 1 if R is not a simple character
-       array and 0 otherwise.
- */
-int32_t
-Value::get_col_spacing(bool & NOTCHAR, ShapeItem col, bool framed) const
+//────────────────────────────────────────────────────────────────────────────
+ShapeItem
+cValue::packed_bytes_per_item() const
 {
-int32_t max_spacing = 0;
-   NOTCHAR = false;
-
-const ShapeItem ec = element_count();
-const ShapeItem cols = get_last_shape_item();
-const ShapeItem rows = ec/cols;
-
-   loop(row, rows)   // for all items of column col
+const RavelType rt = get_ravel_type();
+   // NOTE: this used to be `if (rt & RPT_real) return 8;` -- but
+   // RPT_BOOL == 0x0201 and RPT_real == 0x3200 (RPT_real's definition
+   // ORs in RPT_integer, which ORs in RPT_BOOL, before masking to the
+   // one-hot high byte), so RPT_BOOL & RPT_real == 0x0200 != 0: a
+   // bit-packed boolean ravel matched this test and returned 8, even
+   // though bpi==0 is documented (and intended) for RPT_BOOL just below.
+   // Every caller treats bpi>0 as "byte-addressable packed elements" and
+   // memcpy's raw bytes per element on that assumption -- for a bit-packed
+   // value that reads 8-byte units per *bit*, i.e. stale pre-pack garbage.
+   // Test the two intended types explicitly instead of a bitmask.
+   if (rt == RPT_INT64 || rt == RPT_FLOAT64)   return 8;
+   if (rt == RPT_COMPLEX)   return 16;
+   if (rt == RPT_UNICODE32) return 4;
+   if (rt == RPT_UNICODE16) return 2;
+   return 0;   // RPT_BOOL (bit-packed) or RPT_CELLS (Cell* — not memcpy-safe)
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::commit_ravel_like(const cValue & B, ShapeItem n)
+{
+   Assert(ravel.valid_ravel_items == 0);
+   switch (B.get_ravel_type())
       {
-        /* compute the S, which is the spacing demanded by this item.
-           The spacing is defined by the rank of the item (lrm p.138):
-         
-           S←((ρρA)+NOTCHAR A)⌈(ρρB)+NOTCHAR B
+        case RPT_INT64:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) IntRavel();   // heap ravel: safe; short ravel: base Ravel handles RPT_INT64
+             ravel.fetcher    = &Ravel::int64_fetcher;
+             flags.ravel_type = RPT_INT64;
+             break;
+        case RPT_FLOAT64:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) FloatRavel();
+             ravel.fetcher    = &Ravel::float64_fetcher;
+             flags.ravel_type = RPT_FLOAT64;
+             break;
+        case RPT_COMPLEX:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) ComplexRavel();
+             ravel.fetcher    = &Ravel::complex_fetcher;
+             flags.ravel_type = RPT_COMPLEX;
+             break;
+        case RPT_UNICODE32:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) Char32Ravel();
+             ravel.fetcher    = &Ravel::char32_fetcher;
+             flags.ravel_type = RPT_UNICODE32;
+             break;
+        case RPT_UNICODE16:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) Char16Ravel();
+             ravel.fetcher    = &Ravel::char16_fetcher;
+             flags.ravel_type = RPT_UNICODE16;
+             break;
+        case RPT_BOOL:
+             if (ravel.cells != ravel.short_value)
+                new (&ravel) BoolRavel();
+             ravel.fetcher    = &Ravel::bool_fetcher;
+             flags.ravel_type = RPT_BOOL;
+             break;
+        default: return;
+      }
+   ravel.valid_ravel_items = n;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::pack_like(const cValue & B)
+{
+   if (is_packed())          return;
+   if (pointer_cell_count)   return;
 
-           Instead of computing S for every pair A, B of adjacent columns
-           (which would compute it twice for every column) we only compute it
-           once for every column and reuse the result when B becomes A.
-         */ 
-        const Cell & cell = get_cravel(col + row*cols);
-        int32_t S = 1;   // assume simple numeric
+const ShapeItem N = nz_element_count();
+   if (N < Quad_SYL::pack_min_length)   return;
 
-        if (cell.is_pointer_cell())   // nested: NOTCHAR[2]
+   switch (B.get_ravel_type())
+      {
+        case RPT_BOOL:
+             try_implode();
+             return;
+
+        case RPT_INT64:
+             {
+               // validate before writing in place: a non-integer cell's
+               // get_int_value() throws DOMAIN_ERROR, and this loop had
+               // no such guard, so a throw mid-loop left the ravel half
+               // packed / half (destroyed) Cells with flags.ravel_type
+               // still RPT_CELLS (Bugs18 #11; every current caller is
+               // safe since Z is always a permutation or copy of B, but
+               // nothing enforced that).
+               //
+               loop(i, N)
+                  if (!ravel.cells[i].is_integer_cell())   return;
+
+               auto dst = reinterpret_cast<int64_t *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_int_value();
+               ravel.fetcher           = &Ravel::int64_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_INT64;
+               if (ravel.cells != ravel.short_value)
+                  new (&ravel) IntRavel();   // heap ravel: Cell() doesn't touch packed data
+             }
+             return;
+
+        case RPT_FLOAT64:
+             {
+               // validate before writing in place -- see the RPT_INT64
+               // case above (Bugs18 #11).
+               //
+               loop(i, N)
+                  if (!ravel.cells[i].is_numeric())   return;
+
+               auto dst = reinterpret_cast<double *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_real_value();
+               ravel.fetcher           = &Ravel::float64_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_FLOAT64;
+               if (ravel.cells != ravel.short_value)
+                  new (&ravel) FloatRavel();
+             }
+             return;
+
+        case RPT_COMPLEX:
+             {
+               // validate before writing in place -- see the RPT_INT64
+               // case above (Bugs18 #11).
+               //
+               loop(i, N)
+                  if (!ravel.cells[i].is_numeric())   return;
+
+               auto dst = reinterpret_cast<double *>(ravel.cells);
+               // read both parts into locals BEFORE writing dst[2*i]:
+               // dst aliases ravel.cells (in place), and dst[2*i]'s first
+               // 8 bytes ARE cells[i]'s vptr (sizeof(double)==8, matching
+               // Cell's leading vptr) -- writing dst[2*i] first, then
+               // calling the virtual get_imag_value() on the same cell,
+               // dispatches through the just-clobbered vptr. try_pack()
+               // (which this is a copy of, with the temporaries removed)
+               // already gets this right.
+               loop(i, N)
+                  { const APL_Float r = ravel.cells[i].get_real_value();
+                    const APL_Float m = ravel.cells[i].get_imag_value();
+                    dst[2*i]   = r;
+                    dst[2*i+1] = m;
+                  }
+               ravel.fetcher           = &Ravel::complex_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_COMPLEX;
+               if (ravel.cells != ravel.short_value)
+                  new (&ravel) ComplexRavel();
+             }
+             return;
+
+        case RPT_UNICODE32:
+             {
+               // validate before writing in place -- see the RPT_INT64
+               // case above (Bugs18 #11).
+               //
+               loop(i, N)
+                  if (!ravel.cells[i].is_character_cell())   return;
+
+               auto dst = reinterpret_cast<Unicode *>(ravel.cells);
+               loop(i, N)   dst[i] = ravel.cells[i].get_char_value();
+               ravel.fetcher           = &Ravel::char32_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_UNICODE32;
+               if (ravel.cells != ravel.short_value)
+                  new (&ravel) Char32Ravel();
+             }
+             return;
+
+        case RPT_UNICODE16:
+             {
+               // validate before writing in place -- see the RPT_INT64
+               // case above (Bugs18 #11).
+               //
+               loop(i, N)
+                  if (!ravel.cells[i].is_character_cell())   return;
+
+               auto dst = reinterpret_cast<uint16_t *>(ravel.cells);
+               loop(i, N)   dst[i] = uint16_t(ravel.cells[i].get_char_value());
+               ravel.fetcher           = &Ravel::char16_fetcher;
+               ravel.valid_ravel_items = N;
+               flags.ravel_type = RPT_UNICODE16;
+               if (ravel.cells != ravel.short_value)
+                  new (&ravel) Char16Ravel();
+             }
+             return;
+
+        default:   // RPT_CELLS: B not packed, fall back to type-scanning try_pack
+             try_pack();
+             return;
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::assign_cell(ShapeItem offset, const Cell & C, const char * loc)
+{
+   /* For packed ravels: write directly into packed storage when the new cell
+      type is compatible, so the ravel stays packed.  Only explode to Cell when
+      the new type is incompatible with the current packing.
+
+      Structure: the top-level switch is the new Cell. In total there are
+                 6 Cell types and 7 packing types, thus 42 combinations.
+
+                 The top-level switch handles the incoming Cell types.
+                 There are always 3 possibilities:
+
+                 A. exact match,           e.g.  RPT_FLOAT64 + CT_FLOAT
+                 B. compatible match #1,   e.g.  RPT_INT64   + CT_FLOAT
+                 C. compatible match #2,   e.g.  RPT_FLOAT64 + CT_INT
+                 D. incompatible,          e.g.  RPT_INT64   + CT_CHAR
+
+                 case B. calls the proper explode() function and proceeds
+                         like case A.
+    */
+
+   if (is_packed())
+      {
+        RavelType rt = get_ravel_type();   // current packing
+        switch(C.get_cell_type())                // next Cell
            {
-             NOTCHAR = true;
-             if (framed)
-                {
-                  S = 1;
-                }
-             else
-                {
-                  const Value & sub = *cell.get_pointer_value();
-                  S = sub.get_rank();
-                  if (sub.NOTCHAR())   ++S;
-                }
-           }
-        else if (cell.is_character_cell())   // simple char
-           {
-             S = 0;
-           }
-        else                                 // simple numeric
-           {
-             NOTCHAR = true;
+             case CT_INT:
+                  {
+                    if (rt == RPT_BOOL)   rt = explode_to_INT64();   // B→A
+
+                    const APL_Integer v = C.get_int_value();
+                    if (rt == RPT_INT64)   // A.
+                       {
+                         reinterpret_cast<int64_t *>(ravel.cells)[offset] = v;
+                         return;   // compatible
+                       }
+                    else if (rt == RPT_FLOAT64)   // C
+                       {
+                         reinterpret_cast<double *>
+                                         (ravel.cells)[offset] = double(v);
+                         return;   // compatible
+                       }
+                    else if (rt == RPT_COMPLEX)   // C
+                       {
+                         auto p = reinterpret_cast<double *>
+                                                  (ravel.cells) + 2*offset;
+                         *p++ = double(v);   // real
+                         *p++ = 0.0;         // imag
+                         return;   // compatible
+                       }
+                  }
+                  // D.: explode_to_Cells() below
+                  break;
+
+             case CT_FLOAT:
+                  {
+                    if (rt & RPT_integer)   rt = explode_to_FLOAT64();   // B→A
+
+                    const APL_Float f = C.get_real_value();
+                    if (rt == RPT_FLOAT64)   // A.
+                       {
+                         reinterpret_cast<double *>(ravel.cells)[offset] = f;
+                         return;
+                       }
+
+                    if (rt == RPT_COMPLEX)   // C.
+                       {
+                         auto p = reinterpret_cast<double *>
+                                                (ravel.cells) + offset * 2;
+                         *p++ = f;
+                         *p++ = 0.0;
+                         return;
+                       }
+                  }
+                  // D.: explode_to_Cells() below
+                  break;
+
+             case CT_COMPLEX:
+                  if (rt & RPT_real)   rt = explode_to_COMPLEX();   // B→A
+                  if (rt == RPT_COMPLEX)   // A.
+                     {
+                       auto p = reinterpret_cast<double *>
+                                                    (ravel.cells) + offset * 2;
+                       *p++ = C.get_real_value();
+                       *p++ = C.get_imag_value();
+                       return;
+                     }
+                  // D.: explode_to_Cells() below
+                  break;
+
+             case CT_CHAR:
+                  {
+                    const Unicode u = C.get_char_value();
+                    if (rt == RPT_UNICODE16 && u > Unicode(0xFFFF))
+                       rt = explode_to_UNICODE32();   // B. → A.
+
+                    if (rt == RPT_UNICODE16)   // most likely
+                       {
+                         reinterpret_cast<uint16_t *>(ravel.cells)[offset] = u;
+                         return;
+                       }
+                    else if (rt == RPT_UNICODE32)   // rarely
+                       {
+                         reinterpret_cast<uint32_t *>(ravel.cells)[offset] = u;
+                         return;
+                       }
+                  }
+                  // D.: explode_to_Cells() below
+                  break;
+
+             default: break;   // PointerCell, LvalCell (always D.)
            }
 
-        if (max_spacing < S)   max_spacing = S;
+        explode_to_Cells();   // incompatible type: convert back to Cell array
       }
 
-   return max_spacing;
+   // Cell path. Either C can not be packed (as e.g. PointerCells)
+   // or C does noy fit into the current packing (eg char in numeric packing
+   //
+   depth_update_for_overwrite(offset, C.is_pointer_cell() ? 0 : -1);
+   ravel.cells[offset].release(loc);
+   C.init_other(&ravel.cells[offset], *this, loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::print_incomplete(ostream & out)
 {
-std::vector<const Value *> incomplete;
+std::vector<const cValue *> incomplete;
 bool goon = true;
 
    for (const DynamicObject * dob = all_values.get_prev();
@@ -2887,7 +2012,8 @@ bool goon = true;
 int count = 0;
    loop(s, incomplete.size())
       {
-        incomplete[s]->print_stale_info(out, incomplete[s]);
+        { const Value * vp = static_cast<const Value *>(incomplete[s]);
+          vp->print_stale_info(out, vp); }
         if (++count > 20)   // its getting boring
            {
              CERR << endl << " ... ( " << (incomplete.size() - count) 
@@ -2898,11 +2024,11 @@ int count = 0;
 
    return incomplete.size();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::print_stale(ostream & out)
 {
-std::vector<const Value *> stale_vals;
+std::vector<const cValue *> stale_vals;
 std::vector<const DynamicObject *> stale_dobs;
 bool goon = true;
 int count = 0;
@@ -2913,7 +2039,7 @@ int count = 0;
         goon && (dob != &all_values); dob = dob->get_prev())
        {
          const Value & value = dob->rValue();
-         goon = (dob == dob->get_prev());
+         goon = (dob != dob->get_prev());
 
          if (value.owner_count)   continue;
 
@@ -2933,7 +2059,7 @@ int count = 0;
    loop(s, stale_vals.size())
       {
         const DynamicObject * dob = stale_dobs[s];
-        const Value * val = stale_vals[s];
+        const cValue * val = stale_vals[s];
         val->print_stale_info(out, dob);
         if (++count > 20)   // its getting boring
            {
@@ -2981,28 +2107,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
-void
-Value::print_stale_info(ostream & out, const DynamicObject * dob) const
-{
-   out << "print_stale_info():   alloc(" << dob->where_allocated()
-       << ") flags(" << get_flags() << ")" << endl;
-
-   VH_entry::print_history(out, dob->rValue(), LOC);
-
-   try
-      {
-        print_structure(out, 0, 0);
-        const PrintContext pctx(PST_NONE);
-        Value_P Z = Quad_CR::do_CR(7, this, pctx);
-        Z->print(out);
-        out << endl;
-      }
-   catch (...)   { out << " *** corrupt stale ***"; }
-
-   out << endl;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Value::check_all_Cells(ostream & out)
 {
@@ -3017,124 +2122,304 @@ int errors = 0;
 
    return errors;
 }
-//----------------------------------------------------------------------------
-int
-Value::check_Cells(ostream & out) const
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Value::glue_item_item(Value & item_A, Value & item_B, const char * loc)
 {
-size_t errors = 0;
-ShapeItem pointer_count = 0;
-ShapeItem lval_count = 0;
-
-   loop(c, nz_element_count())
-       {
-         const Cell & cell = get_cravel(c);
-         if (cell.is_pointer_cell())     ++pointer_count;
-         else if (cell.is_lval_cell())   ++lval_count;
-       }
-
-   if (lval_count)
+   // glue two items together, starting a strand
+   //
+   Log(LOG_glue)
       {
-        out << "*** Warning: value " << voidP(this)
-            << " has " << lval_count << " Lval Cells" << endl;
-        VH_entry::print_history(cerr, *this, LOC);
-
-        ++errors;
+        CERR << "gluing two items " << endl << item_A
+             << " and " << endl << item_B << endl;
       }
 
-   if (pointer_count != get_pointer_cell_count())
-      {
-        out << "*** Error: value " << voidP(this)
-            << " has pointer_cell_count=" << pointer_cell_count
-            << " but " << pointer_count << " PointerCells" << endl;
-        ++errors;
-      }
+Value_P Z(2, LOC);
+   Z->next_ravel_Value(&item_A);
+   Z->next_ravel_Value(&item_B);
 
-   return errors;
+   Z->check_value(LOC);
+   return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Value::glue_item_strand(Value & item_A, const Value & strand_B,
+                        const char * loc)
+{
+   // glue a new item A to the strand B
+   //
+const ShapeItem len_A = item_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
+   Log(LOG_glue)
+      {
+        CERR << "gluing item[" << len_A << "] " << endl << item_A
+             << " to strand[" << len_B << "] " << endl << strand_B << endl;
+      }
+
+   Assert(strand_B.is_scalar_or_vector());
+
+Value_P Z(len_B + 1, LOC);
+   Z->next_ravel_Value(&item_A);
+
+   loop(b, len_B)
+       { Cell cache; Z->next_ravel_Cell(strand_B.get_cravel(b, cache)); }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Value::glue_strand_item(const Value & strand_A, Value & item_B,
+                        const char * loc)
+{
+   // glue a strand A to new item B
+   //
+   Log(LOG_glue)
+      {
+        CERR << "gluing strand " << endl << strand_A
+             << " to item " << endl << item_B << endl;
+      }
+
+   Assert(strand_A.is_scalar_or_vector());
+
+const ShapeItem len_A = strand_A.element_count();
+Value_P Z(len_A + 1, LOC);
+
+   loop(a, len_A)
+       { Cell cache; Z->next_ravel_Cell(strand_A.get_cravel(a, cache)); }
+   Z->next_ravel_Value(&item_B);
+
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Value::glue_strand_strand(const Value & strand_A, const Value & strand_B,
+                          const char * loc)
+{
+   // glue two strands A and B together
+   //
+const ShapeItem len_A = strand_A.element_count();
+const ShapeItem len_B = strand_B.element_count();
+
+   Log(LOG_glue)
+      {
+        CERR << "gluing strands " << endl << strand_A
+             << "with shape " << strand_A.get_shape() << endl
+             << " and " << endl << strand_B << endl
+             << "with shape " << strand_B.get_shape() << endl;
+      }
+
+   Assert(strand_A.is_scalar_or_vector());
+   Assert(strand_B.is_scalar_or_vector());
+
+Value_P Z(len_A + len_B, LOC);
+
+   loop(a, len_A)
+       { Cell cache; Z->next_ravel_Cell(strand_A.get_cravel(a, cache)); }
+   loop(b, len_B)
+       { Cell cache; Z->next_ravel_Cell(strand_B.get_cravel(b, cache)); }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Value::check_WS_FULL(const char * args, ShapeItem requested_cell_count,
+                     const char * loc)
+{
+const int64_t used_memory
+               = (total_ravel_count + requested_cell_count) * sizeof(Cell)
+               + (value_count + 1) * sizeof(Value)
+               + Workspace::SI_entry_count() * sizeof(StateIndicator);
+
+   if (int64_t((Quad_WA::total_memory*Quad_WA::WA_scale/100)) >
+       (used_memory + Quad_WA::WA_margin))   return false;   // OK
+
+   Log(LOG_Value_alloc) CERR
+   << "    value_count:       " << value_count             << endl
+   << "    total_ravel_count: " << total_ravel_count       << " cells" << endl
+   << "    new cell_count:    " << requested_cell_count    << " cells" << endl
+   << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << endl
+   << "    used_memory:       " << used_memory             << " bytes" << endl
+   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
+   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
+
+           << " at " << LOC << endl;
+   return true;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
-Value::explode()
+Value::catch_Error(const Error & error, const char * args, const char * loc)
 {
-   Assert(is_packed());
-const uint8_t * bits = reinterpret_cast<const uint8_t *>(ravel);
+   Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
 
-IntCell * new_ravel = 0;
-   try           { ravel = new IntCell[element_count()]; }
-   catch (...)   { WS_FULL }
-
-   loop(b, element_count())
-      if (bits[b >> 3] & 1 << (b & 7))   new_ravel[b].set_int_value(1);
-
-   delete [] bits;
-   ravel = new_ravel;
-   clear_packed();
-   fetcher = &cell_fetcher;
+   // keep a more specific )MORE text, e.g. the ⎕SYL limit (Bugs37 #49)
+   //
+   if (Workspace::more_error().size() == 0)
+      MORE_ERROR() << "new Value(" << args
+                   << ") failed (APL error in ravel allocation)";
+   throw error;   // rethrow
 }
-//----------------------------------------------------------------------------
-const char *
-Value::try_implode()
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::catch_exception(const exception & ex, const char * args,
+                      const char * caller,  const char * loc)
 {
-   if (is_packed())          return "value already packed";
-   if (pointer_cell_count)   return "value not simple";
+const int64_t used_memory
+               = total_ravel_count * sizeof(Cell)
+               + value_count * sizeof(Value)
+               + Workspace::SI_entry_count() * sizeof(StateIndicator);
 
-   // at this point we are optimistic that all B-items are boolean.
-   //
-const ShapeItem Z_len = (nz_element_count() + 63) >> 6;
-uint64_t * bits = new uint64_t[Z_len];
-const char * error_reason = 0;
+   Log(LOG_Value_alloc)
+      CERR << "Value_P::Value_P(" << args << ") failed at " << loc
+           << " (caller: "        << caller << ")" << endl
+           << " what: "           << ex.what() << endl
+           << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
+           << " current sbrk(): 0x" << top_of_memory() << endl
+           << " alloc_size:     0x" << alloc_size << dec << " ("
+                                    << alloc_size << ")" << endl
+           << " used memory:    0x" << hex  << used_memory << dec
+                                    << " (" << used_memory << ")" << endl;
 
-   if (bits == 0)   return "WS FULL";
-
-   // first set all bits to 0
-   //
-   loop(z, Z_len)   bits[z] = 0;
-
-   // then set some bits to 1
-   //
-uint64_t zchunk = 0;
-uint64_t zbit  = 1;
-
-ShapeItem z = 0;
-   for (ConstRavel_P b(*this, true); +b; ++b)
-       {
-         if (!b->is_near_bool())
-            {
-              error_reason = "value has non-boolean items";
-              break;
-            }
-
-         // OK, bit is 0 or 1. Already done if bit is 0.
-         if (b->get_near_bool())   zchunk |= zbit;   // bit in B is set
-
-         zbit += zbit;                   // next bit
-         if (zbit)   continue;           // more bits in same chunk
-         bits[z++] = zchunk;
-         zchunk = 0;
-       }
-
-   if (zchunk)   bits[Z_len - 1] = zchunk;   // rest bits
-
-   if (error_reason)
-      {
-        delete[] bits;
-      }
-   else
-      {
-        if (ravel != short_value)   delete[] ravel;
-        ravel = reinterpret_cast<Cell *>(bits);
-        flags |= VF_packed;
-      }
-
-   return error_reason;
+   MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
+   WS_FULL;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::catch_ANY(const char * args, const char * caller, const char * loc)
+{
+   Log(LOG_Value_alloc)
+      CERR << "Value_P::Value_P(Shape " << args << " failed at " << loc
+           << " (caller: " << caller << ")" << endl;
+   MORE_ERROR() << "new Value(" << args << ") failed (ANY)";
+   WS_FULL;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Value::init_ravel()
+{
+   owner_count = 0;
+   ravel.fetcher = &Ravel::cell_fetcher;
+   pointer_cell_count = 0;
+   ravel.nz_subcell_count = 0;
+   check_ptr = 0;
+   IntCell::z0(ravel.short_value);
+   ravel.cells = ravel.short_value;
+
+   ++value_count;
+   if (Quad_SYL::value_count_limit &&
+       Quad_SYL::value_count_limit < APL_Integer(value_count))
+      {
+        MORE_ERROR() <<
+"the system limit on the APL value count (as set in ⎕SYL["
+<< (Quad_SYL::SYL_VALUE_COUNT_LIMIT + Workspace::get_IO())
+<< ";2]) was reached\n"
+"(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
+
+        // reset the limit so that we don't get stuck here.
+        //
+        Quad_SYL::value_count_limit = 0;
+        InterruptContext::set_attention_raised(LOC);
+        InterruptContext::set_interrupt_raised(LOC);
+      }
+
+const ShapeItem length = shape.checked_volume();
+
+   // small values always succeed...
+   //
+   if (length <= cfg_SHORT_VALUE_LENGTH_WANTED)
+      {
+        check_ptr = charP(this) + 7;
+        return;
+      }
+
+   // large Value. If the compiler uses 4-byte pointers, then do not allow APL
+   // values that are too large. The reason is that new[] may return
+   // a non-0 pointer (thus pretending everything is OK), but a subsequent
+   // attempt to initialize the value might then throw a segfault.
+   //
+   enum { MAX_LEN = 2000000000 / sizeof(Cell) };
+   if (length > MAX_LEN && sizeof(void *) < 6)
+      throw_apl_error(E_WS_FULL, alloc_loc);
+
+   if (Quad_SYL::ravel_count_limit &&
+       Quad_SYL::ravel_count_limit < APL_Integer(total_ravel_count + length))
+      {
+        // throw WS FULL right away (like for MAX_LEN above) rather than
+        // continuing with a fake value and an INTERRUPT later, which
+        // computed a wrong result and leaked the value (Bugs37 #49).
+        // The limit remains in place; ⎕SYL[…;2]←0 clears it.
+        //
+        MORE_ERROR() <<
+"the system limit on the total ravel size (as set in ⎕SYL["
+<< (Quad_SYL::SYL_RAVEL_BYTES_LIMIT + Workspace::get_IO())
+<< ";2]) was reached";
+        throw_apl_error(E_WS_FULL, alloc_loc);
+      }
+
+   alloc_size = length * sizeof(Cell);
+   ravel.cells = std::allocator<Cell>{}.allocate(length);
+   ravel.alloc_cells = length;
+
+/*
+   ravel = 0;   // assume new() fails
+// try
+//    {
+        ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
+        if (ravel == 0)   // new failed (without trowing an exception)
+           {
+              Log(LOG_Value_alloc)
+                 CERR << "new char[" << (length * sizeof(Cell))
+                      << "] (aka. long ravel allocation) returned 0 at " LOC
+                      << endl;
+
+              MORE_ERROR() << "The instatiation of a Value object succeeded, "
+                              "but allocation of its (large) ravel failed.";
+              new (&shape) Shape();
+              ravel = short_value;
+              throw_apl_error(E_WS_FULL, alloc_loc);
+           }
+      }
+   catch (...)
+      {
+        // for some unknown reason, this object gets cleared after
+        // throwing the E_WS_FULL below (which destroys the prev and
+        // next pointers. We therefore unlink() the object here (where
+        // prev and next pointers are still intact).
+        //
+        unlink();
+
+        Log(LOG_Value_alloc)
+           {
+             CERR << "new char[" << (length * sizeof(Cell))
+                  << "] (aka. long ravel allocation) threw an exception at " LOC
+                  << endl;
+           }
+
+        MORE_ERROR() << "The instatiation of a Value object succeeded, "
+                        "but allocation of its (large) ravel failed.";
+        new (&shape) Shape();
+        ravel = short_value;
+        throw_apl_error(E_WS_FULL, alloc_loc);
+      }
+*/
+
+   // init the first ravel element to (prototype) 0 so that we can avoid
+   // many empty checks all over the place
+   //
+   IntCell::z0(&get_wproto());
+   check_ptr = charP(this) + 7;
+   total_ravel_count += length;
+}
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator <<(ostream & out, const Value & v)
 {
    v.print(out);
    return out;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 IntScalar(APL_Integer val, const char * loc)
 {
@@ -3143,7 +2428,7 @@ Value_P Z(loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 FloatScalar(APL_Float val, const char * loc)
 {
@@ -3152,7 +2437,7 @@ Value_P Z(loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 ComplexScalar(APL_Complex val, const char * loc)
 {
@@ -3161,7 +2446,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 ComplexScalar(APL_Float real, APL_Float imag, const char * loc)
 {
@@ -3170,7 +2455,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 CharScalar(Unicode uni, const char * loc)
 {
@@ -3179,7 +2464,7 @@ Value_P Z(loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Idx0(const char * loc)
 {
@@ -3188,7 +2473,7 @@ Value_P Z(ShapeItem(0), loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Str0(const char * loc)
 {
@@ -3197,7 +2482,7 @@ Value_P Z(ShapeItem(0), loc);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Str0_0(const char * loc)
 {
@@ -3207,7 +2492,7 @@ Value_P Z(sh, loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Idx0_0(const char * loc)
 {
@@ -3216,7 +2501,7 @@ Value_P Z(sh, loc);
    Z->check_value(loc);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 EmptyStruct(const char * loc)
 {
@@ -3233,12 +2518,12 @@ Value_P Z(shape_Z, loc);
    Z->set_member();
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// declared in PrintOperator.hh
 ostream &
 operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

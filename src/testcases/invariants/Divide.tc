@@ -1,0 +1,40 @@
+⍝ Divide.tc
+⍝ ═════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A numeric, B numeric and non-zero
+      ⍝ inv: A÷B ←→ A×÷B   (divide = multiply by the reciprocal)
+      A ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      B ← B+(B=0)                    ⍝ avoid division by zero
+      ∧/(A÷B) = A×÷B
+1
+
+      ⍝ inv: A ←→ B×(A÷B)   (division is the inverse of multiplication)
+      ⍝ uses tolerant = rather than exact ≡, since A÷B is in general not
+      ⍝ exactly representable as a double when B does not divide A
+      ∧/(B×(A÷B)) = A
+1
+
+      ⍝ Precond: B non-zero and A an exact multiple of B, so A÷B stays
+      ⍝ an exact int (no rounding to worry about)
+      ⍝ inv: A ←→ B×(A÷B)   (exact this time - checked with ≡)
+      B ← 1+99∣|⎕RVAL 0
+      K ← 1+9999∣|(⎕RVAL 1 (,5) (,0 1 0 0 0))
+      A ← B×K
+      A ≡ B×(A÷B)
+1
+
+      ⍝ Precond: Big is at the int64 boundary and evenly divisible by
+      ⍝ 7, so Big÷7 stays an exact int (Quad_CR reports type 16), but
+      ⍝ multiplying it back by 7 crosses the conservative LARGE_INT
+      ⍝ threshold and is promoted to float by ×
+      ⍝ (IntCell::bif_multiply_ii()) - yet the result still matches Big
+      ⍝ exactly
+      ⍝ inv: Big ←→ 7×(Big÷7)
+      Big ← 9223372036854775807
+      Big ≡ 7×(Big÷7)
+1

@@ -19,8 +19,8 @@ For Fedora:
 
 For Centos: replace dnf by yum
 
-On Linux Mint 14.1, GNU APL compiled out-of--the-box.
-On Fedora 25, GNU APL compiled out-of-the-box.
+GNU APL compiles out-of-the-box on all current Debian/Ubuntu-based and
+RPM-based distributions tested to date.
 
 On macOS, there is a detailed description, kindly provided by Peter Teeson,
 in file APL-on-Macintosh.pdf. Also consider Peter's latest remark:

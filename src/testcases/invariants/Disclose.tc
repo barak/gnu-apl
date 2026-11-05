@@ -1,0 +1,16 @@
+⍝ Disclose.tc
+⍝ ═══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ inv: B ←→ ⊃⊂B  (disclose/enclose inverse)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ≡ ⊃⊂B
+1
+      ⍝ inv: (⍴⍴Z) ←→ (⍴⍴B)+↑⌈/⍴¨⍴¨(,B),⊂↑B
+      B ← (⎕RVAL 1 (,3) (,0 1 0 0 0)) (⎕RVAL 1 (,3) (,0 1 0 0 0))
+      Z ← ⊃B
+      (⍴⍴Z) ≡ (⍴⍴B)+↑⌈/⍴¨⍴¨(,B),⊂↑B
+1

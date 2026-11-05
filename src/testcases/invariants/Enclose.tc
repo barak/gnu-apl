@@ -1,0 +1,23 @@
+⍝ Enclose.tc
+⍝ ══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: Z scalar array
+      ⍝ inv: ⍴Z ←→ ⍳0  (scalar has empty shape)
+      ⍝ inv: ⍴⍴Z ←→ ,0  (rank 0)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ⊂B
+      (⍴Z) ≡ ⍳0
+1
+      (⍴⍴Z) ≡ ,0
+1
+      ⍝ inv: B ←→ ⊃⊂B
+      B ≡ ⊃⊂B
+1
+      ⍝ inv: (A B C) ←→ (⊂A),(⊂B),⊂C   vector notation
+      A ← ⎕RVAL 0 ⋄ B ← ⎕RVAL 0 ⋄ C ← ⎕RVAL 0
+      (A B C) ≡ (⊂A),(⊂B),⊂C
+1

@@ -1,6 +1,8 @@
 ⍝ Laminate.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       A←'FOR'
       B←'AXE'
       ⎕IO←1
@@ -46,7 +48,7 @@ RE
       ≡V
 2
 
-⍝ Conformability ----------------------------------
+      ⍝ Conformability ----------------------------------
 
       Q←3 3ρ'STYHIMRED'
       Q
@@ -86,54 +88,75 @@ AR
 AE
 AD
 
-⍝ Regression
+      ⍝ Regression
 
-A←4 3⍴'A'
-B←4 3⍴'B'
+      A←4 3⍴'A'
+      B←4 3⍴'B'
 
-⎕IO←1
+      ⎕IO←1
       ⍴ A ,[¯0.5] B
-AXIS ERROR
+AXIS ERROR+
       ⍴A,[¯0.5]B
-       ^       ^
+       ^^
 
       ⍴A,[0.5]B
 2 4 3
 
-⍴ A ,[1.5] B
+      ⍴ A ,[1.5] B
 4 2 3
 
-⍴ A ,[2.5] B
+      ⍴ A ,[2.5] B
 4 3 2
 
-⍴ A ,[3.5] B
-AXIS ERROR
+      ⍴ A ,[3.5] B
+AXIS ERROR+
       ⍴A,[3.5]B
-       ^      ^
+       ^^
 
-⎕IO←0
+      ⎕IO←0
       ⍴ A ,[¯1.5] B
-AXIS ERROR
+AXIS ERROR+
       ⍴A,[¯1.5]B
-       ^       ^
+       ^^
 
       ⍴A,[¯0.5]B
 2 4 3
 
-⍴ A ,[0.5] B
+      ⍴ A ,[0.5] B
 4 2 3
 
-⍴ A ,[1.5] B
+      ⍴ A ,[1.5] B
 4 3 2
 
-⍴ A ,[2.5] B
-AXIS ERROR
+      ⍴ A ,[2.5] B
+AXIS ERROR+
       ⍴A,[2.5]B
-       ^      ^
+       ^^
 
-)SIC
-⎕IO←1
+      )SIC
+      ⎕IO←1
 
+      ⍝ regression (Blake McBride, Bugs28 #66, Bugs27 #48 residual,
+      ⍝ 2026-08-11): a rank mismatch in A,[X]B (laminate) raised INDEX
+      ⍝ ERROR instead of RANK ERROR, even though the )MORE text itself
+      ⍝ already says "expecting ⍴⍴A = ⍴⍴B"; and laminate's own Z, when B
+      ⍝ is empty, always took its prototype from B instead of A (rank>=2),
+      ⍝ unlike plain catenate which already got this right for #48.
+      ⍝
+      Z←1 2 3,[0.5]2 3⍴0
+RANK ERROR+
+      Z←1 2 3,[0.5]2 3⍴0
+        ^    ^
+      )MORE
+A,[X]B: expecting ⍴⍴A = ⍴⍴B (or A or B a scalar); ⍴⍴A is 1, ⍴⍴B is 2
 
-⍝ ==================================
+      ⎕UCS ↑(0 3⍴'a'),[0.5]0 3⍴0
+32
+
+      ⍝ control: plain catenate was already right (Bugs27 #48)
+      ⍝
+      ⎕UCS ↑(0 3⍴'a'),0 3⍴0
+32
+
+      ⍝ ==================================
 

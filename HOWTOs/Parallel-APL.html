@@ -744,7 +744,7 @@ asciidoc.install(4);
 <div class="sect1">
 <h2 id="_abstract">Abstract</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>This document briefly describes parallel execution in GNU APL</p></div>
+<div class="paragraph"><p>This document briefly describes parallel execution in GNU APL.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -883,27 +883,27 @@ particular <strong>⎕SYL[24 25 26;]</strong> control the number of cores being 
 </div></div>
 <div class="sect3">
 <h4 id="_syl_24_2">⎕SYL[24;2]</h4>
-<div class="paragraph"><p><strong>⎕SYL[24;2])</strong> is a read-only value pertaining to the value used for
+<div class="paragraph"><p><strong>⎕SYL[24;2]</strong> is a read-only value pertaining to the value used for
 <strong>CORE_COUNT_WANTED</strong> in <strong>./configure</strong>.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_syl_25_2">⎕SYL[25;2]</h4>
-<div class="paragraph"><p><strong>⎕SYL[25;2])</strong> is the number of cores either chosen by ⎕SYL[24;2] or else as
-indicated by the platform. The value 12 above as reported on a i7-8700
+<div class="paragraph"><p><strong>⎕SYL[25;2]</strong> is the number of cores either chosen by ⎕SYL[24;2] or else as
+indicated by the platform. The value 12 above was reported on an i7-8700
 Intel CPU with 6 physical cores and 2 core threads per physical core.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_syl_26_2">⎕SYL[26;2]</h4>
-<div class="paragraph"><p><strong>⎕SYL[26;2])</strong> is the number of cores used by the interpreter. Setting:</p></div>
-<div class="paragraph"><p><strong>⎕SYL[26;2])←0</strong> chooses sequential operation of the interpreter.
-<strong>⎕SYL[26;2])←N</strong> with <strong>N≥1 chooses parallel operation on *N</strong> cores.
+<div class="paragraph"><p><strong>⎕SYL[26;2]</strong> is the number of cores used by the interpreter. Setting:</p></div>
+<div class="paragraph"><p><strong>⎕SYL[26;2]←0</strong> chooses sequential operation of the interpreter.
+<strong>⎕SYL[26;2]←N</strong> with <strong>N≥1</strong> chooses parallel operation on <strong>N</strong> cores.
 * Other values trigger a <strong>DOMAIN ERROR</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
 </td>
-<td class="content"><strong>⎕SYL[26;2])←1</strong> could be useful for benchmarking to see the difference
+<td class="content"><strong>⎕SYL[26;2]←1</strong> could be useful for benchmarking to see the difference
 between parallel and sequential code, but without distributing the
 computational load over several cores.</td>
 </tr></table>
@@ -946,7 +946,7 @@ Then <strong>Parallel::init()</strong> creates a thread pool with
   <strong>Thread_context::init_parallel</strong>, with one thread for each CPU
   in <strong>CPU_pool::the_CPUs</strong>. If <strong>CORE_COUNT_WANTED = -3</strong> then only the first
   thread is activated (and the user needs to use ⎕SYL in order to activate
-  more cores. Otherwise all threads are activated (and ⎕SYL cannot be used).
+  more cores). Otherwise all threads are activated (and ⎕SYL cannot be used).
   Finally <strong>Parallel::init()</strong> brings all threads into their initial state.
 </p>
 </li>
@@ -1083,7 +1083,7 @@ When the master finds new work (e.g. after interpreting a scalar APL
 <li>
 <p>
 The workers perform their work and, after finishing it, increment their
-  <strong>Thread_context::job_number</strong> and decrement <strong>busy_worker_count</strong>.again:
+  <strong>Thread_context::job_number</strong> and decrement <strong>busy_worker_count</strong> again:
 </p>
 </li>
 </ul></div>
@@ -1132,7 +1132,7 @@ thread after returning from <strong>M_fork()</strong> and before calling <strong
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_the_theory_8230">The Theory &#8230;</h3>
-<div class="paragraph"><p>If a scalar APL function, is computed on a single core, then the time (most
+<div class="paragraph"><p>If a scalar APL function is computed on a single core, then the time (most
 conveniently expressed in terms of CPU cycles) to compute it for an APL array
 with a ravel of length N is:</p></div>
 <div class="paragraph"><p>T<sub>seq</sub>(N) = ⍺<sub>seq</sub> + β<sub>seq</sub> × N.</p></div>
@@ -1141,7 +1141,7 @@ requires time:</p></div>
 <div class="paragraph"><p>T<sub>par</sub>(N) = ⍺<sub>par</sub> + β<sub>par</sub> × N.</p></div>
 <div class="paragraph"><p>The terms ⍺<sub>seq</sub> and ⍺<sub>par</sub> are the start-up times for the computation, while
 the terms β<sub>seq</sub> and β<sub>par</sub> are the per-item times for the computation.</p></div>
-<div class="paragraph"><p>Under normal circumstance one has:</p></div>
+<div class="paragraph"><p>Under normal circumstances one has:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1176,7 +1176,7 @@ T<sub>seq</sub>(N) &gt; T<sub>par</sub>(N) for N &gt; N<sub>BE</sub>.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>That simply means that the computation for arrays with a short ravel (i.e. of
+<div class="paragraph"><p>That simply means that for arrays with a short ravel (i.e. of
 less than N<sub>BE</sub> items) it is faster to compute sequentially, while for longer
 ravels it is faster to compute in parallel.</p></div>
 <div class="paragraph"><p>The above formulae are easier to interpret if one plots the execution times
@@ -1217,9 +1217,9 @@ Even worse, these days the same code, executed again and again, typically
 results in rather different cycle counts for each execution pass. Even if
 "no" other processes execute on the same CPU on which a benchmark measurement
 is performed (where "no other process" means not counting the typically 250 or
-so operating system processes that are sitting idle on the CPU) the results
+so operating system processes that are sitting idle on the CPU), the results
 can differ substantially between different measurements of the same code.</p></div>
-<div class="paragraph"><p>So in practice, lets discuss the results of a benchmark:</p></div>
+<div class="paragraph"><p>So in practice, let&#8217;s discuss the results of a benchmark:</p></div>
 <div class="imageblock">
 <div class="content">
 <img src="./APL3.png" alt="APL3" />
@@ -1232,7 +1232,7 @@ the sense that the measured numbers of CPU cycles were very much in line with
 the theory. The thick lines are those that have the smallest squared
 differences from the measurement points (the line that best matches the
 measurement points).</p></div>
-<div class="paragraph"><p>To be on the safe side, lets repeat <strong>the same</strong> benchmark:</p></div>
+<div class="paragraph"><p>To be on the safe side, let&#8217;s repeat <strong>the same</strong> benchmark:</p></div>
 <div class="imageblock">
 <div class="content">
 <img src="./APL4.png" alt="APL4" />
@@ -1244,7 +1244,7 @@ previous run. If one runs the benchmark many times, then it looks like the
 deviations in the sequential execution are larger than in the parallel
 execution. More importantly, the sequential start-up time ⍺<sub>seq</sub> is now
 larger than the parallel start-up time ⍺<sub>par</sub>.</p></div>
-<div class="paragraph"><p>These two examples are only meant to highlight some the problems that may occur
+<div class="paragraph"><p>These two examples are only meant to highlight some of the problems that may occur
 if one tries to determine the parameters ⍺ and β. The following is a summary
 of findings after having performed many such measurements with GNU APL and
 different core counts, vector lengths, and primitive functions:</p></div>
@@ -1563,7 +1563,7 @@ perform the APL work.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2024-03-14 14:48:59 CET
+ 2026-09-19 18:16:45 CEST
 </div>
 </div>
 </body>

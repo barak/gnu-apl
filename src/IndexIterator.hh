@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
    An iterator for one dimension of indices. When the iterator reached its
    end, it wraps around and increments its upper IndexIterator (if any).
@@ -36,6 +36,8 @@ class IndexIterator
 {
 public:
    /// constructor: IndexIterator with weight w
+   /// @param w   stride weight for this dimension
+   /// @param cnt number of index elements in this dimension
    IndexIterator(ShapeItem w, ShapeItem cnt)
    : weight(w),
      count(cnt),
@@ -45,29 +47,32 @@ public:
 
     virtual ~IndexIterator() {}
 
-   /// go the the next index
-   void operator ++();
+   /// get the number of indices.
+   ShapeItem get_index_count() const   { return count; }
+
+   /// return the next higher IndexIterator
+   IndexIterator * get_upper() const   { return upper; };
 
    /// return true if more indices are coming
    bool has_more() const   { return count && pos < count; }
+
+   /// set the next higher IndexIterator
+   /// @param up the IndexIterator one dimension higher
+   void set_upper(IndexIterator * up)   { Assert(upper == 0);   upper = up; };
 
    /// return the current index
    virtual ShapeItem get_ivalue() const = 0;
 
    /// return the current index
+   /// @param p position within the index sequence
    virtual ShapeItem get_pos(ShapeItem p) const = 0;
 
    /// print this iterator (for debugging purposes).
+   /// @param out output stream to write to
    ostream & print(ostream & out) const;
 
-   /// return the next higher IndexIterator
-   IndexIterator * get_upper() const   { return upper; };
-
-   /// set the next higher IndexIterator
-   void set_upper(IndexIterator * up)   { Assert(upper == 0);   upper = up; };
-
-   /// get the number of indices.
-   ShapeItem get_index_count() const   { return count; }
+   /// go the the next index
+   void operator ++();
 
 protected:
    /// the weight of this IndexIterator
@@ -82,12 +87,14 @@ protected:
    /// The current value.
    ShapeItem pos;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Iterator for an elided index (= ⍳(⍴B)[N] for some N)
 class ElidedIndexIterator : public IndexIterator
 {
 public:
    /// constructor
+   /// @param w  stride weight for this dimension
+   /// @param sh shape (element count) of this dimension
    ElidedIndexIterator(ShapeItem w, ShapeItem sh)
    : IndexIterator(w, sh)
    {}
@@ -96,15 +103,20 @@ public:
    virtual ShapeItem get_ivalue() const { return pos * weight; }
 
    /// get the index i.
+   /// @param i position within the elided index sequence
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return i; }
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// an IndexIterator for a true (i.e. non-elided) index array
 class TrueIndexIterator : public IndexIterator
 {
 public:
    /// constructor
+   /// @param w       stride weight for this dimension
+   /// @param value   APL array supplying the index values
+   /// @param qio     current value of ⎕IO (index origin)
+   /// @param max_idx exclusive upper bound for valid indices
    TrueIndexIterator(ShapeItem w, Value_P value,
                      uint32_t qio, ShapeItem max_idx);
 
@@ -117,6 +129,7 @@ public:
       { Assert(pos < count);   return indices[pos]; }
 
    /// return the i'th index
+   /// @param i position within the index array
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return indices[i]; }
 
@@ -124,7 +137,7 @@ protected:
    /// the indices
    ShapeItem * indices;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
     a multi-dimensional index iterator, consisting of several
    one-dimensional iterators.
@@ -134,17 +147,33 @@ class MultiIndexIterator
 {
 public:
    /// constructor from IndexExpr for value with rank/shape
+   /// @param shape shape of the APL value being indexed
+   /// @param IDX   the index expression specifying the desired elements
    MultiIndexIterator(const Shape & shape, const IndexExpr & IDX);
 
    /// destructor
    ~MultiIndexIterator();
 
-   /// get the current index (offset into a ravel) and increment iterators
-   ShapeItem operator ++(int);
-
    /// return true if more indices are coming
    bool has_more() const
-      { return highest_it && highest_it->has_more(); }
+      {
+        // highest_it->has_more() alone only reflects the highest
+        // dimension's own count/pos; a LOWER dimension with count == 0
+        // (an empty explicit index like Z[1;⍬], or an elided index over
+        // a shape-0 axis like Z[;] on a 2 0-shaped Z) still lets this
+        // return true whenever the highest dimension itself isn't
+        // exhausted, and operator++(int) then reads that empty lower
+        // iterator's get_ivalue() at pos 0 with count 0 -- out of range.
+        // A multi-index with ANY empty axis has NO elements at all
+        // (Cartesian product with an empty factor is empty), which is
+        // exactly what the constructor already computes into `empty` --
+        // it was just never consulted here. See Bugs27 #16.
+        //
+        return highest_it && !empty && highest_it->has_more();
+      }
+
+   /// get the current index (offset into a ravel) and increment iterators
+   ShapeItem operator ++(int);
 
 protected:
    /// the iterator for the highest dimension
@@ -156,5 +185,5 @@ protected:
    /// true if one of the iterators has length 0
    bool empty;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

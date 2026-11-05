@@ -1,6 +1,8 @@
 ⍝ Residue.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       10∣17
 7
       10∣8 10 ¯4 4J3
@@ -21,7 +23,7 @@
 ¯3 ¯3E0   ¯3E0
 ¯2 ¯2E0   ¯2E0
 ¯1 ¯1E0   ¯1E0
- 0  0E0    0E0
+ 0 ¯4E0   ¯1E¯11
 ¯3 ¯3E0   ¯3E0
 ¯2 ¯2E0   ¯2E0
 ¯1 ¯1E0   ¯1E0
@@ -31,7 +33,7 @@
  0  0E0    0E0
 ¯2 ¯2E0   ¯2E0
 ¯1 ¯1E0   ¯1E0
- 0  0E0    0E0
+ 0 ¯3E0   ¯1E¯11
 ¯2 ¯2E0   ¯2E0
 ¯1 ¯1E0   ¯1E0
  0  0E0    0E0
@@ -41,7 +43,7 @@
 ¯1 ¯1E0   ¯1E0
  0  0E0    0E0
 ¯1 ¯1E0   ¯1E0
- 0  0E0    0E0
+ 0 ¯2E0   ¯1E¯11
 ¯1 ¯1E0   ¯1E0
  0  0E0    0E0
 ¯1 ¯1E0   ¯1E0
@@ -51,7 +53,7 @@
  0  0E0    0E0
  0  0E0    0E0
  0  0E0    0E0
- 0  0E0    0E0
+ 0 ¯1E0   ¯1E¯11
  0  0E0    0E0
  0  0E0    0E0
  0  0E0    0E0
@@ -71,7 +73,7 @@
  0  0E0    0E0
  0  0E0    0E0
  0  0E0    0E0
- 0  0E0    0E0
+ 0  1E¯11  1E0
  0  0E0    0E0
  0  0E0    0E0
  0  0E0    0E0
@@ -81,7 +83,7 @@
  1  1E0    1E0
  0  0E0    0E0
  1  1E0    1E0
- 0  0E0    0E0
+ 0  1E¯11  2E0
  1  1E0    1E0
  0  0E0    0E0
  1  1E0    1E0
@@ -91,7 +93,7 @@
  0  0E0    0E0
  1  1E0    1E0
  2  2E0    2E0
- 0  0E0    0E0
+ 0  1E¯11  3E0
  1  1E0    1E0
  2  2E0    2E0
  0  0E0    0E0
@@ -101,7 +103,7 @@
  1  1E0    1E0
  2  2E0    2E0
  3  3E0    3E0
- 0  0E0    0E0
+ 0  1E¯11  4E0
  1  1E0    1E0
  2  2E0    2E0
  3  3E0    3E0
@@ -199,18 +201,58 @@
  3  3.000000000E0    3.000000000E0
  0  1.000000083E¯11  4.000000000E0
 
-     A← ¯1E200 ¯1E100 ¯1 ¯1E¯100 ¯1E¯200 0 1E¯200 1E¯100 1 1E100 1E200
-     A∘.|A
+      A← ¯1E200 ¯1E100 ¯1 ¯1E¯100 ¯1E¯200 0 1E¯200 1E¯100 1 1E100 1E200
+      A∘.|A
+ 0E0   ¯1E100 ¯1 ¯1E¯100 ¯1E¯200 0 0E0    0E0    0 0E0   0E0
+ 0E0    0E0   ¯1 ¯1E¯100 ¯1E¯200 0 0E0    0E0    0 0E0   0E0
+ 0E0    0E0    0 ¯1E¯100 ¯1E¯200 0 0E0    0E0    0 0E0   0E0
  0E0    0E0    0  0E0    ¯1E¯200 0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
  0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
 ¯1E200 ¯1E100 ¯1 ¯1E¯100 ¯1E¯200 0 1E¯200 1E¯100 1 1E100 1E200
  0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
- 0E0    0E0    0  0E0     0E0    0 0E0    0E0    0 0E0   0E0
  0E0    0E0    0  0E0     0E0    0 1E¯200 0E0    0 0E0   0E0
+ 0E0    0E0    0  0E0     0E0    0 1E¯200 1E¯100 0 0E0   0E0
+ 0E0    0E0    0  0E0     0E0    0 1E¯200 1E¯100 1 0E0   0E0
+ 0E0    0E0    0  0E0     0E0    0 1E¯200 1E¯100 1 1E100 0E0
+
+      ⍝ regression (Bugs28 #86): complex residue's tolerant per-
+      ⍝ component floor of the quotient decided (correctly) that the
+      ⍝ quotient was ⎕CT-close to a Gaussian integer, but then still
+      ⍝ returned b - a×floor_quot verbatim -- floating-point
+      ⍝ cancellation noise on the order of ⎕CT×|b| from that
+      ⍝ subtraction (not caught by comparing the noise itself against 0
+      ⍝ or against a) leaked into the result instead of being
+      ⍝ recognised as "the true residue is exactly 0".
+      ⍝
+      0J1E¯11|1
+0
+
+      3|2.9999999999999J3
+0
+
+      ⍝ regression (Bugs28 #100(q)): FloatCell::bif_residue_ff()'s
+      ⍝ helper nc_p_modulo_q() deliberately gives up (returns 0)
+      ⍝ whenever |B÷A| exceeds 4.5E15, since its own floor()/multiply
+      ⍝ steps lose precision beyond that magnitude for a genuinely
+      ⍝ fractional quotient -- but that guard has no bearing when B
+      ⍝ (here 1E17, a float literal) is itself an EXACT integer: it
+      ⍝ must then agree exactly with the same residue computed from the
+      ⍝ equal integer literal, which takes IntCell's own, always-exact
+      ⍝ path and was never affected by this guard.
+      ⍝
+      7|1E17
+5
+
+      7|100000000000000000
+5
+
+      (7|1E17) ≡ 7|100000000000000000
+1
+
+      ⍝ control: a genuinely fractional B is unaffected by this fix and
+      ⍝ still uses the ordinary (tolerant) float residue path
+      ⍝
+      7|1E15+0.5
+6.5
 
 

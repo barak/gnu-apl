@@ -1,0 +1,68 @@
+@ifplaintext
+\input texinfo
+@settitle Seeking answers in a top -- quit -- done world
+@setfilename prompt.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Seeking answers in a top -- quit -- done world
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node prompt
+@end ifnotplaintext
+
+@chapter Seeking answers in a top -- quit -- done world.
+
+Workspace to seek answers from your users.
+
+@deffn ∇ ans ← prompt 'Query'
+
+Function prints the query and returns the user's answer. If one of the
+four keywords quit, top, done, or back are entered, prompt will return
+an integer. 1 for quit, 2 for top, 3 from done, and 4 for back when
+⎕io is set to 1.
+
+This should allow the programmer to react:
+
+@example
+[1] ans←prompt 'Last Name ... '
+[2] →(utl∆numberp ans)/keyword
+[3] ⍝ Deal with actual data
+..
+[n]→0
+[n+1] →(top,quit,done,back)[ans]
+[n+2] top:
+@end example
+
+I use 'top' to return the user to the first prompt in the program;
+'quit' to exit the program making no changes; 'done' to exit the
+program making changes; and 'back' to return the users to the previous
+prompt.
+
+@end deffn

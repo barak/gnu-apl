@@ -1,6 +1,8 @@
 ⍝ ZZ39_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE FIB
 
 ∇R←FIB N

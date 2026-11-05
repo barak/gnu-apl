@@ -1,6 +1,8 @@
 
       ]PSTAT SAVE
       ]PSTAT
+⍝@ test3.
+
 
       'APL expression lines:' ⎕AI[5]
  APL expression lines: ⁰ 
@@ -17,7 +19,7 @@ OK      - no duplicate parents
 CLEAR WS
       )HISTORY CLEAR
 "UCS strings:" (⎕FIO ¯13)
- UCS strings: 373 
+ UCS strings: ⁰ 
 
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
           ⍝⍝                               ⍝⍝
@@ -29,5 +31,20 @@ CLEAR WS
           ⍝⍝                               ⍝⍝
            ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 
+⍝ regression (our own AP210-based cross-checking harness, 2026-09-25):
+⍝ this is the very last statement of the very last file (by design --
+⍝ ZZZZ.tc sorts after every other testcase), a real cleanup step for
+⍝ GNU's own test suite once all shared-variable-using tests are done.
+⍝ Our harness itself depends on APserver for its own ⎕SVO-based result
+⍝ capture for the *entire* run, including its own bookkeeping write
+⍝ right after this statement -- so running this HERE self-sabotages the
+⍝ harness (confirmed live: "TIMEOUT on signal ASSIGN_VALUE" /
+⍝ "Svar_record_P() failed" immediately after, since APserver is now
+⍝ dead), even though the statement itself is completely correct and
+⍝ intentional in GNU's own suite. SKIPped -- see
+⍝ project_apl2_and_or_boolean_only.md.
+]FILE_CTL SKIP_APL2
 ⊣ ⍎ ')HOST killall APserver'
+
+]FILE_CTL NO_SKIP
 

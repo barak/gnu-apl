@@ -1,9 +1,13 @@
 ⍝ Quad_TZ.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       ⎕TZ
 ⁴⁰
 
+      ]FILE_CTL NO_SKIP
       ⎕TZ←5
       ⎕TZ
 5
@@ -12,26 +16,77 @@
       ⎕TZ
 6.2
 
-⍝ ignore values too small or too large ----------------------------------
-
+      ⍝ regression (Bugs28 #100(k)): values too small or too large used
+      ⍝ to be silently ignored (⎕TZ left unchanged, no diagnostic at
+      ⍝ all) -- unlike a bad type, which already correctly raised
+      ⍝ DOMAIN ERROR. No real-world timezone lies outside
+      ⍝ [-12 ... 14] hours (UTC-12 to Kiribati's UTC+14), so there is
+      ⍝ no sensible value to clamp to (unlike ⎕PP/⎕PW, which clamp an
+      ⍝ over-large request to the system's actual capacity); reject
+      ⍝ instead.
+      ⍝
       ⎕TZ←15
+DOMAIN ERROR+
+      ⎕TZ←15
+      ^  ^
+
+      )MORE
+⎕TZ←15: expecting -12 ≤ ⎕TZ ≤ 14 (hours UTC offset)
+      )SIC
       ⎕TZ
 6.2
 
       ⎕TZ←14.2
+DOMAIN ERROR+
+      ⎕TZ←14.2
+      ^  ^
+
+      )MORE
+⎕TZ←14.199999999999999: expecting -12 ≤ ⎕TZ ≤ 14 (hours UTC offset)
+      )SIC
       ⎕TZ
 6.2
 
       ⎕TZ←¯13
+DOMAIN ERROR+
+      ⎕TZ←¯13
+      ^  ^
+
+      )MORE
+⎕TZ←¯13: expecting -12 ≤ ⎕TZ ≤ 14 (hours UTC offset)
+      )SIC
       ⎕TZ
 6.2
 
       ⎕TZ←¯12.2
+DOMAIN ERROR+
+      ⎕TZ←¯12.2
+      ^  ^
+
+      )MORE
+⎕TZ←¯12.199999999999999: expecting -12 ≤ ⎕TZ ≤ 14 (hours UTC offset)
+      )SIC
       ⎕TZ
 6.2
 
+      ⍝ control: the boundary values themselves are still accepted
+      ⍝
+      ⎕TZ←14
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
+      ⎕TZ
+14
+
+      ]FILE_CTL NO_SKIP
+      ⎕TZ←¯12
+      ⎕TZ
+¯12
+
+      ⎕TZ←6.2
+
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       ⎕TZ←12  ◊ T1←⎕TS         ⍝ timezone 12 (ahead)
       ⎕TZ←¯12 ◊ T2←⎕TS         ⍝ timezone ¯12 (behind)
+      ]FILE_CTL NO_SKIP
       ∆_YEAR ← T1[1] - T2[1]   ⍝ 1 on 12/31
       ∆_MON  ← T1[2] - T2[2]
       ∆_DAY  ← T1[3] - T2[3]
@@ -44,13 +99,13 @@
       (∆_YEAR = 0) ∨ (∆_MON = ¯11)          ⍝ end of the year
 1
       (∆_MON ∈ 0 ¯11) ∨ (∆_DAY ∈ ¯27 ¯28)   ⍝ end of February
-1
+⁰
       (∆_MON ∈ 0 ¯11) ∨ (∆_DAY = ¯29)       ⍝ end of Apr, Jun, Sep, Nov
-1
+⁰
       (∆_MON = 0) ∨ (∆_DAY = ¯30)           ⍝ Jan, Mar, May, Jul, Aug, Oct, Dec
-1
+⁰
 
-⍝ ==================================
+      ⍝ ==================================
 
       ⎕TZ←¯1
 

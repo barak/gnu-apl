@@ -1,0 +1,131 @@
+⍝ Quad_RVAL.tc
+⍝ ----------------------------------
+
+⍝@ test3.
+
+      ⍝ zero-axis / ecount-budget regression (Blake McBride, Bugs21 #1)
+      ⍝ ------------------------------------------------------------
+      ⍝ The shape-shrinking code has two copies of the "saturating
+      ⍝ volume" loop; the second one (added by the Bugs20 #3 fix) was
+      ⍝ missing the zero-axis guard the first one already has. A shape
+      ⍝ that survives the first loop's early "saturated" break with a
+      ⍝ still-zero axis then hit budget/0 in the second loop -- SIGFPE,
+      ⍝ killing the interpreter (and, since this also happens inside
+      ⍝ AllPrimitives.tc's own use of ⎕RVAL, aborting the whole shipped
+      ⍝ test suite partway through). Any SIGFPE/crash on the line below
+      ⍝ is a regression; the exact shape/ecount is otherwise arbitrary
+      ⍝ (any shape with a 0-axis that is not the largest axis, combined
+      ⍝ with an ecount budget too small for the loop to reach that
+      ⍝ axis, reproduces it).
+
+      ⍴⎕RVAL 2 (2 0) (0 1 0 0 0) 1 1
+1 0
+
+      ⍝ ⎕RVAL 0 (a scalar 0) returns the next random value according to
+      ⍝ the properties set with dyadic A ⎕RVAL B, as documented. It used
+      ⍝ to be treated as the 1-element property vector ,0 (rank 0), which
+      ⍝ ignored any rank set with 1 ⎕RVAL B and always returned a scalar.
+      ⍝ Any other B is unchanged: ⎕RVAL ,0 still forces rank 0, and a
+      ⍝ scalar N≠0 is still the rank N.
+      ⍝
+      ⍴⍴⎕RVAL 0     ⍝ default rank 0
+0
+
+      OLD_RANK←1 ⎕RVAL 2
+      ⍴⍴⎕RVAL 0     ⍝ current rank 2
+2
+
+      ⍴⍴⎕RVAL ,0    ⍝ rank 0 forced
+0
+
+      ⍴⍴⎕RVAL 1     ⍝ rank 1 forced
+1
+
+      ⍴⍴⎕RVAL 0     ⍝ the forced ranks above did not change the setting
+2
+
+      OLD_RANK←1 ⎕RVAL OLD_RANK
+      ⍴⍴⎕RVAL 0
+0
+
+      )ERASE OLD_RANK
+
+      ⍝ 8 ⎕RVAL B (aka. ⎕RVAL.purpose B): the purpose of subsequently
+      ⍝ returned random values, 0 (default) or 1. Like the other
+      ⍝ properties it returns the previous setting; an empty B queries it.
+      ⍝
+      8 ⎕RVAL ⍬
+0
+
+      8 ⎕RVAL 1
+0
+
+      'purpose' ⎕RVAL ⍬
+1
+
+      ⎕RVAL.purpose 0
+1
+
+      ⎕RVAL[8] ⍬
+0
+
+      8 ⎕RVAL 2
+DOMAIN ERROR+
+      8 ⎕RVAL 2
+      ^ ^
+
+      )MORE
+8 ⎕RVAL B: B must be 0 or 1
+
+      )SIC
+      8 ⎕RVAL 1 1
+LENGTH ERROR
+      8 ⎕RVAL 1 1
+      ^ ^
+
+      )SIC
+      8 ⎕RVAL ⍬
+0
+
+      ⍝ 8 ⎕RVAL 1 (APL2 mode): integers are signed 32 bit, reals (and both
+      ⍝ parts of complex numbers) are IEEE 32-bit floats, and characters
+      ⍝ come from IBM APL2's ⎕AV: 220 characters, i.e. without the control
+      ⍝ characters, DEL, and the 3 positions where GNU APL's table of it
+      ⍝ (Avec::IBM_quad_AV()) differs from IBM APL2 (⍶ ⋸ ⍹; 0x0B (⍬) is a
+      ⍝ control character in IBM APL2). 8 ⎕RVAL 0 (default):
+      ⍝ unchanged, i.e. 64-bit integers and 64-bit floats.
+      ⍝
+      ∇Z←F32 X;E
+       ⍝ all items of X are exactly IEEE 32-bit floats (24-bit mantissa)
+       E←⌊2⍟|X+X=0 ◊ Z←∧/,(⌊M)=M←(|X)÷2⋆E-23
+      ∇
+
+      X←0 ⎕RVAL 8⍴42 ◊ X←8 ⎕RVAL 1
+      I←⎕RVAL 1 (,1000) (0 1 0 0 0)
+      (∧/I=⌊I) (∧/(I≥¯2⋆31)∧I<2⋆31) (∨/(|I)>2⋆30)
+1 1 1
+
+      F←⎕RVAL 1 (,1000) (0 0 1 0 0)
+      (∧/(F≥0)∧F<1) (F32 F)
+1 1
+
+      C←⎕RVAL 1 (,5000) (0 0 0 1 0)
+      (F32 9○C) (F32 11○C)
+1 1
+
+      ⍴∪⎕RVAL 1 (,5000) (1 0 0 0 0)
+220
+
+      X←8 ⎕RVAL 0
+      I←⎕RVAL 1 (,1000) (0 1 0 0 0)
+      ∨/(|I)>2⋆40
+1
+
+      F←⎕RVAL 1 (,1000) (0 0 1 0 0)
+      F32 F
+0
+
+      )ERASE F32 X I F C
+
+
+

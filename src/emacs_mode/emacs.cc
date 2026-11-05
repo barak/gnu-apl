@@ -81,7 +81,7 @@ static Token list_functions( ostream &out )
 }
 
 Token
-eval_B(Value_P B)
+eval_B(const Value * B)
 {
     return list_functions( CERR );
 }
@@ -91,9 +91,10 @@ Token eval_AB(Value_P A, Value_P B)
     return list_functions( COUT );
 }
 
-Token eval_XB(Value_P X, Value_P B)
+Token eval_XB(const Value * X, const Value * B)
 {
-    const int function_number = X->get_cravel(0).get_near_int();
+    Cell cache;
+    const int function_number = X->get_cfirst( cache ).get_near_int();
 
     switch( function_number ) {
     case 0:
@@ -106,7 +107,8 @@ Token eval_XB(Value_P X, Value_P B)
             port = 0;
         }
         else {
-            port = B->get_cravel( 0 ).get_near_int();
+            Cell cache;
+            port = B->get_cravel( 0, cache ).get_near_int();
         }
 
         try {
@@ -128,7 +130,7 @@ Token eval_XB(Value_P X, Value_P B)
     return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 
-Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
+Token eval_AXB(const Value * A, const Value * X, const Value * B)
 {
     COUT << "eval_AXB" << endl;
     return Token(TOK_APL_VALUE1, Str0(LOC));

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions matrix divide and matrix inverti (and a number
     of nonstandard GNMNU APL functions 
  */
@@ -40,93 +40,183 @@ public:
    Bif_F12_DOMINO();
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis specification value
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param X axis specification value
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
+
+   /// overloaded NonscalarFunction_default_identity::eval_identity_fun().
+   /// Figure 28 (apl2lrm.txt p.212): the identity item for ⌹ is
+   /// ⊂(0 0⍴prototype-of-B) -- a scalar containing an empty 0×0 matrix
+   /// (degenerate since an entirely empty B gives no basis to infer any
+   /// other matrix size), unlike ⍴/⍉/↑/,'s plain ⊂B.
+   virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
+      {
+        Value_P M(0, 0, LOC);
+        M->set_default(B, LOC);
+        M->check_value(LOC);
+        return enclosed_identity(B, axis, M);
+      }
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    static Bif_F12_DOMINO  fun;   ///< Built-in function
 
    /// overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B) const;
+   /// @param B right argument APL value
+   virtual Token eval_fill_B(cValue_R B) const;
 
    /// overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const;
+
+   /// overloaded Function::eval_rank_fill_B(): genuinely evaluating ⌹ on
+   /// an all-zero synthetic prototype matrix is singular (a real DOMAIN
+   /// ERROR, not a useful shape), so delegate to eval_fill_B()'s own
+   /// Figure-20 "Matrix Inverse: Z←⍉R" formula instead, the same one
+   /// already used for Each/Outer Product.
+   virtual Token eval_rank_fill_B(cValue_R B) const
+      { return eval_fill_B(B); }
+
+   /// see eval_rank_fill_B() above.
+   virtual Token eval_rank_fill_AB(cValue_R A, cValue_R B) const
+      { return eval_fill_AB(A, B); }
 
 protected:
    /// a mapping between function names and function numbers
    static const FunctionGroup::function_info subfunction_infos[];
 
    /// overloaded FunctionGroup::print_fun_syntax()
+   /// @param out output stream to write to
+   /// @param info function descriptor entry
   virtual void print_fun_syntax(ostream & out,
                                 const function_info & info) const;
 
    /// overloaded FunctionGroup::print_map_syntax()
+   /// @param out output stream to write to
+   /// @param info function descriptor entry
    virtual void print_map_syntax(ostream & out,
                                  const function_info & info) const;
 
    /// compute the Q matrix of B = QR
+   /// @param Z output value to receive the Q matrix
+   /// @param need_complex true if complex arithmetic is required
+   /// @param rows number of matrix rows
+   /// @param cols number of matrix columns
+   /// @param B source value containing the input ravel
+   /// @param idx starting index into B's ravel
+   /// @param EPS epsilon tolerance for near-zero detection
    static void QR_Helzer(Value_P Z, bool need_complex, ShapeItem rows,
-                         ShapeItem cols, const Cell * cB, double EPS);
+                         ShapeItem cols, cValue_R B, ShapeItem idx, double EPS);
 
    /// compute the householder transformation Q of B = QR
+   /// @param B input/output matrix data buffer
+   /// @param rows number of matrix rows
+   /// @param cols number of matrix columns
+   /// @param Q output buffer for the Q orthogonal matrix
+   /// @param Q1 scratch buffer for intermediate Q factor
+   /// @param R output buffer for the R upper-triangular matrix
+   /// @param S scratch buffer used during computation
+   /// @param EPS epsilon tolerance for near-zero detection
    template<bool cplx>
    static double * householder(double * B, ShapeItem rows, ShapeItem cols,
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
 
    /// return the polynomial B with indeterminant A as APL string
-   static Value_P print_polynomial(const Value & A, const Value & B);
+   /// @param A value providing the indeterminant name(s)
+   /// @param B coefficient array of the polynomial
+   static Value_P print_polynomial(const cValue & A, const cValue & B);
 
    /// return the polynomial B with indeterminant A as APL string
+   /// @param vars vector of variable name strings
+   /// @param B coefficient array of the polynomial
    static UCS_string print_polynomial(const UCS_string_vector & vars,
-                                      const Value & B);
+                                      const cValue & B);
 
    /// return the polynomial B with indeterminant 'x' as APL string
-   static Value_P print_polynomial(const Value & B);
+   /// @param B coefficient array of the polynomial
+   static Value_P print_polynomial(const cValue & B);
 
    /// return the product A×B of polynomilals A and B
-   static Value_P polynomial_product(const Value & A, const Value & B);
+   /// @param A left polynomial coefficient array
+   /// @param B right polynomial coefficient array
+   static Value_P polynomial_product(const cValue & A, const cValue & B);
 
    /// return the quotient A÷B of polynomilals A and B (1 indeterminant)
-   static Value_P poly_quotient(const Value & A, const Value & B);
+   /// @param A dividend polynomial coefficient array
+   /// @param B divisor polynomial coefficient array
+   static Value_P poly_quotient(const cValue & A, const cValue & B);
 
    /// return the quotient A÷B of polynomilals A and B (with orders)
-   static Value_P poly_quotient_NO(const Value & A, const Value & B,
-                                   const Value * optional_order_A,
-                                   const Value * optional_order_B);
+   /// @param A dividend polynomial coefficient array
+   /// @param B divisor polynomial coefficient array
+   /// @param optional_order_A optional order override for A (may be null)
+   /// @param optional_order_B optional order override for B (may be null)
+   static Value_P poly_quotient_NO(const cValue & A, const cValue & B,
+                                   const cValue * optional_order_A,
+                                   const cValue * optional_order_B);
 
    /// return the quotient A÷B of polynomilals A and B
-   static Value_P poly_quotient_N(const Value & A, const Value & B);
+   /// @param A dividend polynomial coefficient array
+   /// @param B divisor polynomial coefficient array
+   static Value_P poly_quotient_N(const cValue & A, const cValue & B);
 
    /// return the polynomial B with indeterminant 'x' as APL string
-   static Value_P scan_polynomial(const Value & A, const Value & B);
+   /// @param A value providing the indeterminant name(s)
+   /// @param B coefficient array of the polynomial
+   static Value_P scan_polynomial(const cValue & A, const cValue & B);
 
    /// return the polynomial B with indeterminant 'x' as APL string
-   static Value_P scan_polynomial(const Value & B);
+   /// @param B coefficient array of the polynomial
+   static Value_P scan_polynomial(const cValue & B);
 
    /// return the polynomial B with indeterminant A as APL string
+   /// @param vars vector of variable name strings
+   /// @param B coefficient array of the polynomial
    static Value_P scan_polynomial(const UCS_string_vector & vars,
-                                  const Value & B);
+                                  const cValue & B);
 
    /// run (python-) script \b script with command line arguments \b args
+   /// @param script path or name of the script to execute
+   /// @param args command-line arguments passed to the script
+   /// @param result output lines collected from the script's stdout
    static void run_script(const UTF8_string & script, const UTF8_string & args,
                           UCS_string_vector & result);
 
    /// return the integral for B.
-   static Value_P integral(const Value * A, const Value & B);
+   /// @param A optional integration bounds or variable (may be null)
+   /// @param B polynomial coefficient array to integrate
+   static Value_P integral(const cValue * A, const cValue & B);
 
-   /// initialize complex D with Cells cB
-   static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);
+   /// initialize complex D from V.get_cravel(idx..idx+count-1)
+   /// @param V source value
+   /// @param idx starting index into V's ravel
+   /// @param D destination double buffer (interleaved real/imag pairs)
+   /// @param count number of cells to copy
+   static void setup_complex_B(cValue_R V, ShapeItem idx, double * D,
+                                ShapeItem count);
 
-   /// initialize real D with Cells cB
-   static void setup_real_B(const Cell * cB, double * D, ShapeItem count);
+   /// initialize real D from V.get_cravel(idx..idx+count-1)
+   /// @param V source value
+   /// @param idx starting index into V's ravel
+   /// @param D destination double buffer
+   /// @param count number of cells to copy
+   static void setup_real_B(cValue_R V, ShapeItem idx, double * D,
+                             ShapeItem count);
 
    /** a real or complex matrix. Unlike "normal" matrices where the matrix rows
        are adjacent, this matrix class separates the number of columns and the
@@ -162,7 +252,9 @@ public:
 #define matrix_assert(x) Assert(x)
 
        /// constructor: M×N matrix with the default vertical item spacings dY
-       //
+       /// @param pdata pointer to the backing double array
+       /// @param uM number of rows
+       /// @param uN number of columns
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN)
        : data(pdata),
          M(uM),
@@ -171,7 +263,10 @@ public:
        {}
 
        /// constructor: M×1 matrix (aka. column vector) from a matrix column
-       //
+       /// @param pdata pointer to the backing double array
+       /// @param uM number of rows
+       /// @param uN number of columns
+       /// @param udY vertical stride in doubles between successive rows
        Matrix(double * pdata, ShapeItem uM, ShapeItem uN, ShapeItem udY)
        : data(pdata),
          M(uM),
@@ -180,17 +275,24 @@ public:
        {}
 
        /// transpose the upper left M×M submatrix of this matrix
+       /// @param M size of the square submatrix to transpose
        inline void transpose(ShapeItem M);
 
        /// set this matrix to A +.× B
+       /// @param src_A left matrix operand
+       /// @param src_B right matrix operand
        inline void init_inner_product(const Matrix<cplx> & src_A,
                                       const Matrix<cplx> & src_B);
 
        /// resize a (nulti-purpose) matrix to size M×N
+       /// @param M new number of rows
+       /// @param N new number of columns
        inline void resize(ShapeItem M, ShapeItem N)
-          { new (this)   Matrix<cplx>(data, M, N); }
+          { this->M = M;   this->N = N;   dY = dpi*N; }
 
        /// return the real part of A[x;y]
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        double & real(ShapeItem y, ShapeItem x)
           {
              matrix_assert(x >= 0);
@@ -201,25 +303,34 @@ public:
           }
 
        /// initialize this matrix to the identity matrix
+       /// @param rows size of the square identity matrix to initialize
        inline void init_identity(ShapeItem rows);
 
        /// imbed matrix S into this matrix
+       /// @param S smaller matrix to embed in the lower-right corner
        inline void imbed(const Matrix<cplx> & S);
 
        /// initialize this matrix to be the outer product of the first
        /// column of src with itself
+       /// @param scale precomputed norm values used as scaling factors
+       /// @param src source matrix whose first column is used
        inline void init_outer_product(const norm_result & scale,
                                       const Matrix<cplx> & src);
 
        /// assign matrix other to this matrix
+       /// @param other source matrix to copy from
        inline void operator =(const Matrix<cplx> & other);
 
        /// return the elements of matrix 1 1↓this
        inline double * drop_1_1()
-          { new (this)   Matrix<cplx>(data + dpi*(N + 1), M-1, N-1, dY);
+          { data = data + dpi*(N + 1);   // uses old N; must run before N--
+            --M;
+            --N;                         // dY (stride) is unchanged
             return data; }
 
        /// return the real part of A[x;y]
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        const double & real(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -228,6 +339,8 @@ public:
           }
 
        /// return the imaginary part of A[x;y]
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        double & imag(ShapeItem y, ShapeItem x)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -236,6 +349,8 @@ public:
           }
 
        /// return the imaginary part of A[x;y]
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        const double & imag(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -244,6 +359,8 @@ public:
           }
 
        /// return the complex number at row y, column x of this matrix
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        inline complex<double> get_Z(ShapeItem y, ShapeItem x) const
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -253,6 +370,9 @@ public:
           }
 
        /// set the complex number at row y, column x of this matrix
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
+       /// @param val complex value to store
        inline void set_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -263,6 +383,9 @@ public:
           }
 
        /// subtract val from the matrix element at row y, column x.
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
+       /// @param val complex value to subtract
        inline void sub_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -273,6 +396,9 @@ public:
           }
 
        /// divide the matrix element at row y, col x by val.
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
+       /// @param val complex divisor
        inline void div_Z(ShapeItem y, ShapeItem x, complex<double> val)
           {
              matrix_assert(x >= 0);   matrix_assert(x <  N);
@@ -285,6 +411,8 @@ public:
           }
 
        /// true if this matrix is significant with respect to bmax and eps
+       /// @param bmax reference maximum value for the significance test
+       /// @param eps absolute epsilon tolerance
        inline bool significant(double bmax, double eps) const
           {
             const double bmax_eps = bmax + eps;
@@ -292,25 +420,36 @@ public:
             const double diff2 = diff * diff;   // square diff since abs2 is
             for (ShapeItem y = 1; y < M; ++y)
                 {
-                  const double abs = abs2(y, 1);
-                  if (abs < diff2)   return true;   // non-zero
-                  if (abs > diff2)   return true;   // non-zero
+                  // column 0, matching col1_norm() above (also "column 1"
+                  // in 1-based terms); the old "abs2(y,1)" read column 1
+                  // instead. The old two-sided check (abs<diff2 OR
+                  // abs>diff2) was true for any abs != diff2, including
+                  // abs==0 (i.e. "non-zero" for an actually-zero item) --
+                  // only a value close to bmax's own scale is genuinely
+                  // insignificant, so this must be one-sided.
+                  if (abs2(y, 0) > diff2)   return true;   // non-zero
                 }
 
-            return false;   // all items below A[0;1] are (close to) 0
+            return false;   // all items below A[0;0] are (close to) 0
           }
 
        /// return the square of the length of the item at row x column y
+       /// @param y row index (0-based)
+       /// @param x column index (0-based)
        inline double abs2(ShapeItem y, ShapeItem x) const;
 
        /// add or subtract val to/from a so that the result has the largest
        /// length.
+       /// @param V11 pointer to the value to be adjusted in place
+       /// @param W11 pointer to the reference value
        static inline void add_sub(double * V11, const double * W11);
 
        /// return the lengts of the first column(-vector) in different forms
+       /// @param result structure to receive the computed norm values
        inline void col1_norm(norm_result & result) const;
 
        /// print this matrix boxed with name
+       /// @param name label string printed above the matrix
        void debug(const char * name) const;
 
        protected:
@@ -319,17 +458,16 @@ public:
 
        public:
        /// the number of matrix rows
-       const ShapeItem M;
+       ShapeItem M;
 
        /// the number of matrix columns
-       const ShapeItem N;
+       ShapeItem N;
 
        /// the distance (in doubles) between  A[i;j] and A[i+1;j]
-       const ShapeItem dY;
+       ShapeItem dY;
      };
 };
-
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// compute norm variants of column 1 of \b this real marix
 template<>
 inline void
@@ -350,7 +488,7 @@ double sum = 0;
    result.norm__2_real = 2.0 / result.norm2_real;
    result.norm__2_imag = 0.0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// compute norm variants of column 1 of \b this complex marix
 template<>
 inline void
@@ -378,7 +516,7 @@ const complex<double> _2__sum = 2.0 / sum;
    result.norm__2_real = _2__sum.real();
    result.norm__2_imag = _2__sum.imag();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// compute the square of the real item at row y, columns x
 template<>
 inline double
@@ -387,7 +525,7 @@ Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
 const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// compute the square of the complex item at row y, columns x
 template<>
 inline double
@@ -396,7 +534,7 @@ Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
 const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b] + data[b+1]*data[b+1];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// increase real *W11 by +/- real *V11
 template<>
 inline void
@@ -407,7 +545,7 @@ double w11 = *W11;
    if (*V11 < 0)      *V11 -= w11;
    else               *V11 += w11;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// increase complex *W11 by +/- complex *V11
 template<>
 inline void
@@ -420,7 +558,7 @@ bool add = false;
    if (add)   { V11[0] += W11[0];   V11[1] += W11[1]; }
    else       { V11[0] -= W11[0];   V11[1] -= W11[1]; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// increase complex *W11 by +/- *V11
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
@@ -436,7 +574,7 @@ inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
    //
    loop(y, rows)              real(y, y) = 1.0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// initialize \b this complex matrix to the unit matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
@@ -453,7 +591,7 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
    //
    loop(y, rows)   { real(y, y) = 1.0;   imag(y, y) = 0.0; }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// insert S into \b this real matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
@@ -477,7 +615,7 @@ const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
    //
    loop(y, iN)   real(y,y) = 1.0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// insert S into \b this complex matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
@@ -510,7 +648,7 @@ const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
             }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// initialize this real matrix to be the outer product of the first
 /// column of the real matrix \b src with itself
 template<>
@@ -536,7 +674,7 @@ Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
        real(y, y) = scale.norm__2_real * src.real(y, 0) * src.real(y, 0);
 
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// initialize this complex matrix to be the outer product of the first
 /// column of the complex matrix \b src with itself
 template<>
@@ -573,7 +711,7 @@ const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
          imag(y, y) = prod.imag();
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// assign real matrix src to this real matrix
 template<>
 inline void
@@ -586,7 +724,7 @@ Bif_F12_DOMINO::Matrix<false>::operator =(const Matrix<false> & src)
          real(y, x) = src.real(y, x);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// assign complex matrix src to this complex matrix
 template<>
 inline void
@@ -594,14 +732,16 @@ Bif_F12_DOMINO::Matrix<true>::operator =(const Matrix<true> & src)
 {
    matrix_assert(M == src.M);
    matrix_assert(N == src.N);
-   new(this)   Matrix<true>(data, src.M, src.N);
+   M = src.M;
+   N = src.N;
+   dY = dpi*N;
    loop(y, src.M) loop(x, src.N)
        {
          real(y, x) = src.real(y, x);
          imag(y, x) = src.imag(y, x);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// set this matrix to A +.× B
 template<>
 inline void
@@ -622,7 +762,7 @@ const ShapeItem Z = src_A.N;
          real(y, x) = sum;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// set this matrix to A +.× B
 template<>
 inline void
@@ -634,7 +774,9 @@ const ShapeItem Z = src_A.N;
    matrix_assert(N == src_B.N);
    matrix_assert(Z == src_A.N);
    matrix_assert(Z == src_B.M);
-   new (this) Matrix<true>(data, src_A.M, src_B.N);
+   M = src_A.M;
+   N = src_B.N;
+   dY = dpi*N;
 
    loop(y, src_A.M)   // for every row y of src_A
    loop(x, src_B.N)   // for every column x of src_B
@@ -650,7 +792,7 @@ const ShapeItem Z = src_A.N;
          imag(y, x) = sum.imag();
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// transpose the upper left M×M submatrix of this real matrix
 template<>
 inline void
@@ -662,7 +804,7 @@ Bif_F12_DOMINO::Matrix<false>::transpose(ShapeItem M)
         double r = real(y, x); real(y, x) = real(x, y); real(x, y) = r;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// transpose the upper left M×M submatrix of this complex matrix
 template<>
 inline void
@@ -675,7 +817,7 @@ Bif_F12_DOMINO::Matrix<true>::transpose(ShapeItem M)
                t = imag(y, x);   imag(y, x) = imag(x, y);   imag(x, y) = t;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __BIF_F12_DOMINO_HH_DEFINED__
 

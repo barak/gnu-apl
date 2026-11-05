@@ -1,6 +1,8 @@
 ⍝ MatrixDivide.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ lrm p. 175
 
       ⍝ real L, R
@@ -34,7 +36,7 @@
 0J¯1 0J¯2
 2    4
 
-⍝ Square difference ----------------------------------
+      ⍝ Square difference ----------------------------------
 
       A←6 5 14 12 13 3
       B←6 4⍴1 2 1 3 1 1 2 4 7 9 10 4 10 9 3 10 11 18 10 4 4 20 18 23
@@ -62,7 +64,7 @@
 
 
 
-⍝ curve fitting ----------------------------------
+      ⍝ curve fitting ----------------------------------
 
       ⎕PP←8
       V←1 1.2 1.4 1.6 1.8 2
@@ -104,18 +106,59 @@
  'ERROR'
 ∇
 
-   RANDOM_MATRIX_DIVIDE¨⍳100
+      RANDOM_MATRIX_DIVIDE¨⍳100
 
       ⍝ regression
       ⍝
+      ⍝ our own AP210-based cross-checking harness captures the VALUE of
+      ⍝ every statement (assignments return their assigned value) -- a
+      ⍝ 99999x3 random array is far too large for one shared-variable
+      ⍝ write ("SYSTEM LIMIT (shared var size)"), even though this test
+      ⍝ never actually displays A itself, only ⍴A⌹A below. Substitute a
+      ⍝ much smaller array with the same shape characteristics (tall,
+      ⍝ 3 columns) for that harness -- see
+      ⍝ project_apl2_and_or_boolean_only.md
+      ]FILE_CTL SKIP_APL2
       A←?99999 3⍴256
+      ]FILE_CTL NO_SKIP
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      A←?99 3⍴256
+      ]FILE_CTL NO_SKIP
       ⍴A⌹A
 3 3
 
       ⍝ fails with DOMAIN ERROR for some (linear dependent) A and B
 
+      ⍝ regression (Blake McBride, Bugs12.md #7, 2026-08-06): A⌹⍤1 B (or
+      ⍝ B⌹⍤1 A) reaches Bif_F12_DOMINO::eval_fill_AB() via the rank
+      ⍝ operator's empty-frame path whenever A or B is a scalar (which
+      ⍝ Bif_OPER2_RANK::do_ALyXB() always passes as a rank-0 argument
+      ⍝ here). "A.get_rank() - 1" used to wrap (uRank is unsigned), so
+      ⍝ the loop bound became ~4 billion -- Shape::get_shape_item()
+      ⍝ asserted (or, with asserts off, ran off the end of Shape::rho[]
+      ⍝ until LIMIT_ERROR_RANK). Plain (non-rank-operator) A⌹B is
+      ⍝ unaffected -- it never reaches eval_fill_AB() this way.
+      ⍝
+      ⍝ Bugs31 #16: the shape of an empty-frame rank result is the (empty)
+      ⍝ frame followed by the shape of LO's result on one chunk, here ⌹'s
+      ⍝ fill formula (1↓⍴A),(1↓⍴B) applied to the chunks ⍬ (resp. 1) and
+      ⍝ 0 0 0, i.e. ⍬. Previously B's entire shape was returned. (Every
+      ⍝ non-empty frame is a LENGTH ERROR for these A and B anyway.)
+      ⍝
+      ⍴⍬⌹⍤1(0 3⍴0)
+0
+
+      ⍴1⌹⍤1(0 3⍴0)
+0
+
+      ⍴(0 3⍴0)⌹⍤1⊢⍬
+0
+
+      ⍴⍬⌹⍤1(0 0⍴0)
+0
+
       )CLEAR
 CLEAR WS
 
-⍝ ==================================
+      ⍝ ==================================
 

@@ -23,7 +23,10 @@
 
 #include "Listener.hh"
 #include "TcpListener.hh"
-#include "UnixSocketListener.hh"
+#if HAVE_SYS_UN_H
+#  include "UnixSocketListener.hh"
+#endif
+//════════════════════════════════════════════════════════════════════════════
 
 Listener *Listener::create_listener( int port )
 {
@@ -33,8 +36,13 @@ Listener *Listener::create_listener( int port )
         ret = new TcpListener( port );
     }
     else {
+#if HAVE_SYS_UN_H
         ret = new UnixSocketListener();
+#else
+        ret = new TcpListener( 0 );   // Unix sockets unavailable; fall back to TCP
+#endif
     }
 
     return ret;
 }
+//════════════════════════════════════════════════════════════════════════════

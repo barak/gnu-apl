@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,29 +21,49 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <fcntl.h>
 #include <unistd.h>
-#include <sys/socket.h>
+
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_NETINET_IN_H
 #include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif
+
+#if MINGW_SRC
+# define socketpair(a, b, c, d) 1
+#define fork() 1
+#endif // MINGW_SRC
 
 #include "Error_macros.hh"
-#include "LibPaths.hh"
+#include "Sys.hh"
 #include "PythonPipe.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 PythonPipe::PythonPipe(const char * script)
-  : python_script(script),
+  : fd(-1),
     pid(-1),
-    fd(-1)
+    python_script(script)
+
 {
-   // check that script is readable. We expect in in the current directory, or
-   // else in APL_bin_path.
+   // check that script is readable. We expect it in the current directory
+   // (e.g. when running from the build tree), or else in $(pkgdatadir), where
+   // it is installed (dist_pkgdata_DATA in src/Makefile.am).
    //
 UTF8_string argv1_utf;
    {
-     const char * bin_dir = LibPaths::get_APL_bin_path();
-     UTF8_string path1("./");      // current directory
-     UTF8_string path2(bin_dir);   // where apl shll be installed
+     const char * data_dir = apl_DIR__pkgdata;
+     UTF8_string path1("./");          // current directory
+     UTF8_string path2(data_dir);      // where integral.py is installed
+     path2 << "/";
      path1 << script;
      path2 << script;
      if      (access(path1.c_str(), R_OK) == 0)   argv1_utf = path1;
@@ -51,7 +71,7 @@ UTF8_string argv1_utf;
      else
         {
           MORE_ERROR() << "No python script '" << script
-                       << "' in the current directory or in " << bin_dir;
+                       << "' in the current directory or in " << data_dir;
           DOMAIN_ERROR;
         }
    }
@@ -78,6 +98,7 @@ const int & python_sock = spair[1];
 
    if (pid)   // parent (caller (APL))
       {
+        sys_auto_reap(pid);   // nobody waits for the python child
         // ::close(python_sock);   // child end of the pipe
         //
         fd = apl_sock;
@@ -104,14 +125,7 @@ char * env[] = { 0 };
    //
    cout << "\n\n*** child: execve() failed: " << strerror(errno) << "\n\n";
 }
-//----------------------------------------------------------------------------
-void
-PythonPipe::close()
-{
-   if (fd != -1)   ::close(fd);
-   fd = -1;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 PythonPipe::read(bool keep_LF)
 {
@@ -147,7 +161,7 @@ UTF8_string ret;
 
    return UCS_string(ret);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 PythonPipe::write(UTF8_string cmd, bool no_LF )
 {
@@ -155,7 +169,7 @@ PythonPipe::write(UTF8_string cmd, bool no_LF )
 const ssize_t len = ::write(fd, cmd.c_str(), cmd.size());
    Assert(len == int(cmd.size()));
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 UCS_string
 PythonPipe::wr_rd(const char * cmd)
 {
@@ -163,5 +177,12 @@ UTF8_string cmd_utf(cmd);
    write(cmd_utf);
    return read();
 }
-//============================================================================
+//────────────────────────────────────────────────────────────────────────────
+void
+PythonPipe::close()
+{
+   if (fd != -1)   ::close(fd);
+   fd = -1;
+}
+//════════════════════════════════════════════════════════════════════════════
 

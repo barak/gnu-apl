@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2013  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 
 #include "Svar_record.hh"
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the Svar database in the server
 struct Svar_DB_server
 {
@@ -83,7 +83,7 @@ protected:
    /// a sequence number helping to create unique keys
    uint32_t seq;
 };
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// one connected processors
 struct AP3_fd
 {
@@ -104,6 +104,6 @@ struct AP3_fd
    /// the name of the program that the peer is running
    string progname;
 };
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SVAR_DB_MEMORY_HH_DEFINED__

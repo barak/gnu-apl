@@ -418,7 +418,7 @@ o  APL_keyboard         to use the file from APL_keyboard_learn
 
 o  make                 to transform output from learn to program
 
-Details follow in sections 10.2 through 10.4 below.
+Details follow in sections 11.2 through 11.4 below.
 
 11.2 APL_keyboard_show
 ----------------------
@@ -515,7 +515,7 @@ Once APL_keyboard is made, you can start GNU APL like this:
 $ APL_keyboard | apl
 
 
-122 aplwrap
+12. aplwrap
 ===========
 
 There is a cool GTK-based keyboard wrapper written by Chris Moller.

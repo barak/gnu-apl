@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -59,39 +59,51 @@ class ID
 {
 public:
    /// constructor
+   /// @param _id   the identifier enum value
+   /// @param name  printable name string for the identifier
    ID(Id _id, const char * name)
    : id(_id),
      name_utf(utf8P(name))
      {}
 
-   /// sort helper: compare IDs. Return \b true if id1 > id2
-   static bool greater_id(const ID & id1, const ID & id2, const void *)
-      { return id1.id > id2.id; }
-
    /// search helper: compare \b id1 with id2
+   /// @param key the Id value to search for
+   /// @param id  the ID entry to compare against
    static int compare_id(const Id & key, const ID & id, const void *)
       { return key - id.id; }
 
+   /// If \b tag is the tag of primitive function, primitive operator, or
+   /// quad function, then return a pointer to it. Otherwise return 0.
+   /// @param tag token tag whose upper 16 bits encode the Id
+   static cFunction_P get_system_function(TokenTag tag)
+      { return get_system_function(Id(tag >> 16)); }
+
+   /// sort helper: compare IDs. Return \b true if id1 > id2
+   /// @param id1 first ID to compare
+   /// @param id2 second ID to compare
+   static bool greater_id(const ID & id1, const ID & id2, const void *)
+      { return id1.id > id2.id; }
+
    /// return the printable name for id as UTF8 *
+   /// @param id the identifier to look up
    static const UTF8 * get_name(Id id);
 
    /// return the printable name for id as UCS_string
+   /// @param id the identifier to look up
    static UCS_string get_name_UCS(Id id);
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
+   /// @param id the identifier to look up
    static cFunction_P get_system_function(Id id);
-
-   /// If \b tag is the tag of primitive function, primitive operator, or
-   /// quad function, then return a pointer to it. Otherwise return 0.
-   static cFunction_P get_system_function(TokenTag tag)
-      { return get_system_function(Id(tag >> 16)); }
 
    /// If \b id is the ID of a quad variable, then return a pointer to its
    /// symbol. Otherwise return 0.
+   /// @param id the identifier to look up
    static Symbol * get_system_variable(Id id);
 
    /// return the TokenTag for \b id
+   /// @param id the identifier to convert
    static TokenTag get_token_tag(Id id);
 
 protected:
@@ -104,7 +116,7 @@ protected:
    /// a sorted vector of all IDs. Created on demand
    static vector<ID> all_IDs;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #include "TokenEnums.hh"
 

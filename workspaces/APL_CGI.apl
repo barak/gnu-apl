@@ -75,10 +75,11 @@ xGNU_PIC←HTML∆__src xHTTP_GNU, "graphics/gnu-head-sm.jpg"
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 ⍝ some file names used in the BODY
 ⍝
-xAPL_VERSION←'apl-1.9'
+xAPL_VERSION←'apl-2.0'
 xTARFILE←xAPL_VERSION,  '.tar.gz'
 xDEBFILE←xAPL_VERSION,  '-1_amd64.deb'
 xSDEBFILE←xAPL_VERSION, '-1.debian.tar.gz'
+xWINFILE←'GNU_APL_2_0_Setup.exe'
 xAPL_TAR←xFTP_GNU, '/', xTARFILE
 xMAIL_GNU←'gnu@gnu.org'
 xMAIL_WEB←'bug-apl@gnu.org'
@@ -103,13 +104,22 @@ yFEATURES←HTML∆Ul yFEATURES
 I1←      'Visit one of the ', xMIRRORS HTML∆A 'GNU mirrors'
 I1←  I1, ' and download the tar file <B>', xTARFILE,'</B> in directory'
 I1←⊂ I1, ' <B>apl</B>.'
+
 I2←⊂     'Unpack the tar file: <B>tar xzf ', xTARFILE, '</B>'
+
 I3←⊂     'Change to the newly created directory: <B>cd ', xAPL_VERSION, '</B>'
+
 I4←      'Read (and follow) the instructions in files <B>INSTALL</B>'
 I4←⊂ I4, ' and <B>README-*</B>'
-I5←      '<B>Caveat:</B> GNU APL creates full releases only every 1-2 years. Therefore an interpreter'
-I5←I5,   ' downloaded from a GNU mirror is inevitably outdated and likely contains errors that were fixed already.'
-I5←⊂I5,  ' Consider using <B>git</B> or <B>SVN</B> (see below) instead.'
+
+I5←      '<B>Note:</B> Between releases 1.9 and 2.0, GNU APL distributed only '
+I5←I5,  'incremental bug fixes via its '
+I5←I5,  '<A href=https://savannah.gnu.org/>GNU Savannah</A> repository '
+I5←I5,  'rather than full tar releases. Release 2.0 is again a full release '
+I5←I5,  'with a tar file, Debian package, and Windows installer. '
+I5←I5,  'See topic <I>Subversion (SVN) and Git repositories for GNU APL</I> '
+I5←I5,  'below for how to track ongoing development between releases.'
+I5←⊂I5
 
 yZ←⊃ HTML∆Ol I1, I2, I3, I4, I5
 ∇
@@ -176,29 +186,21 @@ GNU APL should be available on every
 <?apl  xFTP_APL HTML∆A xFTP_GNU ?>.
 
 <?apl HTML∆H4[''] 'Simple Installation of GNU APL' ?>
-The <B>simplest</B> (though not necessarily best) way to install GNU APL is this:
+The <B>simplest</B> (though not the best) way to install GNU APL is this:
 
 <?apl ⊃ INSTALL ?>
 
-<?apl HTML∆H4[''] 'GNU APL for WINDOWs' ?>
+<?apl HTML∆H4[''] 'Platforms' ?>
 
-GNU APL supposedly compiles under CYGWIN, (see
-<?apl  ('http://',xCYGWIN) HTML∆A xCYGWIN ?>),
-provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
-that should run under CYGWIN lives in the download area. Use at your own risk
-and see <B>README-5-WINDOWS</B> for further information. Building GNU APL under
-cygwin is the method of choice if you need some of the special purpose system
-functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries. Due to
-the proliferation of Windows Versions has the support for apl.exe been
-discontinued. The apl.exe on the gnu mirrors was therefore creataed with an
-(as of today) outdated GNU APL version and will not be updated. However,
-building an up-to-date apl.exe should still be possible under CYGWIN.
-
-
-A compiled 64-bit version of GNU APL 1.8 (briefly tested under Windows 10)
-which was built under cygwin, but runs without cygwin being installed,
-is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
-an installer for an APL keyboard layout.
+GNU APL compiles and runs under all major platforms (GNU/Linux, BSD, MacOS,
+Windows).
+<BR><BR>
+On GNU/Linux, GNU APL runs almost out-of-the-box. APL fonts and keyboard
+mappings are well supported by the platform.
+<BR><BR>
+On Windows, a native installer is now available (see below). The installer
+includes the GNU APL interpreter, the GNU APL font, and sets up the Right-Alt
+key as the APL key — no administrator rights, no Cygwin, no WSL required.
 
 <?apl HTML∆H4[''] 'Subversion (SVN) and Git repositories for GNU APL' ?>
 
@@ -220,36 +222,47 @@ checkout is:
 and here is <?apl HTML∆x2y xGIT_APL HTML∆A "<EM>more information</EM>" ?>
 about using Git with GNU APL.
 
+<?apl HTML∆H4[''] 'Windows installer for GNU APL' ?>
+
+A native Windows installer is available for GNU APL. Look for the file
+<B><?apl xWINFILE ?></B> on a
+<?apl xMIRRORS HTML∆A 'GNU mirror' ?>
+(in directory <B>apl</B>).
+<BR><BR>
+The installer includes:
+<UL>
+  <LI> The GNU APL interpreter (<B>apl.exe</B>), ready to run in a Windows
+       Command Prompt (<B>cmd.exe</B>) window.
+  <LI> The <B>GNU APL font</B>, which provides correct display of all APL
+       characters in cmd.exe.
+  <LI> A keyboard mapping that uses the <B>Right-Alt key</B> as the APL key,
+       so that e.g. Right-Alt+A types <B>⍺</B>. No administrator rights are
+       needed to install or use this keyboard mapping.
+</UL>
+
 <?apl HTML∆H4[''] 'Debian packages for GNU APL' ?>
 
-For Debian based GNU/Linux distributions we have created source and binary 
+For Debian based GNU/Linux distributions we have created source and binary
 packages for Debian. Look for files <B><?apl xDEBFILE ?></B> (binary Debian
 package) or <B><?apl xSDEBFILE ?></B> (Debian source package).
 If you encounter a problem with these packages, then please report it,
 but with a solution, since the maintainer of GNU APL may use a GNU/Linux
 distribution with a different package manager.
 
-<?apl HTML∆H4[''] 'GNU APL Binary' ?>
+<?apl HTML∆H4[''] 'Try GNU APL' ?>
 
-If you just want to quickly give GNU APL a try, and if you are very lucky,
-then you may be able to start the compiled
-GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than
-installing the entire packet . The binary MAY run on a 32-bit i686 Ubuntu.
-Chances are, however, that it does NOT work, Please DO NOT report any
-problems if the binary does not run on your machine. Instead please use a better
-supported installation method above.
-<BR><BR>
-<B>Note:</B> The programs <B>APxxx</B> and <B>APserver</B> (support programs for
-shared APL variables) are not provided in binary form. Therefore you should
-start the <B>apl</B> binary with command line option <B>--noSV</B>. Note as
-well that the binary <B>apl</B> will not be updated with every GNU APL release.
-Therefore it will contain errors that have been corrected already.
+Last, but not least, there is an online version of GNU APL, kindly provided
+and maintained by <B>Roy Tobin</B>, that you can use to try out GNU APL
+without installing it on your machine:
+
+<A href="https://trygnuapl.github.io" rel="nofollow">
+<B>https://trygnuapl.github.io</B></A>.
 </DIV>
 
 <DIV class="c4">
 <?apl HTML∆H2[''] 'Reporting Bugs' ?>
 
-GNU APL is made up of more than 100,000 lines of C++ code. In a code of that
+GNU APL is made up of more than 140,000 lines of C++ code. In a code of that
 size, programming mistakes are inevitable. Even though mistakes are hardly
 avoidable, they can be <B>corrected</B> once they are found. In order to
 improve the quality of GNU APL, we would like to encourage you to report

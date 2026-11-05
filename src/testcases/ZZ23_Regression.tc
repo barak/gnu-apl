@@ -1,6 +1,8 @@
 ⍝ ZZ23_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       '5,550.05' ⍕9
     9.0 
       '5,550.05' ⍕99
@@ -13,17 +15,18 @@
 1,000.0 
 
 
-∇z←l (f foo g) r
+∇z←l (f foo23 g) r
  z←(r f l) (l g r)
 ∇
 
-      1 {⍺ ⍵} foo {3} 2
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      1 {⍺ ⍵} foo23 {3} 2
  2 1  1 3 2 
 
-      1 {3} foo {⍺ ⍵} 2
+      1 {3} foo23 {⍺ ⍵} 2
  2 3 1  1 2 
 
-⍝ ==================================
+      ⍝ ==================================
 
       )CHECK
 OK      - no stale functions

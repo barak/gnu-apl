@@ -1,6 +1,8 @@
 ⍝ ZZZ0_Standard_09x.tc
 ⍝ Examples from the APL standard 
 ⍝ ----------------------------------
+⍝@ test3.
+
 
       ⎕CT←1E¯10
       ⎕PP←6
@@ -50,7 +52,7 @@
 0 0.1 0
 
       1 |1E30 1E¯30 ¯1E¯30 .99999999999
-0 0 0 0
+0 1E¯30 0 0
 
       ⎕CT←0
       1|1E30 1E¯30 ¯1E¯30 .99999999999
@@ -94,6 +96,7 @@
 0 0
 0 1
 
+      ]FILE_CTL SKIP_APL2   ⍝ GCD/LCM (non-boolean ∧ ∨) is a GNU APL extension
       30 ∧ 36
 180
 
@@ -108,10 +111,12 @@
 
       ⍝ page 98 ------------------------------------------------------
       ⍝
+      ]FILE_CTL NO_SKIP
       0 1 ∘.∨ 0 1
 0 1
 1 1
 
+      ]FILE_CTL SKIP_APL2   ⍝ GCD/LCM (non-boolean ∧ ∨) is a GNU APL extension
       30 ∨ 36
 6
 
@@ -122,6 +127,7 @@
 7J1
 
 
+      ]FILE_CTL NO_SKIP
       0 1 ∘.⍲ 0 1
 1 1
 1 0

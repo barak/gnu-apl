@@ -1,6 +1,8 @@
 ⍝ Logarithm.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       2⍟256
 8
 
@@ -11,7 +13,50 @@
 2 2.698970004 3
 
       1⍟1
-1
+DOMAIN ERROR
+      1⍟1
+      ^^
 
-⍝ ==================================
+      )SIC
+
+      ⍝ Bugs28 #41 regression: A⍟B with a negative real base was
+      ⍝ DOMAIN ERROR as soon as either cell was complex-TYPED, even
+      ⍝ though the same base/argument pair as plain real/FloatCells
+      ⍝ (¯2⍟8) already gave a well-defined, finite complex result.
+      ⍝ Root cause: ComplexCell::bif_logarithm_cc()'s "real base"
+      ⍝ shortcut computed log(b)/log(a.real()) using the REAL log(),
+      ⍝ which is NaN for a negative a.real() -- rejected by the
+      ⍝ isfinite() check right after. Fixed by using the COMPLEX
+      ⍝ log(APL_Complex(a.real(),0.0)) instead, taking the
+      ⍝ negative-real branch cut correctly (the same way the general,
+      ⍝ genuinely-complex-base case just below already does).
+      ⍝
+      ¯2⍟8
+0.1392609706J¯0.6311808726
+
+      ⍝ same base/argument, each wrapped in a ComplexCell in turn
+      ⍝
+      ¯2J0⍟8
+0.1392609706J¯0.6311808726
+
+      ¯2⍟8J0
+0.1392609706J¯0.6311808726
+
+      ¯2⍟8J1
+0.17752608J¯0.6252057952
+
+      ¯1⍟0J1
+0.5
+
+      ⍝ regression (Bugs28 #87): A⍟B rejected any base within a fixed
+      ⍝ absolute INTEGER_TOLERANCE (1E¯10) of 1, even when ⎕CT itself
+      ⍝ (the default 1E¯13) would not consider that base tolerantly
+      ⍝ equal to 1 at all -- e.g. (1+1E¯11)=1 is 0, yet
+      ⍝ (1+1E¯11)⍟5 was rejected as if the base were 1.
+      ⍝
+      (1+1E¯11)⍟5
+1.609437779E11
+
+      (1J0+1E¯11)⍟5J0
+1.609437779E11
 

@@ -1,18 +1,20 @@
 ⍝ ZZ11_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ binding of [] versus vector notation
       ⍝ 
       ⍝ 
 
       ⍝ ISO 13751 example (10.2.14 Indexed Reference):
-⍝       1 2 3[2]
-⍝ 2
+      ⍝       1 2 3[2]
+      ⍝ 2
 
       ⍝ IBM binding rules ([] binds stronger than vector notation)
       ⍝
       1 2 3[2]
-RANK ERROR
+RANK ERROR+
       1 2 3[2]
           ^^
       →
@@ -20,5 +22,5 @@ RANK ERROR
       (1 2 3)(4 5 6)(7 8 9)[2]
  1 2 3  4 5 6  8 
 
-⍝ ==================================
+      ⍝ ==================================
 

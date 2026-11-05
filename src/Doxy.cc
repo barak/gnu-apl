@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,9 +20,12 @@
 
 /** @file
 */
+#include "config.h"
+
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "Bif_F12_ELEMENT.hh"
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Doxy.hh"
 #include "Heapsort.hh"
@@ -30,6 +33,7 @@
 #include "NativeFunction.hh"
 #include "PrintOperator.hh"
 #include "StateIndicator.hh"
+#include "Sys.hh"
 #include "UserFunction.hh"
 #include "UTF8_string.hh"
 #include "Workspace.hh"
@@ -39,14 +43,7 @@ using namespace std;
 #define BRLF "<BR>\r\n"
 #define CRLF "\r\n"
 
-//----------------------------------------------------------------------------
-/// a helper for sorting Symbol * by symbol name
-static bool
-symcomp(const Symbol * const & s1, const Symbol * const & s2, const void *)
-{
-   return s2->get_name().compare(s1->get_name()) == COMP_LT;
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
    : out(cout),
      root_dir(dest_dir),
@@ -73,7 +70,11 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
       out << "Creating output directory " << root_dir << endl;
 
    errno = 0;
+#if MINGW_SRC
+   if (mkdir(root_dir.c_str()))
+#else // ! MINGW_SRC
    if (mkdir(root_dir.c_str(), 0777))
+#endif // ! MINGW_SRC
       {
         const char * why = strerror(errno);
 
@@ -89,148 +90,7 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
       }
    write_css();
 }
-//----------------------------------------------------------------------------
-void
-Doxy::write_css()
-{
-UTF8_string css_filename(root_dir);
-   css_filename << "/apl_doxy.css";
-
-   Log(LOG_command_DOXY)
-      out << "Writing style sheet file " << css_filename << endl;
-
-ofstream css(css_filename.c_str());
-   css <<
-"/* GNU APL Doxy css file */"                                             CRLF
-"BODY, TABLE.h1tab"                                                       CRLF
-"  { background-color: #D0D0FF; }"                                        CRLF
-"TABLE.h1tab"                                                             CRLF
-"  { width: 100%; border: 0;"                                             CRLF
-"    margin-left:auto; margin-right:auto; }"                              CRLF
-"TD.h1tab { border: 0; }"                                                 CRLF
-"TABLE    { background-color: #FFFFFF; }"                                 CRLF
-"H1, H3, TH, .center"                                                     CRLF
-"   { text-align: center; }"                                              CRLF
-"H3       { width: 100%; text-align: center; }"                           CRLF
-"TH, TD   { padding-left: 0.5em; padding-right: 0.5em; }"                 CRLF
-".code    { font-family: monospace; }"                                    CRLF
-"TABLE, TH, TD { border: 1px solid black; }"                              CRLF
-".onefuntab { margin-left:auto; margin-right:auto; }"                     CRLF
-".funtab, .vartab, .sitab"                                                CRLF
-"  { margin-left:auto; margin-right:auto;"                                CRLF
-"    border-collapse: collapse; }"                                        CRLF
-".cg1, .cg2"                                                              CRLF
-"  { margin:auto; display: block; }"                                      CRLF
-".doxy_comment { width: 40%; }"                                           CRLF;
-
-   css.close();
-}
-//----------------------------------------------------------------------------
-void
-Doxy::gen()
-{
-const SymbolTable & symtab = Workspace::get_symbol_table();
-
-std::vector<const Symbol *> all_symbols = symtab.get_all_symbols();
-std::vector<const Symbol *> variables;
-
-   loop(a, all_symbols.size())
-      {
-        const Symbol * sym = all_symbols[a];
-        if (sym->is_erased())                continue;
-        if (sym->get_name()[0] == UNI_MUE)   continue;   // macro
-
-        bool is_function = false;
-        bool is_variable = false;
-        loop(si, sym->value_stack_size())
-            {
-              switch((*sym)[si].get_NC())
-                 {
-                   case NC_VARIABLE: is_variable = true;   break;
-                   case NC_FUNCTION: is_function = true;   break;
-                   case NC_OPERATOR: is_function = true;   break;
-                   default: ;
-                 }
-            }
-        if (is_function)
-           all_functions.push_back(sym);
-
-
-        if (is_variable)
-           variables.push_back(sym);
-      }
-
-   if (all_functions.size() > 1)
-      Heapsort<const Symbol *>::sort(all_functions, symcomp, 0);
-
-   if (variables.size() > 1)
-      Heapsort<const Symbol *>::sort(variables, symcomp, 0);
-
-UTF8_string index_filename(root_dir);
-   index_filename << "/index.html";
-
-   Log(LOG_command_DOXY)
-      out << "Writing top-level HTML file " << index_filename << endl;
-
-ofstream page(index_filename.c_str());
-   page <<
-"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                     CRLF
-"                      \"http://www.w3.org/TR/html4/strict.dtd\">"        CRLF
-"<HTML>"                                                                  CRLF
-"  <HEAD>"                                                                CRLF
-"    <TITLE>Documentation of " << ws_name << "</title> "                  CRLF
-"    <META http-equiv=\"content-type\" "                                  CRLF
-"          content=\"text/html; charset=UTF-8\">"                         CRLF
-"   <LINK rel='stylesheet' type='text/css' href='apl_doxy.css'>"          CRLF
-" </HEAD>"                                                                CRLF
-" <BODY>"                                                                 CRLF
-"  <H1>Documentation of workspace " << ws_name << "</H1><HR>"             CRLF;
-
-   make_call_graph(all_functions);
-   functions_table(all_functions, page);
-   variables_table(variables, page);
-   SI_table(page);
-
-   set_call_graph_root(0);
-const UCS_string alias(U"all_functions");
-   if (write_call_graph(0, alias, false) == 0)
-      {
-        page <<
-"   <H3>Global Function Call Graph</H3>"                                  CRLF
-"    <IMG class=cg1 usemap=#CG src=cg_" << alias << ".png>"               CRLF;
-
-         // copy the cmap file for the IMG (generated by dot) into the page
-         {
-           UTF8_string cmapx_filename(root_dir);
-           cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
-           if (FILE * cmap = fopen(cmapx_filename.c_str(), "r"))
-              {
-                char buffer[400];
-                for (;;)
-                    {
-                      const char * s = fgets(buffer, sizeof(buffer), cmap);
-                      if (s == 0)   break;
-                      buffer[sizeof(buffer) - 1] = 0;
-                      page << "    " << buffer;
-                    }
-                fclose(cmap);
-              }
-           else
-              {
-                CERR << "*** Cannot open " << cmapx_filename
-                     << ": " << strerror(errno) << endl;
-              }
-
-           Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
-         }
-      }
-
-   page <<
-" </BODY>"                                                                CRLF
-"</HTML>"                                                                 CRLF;
-   page.close();
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Doxy::functions_table(const std::vector<const Symbol *> & functions,
                       ofstream & page)
@@ -261,7 +121,7 @@ size_t total_lines = 0;
         << total_lines <<                                                 CRLF
 "   </TABLE>"                                                             CRLF;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Doxy::functions_table_entry(const Symbol * fun_sym, ofstream & page,
                             size_t & total_lines)
@@ -269,8 +129,8 @@ Doxy::functions_table_entry(const Symbol * fun_sym, ofstream & page,
    loop(si, fun_sym->value_stack_size())
        {
          cFunction_P fun = fun_sym->get_function(si);
-         const UserFunction * ufun = fun->get_func_ufun();
          if (fun == 0)   continue;
+         const UserFunction * ufun = fun->get_func_ufun();
 
          const int si_level = fun_sym->get_SI_level(fun);
 
@@ -368,77 +228,117 @@ Doxy::functions_table_entry(const Symbol * fun_sym, ofstream & page,
             }
        }
 }
-//----------------------------------------------------------------------------
-void
-Doxy::variables_table(const std::vector<const Symbol *> & variables,
-                       ofstream & page)
+//────────────────────────────────────────────────────────────────────────────
+/// a helper for sorting Symbol * by symbol name
+static bool
+symcomp(const Symbol * const & s1, const Symbol * const & s2, const void *)
 {
-   if (variables.size() == 0)   return;
-
-   page <<
-"   <H3>Variables</H3>"                                                   CRLF
-"   <TABLE class=vartab>"                                                 CRLF
-"     <TR>"                                                               CRLF
-"      <TH>Variable"                                                      CRLF
-"      <TH>L"                                                             CRLF
-"      <TH>SI"                                                            CRLF
-"      <TH>⍴⍴"                                                            CRLF
-"      <TH>⍴"                                                             CRLF
-"      <TH>≡"                                                             CRLF
-"      <TH>Type"                                                          CRLF
-"      <TH>↑ϵ"                                                            CRLF;
-   loop(v, variables.size())
-      {
-        const Symbol & var_sym = *variables[v];
-        loop(si, var_sym.value_stack_size())
-            {
-              if (var_sym[si].get_NC() != NC_VARIABLE)   continue;
-
-              const Value * value = var_sym[si].get_val_cptr();
-              const int si_level  = var_sym.get_SI_level(*value);
-              Value_P elem = Bif_F12_ELEMENT::do_eval_B(value);
-              Value_P first = Bif_F12_TAKE::first(*elem.get());
-              page <<
-"     <TR>"                                                               CRLF
-"      <TD class=code>" << var_sym.get_name() <<                          CRLF
-"      <TD class='code center'>" << si <<                                 CRLF;
-              if (si_level)   page <<
-"      <TD class='code center'>" << si_level <<                           CRLF;
-              else            page <<
-"      <TD class='code center'>G"                                         CRLF;
-              page <<
-"      <TD class='code center'>" << value->get_rank() <<                  CRLF
-"      <TD class='code center'>";
-              if (value->get_rank())
-                 {
-                   loop(r, value->get_rank())
-                       page << " " << value->get_shape_item(r);
-                   page <<                                                CRLF;
-                 }
-              else
-                 {
-                  page << "⍬"                                             CRLF;
-                 }
-
-              page <<                                                     CRLF
-"      <TD class='code center'>" << value->compute_depth() <<             CRLF;
-
-              const CellType ct = value->deep_cell_types();
-                 page <<
-"      <TD class=code>";
-              if ((ct & CT_NUMERIC) && (ct & CT_CHAR)) page << "Mixed"    CRLF;
-              else if (ct & CT_NUMERIC)                page << "Numeric"  CRLF;
-              else if (ct & CT_CHAR)                  page << "Character" CRLF;
-              else                                     page << "? ? ?"    CRLF;
-
-              page <<                                                     CRLF
-"      <TD class='code center'>" << *first <<                             CRLF;
-            }
-      }
-   page <<
-"   </TABLE>"                                                             CRLF;
+   return s2->get_name().compare(s1->get_name()) == COMP_LT;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::gen()
+{
+const SymbolTable & symtab = Workspace::get_symbol_table();
+
+std::vector<const Symbol *> all_symbols = symtab.get_all_symbols();
+std::vector<const Symbol *> variables;
+
+   loop(a, all_symbols.size())
+      {
+        const Symbol * sym = all_symbols[a];
+        if (sym->is_erased())                continue;
+        if (sym->get_name()[0] == UNI_MUE)   continue;   // macro
+
+        bool is_function = false;
+        bool is_variable = false;
+        loop(si, sym->value_stack_size())
+            {
+              switch((*sym)[si].get_NC())
+                 {
+                   case NC_VARIABLE: is_variable = true;   break;
+                   case NC_FUNCTION: is_function = true;   break;
+                   case NC_OPERATOR: is_function = true;   break;
+                   default: ;
+                 }
+            }
+        if (is_function)
+           all_functions.push_back(sym);
+
+
+        if (is_variable)
+           variables.push_back(sym);
+      }
+
+   if (all_functions.size() > 1)
+      Heapsort<const Symbol *>::sort(all_functions, symcomp, 0);
+
+   if (variables.size() > 1)
+      Heapsort<const Symbol *>::sort(variables, symcomp, 0);
+
+UTF8_string index_filename(root_dir);
+   index_filename << "/index.html";
+
+   Log(LOG_command_DOXY)
+      out << "Writing top-level HTML file " << index_filename << endl;
+
+ofstream page(index_filename.c_str());
+   page <<
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                     CRLF
+"                      \"http://www.w3.org/TR/html4/strict.dtd\">"        CRLF
+"<HTML>"                                                                  CRLF
+"  <HEAD>"                                                                CRLF
+"    <TITLE>Documentation of " << ws_name << "</title> "                  CRLF
+"    <META http-equiv=\"content-type\" "                                  CRLF
+"          content=\"text/html; charset=UTF-8\">"                         CRLF
+"   <LINK rel='stylesheet' type='text/css' href='apl_doxy.css'>"          CRLF
+" </HEAD>"                                                                CRLF
+" <BODY>"                                                                 CRLF
+"  <H1>Documentation of workspace " << ws_name << "</H1><HR>"             CRLF;
+
+   make_call_graph(all_functions);
+   functions_table(all_functions, page);
+   variables_table(variables, page);
+   SI_table(page);
+
+   set_call_graph_root(0);
+const UCS_string alias(U"all_functions");
+   if (write_call_graph(0, alias, false) == 0)
+      {
+        page <<
+"   <H3>Global Function Call Graph</H3>"                                  CRLF
+"    <IMG class=cg1 usemap=#CG src=cg_" << alias << ".png>"               CRLF;
+
+         // copy the cmap file for the IMG (generated by dot) into the page
+         {
+           UTF8_string cmapx_filename(root_dir);
+           cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
+           FileReader reader(cmapx_filename.c_str());
+           if (!reader)
+              {
+                CERR << "*** Cannot open " << cmapx_filename
+                     << ": " << strerror(errno) << endl;
+              }
+
+           char buffer[400];
+           for (;;)
+               {
+                      const char * s = reader.fgets(buffer, sizeof(buffer));
+                      if (s == 0)   break;
+                      buffer[sizeof(buffer) - 1] = 0;
+                      page << "    " << buffer;
+               }
+
+           Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
+         }
+      }
+
+   page <<
+" </BODY>"                                                                CRLF
+"</HTML>"                                                                 CRLF;
+   page.close();
+}
+//════════════════════════════════════════════════════════════════════════════
 void
 Doxy::SI_table(ofstream & page)
 {
@@ -479,7 +379,8 @@ std::vector<const StateIndicator *> stack;
           if (si->get_parse_mode() == PM_FUNCTION)
              {
                Assert(ufun);
-               Function_PC PC = si->get_prefix().get_range_high();
+               // a position in body (not a Token_loc PC)
+               Prefix_PC PC = si->get_prefix().get_statement_PC();
                if (const ErrorCode ec =
                          StateIndicator::get_error(si).get_error_code())
                   {
@@ -541,7 +442,337 @@ std::vector<const StateIndicator *> stack;
    page <<
 "   </TABLE>"                                                             CRLF;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::variables_table(const std::vector<const Symbol *> & variables,
+                       ofstream & page)
+{
+   if (variables.size() == 0)   return;
+
+   page <<
+"   <H3>Variables</H3>"                                                   CRLF
+"   <TABLE class=vartab>"                                                 CRLF
+"     <TR>"                                                               CRLF
+"      <TH>Variable"                                                      CRLF
+"      <TH>L"                                                             CRLF
+"      <TH>SI"                                                            CRLF
+"      <TH>⍴⍴"                                                            CRLF
+"      <TH>⍴"                                                             CRLF
+"      <TH>≡"                                                             CRLF
+"      <TH>Type"                                                          CRLF
+"      <TH>↑ϵ"                                                            CRLF;
+   loop(v, variables.size())
+      {
+        const Symbol & var_sym = *variables[v];
+        loop(si, var_sym.value_stack_size())
+            {
+              if (var_sym[si].get_NC() != NC_VARIABLE)   continue;
+
+              const cValue * value = var_sym[si].get_val_cptr();
+              const int si_level  = var_sym.get_SI_level(*value);
+              Value_P elem = Bif_F12_ELEMENT::do_eval_B(*value);
+              Value_P first = Bif_F12_TAKE::first(*elem.get());
+              page <<
+"     <TR>"                                                               CRLF
+"      <TD class=code>" << var_sym.get_name() <<                          CRLF
+"      <TD class='code center'>" << si <<                                 CRLF;
+              if (si_level)   page <<
+"      <TD class='code center'>" << si_level <<                           CRLF;
+              else            page <<
+"      <TD class='code center'>G"                                         CRLF;
+              page <<
+"      <TD class='code center'>" << value->get_rank() <<                  CRLF
+"      <TD class='code center'>";
+              if (value->get_rank())
+                 {
+                   loop(r, value->get_rank())
+                       page << " " << value->get_shape_item(r);
+                   page <<                                                CRLF;
+                 }
+              else
+                 {
+                  page << "⍬"                                             CRLF;
+                 }
+
+              page <<                                                     CRLF
+"      <TD class='code center'>" << value->compute_depth() <<             CRLF;
+
+              const CellType ct = value->deep_cell_types();
+                 page <<
+"      <TD class=code>";
+              if ((ct & CT_NUMERIC) && (ct & CT_CHAR)) page << "Mixed"    CRLF;
+              else if (ct & CT_NUMERIC)                page << "Numeric"  CRLF;
+              else if (ct & CT_CHAR)                  page << "Character" CRLF;
+              else                                     page << "? ? ?"    CRLF;
+
+              page <<                                                     CRLF
+"      <TD class='code center'>" << *first <<                             CRLF;
+            }
+      }
+   page <<
+"   </TABLE>"                                                             CRLF;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::bold_name(ostream & of, const UserFunction * ufun) const
+{
+const UserFunction_header & header = ufun->get_header();
+const char * bold = "<span style='font-weight: bold'>";
+
+   if (header.Z())   of << header.Z()->get_name() << "←";
+   if (header.A())   of << header.A()->get_name() << " ";
+   if (header.LO())   // operator
+      {
+        of << "(" << header.LO()->get_name() << " ";
+        of << bold << header.get_name() << "</span>";
+        if (header.RO())   of << " " << header.RO()->get_name();
+      }
+   else               // function
+      {
+        of << bold << header.get_name() << "</span>";
+      }
+
+   if (header.B())   of << " " << header.B()->get_name();
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
+                            const UserFunction * ufun)
+{
+   Log(LOG_command_DOXY)
+      out << "   add (caller-) Symbol " << caller_sym->get_name() << endl;
+
+const Token_string & body = ufun->get_body();
+
+   // scan the body of ufun for symbol Token and filter those that are
+   // functions. This is rather heuriostic and therefore not reliable.
+   //
+   // It can fail if the same name is used for both functions and variables.
+   //
+   loop(b, body.size())
+      {
+        const Token & tok = body[b];
+        if (tok.get_Class() != TC_SYMBOL)   continue;
+
+        const Symbol * callee_ptr = tok.get_sym_ptr();
+        Assert(callee_ptr);
+
+        // assume (maybe incorrectly) that local symbol of ufun are variables.
+        //
+        if (ufun->localizes(callee_ptr))   continue;
+
+        const Symbol & callee_sym = *callee_ptr;
+        loop(si, callee_sym.value_stack_size())
+            {
+              if (cFunction_P fun = callee_sym.get_function(si))
+                 {
+                   Assert(fun);
+                   const UserFunction * callee = fun->get_func_ufun();
+                   if (!(callee || fun->is_native()))   continue;
+
+                    // ignore multiple calls of the same callee from the
+                    // same caller...
+                    //
+                    bool have_call = false;
+                    loop(cg, call_graph.size())
+                        {
+                          if (call_graph[cg].caller == ufun &&
+                              call_graph[cg].callee == fun)
+                             {
+                               have_call = true;
+                               break;   // loop(cg, ...
+                             }
+                        }
+
+                    if (!have_call)
+                       {
+                         const fcall_edge edge(ufun, caller_sym->get_name(),
+                                               fun,   callee_sym.get_name());
+
+                         call_graph.push_back(edge);
+                         Log(LOG_command_DOXY)
+                            out << "    " << caller_sym->get_name()
+                                << " calls " << fun->get_name() << endl;
+                       }
+                 }
+            }
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::function_page(const UserFunction * ufun, const UCS_string & alias)
+{
+UTF8_string fun_filename(root_dir);
+   fun_filename << "/f_" << UTF8_string(alias) << ".html";
+
+   Log(LOG_command_DOXY)
+      out << "Writing function HTML file " << fun_filename << endl;
+
+ofstream page(fun_filename.c_str());
+   page <<
+"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                     CRLF
+"                      \"http://www.w3.org/TR/html4/strict.dtd\">"        CRLF
+"<HTML>"                                                                  CRLF
+"  <HEAD>"                                                                CRLF
+"    <TITLE>Documentation of function" << alias << "</TITLE> "            CRLF
+"    <META http-equiv=\"content-type\" "                                  CRLF
+"          content=\"text/html; charset=UTF-8\">"                         CRLF
+"   <LINK rel='stylesheet' type='text/css' href='apl_doxy.css'>"          CRLF
+" </HEAD>"                                                                CRLF
+" <BODY>"                                                                 CRLF
+"  <TABLE class=h1tab><TR>"                                               CRLF
+"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
+"   <TD class=h1tab width=80%><H1>Function " << alias << "</H1>"          CRLF
+"   <TD class=h1tab width=10%>"                                           CRLF
+"  </TABLE><HR>"                                                          CRLF;
+
+   page <<
+"   <H3>Definition</H3>"                                                  CRLF
+"   <TABLE class=onefuntab><TR><TD><PRE>"                                 CRLF
+"    ∇ ";
+   loop(l, ufun->get_text_size())
+       {
+         const UCS_string & line(ufun->get_text(l));
+         if (l > 99)       page << "[" << l << "]";
+         else if (l > 9)   page << "[" << l << "] ";
+         else if (l > 0)   page << "[" << l << "]  ";
+         page << line.to_HTML(0, false) <<                                CRLF;
+       }
+   page <<
+"    ∇</PRE>"                                                             CRLF
+"  </TABLE>"                                                              CRLF;
+
+   set_call_graph_root(ufun);
+   if (write_call_graph(ufun, alias, false) == 0)
+      {
+        page << "   <H3>Call Graph (defined functions called from function "
+             << alias << ")</H3>"                                         CRLF
+                "    <IMG class=cg1 usemap=#CG src=cg_"
+                      << alias << ".png>"                                 CRLF;
+
+        // copy the cmap file for the IMG (generated by dot) into the page
+        {
+          UTF8_string cmapx_filename(root_dir);
+          cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
+          FileReader reader(cmapx_filename.c_str());
+          if (!reader)
+             {
+               CERR << "cannot open " << cmapx_filename << ": "
+                    << strerror(errno) << endl;
+               return;
+             }
+
+          char buffer[400];
+          for (;;)
+              {
+                const char * s = reader.fgets(buffer, sizeof(buffer));
+                if (s == 0)   break;
+                buffer[sizeof(buffer) - 1] = 0;
+                page << "    " << buffer;
+              }
+
+          Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
+        }
+      }
+   swap_caller_calee();
+
+   set_call_graph_root(ufun);
+   if (write_call_graph(ufun, alias, true) == 0)
+      {
+        page << "   <H3>Caller Graph (defined functions calling function "
+             << alias << ")</H3>"                                         CRLF
+             << "<IMG class=cg2 usemap=#GC src=gc_"
+             << alias << ".png>"                                          CRLF;
+
+         // copy the cmap file for the IMG (generated by dot) into the page
+         {
+           UTF8_string cmapx_filename(root_dir);
+           cmapx_filename << "/gc_" << UTF8_string(alias) << ".cmapx";
+           FileReader reader(cmapx_filename.c_str());
+           Assert(+reader);
+           char buffer[400];
+           for (;;)
+               {
+                 const char * s = reader.fgets(buffer, sizeof(buffer));
+                 if (s == 0)   break;
+                 buffer[sizeof(buffer) - 1] = 0;
+                 page << "    " << buffer;
+               }
+
+           Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
+         }
+      }
+
+   swap_caller_calee();   // restore
+
+   page <<
+" </BODY>"                                                                CRLF
+" </HTML>"                                                                CRLF;
+
+   page.close();
+}
+//────────────────────────────────────────────────────────────────────────────
+int
+Doxy::gv_to_png(const char * gv_filename, const char * out_filename, bool cmapx)
+{
+   // convert .gv file gv_filename to .png file out_filename using the 'dot'
+   // program
+
+const char * out_type = cmapx ? "cmapx" : "png";
+char cmd[200];
+   SPRINTF(cmd, "dot -T%s %s -o%s", out_type, gv_filename, out_filename);
+
+   errno = 0;
+PipeReader dot(cmd);
+   if (!dot)
+      {
+        if (errno)
+           CERR << "Could not run 'dot': " << strerror(errno) << endl;
+        else
+           CERR << "Could not run 'dot'. Maybe install package 'graphviz'?"
+                << endl;
+        ++errors;
+        return 1;
+      }
+
+char buffer[1000];
+   for (;;)
+       {
+         const int len = dot.fread(buffer, sizeof(buffer) - 1);
+         if (len == 0)   break;
+         buffer[len] = 0;
+         CERR << "dot says: " << buffer;
+       }
+
+   // if LOG_command_DOXY then do not remove temporary files
+   Log(LOG_command_DOXY)
+      {
+        out << "  converted " << gv_filename << " to " << out_filename << endl;
+      }
+   else
+      {
+        if (cmapx)   unlink(gv_filename);   // no longer needed
+      }
+   return 0;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
+{
+   loop(f, all_fns.size())
+      {
+        const Symbol & fun_sym = *(all_fns[f]);
+        loop(si, fun_sym.value_stack_size())
+            {
+              if (cFunction_P fun = fun_sym.get_function(si))
+                 {
+                   if (const UserFunction * ufun = fun->get_func_ufun())
+                      add_fun_to_call_graph(&fun_sym, ufun);
+                 }
+            }
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Doxy::native_page(cFunction_P fun, const UCS_string & alias)
 {
@@ -612,17 +843,16 @@ ofstream page(fun_filename.c_str());
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename << "/gc_" << UTF8_string(alias) << ".cmapx";
-           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-           Assert(cmap);
+           FileReader reader(cmapx_filename.c_str());
+           Assert(+reader);
            char buffer[400];
            for (;;)
                {
-                 const char * s = fgets(buffer, sizeof(buffer), cmap);
+                 const char * s = reader.fgets(buffer, sizeof(buffer));
                  if (s == 0)   break;
                  buffer[sizeof(buffer) - 1] = 0;
                  page << "    " << buffer;
                }
-           fclose(cmap);
            Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
          }
       }
@@ -634,222 +864,15 @@ ofstream page(fun_filename.c_str());
 
    page.close();
 }
-//----------------------------------------------------------------------------
-void
-Doxy::function_page(const UserFunction * ufun, const UCS_string & alias)
+//────────────────────────────────────────────────────────────────────────────
+int Doxy::node_ID(cFunction_P fun)
 {
-UTF8_string fun_filename(root_dir);
-   fun_filename << "/f_" << UTF8_string(alias) << ".html";
+   loop(n, nodes.size())
+      if (nodes[n] == fun)   return n;
 
-   Log(LOG_command_DOXY)
-      out << "Writing function HTML file " << fun_filename << endl;
-
-ofstream page(fun_filename.c_str());
-   page <<
-"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\""                     CRLF
-"                      \"http://www.w3.org/TR/html4/strict.dtd\">"        CRLF
-"<HTML>"                                                                  CRLF
-"  <HEAD>"                                                                CRLF
-"    <TITLE>Documentation of function" << alias << "</TITLE> "            CRLF
-"    <META http-equiv=\"content-type\" "                                  CRLF
-"          content=\"text/html; charset=UTF-8\">"                         CRLF
-"   <LINK rel='stylesheet' type='text/css' href='apl_doxy.css'>"          CRLF
-" </HEAD>"                                                                CRLF
-" <BODY>"                                                                 CRLF
-"  <TABLE class=h1tab><TR>"                                               CRLF
-"   <TD class=h1tab width=10%><H3>↑ <A href=index.html>UP</A></H3>"       CRLF
-"   <TD class=h1tab width=80%><H1>Function " << alias << "</H1>"          CRLF
-"   <TD class=h1tab width=10%>"                                           CRLF
-"  </TABLE><HR>"                                                          CRLF;
-
-   page <<
-"   <H3>Definition</H3>"                                                  CRLF
-"   <TABLE class=onefuntab><TR><TD><PRE>"                                 CRLF
-"    ∇ ";
-   loop(l, ufun->get_text_size())
-       {
-         const UCS_string & line(ufun->get_text(l));
-         if (l > 99)       page << "[" << l << "]";
-         else if (l > 9)   page << "[" << l << "] ";
-         else if (l > 0)   page << "[" << l << "]  ";
-         page << line.to_HTML(0, false) <<                                CRLF;
-       }
-   page <<
-"    ∇</PRE>"                                                             CRLF
-"  </TABLE>"                                                              CRLF;
-
-   set_call_graph_root(ufun);
-   if (write_call_graph(ufun, alias, false) == 0)
-      {
-        page << "   <H3>Call Graph (defined functions called from function "
-             << alias << ")</H3>"                                         CRLF
-                "    <IMG class=cg1 usemap=#CG src=cg_"
-                      << alias << ".png>"                                 CRLF;
-
-        // copy the cmap file for the IMG (generated by dot) into the page
-        {
-          UTF8_string cmapx_filename(root_dir);
-          cmapx_filename << "/cg_" << UTF8_string(alias) << ".cmapx";
-          FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-          if (cmap == 0)
-             {
-               CERR << "cannot open " << cmapx_filename << ": "
-                    << strerror(errno) << endl;
-               return;
-             }
-          char buffer[400];
-          for (;;)
-              {
-                const char * s = fgets(buffer, sizeof(buffer), cmap);
-                if (s == 0)   break;
-                buffer[sizeof(buffer) - 1] = 0;
-                page << "    " << buffer;
-              }
-          fclose(cmap);
-          Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
-        }
-      }
-   swap_caller_calee();
-
-   set_call_graph_root(ufun);
-   if (write_call_graph(ufun, alias, true) == 0)
-      {
-        page << "   <H3>Caller Graph (defined functions calling function "
-             << alias << ")</H3>"                                         CRLF
-             << "<IMG class=cg2 usemap=#GC src=gc_"
-             << alias << ".png>"                                          CRLF;
-
-         // copy the cmap file for the IMG (generated by dot) into the page
-         {
-           UTF8_string cmapx_filename(root_dir);
-           cmapx_filename << "/gc_" << UTF8_string(alias) << ".cmapx";
-           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
-           Assert(cmap);
-           char buffer[400];
-           for (;;)
-               {
-                 const char * s = fgets(buffer, sizeof(buffer), cmap);
-                 if (s == 0)   break;
-                 buffer[sizeof(buffer) - 1] = 0;
-                 page << "    " << buffer;
-               }
-           fclose(cmap);
-           Log(LOG_command_DOXY) {} else unlink(cmapx_filename.c_str());
-         }
-      }
-
-   swap_caller_calee();   // restore
-
-   page <<
-" </BODY>"                                                                CRLF
-" </HTML>"                                                                CRLF;
-
-   page.close();
+   return -1;
 }
-//----------------------------------------------------------------------------
-void
-Doxy::bold_name(ostream & of, const UserFunction * ufun) const
-{
-const UserFunction_header & header = ufun->get_header();
-const char * bold = "<span style='font-weight: bold'>";
-
-   if (header.Z())   of << header.Z()->get_name() << "←";
-   if (header.A())   of << header.A()->get_name() << " ";
-   if (header.LO())   // operator
-      {
-        of << "(" << header.LO()->get_name() << " ";
-        of << bold << header.get_name() << "</span>";
-        if (header.RO())   of << " " << header.RO()->get_name();
-      }
-   else               // function
-      {
-        of << bold << header.get_name() << "</span>";
-      }
-
-   if (header.B())   of << " " << header.B()->get_name();
-}
-//----------------------------------------------------------------------------
-void
-Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
-{
-   loop(f, all_fns.size())
-      {
-        const Symbol & fun_sym = *(all_fns[f]);
-        loop(si, fun_sym.value_stack_size())
-            {
-              if (cFunction_P fun = fun_sym.get_function(si))
-                 {
-                   if (const UserFunction * ufun = fun->get_func_ufun())
-                      add_fun_to_call_graph(&fun_sym, ufun);
-                 }
-            }
-      }
-}
-//----------------------------------------------------------------------------
-void
-Doxy::add_fun_to_call_graph(const Symbol * caller_sym,
-                            const UserFunction * ufun)
-{
-   Log(LOG_command_DOXY)
-      out << "   add (caller-) Symbol " << caller_sym->get_name() << endl;
-
-const Token_string & body = ufun->get_body();
-
-   // scan the body of ufun for symbol Token and filter those that are
-   // functions. This is rather heuriostic and therefore not reliable.
-   //
-   // It can fail if the same name is used for both functions and variables.
-   //
-   loop(b, body.size())
-      {
-        const Token & tok = body[b];
-        if (tok.get_Class() != TC_SYMBOL)   continue;
-
-        const Symbol * callee_ptr = tok.get_sym_ptr();
-        Assert(callee_ptr);
-
-        // assume (maybe incorrectly) that local symbol of ufun are variables.
-        //
-        if (ufun->localizes(callee_ptr))   continue;
-
-        const Symbol & callee_sym = *callee_ptr;
-        loop(si, callee_sym.value_stack_size())
-            {
-              if (cFunction_P fun = callee_sym.get_function(si))
-                 {
-                   Assert(fun);
-                   const UserFunction * callee = fun->get_func_ufun();
-                   if (!(callee || fun->is_native()))   continue;
-
-                    // ignore multiple calls of the same callee from the
-                    // same caller...
-                    //
-                    bool have_call = false;
-                    loop(cg, call_graph.size())
-                        {
-                          if (call_graph[cg].caller == ufun &&
-                              call_graph[cg].callee == fun)
-                             {
-                               have_call = true;
-                               break;   // loop(cg, ...
-                             }
-                        }
-
-                    if (!have_call)
-                       {
-                         const fcall_edge edge(ufun, caller_sym->get_name(),
-                                               fun,   callee_sym.get_name());
-
-                         call_graph.push_back(edge);
-                         Log(LOG_command_DOXY)
-                            out << "    " << caller_sym->get_name()
-                                << " calls " << fun->get_name() << endl;
-                       }
-                 }
-            }
-      }
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Doxy::set_call_graph_root(cFunction_P fun)
 {
@@ -959,7 +982,20 @@ bool progress = true;
             << " alias: " << aliases[n] << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Doxy::swap_caller_calee()
+{
+   loop(cg, call_graph.size())
+       {
+         const fcall_edge edge = call_graph[cg];
+         call_graph[cg].caller      = edge.callee;
+         call_graph[cg].caller_name = edge.callee_name;
+         call_graph[cg].callee      = edge.caller;
+         call_graph[cg].callee_name = edge.caller_name;
+       }
+}
+//────────────────────────────────────────────────────────────────────────────
 int
 Doxy::write_call_graph(cFunction_P fun, const UCS_string & alias, bool caller)
 {
@@ -1040,77 +1076,48 @@ int ret = gv_to_png(cg_filename.c_str(), png_filename.c_str(), false);
       ret = gv_to_png(cg_filename.c_str(), cmapx_filename.c_str(), true);
    return ret;
 }
-//----------------------------------------------------------------------------
-int Doxy::node_ID(cFunction_P fun)
-{
-   loop(n, nodes.size())
-      if (nodes[n] == fun)   return n;
-
-   return -1;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Doxy::swap_caller_calee()
+Doxy::write_css()
 {
-   loop(cg, call_graph.size())
-       {
-         const fcall_edge edge = call_graph[cg];
-         call_graph[cg].caller      = edge.callee;
-         call_graph[cg].caller_name = edge.callee_name;
-         call_graph[cg].callee      = edge.caller;
-         call_graph[cg].callee_name = edge.caller_name;
-       }
-}
-//----------------------------------------------------------------------------
-int
-Doxy::gv_to_png(const char * gv_filename, const char * out_filename, bool cmapx)
-{
-   // convert .gv file gv_filename to .png file out_filename using the 'dot'
-   // program
+UTF8_string css_filename(root_dir);
+   css_filename << "/apl_doxy.css";
 
-const char * out_type = cmapx ? "cmapx" : "png";
-char cmd[200];
-   SPRINTF(cmd, "dot -T%s %s -o%s", out_type, gv_filename, out_filename);
-
-   errno = 0;
-FILE * dot = popen(cmd, "r");
-   if (dot == 0)
-      {
-        if (errno)
-           CERR << "Could not run 'dot': " << strerror(errno) << endl;
-        else
-           CERR << "Could not run 'dot'. Maybe install package 'graphviz'?"
-                << endl;
-        ++errors;
-        return 1;
-      }
-
-char buffer[1000];
-   for (;;)
-       {
-         const int len = fread(buffer, 1, sizeof(buffer), dot);
-         if (len == 0)   break;
-         buffer[len] = 0;
-         CERR << "dot says: " << buffer;
-       }
-   pclose(dot);
-
-   // if LOG_command_DOXY then do not remove temporary files
    Log(LOG_command_DOXY)
-      {
-        out << "  converted " << gv_filename << " to " << out_filename << endl;
-      }
-   else
-      {
-        if (cmapx)   unlink(gv_filename);   // no longer needed
-      }
-   return 0;
+      out << "Writing style sheet file " << css_filename << endl;
+
+ofstream css(css_filename.c_str());
+   css <<
+"/* GNU APL Doxy css file */"                                             CRLF
+"BODY, TABLE.h1tab"                                                       CRLF
+"  { background-color: #D0D0FF; }"                                        CRLF
+"TABLE.h1tab"                                                             CRLF
+"  { width: 100%; border: 0;"                                             CRLF
+"    margin-left:auto; margin-right:auto; }"                              CRLF
+"TD.h1tab { border: 0; }"                                                 CRLF
+"TABLE    { background-color: #FFFFFF; }"                                 CRLF
+"H1, H3, TH, .center"                                                     CRLF
+"   { text-align: center; }"                                              CRLF
+"H3       { width: 100%; text-align: center; }"                           CRLF
+"TH, TD   { padding-left: 0.5em; padding-right: 0.5em; }"                 CRLF
+".code    { font-family: monospace; }"                                    CRLF
+"TABLE, TH, TD { border: 1px solid black; }"                              CRLF
+".onefuntab { margin-left:auto; margin-right:auto; }"                     CRLF
+".funtab, .vartab, .sitab"                                                CRLF
+"  { margin-left:auto; margin-right:auto;"                                CRLF
+"    border-collapse: collapse; }"                                        CRLF
+".cg1, .cg2"                                                              CRLF
+"  { margin:auto; display: block; }"                                      CRLF
+".doxy_comment { width: 40%; }"                                           CRLF;
+
+   css.close();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Doxy::fun_anchor(const UCS_string & name)
 {
 UCS_string anchor(U"<A href=f_");
    return anchor << name << ".html>" << name << "</A>";
 }
+//════════════════════════════════════════════════════════════════════════════
 

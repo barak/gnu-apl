@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** System function index of (⍳) */
 /// The class implementing ⍳
 class Bif_F12_INDEX_OF : public NonscalarFunction
@@ -37,34 +37,50 @@ public:
    : NonscalarFunction(TOK_F12_INDEX_OF)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left APL value argument (the array to search in)
+   /// @param B right APL value argument (items to look up)
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
+
+   /// overloaded Function::eval_B()
+   /// @param B right APL value argument
+   virtual Token eval_B(cValue_R B) const;
 
    static Bif_F12_INDEX_OF  fun;   ///< Built-in function
 
 protected:
    /// find Cell B in the ravel A (of length len_A). Return the position
    /// (< len_A) if found, or len_A if not.
-   static ShapeItem find_B_in_A(const Cell * A, ShapeItem len_A,
+   /// @param A pointer to the first cell of the ravel to search
+   /// @param len_A number of cells in the ravel
+   /// @param cell_B cell value to search for
+   /// @param qct comparison tolerance (⎕CT)
+   static ShapeItem find_B_in_A(cValue_R A, ShapeItem len_A,
                          const Cell & cell_B, double qct)
       {
-        loop(a, len_A)   if (cell_B.equal(A[a], qct))   return a;   // found
-        return len_A;                                               // not found
+        Cell cache;
+        loop(a, len_A)
+            if (cell_B.equal(A.get_cravel(a, cache), qct))   return a;   // found
+        return len_A;                                                   // not found
       }
+
+   /// compare function for Heapsort<ShapeItem>::search<const Cell &>
+   /// @param cell cell value used as the search key
+   /// @param A ravel index into the sorted array
+   /// @param ctx opaque context pointer (points to the source Value)
+   static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 
    /// find Cell B in value A. Return the position (< len_A) if found,
    /// or len_A if not. Idx_A is ⍋A ⊣ ⎕IO←0.
-   static ShapeItem find_B_in_sorted_A(const Value & A,
+   /// @param A APL value whose ravel is searched
+   /// @param Idx_A ascending sort-index of A (grade-up, ⎕IO←0)
+   /// @param cell_B cell value to search for
+   /// @param qct comparison tolerance (⎕CT)
+   static ShapeItem find_B_in_sorted_A(const cValue & A,
                                        const vector<ShapeItem> & Idx_A,
                                        const Cell & cell_B, double qct);
-
-   /// compare function for Heapsort<ShapeItem>::search<const Cell &>
-   static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Bif_F12_INDEX_OF_HH_DEFINED__
 

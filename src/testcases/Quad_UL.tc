@@ -1,20 +1,22 @@
 ⍝ Quad_UL.tc
 ⍝ ----------------------------------
 
-   ⎕UL
+⍝@ test3.
+
+      ⎕UL
 ⁰
 
-   X←⎕UL
-   ⎕UL←333
+      X←⎕UL
+      ⎕UL←333
 SYNTAX ERROR+
       ⎕UL←333
-         ^
+         ^^
 
       )more
 Assignment to read-only system variable ⎕UL
 
-   ⎕UL=X
+      ⎕UL=X
 1
 
-⍝ ==================================
+      ⍝ ==================================
 

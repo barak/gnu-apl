@@ -34,3 +34,4 @@
 ∇A ASSERT_EQUIV B
  ASSERT (A) ≡ (B)
 ∇
+⍝ checksum: crc32=353C25F1

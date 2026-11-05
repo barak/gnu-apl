@@ -1,6 +1,8 @@
 ⍝ Pick.tc
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
+⍝@ test3.
+
 
       R←'FOUR' 'TO' 'GO'
       ≡R
@@ -51,7 +53,7 @@ SI
       ≡X
 2
 
-⍝ pick from higher rank array ----------------------------------
+      ⍝ pick from higher rank array ----------------------------------
 
       C←2 2ρ'ONE' 'TWO' 'BUCKLE' ('MY' 'SHOE')
       4⎕CR C
@@ -120,7 +122,7 @@ FOUR
       ≡Q
 1
 
-⍝ specifying the left argument ----------------------------------
+      ⍝ specifying the left argument ----------------------------------
 
       Q←'FLY' 'PAPER'
       2 4⊃Q
@@ -147,6 +149,9 @@ F
       ≡N
 3
 
+      )ERASE M
+      )ERASE N
+
       A←(ι0)⊃0 2ρ0
       ρA
 0 2
@@ -154,7 +159,7 @@ F
       ≡A
 1
 
-⍝ additional examples ----------------------------------
+      ⍝ additional examples ----------------------------------
 
       H←2 2ρ'BUCKS' 'TWANG' 'LYMPH' 'FROZE'
       4⎕CR  H
@@ -282,7 +287,7 @@ G
       ≡I
 0
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       B←'P' 'PI' ('PIE' 'PIER')
       B
@@ -336,7 +341,86 @@ G
 ┃  ┗ϵ━━━━━┛ ┗ϵ━━━━━━━━━━━┛┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━┛
 
-⍝ ==================================
+      ⍝ Regression (Blake McBride, LanguageVariances.md #4, 2026-08-10):
+      ⍝ (⍳0)⊃V is the only case where Pick returns the whole array to
+      ⍝ which it is applied (LRM p.42); as a selective specification
+      ⍝ target this must replace the named variable's entire value
+      ⍝ (shape and type included, no conformance check), same as a
+      ⍝ plain V←new_value -- not the ordinary per-cell selective
+      ⍝ specification that every other selector uses.
+      ⍝
+      A←'ABCD'
+      ((⍳0)⊃A)←10 20 30
+      A
+10 20 30
+
+      C←5 6 7
+      ((⍳0)⊃C)←(⊂1 2 3)
+      C
+ 1 2 3 
+
+      ⍝ ordinary (non-assignment) value use is unaffected
+      (⍳0)⊃A
+10 20 30
+
+      )ERASE A
+      )ERASE C
+
+      ⍝ regression (Blake McBride, Bugs28 #30, 2026-08-11): (I⊃A)←X used
+      ⍝ to assign INTO the selected item instead of replacing it whenever
+      ⍝ that item was already nested (the shape of the OLD item wrongly
+      ⍝ constrained the new one) -- neither IBM APL2 nor Dyalog assign
+      ⍝ into a nested target, per the LRM's own Pick example. Fixed via a
+      ⍝ new Value marker (set_lval_pick_slot(), Value.hh/.cc): pick()
+      ⍝ still returns the old item's own cellrefs (so an OUTER selector
+      ⍝ composed with Pick, e.g. (1 0/3⊃V)←X below, can still narrow them
+      ⍝ in the ordinary way), but marks them as its own direct, unbroken
+      ⍝ selection; the marker only survives to assign_cellrefs() when
+      ⍝ nothing narrows it first, in which case the whole item is replaced
+      ⍝ wholesale instead of conforming to the old item's shape.
+      ⍝
+      A30←0 0 0 ⋄ (2⊃A30)←1 2 3 ⋄ A30
+ 0  1 2 3  0 
+
+      ⍝ item 2 is now nested (1 2 3) -- replacing it with a different
+      ⍝ shape used to give LENGTH ERROR; want A30 ←→ 0 (4 5) 0
+      ⍝
+      (2⊃A30)←4 5 ⋄ A30
+ 0  4 5  0 
+
+      ⍝ item 2 is now nested (4 5) -- replacing it with a scalar used to
+      ⍝ scalar-extend into the OLD item's shape (0 7 7); want 0 7 0
+      ⍝
+      (2⊃A30)←7 ⋄ A30
+0 7 0
+
+      ⍝ same story for character data (APL2 LRM's own Pick example)
+      ⍝
+      B30←'AB' 'CD' 'EF' ⋄ (2⊃B30)←'XYZ' ⋄ B30
+ AB XYZ EF 
+      (2⊃B30)←'X' ⋄ B30
+ AB X EF 
+
+      ⍝ control: Pick composed with an OUTER selector still narrows the
+      ⍝ old item's cellrefs in the ordinary way (the marker above is
+      ⍝ dropped by compress's own fresh, narrowed result) -- unaffected.
+      ⍝
+      V30←1 'bc' (3 2ρι6)
+      (1 0/3⊃V30)←'ABC'
+      8 ⎕CR V30
+┌→───────────┐
+│1 ┌→─┐ ┌→──┐│
+│  │bc│ ↓A 2││
+│  └──┘ │B 4││
+│       │C 6││
+│       └+──┘│
+└ϵ───────────┘
+
+      )ERASE A30
+      )ERASE B30
+      )ERASE V30
+
+      ⍝ ==================================
 
       )SI
 
@@ -348,5 +432,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝     ]OWNERS
+      ⍝     ]OWNERS
 

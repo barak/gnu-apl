@@ -1,6 +1,8 @@
 ⍝ Quad_CR10.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
 ∇Z←test_CR10 B;B1
  ⍝
  ⍝ compute B1←10 ⎕CR B and check that executing B1 yields B
@@ -191,7 +193,7 @@
        SUMMARY←SUMMARY, ⎕←test_CR10 facs
 1
 
-⍝ another regression ----------------------------------
+      ⍝ another regression ----------------------------------
 
       )ERASE a b c d e f g h i j
 

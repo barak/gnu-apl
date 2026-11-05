@@ -30,6 +30,7 @@
  fio_def(27, rename      )
  fio_def(28, read_dir    )
  fio_def(29, dir_files   )
+ fio_def(30, getcwd      )
  fio_def(31, access      )
  fio_def(32, socket      )
  fio_def(33, bind        )
@@ -61,6 +62,7 @@
  fio_def(59, fcntl       )
  fio_def(60, random      )
  fio_def(61, secs_epoch  )
+ fio_def(62, sock_const  )
 #undef fio_def
 #else
  #error "macro fio_def() was not #define'd"

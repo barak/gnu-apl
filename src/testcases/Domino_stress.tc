@@ -1,0 +1,115 @@
+⍝ A⌹B stress test
+
+⍝@ test3.
+
+      )CLEAR
+CLEAR WS
+
+      ID←{ (⍳⍺) ∘.= (⍳⍵)}   ⍝ the ⍺×⍵ identity matrix (1 on diagonal)
+      UT←{ (⍳⍺) ∘.> (⍳⍵)}   ⍝ upper triangle mask (1 below diagonal)
+
+      TOL←0.001          ⍝ result tolerance
+
+∇TEST COUNT;A;B;Z;M;N;REAL;∆;T;Ti
+ ⍝
+ ⍝ B:  a random M×N matrix,
+ ⍝ Q:  an orthogonal M×M matrix,
+ ⍝ R:  an upper triangle M×N matrix (same shape as B),
+ ⍝ Ri: an upper triangle N×N matrix (the inverse of R), and
+ ⍝
+ ⍝ B ←→ Q ∘ R
+ C1←COUNT
+LOOP:
+ N←1 + 8 ∣ ⎕RVAL 0                  ⍝ random number of columns (1..8)
+ M←N + 4 ∣ 8⌈ ⎕RVAL 0               ⍝ random number of rows (≥ columns)
+ MM←M M ◊ MN←M N ◊ NN←N N
+ REAL← 1 ⍝ 2 | ⎕RVAL 0              ⍝ random type (real or complex)
+ REAL← 0 0, REAL, ~REAL
+ B←100 ∣ ⎕RVAL 2 (M, N) REAL        ⍝ random matrix B
+ A←100 ∣ ⎕RVAL 1 (M)    REAL        ⍝ random result A for A = B∘X
+
+ ⍝ test A⌹B
+ ⍝
+ Z←A ⌹ B
+ →(M>N)/B_is_overspecified
+ ∆←+/,∆×∆←A - ,B∘Z                  ⍝ ⌹ error
+ →(TOL <∣ ∆)/∆_ERROR
+B_is_overspecified:
+
+ ⍝ test ⌹[X]B
+ ⍝
+ (Q R Ri)←⌹[⎕CT]Bin←B
+ →(MN ≢ ⍴B) /RHO_B_ERROR
+ →(MM ≢ ⍴Q) /RHO_Q_ERROR
+ →(NN ≢ ⍴R) /RHO_R_ERROR
+ →(NN ≢ ⍴Ri)/RHO_Ri_ERROR
+ 
+ ⍝ Q is orthogonal/Hermitian
+ ⍝
+ →(0∈TOL > ∣(M ID M) - (⍉Q) ∘ Q)/ORTHO_Q_ERROR
+
+ ⍝ R and Ri are upper triangular
+ ⍝
+ →(0∈TOL > ∣R  × NN↑(M UT N))  /UPPER_R_ERROR    ⍝ R is upper triangular
+ →(0∈TOL > ∣Ri × (N UT N))     /UPPER_Ri_ERROR   ⍝ Ri is upper triangular
+ →(0∈TOL > ∣(N ID N) - R ∘ Ri) /INV_R_ERROR      ⍝ Ri is R⁻¹
+ →(0∈TOL > ∣∆←B - Q ∘ R)       /∆_ERROR2         ⍝ B is Q ∘ R
+
+ →(0<COUNT←COUNT-1)⍴LOOP
+ 'OK' ◊ →0
+
+RHO_B_ERROR:   '⍴B ERROR'        ◊  '⍴B:' (⍴B)                     ◊  →OUT
+RHO_Q_ERROR:   '⍴Q ERROR'        ◊  '⍴B:' (⍴B)  ◊ '⍴Q:' (⍴Q)       ◊  →OUT
+RHO_R_ERROR:   '⍴R ERROR'        ◊  '⍴B:' (⍴B)  ◊ '⍴R:' (⍴R)       ◊  →OUT
+RHO_Ri_ERROR:  '⍴Ri ERROR'       ◊  '⍴B:' (⍴B)  ◊ '⍴Ri:' (⍴Ri)     ◊  →OUT
+INV_R_ERROR:   'INV_R_ERROR: '   ◊  'B:' (2⍕B)
+                                 ◊  'R:' (2⍕R)  ◊ 'Ri:' (2⍕Ri)     ◊  →OUT
+UPPER_R_ERROR: 'UPPER R_ERROR'   ◊  2⍕R                            ◊  →OUT
+UPPER_Ri_ERROR:'UPPER Ri_ERROR'  ◊  2⍕Ri                           ◊  →OUT
+ORTHO_Q_ERROR: 'ORTHO_Q_ERROR:'  ◊  '⍴B:' (⍴B) ◊ ',B:' (,B)
+                                    'Q:' (2⍕Q)  ◊ 'QQ:' (2⍕(⍉Q)∘Q) ◊  →OUT
+∆_ERROR:       '∆_ERROR'
+ 'A:' (2⍕A) ◊ '⍴A' (⍴A)
+ 'B:' (2⍕B) ◊ '⍴B' (⍴B)
+ 'Z:' (2⍕Z) ◊ '⍴Z' (⍴Z)
+ '∆:' ∆
+ TOL <∣ ∆                                                          ◊  →OUT
+
+∆_ERROR2:      '∆_ERROR2'
+ 'B:' (2⍕B)     ◊ '⍴B' (⍴B)
+ 'Q:' (2⍕Q)     ◊ '⍴Q' (⍴Q)
+ 'R:' (2⍕R)     ◊ '⍴R' (⍴R)
+ 'Q∘R:' (2⍕Q∘R) ◊ '⍴Q∘R' (⍴Q∘R)
+
+OUT: "ERROR in pass" (C1 - COUNT) "of" C1
+∇
+      TEST 500
+OK
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ Regression (Blake McBride, Bugs22 #2): ⌹0 discarded
+      ⍝ bif_reciprocal()'s ErrorCode and returned 0 instead of
+      ⍝ DOMAIN ERROR for a singular (zero) scalar argument.
+      ⍝
+      ⌹0
+DOMAIN ERROR
+      ⌹0
+      ^
+      )SIC
+
+      ⌹0.0
+DOMAIN ERROR
+      ⌹0
+      ^
+      )SIC
+
+      ⌹4
+0.25

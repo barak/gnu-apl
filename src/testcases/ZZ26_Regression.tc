@@ -1,13 +1,15 @@
 ⍝ ZZ26_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ not a regression test but a check for too optimistic not-cloning
       ⍝
       A←10⍴10
       A+ (A[3]←3) ⊢ A
 20 20 13 20 20 20 20 20 20 20
 
-⍝ ==================================
+      ⍝ ==================================
 
       )CHECK
 OK      - no stale functions

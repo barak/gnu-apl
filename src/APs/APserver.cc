@@ -20,21 +20,32 @@
 
 // #define USE_POLL   /* use poll() instead of select() */
 
+#include <config.h>
+
 #include <errno.h>
 #include <limits.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
+#if HAVE_NETINET_TCP_H
+# include <netinet/tcp.h>
+#endif // HAVE_NETINET_TCP_H
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
+#if HAVE_SYS_SOCKET_H
+# include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
 #include <unistd.h>
+
+#if MINGW_SRC
+typedef int socklen_t;
+#endif // MINGW_SRC
 
 #ifdef USE_POLL
 # include <poll.h>
 #else
-# include <sys/select.h>
+# if HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+# endif // HAVE_SYS_SELECT_H
 #endif
 
 #include "config.h"   // for HAVE_SYS_UN_H
@@ -75,17 +86,17 @@ bool LOG_shared_variables = false;
 
 AP_num3 ProcessorID::id;
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 const char *
 prog_name()
 {
    return "APserver";
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// a database containing all connected processors
 extern vector<AP3_fd> connected_procs;
 vector<AP3_fd> connected_procs;
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 struct key_value
 {
    /// constructor
@@ -102,7 +113,7 @@ struct key_value
 
 /// the current value of all shared variables
 vector<key_value> var_values;
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 const char * prog = "????";
 
@@ -113,7 +124,7 @@ bool hang_on = false;   // dont exit after last connection was closed
 
 static void print_db(ostream & out);
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 extern TCP_socket get_tcp_fd_for_id(const AP_num3 & id);
 TCP_socket
 get_tcp_fd_for_id(const AP_num3 & id)
@@ -125,7 +136,7 @@ get_tcp_fd_for_id(const AP_num3 & id)
 
    return NO_TCP_SOCKET;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 extern TCP_socket get_tcp_fd2_for_id(const AP_num3 & id);
 TCP_socket
 get_tcp_fd2_for_id(const AP_num3 & id)
@@ -139,7 +150,7 @@ get_tcp_fd2_for_id(const AP_num3 & id)
 
    return NO_TCP_SOCKET;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static
 AP_num3 fd_to_id(TCP_socket fd)
 {
@@ -151,7 +162,7 @@ AP_num3 fd_to_id(TCP_socket fd)
 
    return AP_num3();
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket
 get_TCP_for_key(SV_key key)
 {
@@ -179,7 +190,7 @@ not_found:
    cerr << prog_name() << ": could not find TCP for key " << key << endl;
    return NO_TCP_SOCKET;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket
 get_peer_fd(SV_key key, TCP_socket fd)
 {
@@ -201,7 +212,7 @@ AP_num3 peer_id;
 
    return get_tcp_fd_for_id(peer_id);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket
 get_peer_fd2(SV_key key, TCP_socket fd)
 {
@@ -223,9 +234,14 @@ AP_num3 peer_id;
 
    return get_tcp_fd2_for_id(peer_id);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+
+#if ! MINGW_SRC
 static struct sigaction old_control_C_action;
 static struct sigaction new_control_C_action;
+static struct sigaction old_control_BSL_action;
+static struct sigaction new_control_BSL_action;
+#endif // ! MINGW_SRC
 
 static void
 control_C(int)
@@ -233,16 +249,14 @@ control_C(int)
    cerr << "\nAPserver terminated by SIGINT" << endl;
    exit(0);
 }
-//-----------------------------------------------------------------------------
-static struct sigaction old_control_BSL_action;
-static struct sigaction new_control_BSL_action;
+//════════════════════════════════════════════════════════════════════════════
 
 static void
 control_BSL(int)
 {
    print_db(cerr << "\r");
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 maybe_start_AP(const AP_num3 & id)
 {
@@ -303,7 +317,7 @@ FILE * fp = popen(popen_arg, "r");
 
    pclose(fp);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 close_fd(TCP_socket fd)
 {
@@ -320,26 +334,33 @@ TCP_socket removed_fd2 = NO_TCP_SOCKET;
             {
               found_fd = true;
               removed_AP = connected_procs[j].ap3;
+              // capture fd2 *before* erase(): erase() shifts the following
+              // elements down into slot j, so connected_procs[j] after
+              // erase() is a different (or, for the last index, an
+              // out-of-bounds) record -- reading .fd2 from it closed an
+              // unrelated live connection instead of this record's peer fd.
+              removed_fd2 = connected_procs[j].fd2;
               connected_procs.erase(connected_procs.begin() + j);
               (verbosity > 0) && cerr << "erased fd " << fd << " (Id "
                                       << removed_AP.proc << ":"
                                       << removed_AP.parent << ":"
                                       << removed_AP.grand
                                       << ") from connected_procs" << endl;
-              removed_fd2 = connected_procs[j].fd2;
               break;
             }
          else if (fd == connected_procs[j].fd2)
             {
               found_fd = true;
               removed_AP = connected_procs[j].ap3;
+              // capture fd *before* erase(): see the comment in the
+              // fd-matching branch above.
+              removed_fd2 = connected_procs[j].fd;
               connected_procs.erase(connected_procs.begin() + j);
               (verbosity > 0) && cerr << "erased fd " << fd << " (Id "
                                       << removed_AP.proc << ":"
                                       << removed_AP.parent << ":"
                                       << removed_AP.grand
                                       << ") from connected_procs" << endl;
-              removed_fd2 = connected_procs[j].fd;
               break;
             }
        }
@@ -419,7 +440,7 @@ TCP_socket removed_fd2 = NO_TCP_SOCKET;
         exit(0);
       }
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 new_connection(TCP_socket fd)
 {
@@ -431,7 +452,7 @@ AP3_fd ap3_fd;
 
    connected_procs.push_back(ap3_fd);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 do_signal(TCP_socket fd, Signal_base * request)
 {
@@ -519,9 +540,14 @@ AP3_fd * ap_fd = 0;
         case sid_MATCH_OR_MAKE:
              {
                uint32_t varname[MAX_SVAR_NAMELEN];
-               memcpy(varname,
-                      request->get__MATCH_OR_MAKE__varname().data(),
-                      sizeof(varname));
+               memset(varname, 0, sizeof(varname));
+               {
+                 const string vn_str =
+                             request->get__MATCH_OR_MAKE__varname();
+                 const size_t vn_len = vn_str.size() < sizeof(varname)
+                                     ? vn_str.size() : sizeof(varname);
+                 memcpy(varname, vn_str.data(), vn_len);
+               }
                const int to_proc   = request->get__MATCH_OR_MAKE__to_proc();
                const int to_parent = request->get__MATCH_OR_MAKE__to_parent();
                const int to_grand  = request->get__MATCH_OR_MAKE__to_grand();
@@ -625,7 +651,7 @@ AP3_fd * ap_fd = 0;
                      (request->get__GET_OFFERING_PROCS__offered_to_proc());
                vector<AP_num> processors;
                db.get_offering_processors(to_proc, processors);
-               string sprocs(reinterpret_cast<const char *>(&processors[0]),
+               string sprocs(reinterpret_cast<const char *>(processors.data()),
                              processors.size()*sizeof(AP_num));
                OFFERING_PROCS_ARE_c(fd, sprocs);
              }
@@ -639,7 +665,7 @@ AP3_fd * ap_fd = 0;
                      (request->get__GET_OFFERED_VARS__accepted_by_proc());
                vector<uint32_t> varnames;
                db.get_offered_variables(to_proc, from_proc, varnames);
-               string svars(reinterpret_cast<const char *>(&varnames[0]),
+               string svars(reinterpret_cast<const char *>(varnames.data()),
                             varnames.size()*sizeof(uint32_t));
                OFFERED_VARS_ARE_c(fd, svars);
              }
@@ -830,14 +856,30 @@ AP3_fd * ap_fd = 0;
                char * del = 0;
                char buffer[2*MAX_SIGNAL_CLASS_SIZE + 40000];
                const char * loc = 0;
-               Signal_base * response = Signal_base::recv_TCP(ap_sock, buffer,
-                                    sizeof(buffer), del, debug, &loc);
+               Signal_base * response =
+                             Signal_base::recv_TCP(ap_sock, buffer,
+                                                   sizeof(buffer), del,
+                                                   debug, &loc);
+               if (response == 0)
+                  {
+                    if (verbosity > 0)
+                       {
+                         cerr << prog << ": connection[" << ap_sock
+                              << "] closed by peer: errno=" << errno
+                              << ", loc=" << loc << endl;
+                       }
+                     close_fd(fd);
+                     if (del)   delete[] del;
+                     return;
+                  }
+
                VALUE_IS_c vis(fd, response->get__VALUE_IS__key(),
                                   response->get__VALUE_IS__error(),
                                   response->get__VALUE_IS__error_loc(),
                                   response->get__VALUE_IS__cdr_value());
 
-               if (del)   delete del;
+               delete response;
+               if (del)   delete[] del;
              }
              return;
 
@@ -870,7 +912,7 @@ AP3_fd * ap_fd = 0;
         << request->get_sigID() << " ("
         << request->get_sigName() << ")" << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 connection_readable(TCP_socket fd)
 {
@@ -878,6 +920,7 @@ char buffer[50000];
 char * del = 0;
 ostream * debug = verbosity ? &cerr : 0;
 const char * loc = 0;
+//════════════════════════════════════════════════════════════════════════════
 Signal_base * request = Signal_base::recv_TCP(fd, buffer, sizeof(buffer),
                                               del, debug, &loc);
    if (request == 0)
@@ -889,14 +932,18 @@ Signal_base * request = Signal_base::recv_TCP(fd, buffer, sizeof(buffer),
                   << ", loc=" << loc << endl;
            }
          close_fd(fd);
+         if (del)   delete[] del;   // recv_TCP() may have allocated del
+                                    // before failing to receive the full
+                                    // signal; don't leak it here too.
          return;
       }
 
    do_signal(fd, request);
 
-   if (del)   delete del;
+   delete request;
+   if (del)   delete[] del;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 #ifdef HAVE_SYS_UN_H
 int
 open_UNIX_socket(const char * listen_name)
@@ -912,7 +959,8 @@ struct sockaddr_un local;
    memset(&local, 0, sizeof(sockaddr_un));
    local.sun_family = AF_UNIX;
 
-   strcpy(local.sun_path + ABSTRACT_OFFSET, listen_name);
+   strncpy(local.sun_path + ABSTRACT_OFFSET, listen_name,
+           sizeof(local.sun_path) - ABSTRACT_OFFSET - 1);
 
    if (::bind(listen_sock, reinterpret_cast<const sockaddr *>(&local),
               sizeof(sockaddr_un)))
@@ -942,14 +990,15 @@ open_UNIX_socket(const char * listen_name)
    return -1;
 }
 #endif
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 open_TCP_socket(int listen_port)
 {
 const int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
    {
      int yes = 1;
-     setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+     setsockopt(listen_sock, SOL_SOCKET, SO_REUSEADDR,
+                reinterpret_cast<const char *>(&yes), sizeof(int));
    }
 
 sockaddr_in local;
@@ -962,7 +1011,13 @@ sockaddr_in local;
               sizeof(sockaddr_in)))
       {
         cerr << prog << ": ::bind(127.0.0.1 port"
-             << listen_port << ") failed:" << strerror(errno) << endl;
+             << listen_port << ") failed:"
+#if MINGW_SRC
+             << WSAGetLastError()
+#else
+             << strerror(errno)
+#endif
+             << endl;
         return -13;
       }
 
@@ -978,7 +1033,7 @@ sockaddr_in local;
 
    return listen_sock;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 usage()
 {
@@ -993,10 +1048,39 @@ usage()
 "    -v                     be verbose\n";
 
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 main(int argc, char * argv[])
 {
+   // Bugs8 #3 (Blake McBride) / Bugs27 #59(g) (Bill Heagy): the main
+   // interpreter sets SIGCHLD to SIG_IGN ("do not create zombies")
+   // before popen()-ing this binary (Svar_DB.cc), and SIG_IGN survives
+   // exec (POSIX), so without this reset APserver inherits it. With
+   // SIGCHLD ignored, POSIX/Linux auto-reaps a child the instant it
+   // exits, so the popen()/pclose() pair below (launching each AP
+   // instance on demand) has its pclose() race its own child's exit:
+   // if the child is already auto-reaped by the time pclose()'s
+   // internal waitpid() runs, pclose() fails with ECHILD and returns
+   // -1. Unlike AP100/AP210 (APmain.cc's shared main() already does
+   // this same reset), APserver.cc has always had its own independent
+   // main() -- Makefile.am's APserver_SOURCES does not pull in
+   // APmain.cc -- so it never got this reset and ran with SIGCHLD
+   // possibly stuck at SIG_IGN for its entire daemon lifetime, not just
+   // a narrow startup window. Nothing in this file ever sets SIGCHLD
+   // back to SIG_IGN afterward, so -- exactly as for AP100/AP210 -- a
+   // single reset here, before anything else (including any fork()
+   // this process does to daemonize), is sufficient for the process's
+   // whole lifetime.
+   //
+#if ! MINGW_SRC
+   signal(SIGCHLD, SIG_DFL);
+#endif // ! MINGW_SRC
+
+#if MINGW_SRC
+   // Winsock must be initialised before any socket() call.
+   { WSADATA wsa; WSAStartup(MAKEWORD(2, 2), &wsa); }
+#endif
+
    prog = argv[0];
 
 int listen_port = cfg_APSERVER_PORT;
@@ -1089,6 +1173,7 @@ bool auto_start = false;
 
    // enable ^C and ^\ when in debug mode
    //
+#if ! MINGW_SRC
    memset(&new_control_C_action, 0, sizeof(struct sigaction));
    memset(&new_control_BSL_action, 0, sizeof(struct sigaction));
 
@@ -1105,6 +1190,7 @@ bool auto_start = false;
 
    sigaction(SIGINT,  &new_control_C_action,   &old_control_C_action);
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
+#endif // ! MINGW_SRC
 
    if (verbosity > 0)
       cerr << "sizeof(Svar_DB_server) is " << sizeof(Svar_DB_server) << endl
@@ -1118,6 +1204,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    fclose(stdout);                 // cause getc() of caller to return EOF !
 
+#if ! MINGW_SRC
    if (auto_start && fork())
       {
         // if we return too quickly (a race condition) then the pclose() of
@@ -1128,12 +1215,13 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
         // around line 132, and while we are waiting, the pclose(fp) in
         // Svar_DB.cc line 137 should succeed without ECHILD.
         //
-        // At leat that is the plan.
+        // At least that is the plan.
         //
         usleep(200000);
 
         return 0;         // parent returns (daemonize)
       }
+#endif // ! MINGW_SRC
 
    memset(reinterpret_cast<void *>(&db), 0, sizeof(db));
 
@@ -1193,10 +1281,24 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
         size_t janitor = 0;
         int max_fd = listen_sock;
+#if ! MINGW_SRC
         char dummy;
 
-        if (0 != read(listen_sock, &dummy, 0))
-           cerr << prog << ": listen socket has died unexpectedly" << endl;
+        // read() cannot be used to probe a Winsock SOCKET on Windows --
+        // it is not a CRT file descriptor, only recv()/send()/ioctlsocket()
+        // are valid on it -- so this always (falsely) reported any freshly
+        // accepted connection as dead on every pass, immediately closing
+        // real connections again via close_fd() below. On Windows a dead
+        // per-connection socket is still caught by the normal recv()
+        // return value once real data-handling code runs on it later in
+        // the loop, the same way most Windows socket servers detect a
+        // disconnect.
+        //
+        // The listening socket is not probed at all: a read() on it is
+        // meaningless (macOS fails it with ENOTCONN, which used to print
+        // "listen socket has died unexpectedly" on every pass, i.e. at
+        // least once a second), and there was no corrective action anyway.
+#endif // ! MINGW_SRC
 
         FD_SET(listen_sock, &read_fds);
         for (size_t j = 0; j < connected_procs.size(); ++j)
@@ -1205,13 +1307,30 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
               const TCP_socket fd = connected_procs[j].fd;
               if (fd != NO_TCP_SOCKET)
                  {
+#if ! MINGW_SRC
+                   // see the read()-on-Winsock comment at the listen_sock
+                   // check above; the same false-positive here used to
+                   // close_fd() every real connection immediately after
+                   // it was accepted.
                    if (0 != read(fd, &dummy, 0))
                       {
                         cerr << prog << ": socket fd[" << j
                              << "] has died unexpectedly" << endl;
+                        // close_fd() erases connected_procs[j] (fd is
+                        // unique, so it is the match close_fd() finds),
+                        // shifting every following element down by one.
+                        // connected_procs[j] below would therefore read a
+                        // *different* record (or, for the last index, be
+                        // out of bounds) -- back up j so the loop's ++j
+                        // revisits the shifted-in element instead of
+                        // silently skipping it, and skip the rest of this
+                        // iteration, which assumed the pre-erase layout.
                         close_fd(fd);
+                        --j;
+                        continue;
                       }
                    else
+#endif // ! MINGW_SRC
                       {
                         if (max_fd < fd)   max_fd = fd;
                         FD_SET(fd, &read_fds);
@@ -1223,13 +1342,20 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
                 const TCP_socket fd2 = connected_procs[j].fd2;
                 if (fd2 != NO_TCP_SOCKET)
                    {
+#if ! MINGW_SRC
+                     // see the read()-on-Winsock comment at the
+                     // listen_sock check above.
                      if (0 != read(fd2, &dummy, 0))
                         {
                           cerr << prog << ": socket fd2[" << j
                                << "] has died unexpectedly" << endl;
+                          // see the close_fd(fd) comment above.
                           close_fd(fd2);
+                          --j;
+                          continue;
                         }
                      else
+#endif // ! MINGW_SRC
                         {
                           if (max_fd < fd2)   max_fd = fd2;
                           FD_SET(fd2, &read_fds);
@@ -1261,14 +1387,26 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
              int jfd = connected_procs[janitor].fd;
              if (jfd != NO_TCP_SOCKET)
                 {
+#if MINGW_SRC
+                  u_long iMode = 1;
+                  ioctlsocket(jfd, FIONBIO, &iMode);
+                  ::recv(jfd, 0, 0, 0);
+#else // ! MINGW_SRC
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
+#endif
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
 
              jfd = connected_procs[janitor].fd2;
              if (jfd != NO_TCP_SOCKET)
                 {
+#if MINGW_SRC
+                  u_long iMode = 1;
+                  ioctlsocket(jfd, FIONBIO, &iMode);
+                  ::recv(jfd, 0, 0, 0);
+#else // ! MINGW_SRC
                   ::recv(jfd, 0, 0, MSG_DONTWAIT);
+#endif
                   cerr << "janitor got " << errno << " on fd " << jfd << endl;
                 }
 
@@ -1288,7 +1426,8 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
              // disable nagle
              {
                const int ndelay = 1;
-               setsockopt(new_fd, 6, TCP_NODELAY, &ndelay, sizeof(int));
+               setsockopt(new_fd, 6, TCP_NODELAY,
+                          reinterpret_cast<const char *>(&ndelay), sizeof(int));
              }
 
              if (new_fd == -1)
@@ -1312,7 +1451,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
             }
       }
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 print_db(ostream & out)
 {
@@ -1365,13 +1504,13 @@ print_db(ostream & out)
        << endl;
 
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & os, Unicode uni)
 {
@@ -1402,5 +1541,5 @@ operator << (ostream & os, Unicode uni)
              << char(0x80 | (uni >>  6 & 0x3F))
              << char(0x80 | (uni       & 0x3F));
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

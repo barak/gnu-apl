@@ -1,26 +1,31 @@
 ⍝ ZZ13_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ problem reported by Elias
       ⍝ 
       ⍝ 
       )ERASE foo
 
+      ]FILE_CTL SKIP_APL2   ⍝ GNU APL-only function header
 ∇foo[N] X
 'N =' N
 'X =' X
 ∇
 
+      ]FILE_CTL NO_SKIP
       foo[2] 4
  N = 2 
  X = 4 
 
+      ]FILE_CTL SKIP_APL2   ⍝ uses a function with a GNU APL-only header
       foo[2;3] 4
 AXIS ERROR+
       foo[2;3]4
-      ^      ^
+      ^
 
-   →
+      →
 
-⍝ ==================================
+      ⍝ ==================================
 

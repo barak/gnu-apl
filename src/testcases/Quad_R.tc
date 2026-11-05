@@ -1,28 +1,32 @@
 ⍝ Quad_R.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE FOO
 ∇Z←FOO R
  Z←44 + ((R×1 2)+3 4 5) ⌈ 7
 ∇
 
       FOO 10
-LENGTH ERROR
+LENGTH ERROR+
 FOO[1]  Z←44+((R×1 2)+3 4 5)⌈7
-              ^             ^
+              ^      ^
       ⎕R
 3 4 5
 
+      ]FILE_CTL SKIP_APL2   ⍝ assigning ⎕L, ⎕R, ⎕PS is a GNU APL extension
       ⎕R←3 4
       →ι0
 57 68
 
-⍝ SYNTAX or VALUE ERROR ----------------------------------
+      ⍝ SYNTAX or VALUE ERROR ----------------------------------
 
 
-⍝ ⎕R ASSIGNMENT IGNORED
+      ⍝ ⎕R ASSIGNMENT IGNORED
 
       )ERASE FA
+      ]FILE_CTL NO_SKIP
 ∇Z←FA R
  Z←(R×1 2)+7(13(12+))
 ∇
@@ -32,7 +36,7 @@ SYNTAX ERROR+
 FA[1]  Z←(R×1 2)+7(13(12+))
                         ^^
 
-⍝ ==================================
+      ⍝ ==================================
 
       )SIC
 

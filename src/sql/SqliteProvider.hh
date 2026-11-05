@@ -23,6 +23,8 @@
 
 #include "Provider.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the Sqlite Provider
 class SqliteProvider : public Provider
 {
 public:
@@ -36,7 +38,7 @@ public:
     virtual const char * get_provider_type() const  { return "sqlite"; }
 
    /// overloaded Provider::open_database()
-   virtual Connection * open_database(const Value & B);
+   virtual Connection * open_database(const cValue & B);
 
    /// overloaded Provider::version_string()
     virtual const char * version_string() const;  
@@ -44,3 +46,4 @@ public:
    /// overloaded Provider::version_number()
     virtual int version_number() const;
 };
+//════════════════════════════════════════════════════════════════════════════

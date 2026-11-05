@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** Primitive operator ¨ (each).
  */
 /// The class implementing ¨
@@ -37,21 +37,28 @@ public:
    Bif_OPER1_EACH() : PrimitiveOperator(TOK_OPER1_EACH) {}
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B) const
+   /// @param LO left operand token
+   /// @param B right argument APL value
+   virtual Token eval_LB(Token & LO, cValue_R B) const
       { return do_eval_LB(LO, B); }
 
    /// Overloaded Function::eval_ALB().
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
-
-   static Bif_OPER1_EACH  fun;      ///< Built-in function.
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param B right argument APL value
+   virtual Token eval_ALB(cValue_R A, Token & LO, cValue_R B) const;
 
    /// implementation of eval_LB()
-   static Token do_eval_LB(Token & LO, Value_P B);
+   /// @param LO left operand token
+   /// @param B right argument APL value
+   static Token do_eval_LB(Token & LO, cValue_R B);
+
+   static Bif_OPER1_EACH  fun;      ///< Built-in function.
 
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 #endif // __BIF_OPER1_EACH_HH_DEFINED__

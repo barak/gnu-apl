@@ -45,8 +45,12 @@
 #include <sstream>
 #include <vector>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif
+#if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
@@ -56,6 +60,7 @@ static void add_command( std::map<std::string, NetworkCommand *> &commands, Netw
 {
     commands.insert( std::pair<std::string, NetworkCommand *>( command->get_name(), command ) );
 }
+//════════════════════════════════════════════════════════════════════════════
 
 NetworkConnection::NetworkConnection( int socket_in )
     : socket_fd(socket_in), buffer_pos(0), buffer_length(0)
@@ -250,3 +255,4 @@ void NetworkConnection::send_notification( const std::string &str )
         << NOTIFICATION_END_TAG << "\n";
     write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

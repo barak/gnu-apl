@@ -1,0 +1,48 @@
+⍝ ZZ65_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ bug-apl@gnu.org, Bugs8 #1 (Blake McBride):
+      ⍝ IndexExpr::erase_stale() deleted *live* IndexExprs (no ownership
+      ⍝ tracking at all), which is why re-enabling IndexExpr ring membership
+      ⍝ (so that )CHECK's "no stale indices" diagnostic would do something)
+      ⍝ was tried and reverted twice (SVN 2053/2054): a partial index left
+      ⍝ on a suspended SI's prefix stack after an error got deleted early by
+      ⍝ erase_stale(), then deleted *again* by Prefix::clean_up() at the
+      ⍝ next )SIC/)CLEAR/)RESET -- a double free, SIGSEGV in ~IndexExpr().
+      ⍝
+      ⍝ Fixed by giving IndexExpr the same independent mark/unmark
+      ⍝ reachability check that Value already has (Prefix::unmark_all_values()
+      ⍝ now also unmarks IndexExprs reachable from TOK_PINDEX/TOK_INDEX
+      ⍝ tokens, including Prefix::saved_MISC). IndexExpr::erase_stale() is
+      ⍝ gone -- actual freeing stays exactly where it already correctly
+      ⍝ happened; the ring/mark/unmark mechanism only ever reports, never
+      ⍝ deletes, exactly like Value's.
+      ⍝
+      ⍝ Below: leave a partial index (the ']' already reduced, on the
+      ⍝ prefix stack as a TOK_PINDEX) on a suspended SI by raising an
+      ⍝ error while it is there. )CHECK while still suspended must NOT
+      ⍝ report it stale (it is genuinely live); )SIC then frees it via
+      ⍝ the normal path, and a second )CHECK must still report nothing.
+
+      )CLEAR
+CLEAR WS
+      A←1 2 3
+      A[UNDEF]
+VALUE ERROR+
+      A[UNDEF]
+        ^
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ]NEXTFILE

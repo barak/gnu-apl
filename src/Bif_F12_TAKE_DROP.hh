@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** primitive functions Take and First */
 /// The class implementing ↑
 class Bif_F12_TAKE : public NonscalarFunction_default_identity
@@ -39,36 +39,65 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, first(*B));}
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const
+      { return Token(TOK_APL_VALUE1, first(B));}
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
+
+   /// overloaded NonscalarFunction_default_identity::eval_identity_fun().
+   /// Figure 28 (apl2lrm.txt p.212): the identity item for ↑ is ⊂B.
+   virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
+      { return enclosed_identity(B, axis); }
+
+   /// overloaded Function::get_selectivity(): monadic ↑ (First) and
+   /// dyadic ↑ (Take), with or without axis, all 4 genuinely select
+   /// (confirmed empirically for each of the 4 individually).
+   virtual Fun_selectivity get_selectivity() const
+      { return Fun_selectivity(SEL_MON | SEL_MON_X | SEL_DYA | SEL_DYA_X); }
 
    /// Take from B according to ravel_A
-   static Value_P do_take(const Shape & shape_Zi, const Value & B,
+   /// @param shape_Zi shape of the result
+   /// @param B right argument APL value to take from
+   /// @param axes bitmap of axes to which the take applies
+   static Value_P do_take(const Shape & shape_Zi, const cValue & B,
                           AxesBitmap axes);
 
    /// Fill Z with B, pad as necessary
+   /// @param shape_Zi shape of the result
+   /// @param Z_owner result value to fill
+   /// @param B source APL value
+   /// @param axes bitmap of axes to fill along
    static void fill(const Shape & shape_Zi, Value & Z_owner,
-                    const Value & B, AxesBitmap axes);
+                    const cValue & B, AxesBitmap axes);
 
    static Bif_F12_TAKE  fun;   ///< Built-in function
 
    /// ↑B
-   static Value_P first(const Value & B);
+   /// @param B right argument APL value
+   static Value_P first(const cValue & B);
 
 protected:
    /// Take A from B
+   /// @param A left argument specifying take counts per axis
+   /// @param B right argument APL value to take from
    Token take(Value_P A, Value_P B);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /** primitive function drop */
 /// The class implementing ↓
 class Bif_F12_DROP : public NonscalarFunction
@@ -80,17 +109,56 @@ public:
    {}
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument specifying drop counts per axis
+   /// @param B right argument APL value to drop from
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left argument specifying drop counts per axis
+   /// @param X axis specification APL value
+   /// @param B right argument APL value to drop from
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
+
+   /// overloaded Function::eval_identity_fun(). Figure 28 (apl2lrm.txt
+   /// p.212): the identity item for ↓ is B's own prototype, taken as a
+   /// bare scalar (unlike ⍴/⍉/↑/, whose identity is ⊂B -- confirmed
+   /// against the LRM's own worked example, LanguageVariances.md #19).
+   virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
+      {
+        // one bare-prototype item per position of the axes NOT being
+        // reduced (⍴Z ←→ (⍴B) without axis), not a single overall
+        // scalar -- same frame fix as enclosed_identity() above, for
+        // ↓'s different (bare, not enclosed) per-item value. See
+        // Bugs27 #27.
+        //
+        const Shape shape_Z = B.get_shape().without_axis(axis);
+        Cell cache;
+        const Cell & proto = B.get_cproto(cache);
+
+        Value_P Z(shape_Z, LOC);
+        loop(z, shape_Z.get_volume())   Z->next_ravel_Cell(proto);
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   /// overloaded Function::get_selectivity(): dyadic ↓ (Drop), with or
+   /// without axis, both genuinely select (confirmed empirically for
+   /// each individually); there is no monadic ↓.
+   virtual Fun_selectivity get_selectivity() const
+      { return Fun_selectivity(SEL_DYA | SEL_DYA_X); }
+
+   /// overloaded Function::has_monadic_form(): there is no monadic ↓ at
+   /// all (only eval_AB/eval_AXB are implemented; eval_B falls to
+   /// Function's phrase_error() default) -- see that method's doc
+   /// comment for why this must be reported explicitly.
+   virtual bool has_monadic_form() const   { return false; }
 
    static Bif_F12_DROP  fun;   ///< Built-in function
 
 protected:
 
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// A helper class for Bif_F12_TAKE and Bif_F12_DROP. It implements an iterator
 /// that iterates over the indices (as dictated by left argument A) of the
 /// right argument B of A↑B or A↓B,
@@ -98,6 +166,9 @@ class TakeDropIterator
 {
 public:
    /// constructor
+   /// @param take true for take (↑), false for drop (↓)
+   /// @param sh_A shape derived from the left argument A
+   /// @param sh_B shape of the right argument B
    TakeDropIterator(bool take, const Shape & sh_A, const Shape & sh_B)
    : ref_B(sh_B),
      current_offset(0),
@@ -207,6 +278,7 @@ public:
       }
 
    /// return the prototype for an axis
+   /// @param axes bitmap of axes whose prototype is requested
    ShapeItem axis_proto(AxesBitmap axes) const;
 
    /// return true iff this inerator has more items to come.
@@ -235,5 +307,5 @@ protected:
    /// true iff this interator has reached its final item
    bool done;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __BIF_F12_TAKE_DROP_HH_DEFINED__

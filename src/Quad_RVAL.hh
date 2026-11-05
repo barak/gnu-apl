@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ using namespace std;
 
 #include "QuadFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// a random APL value
 class Quad_RVAL : public QuadFunction
 {
@@ -38,68 +39,106 @@ public:
    static Quad_RVAL  fun;          ///< Built-in function.
 
 protected:
+   /// overloaded Function::eval_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
+
+   /// overloaded Function::eval_B()
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
+
+   /// overloaded Function::eval_XB().
+   /// ⎕RVAL[X] B  ←→  X ⎕RVAL B
+   /// @param X axis/subfunction index
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
+
    /// overloaded FunctionGroup::print_fun_syntax()
+   /// @param out  output stream to print to
+   /// @param info function info entry describing the subfunction
    virtual void print_fun_syntax(ostream & out,
                                  const function_info & info) const;
 
    /// overloaded FunctionGroup::print_fun_syntax()
+   /// @param out  output stream to print to
+   /// @param info function info entry describing the subfunction
       virtual void print_map_syntax(ostream & out,
                                  const function_info & info) const;
 
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
-
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
-   /// do eval_AB(A, B);
-   static Value_P do_eval_AB(int A, const Value & B);
-
-   /// overloaded Function::eval_XB().
-   /// ⎕RVAL[X] B  ←→  X ⎕RVAL B
-   virtual Token eval_XB(Value_P X, Value_P B) const;
-
    /// do eval_B(B);
-   Value_P do_eval_B(const Value & B, int depth) const;
+   /// @param B      right argument APL value
+   /// @param depth  remaining nesting depth for random values
+   /// @param budget max. total (recursive) element count for this
+   ///               sub-value; negative means unlimited. Bounds the
+   ///               *whole* nested (sub-)tree, unlike desired_max_ecount
+   ///               which only bounds a single (top-level) ravel.
+   Value_P do_eval_B(const cValue & B, int depth, ShapeItem budget) const;
 
-   /// set or return the state of the random generator
-   static Value_P generator_state(const Value & B);
+   /// initialize the next ravel cell of \b Z with a random nested value
+   /// @param budget max. total (recursive) element count for the nested
+   ///               sub-value; negative means unlimited
+   void random_nested(Value & Z, const cValue & B, int depth,
+                      ShapeItem budget) const;
 
-   /// set or return the desired rank of random numbers
-   static Value_P result_rank(const Value & B);
-
-   /// set or return the desired ranks of random numbers
-   static Value_P result_shape(const Value & B);
-
-   /// set or return the desired types of random numbers
-   static Value_P result_type(const Value & B);
-
-   /// set or return the desired max. depth of random numbers
-   static Value_P result_maxdepth(const Value & B);
+   /// generate a value that conforms to \b Bref: either a scalar or a
+   /// value with exactly Bref's shape (chosen at random), using the
+   /// currently configured type/depth/ecount settings. This is what a
+   /// stim of "~B" in rval.def selects, so that A and B (or the axis X)
+   /// can be generated to actually fit each other instead of
+   /// independently, per SVN r2037 discussion.
+   /// @param Bref the value to conform to
+   Value_P conform_value(const cValue & Bref) const;
 
    /// choose an integer value at random according to distribution \b dist
    static int choose_integer(const vector<int> & dist);
 
-   /// a random 64-bit IEEE floating point number
-   static double random_ieee();
+   /// do eval_AB(A, B);
+   /// @param A integer subfunction selector
+   /// @param B right argument APL value
+   static Value_P do_eval_AB(int A, const cValue & B);
+
+   /// set or return the state of the random generator
+   static Value_P generator_state(const cValue & B);
+
+   /// return a 17-bit random number from random()
+   static uint64_t rand17();
 
    /// initialize the next ravel cell of \b Z with a random character
    static void random_character(Value & Z);
 
-   /// initialize the next ravel cell of \b Z with a random integer
-   static void random_integer(Value & Z);
+   /// initialize the next ravel cell of \b Z with a random complex number
+   static void random_complex(Value & Z);
 
    /// initialize the next ravel cell of \b Z with a random float
    static void random_float(Value & Z);
 
-   /// initialize the next ravel cell of \b Z with a random complex number
-   static void random_complex(Value & Z);
+   /// a random 64-bit IEEE floating point number
+   static double random_ieee();
 
-   /// initialize the next ravel cell of \b Z with a random nested value
-   void random_nested(Value & Z, const Value & B, int depth) const;
+   /// initialize the next ravel cell of \b Z with a random integer
+   static void random_integer(Value & Z);
 
-   /// return a 17-bit random number from random()
-   static uint64_t rand17();
+   /// set or return the desired max. depth of random numbers
+   static Value_P result_maxdepth(const cValue & B);
+
+   /// set or return the max. element count (⍴Z) per random value (0 = unlimited)
+   static Value_P result_ecount(const cValue & B);
+
+   /// set the purpose (0 or 1) of subsequent random values, return the previous one
+   static Value_P result_purpose(const cValue & B);
+
+   /// return the 113×5 nested character matrix of primitive arities/stimuli/constraints
+   static Value_P prim_table_value(const cValue & B);
+
+   /// set or return the desired rank of random numbers
+   static Value_P result_rank(const cValue & B);
+
+   /// set or return the desired ranks of random numbers
+   static Value_P result_shape(const cValue & B);
+
+   /// set or return the desired types of random numbers
+   static Value_P result_type(const cValue & B);
 
    /// a mapping between function names and function numbers
    static const FunctionGroup::function_info subfunction_infos[];
@@ -116,12 +155,19 @@ protected:
    /// the desired types (or a distribution of types) of random values
    static vector<int> desired_types;
 
-   /// the desiredlimit on the depths of the random values
+   /// the desired limit on the depths of the random values
    static int desired_maxdepth;
+
+   /// max. element count (⍴Z) per value; 0 = unlimited
+   static ShapeItem desired_max_ecount;
+
+   /// the purpose of the random values (8 ⎕RVAL B): 0 (default) or 1
+   static int desired_purpose;
 
    /// the state buffer of the random number generator
    static char state[256];
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_RVAL_DEFINED__
 

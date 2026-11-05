@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /*!
     A cell containing a single Unicode (most likely an APL character)
  */
@@ -39,10 +39,14 @@ class CharCell : public Cell
 
 public:
    /// Construct a character cell containing \b av
+   /// @param av Unicode character value to store
    CharCell(Unicode av)
       { value.aval = av; }
 
    /// overloaded Cell::init_other
+   /// @param other      pointer to uninitialized memory for the new cell
+   /// @param cell_owner APL value that owns the new cell
+   /// @param loc        caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
        const { new (other)   CharCell(value.aval); }
 
@@ -50,26 +54,33 @@ public:
    virtual bool is_character_cell() const
       { return true; }
 
-   /// overloaded Cell::greater()
-   virtual bool greater(const Cell & other) const;
+   /// the Quad_CR representation of this cell
+   /// @param pctx print context controlling formatting options
+   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+
+   /// overloaded Cell::compare()
+   /// @param other cell to compare against
+   virtual Comp_result compare(const Cell & other) const;
 
    /// overloaded Cell::equal()
+   /// @param other cell to compare against
+   /// @param qct   comparison tolerance ⎕CT
    virtual bool equal(const Cell & other, double qct) const;
+
+   /// overloaded Cell::greater()
+   /// @param other cell to compare against
+   virtual bool greater(const Cell & other) const;
 
    /// overloaded Cell::is_example_field()
    virtual bool is_example_field() const;
-
-   /// overloaded Cell::compare()
-   virtual Comp_result compare(const Cell & other) const;
-
-   /// the Quad_CR representation of this cell
-   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
 #ifndef __LIBAPL__
  protected:   // public: in libapl.cc
 #endif // __LIBAPL__
 
    /// initialize the (un-initialized) Cell *Z to Unicode uni
+   /// @param Z   pointer to uninitialized cell memory
+   /// @param uni Unicode character value to store
   static ErrorCode zU(Cell * Z, Unicode uni)
       { new (Z) CharCell(uni);   return E_NO_ERROR; }
 
@@ -78,36 +89,45 @@ protected:
    virtual CellType get_cell_type() const
       { return CT_CHAR; }
 
-   /// overloaded Cell::get_cell_subtype()
-   virtual CellType get_cell_subtype() const;
-
    /// overloaded Cell::get_char_value()
    virtual Unicode get_char_value() const   { return value.aval; }
-
-   /// overloaded Cell::get_byte_value()
-   virtual int get_byte_value() const;
 
    /// overloaded Cell::get_classname()
    virtual const char * get_classname()  const   { return "CharCell"; }
 
+   /// overloaded Cell::bif_and_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
+   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
+
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
 
-   /// overloaded Cell::bif_not_bitwise()
-   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
-
-   /// overloaded Cell::bif_and_bitwise()
-   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
-
-   /// overloaded Cell::bif_and_bitwise()
-   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
-
    /// overloaded Cell::bif_equal_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
    virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::get_byte_value()
+   virtual int get_byte_value() const;
+
+   /// overloaded Cell::get_cell_subtype()
+   virtual CellType get_cell_subtype() const;
+
+   /// overloaded Cell::bif_not_bitwise()
+   /// @param Z result cell pointer
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
+
    /// overloaded Cell::bif_not_equal_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_and_bitwise()
+   /// @param Z result cell pointer
+   /// @param A left operand cell
+   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __CHARCELL_HH_DEFINED__

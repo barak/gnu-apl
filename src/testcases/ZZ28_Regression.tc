@@ -1,16 +1,18 @@
 ⍝ ZZ28_Regression.tc
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
+⍝@ test3.
 
-   ⍝ excerpt from Pick.tc
 
-⍝ selective spec ----------------------------------
+      ⍝ excerpt from Pick.tc
+
+      ⍝ selective spec ----------------------------------
 
       B←'P' 'PI' ('PIE' 'PIER')
 
       (2 1⊃B)←'TR'
 
-⍝ ==================================
+      ⍝ ==================================
 
       )SI
 
@@ -22,5 +24,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝     ]OWNERS
+      ⍝     ]OWNERS
 

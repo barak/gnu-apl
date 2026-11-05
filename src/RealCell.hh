@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "NumericCell.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /*! A cell that is either an integer cell or a floating point cell.
     This class contains all cell functions for which the detailed type
     makes no difference.
@@ -34,24 +35,40 @@
 class RealCell : public NumericCell
 {
 protected:
+   /// overloaded Cell::get_classname().
+   virtual const char * get_classname() const   { return "RealCell"; }
+
    /// overloaded Cell::is_real_cell().
    virtual bool is_real_cell() const { return true; }
 
    /// overloaded Cell::bif_circle_fun().
+   /// @param Z output cell for the result
+   /// @param A cell containing the circle function index
    virtual ErrorCode bif_circle_fun(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_circle_fun_inverse().
+   /// @param Z output cell for the result
+   /// @param A cell containing the circle function index
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const;
 
-   /// compute circle function \b fun
-   ErrorCode do_bif_circle_fun(Cell * Z, int fun) const;
-
    /// overloaded Cell::bif_logarithm().
+   /// @param Z output cell for the result
+   /// @param A cell containing the logarithm base
    virtual ErrorCode bif_logarithm(Cell * Z, const Cell * A) const;
 
-   /// overloaded Cell::get_classname().
-   virtual const char * get_classname() const   { return "RealCell"; }
+   /// compute circle function \b fun of \b b. b is passed in by the
+   /// caller (rather than read from *this here) so that a caller which
+   /// must zero *Z first (IntCell::z0(Z), a safe default before the
+   /// real computation) can capture b beforehand -- when Z and the
+   /// RealCell being operated on are the SAME cell (e.g. Bif_REDUCE's
+   /// in-place accumulator for A○/B), zeroing Z first and reading
+   /// get_real_value() afterwards would silently read back the zero
+   /// instead of the original value. See Bugs27 #18.
+   /// @param Z output cell for the result
+   /// @param fun circle function index
+   /// @param b the real value the circle function applies to
+   static ErrorCode do_bif_circle_fun(Cell * Z, APL_Integer fun, APL_Float b);
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __REALCELL_HH_DEFINED__

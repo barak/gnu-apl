@@ -1,0 +1,76 @@
+@ifplaintext
+\input texinfo
+@settitle Working with files using utf8 format.
+@setfilename utf8.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Working with files using utf8 format.
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node utf8
+@end ifnotplaintext
+
+@chapter Working with files using utf8 format.
+@cindex utf8
+@cindex disk file
+
+Workspace provides access to utf8 files.
+
+@deffn ∇ err ← text utf8∆write file_name
+
+Function to write text to a new file or replace an existing file.
+
+Function return 0 on success.
+
+@end deffn
+
+@deffn ∇txt ← utf8∆read file_name
+
+Function returns the text of file_name.
+
+@end deffn
+
+@deffn ∇ file_list ← utf8∆dir path
+
+File returns a list of the files in directory path.
+
+@end deffn
+
+@deffn ∇ txt utf8pipe cmd
+
+Functions pipes text to an operating system command.
+
+@end deffn
+
+@deffn ∇ txt ← utf8∆sh cmd
+
+Functions returns the standard out of a command.
+
+@end deffn

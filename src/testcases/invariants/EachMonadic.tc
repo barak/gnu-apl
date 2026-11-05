@@ -1,0 +1,25 @@
+⍝ EachMonadic.tc
+⍝ ══════════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: LO monadic function
+      ⍝ inv: ⍴Z ←→ ⍴B
+      ⍝ inv: LO¨ B ←→ LO B  (when LO is scalar)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      Z ← -¨B
+      (⍴Z) ≡ ⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: LO¨ B ←→ LO B for scalar function on simple array
+      (-¨B) ≡ -B
+1
+      ⍝ Applies element-wise: I⊃Z ←→ LO I⊃B
+      Z ← ⌈¨⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      B ← ⌈⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      ⍝ (shape preserved)
+      (⍴Z) ≡ 3 4
+1

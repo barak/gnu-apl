@@ -1,9 +1,14 @@
 ⍝ ZZ44_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
 
       )CLEAR
 CLEAR WS
+
+      )DROP TEST_ZZ44
+³
 
       FOO←{⍺+LOCAL←⍵;LOCAL}
       ⎕CR 'FOO'
@@ -14,12 +19,12 @@ CLEAR WS
 WAS CLEAR WS
 
       )DUMP
-20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+20⁰-⁰-⁰¹⁰:⁰:⁰ (GMT⁵⁰)³
       )SAVE
-20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+20⁰-⁰-⁰¹⁰:⁰:⁰ (GMT⁵⁰)³
 
       )LOAD TEST_ZZ44.apl
-DUMPED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+DUMPED 20⁰-⁰-⁰¹⁰:⁰:⁰ (GMT⁵⁰)³
 
       ⎕CR 'FOO'
 λ←⍺ λ1 ⍵;LOCAL
@@ -32,7 +37,7 @@ DUMPED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 local1
 
       )LOAD TEST_ZZ44.xml
-SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+SAVED 20⁰-⁰-⁰¹⁰:⁰:⁰ (GMT⁵⁰)³
 
       ⎕CR 'FOO'
 λ←⍺ λ0 ⍵;LOCAL

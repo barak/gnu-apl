@@ -1,6 +1,8 @@
 ⍝ Tokenizer.tc
 ⍝ ════════════
 
+⍝@ test3.
+
       ]LOG 6
 
       3E3=3000
@@ -31,6 +33,7 @@
 123456 5
       Q, ⌊TEN⍟Q←123456789
 123456789 8
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
       Q, ⌊TEN⍟Q←123456789098
 123456789098 11
       Q, ⌊TEN⍟Q←123456789098765
@@ -39,7 +42,34 @@
 123456789098765432 17
       Q, ⌊TEN⍟Q←1234567890987654321
 1234567890987654321 18
+      ]FILE_CTL NO_SKIP
       Q, ⌊TEN⍟Q←12345678909876543210
 1.234567891E19 19
+
+      ⍝ malformed complex/degrees/radians literals must raise
+      ⍝ SYNTAX ERROR, not silently drop part of the input (Roy Tobin,
+      ⍝ 2026-08-25: 0J1.2.3 used to tokenize as 0 2.3, dropping "J1"
+      ⍝ entirely, regardless of the actual error)
+      ⍝
+      0J1.2.3
+Bad number+
+      0J1.2
+      ^    ^
+
+      1D2.3.4
+Bad number+
+      1D2.3
+      ^    ^
+
+      1R2.3.4
+Bad number+
+      1R2.3
+      ^    ^
+
+      3J5
+3J5
+
+      1D90
+0J1
 
       ]LOG 6 OFF

@@ -1,6 +1,8 @@
 ⍝ Rotate.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       A←1 2 3 4 5 6 7
       1⌽A
 2 3 4 5 6 7 1
@@ -15,7 +17,7 @@ ASIDE
 GLEAN
 IDEAS
 
-⍝ negative A ----------------------------------
+      ⍝ negative A ----------------------------------
 
       ¯2⌽A
 6 7 1 2 3 4 5
@@ -58,7 +60,7 @@ EAT
  BEAR PONY CAT  
  FOX  GNU  BIRD 
 
-⍝ left arg for 3 dimensions ----------------------------------
+      ⍝ left arg for 3 dimensions ----------------------------------
 
       S←2 3 5ρ'TARESSMARTEARTHSETONLAGERSHEAR'
       S
@@ -87,7 +89,7 @@ ONSET
 LAGER
 HEARS
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       W←'STRIPE'
       2⌽W
@@ -97,5 +99,43 @@ RIPEST
       W
 MOTHER
 
-⍝ ==================================
+      ⍝ huge rotate amount regression ----------------------------------
+      ⍝ A⌽B normalized the rotate amount into [0, axis-length) with a
+      ⍝ while-loop that added/subtracted the axis length one step at a
+      ⍝ time -- O(|A|/axis-length) iterations instead of O(1), hanging
+      ⍝ for huge A (observed: A in the 10^11-10^18 range never
+      ⍝ returned). Fixed to use %. Any of these hanging is a
+      ⍝ regression; the exact numbers below are otherwise arbitrary.
+
+      B←2 3ρ⍳6
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      7023828131934356245 ¯2726503875690172446⌽B
+2 3 1
+4 5 6
+
+      ]FILE_CTL NO_SKIP
+      100000000000⌽5
+5
+
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      ¯99999999999⌽1 2 3 4 5
+2 3 4 5 1
+
+      ⍝ signed overflow regression (Blake McBride, Bugs21 #2) ------
+      ⍝ src += m ran before src %= shape_B3.m(), so a rotate amount
+      ⍝ within m of INT64_MAX overflowed (UB, wrapped to a wrong
+      ⍝ offset) and produced a result that was not even a permutation
+      ⍝ of B -- elements silently duplicated and dropped. Fixed to
+      ⍝ reduce modulo first. INT64_MAX itself is the smallest amount
+      ⍝ that triggers it for these shapes.
+
+      9223372036854775807⌽⍳10
+8 9 10 1 2 3 4 5 6 7
+
+      9223372036854775807⊖3 4⍴⍳12
+5  6  7  8
+9 10 11 12
+1  2  3  4
+
+      ⍝ ==================================
 

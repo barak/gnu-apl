@@ -1,6 +1,8 @@
 ⍝ Format_by_example.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       L←' 55@  $55.50 EA'
       R←3 2ρ3 4.99 7 7.45 12 .5
       R
@@ -24,7 +26,7 @@
       'TOTAL ORDER COST: $5,555.50'⍕+/EXPR
 TOTAL ORDER COST: $1,712.78
 
-⍝ ⎕FC ----------------------------------
+      ⍝ ⎕FC ----------------------------------
 
       ' 55.55'⍕345 .6789
 DOMAIN ERROR+
@@ -39,7 +41,7 @@ DOMAIN ERROR+
 
       ⎕FC←''
 
-⍝ Format chars '5' . , ----------------------------------
+      ⍝ Format chars '5' . , ----------------------------------
 
       ' 55.55'⍕.10 1.1 1.01 10.019 .11
    .1   1.1   1.01 10.02   .11
@@ -47,12 +49,12 @@ DOMAIN ERROR+
       ' 55.55'⍕2 2.2 0 2.22
   2     2.2         2.22
 
-⍝ Format char '0' ----------------------------------
+      ⍝ Format char '0' ----------------------------------
 
       ' 055.50'⍕.3 33.2 0 300
  000.30 033.20 000.00 300.00
 
-⍝ Format char '1' ----------------------------------
+      ⍝ Format char '1' ----------------------------------
 
       ' -55.10'⍕¯3.4 0 4.5 ¯2.12
   -3.40    .00   4.50  -2.12
@@ -60,7 +62,7 @@ DOMAIN ERROR+
       ' (55.10)'⍕¯3.4 0 4.5 ¯2.12
   (3.40)    .00    4.50   (2.12)
 
-⍝ Format char '2' ----------------------------------
+      ⍝ Format char '2' ----------------------------------
 
       ' +552.50'⍕¯4 40 ¯400
     4.00  +40.00  400.00
@@ -68,15 +70,15 @@ DOMAIN ERROR+
       ' -551.20CR'⍕¯4 40 ¯400
    -4.00     40.00CR -400.00  
 
-⍝ Format char '3' ----------------------------------
+      ⍝ Format char '3' ----------------------------------
 
       ' $555.50'⍕3.1 32.23 324
  $  3.10 $ 32.23 $324.00
 
-' $553.50'⍕3.1 32.23 324
+      ' $553.50'⍕3.1 32.23 324
    $3.10  $32.23 $324.00
 
-⍝ Format char '4' ----------------------------------
+      ⍝ Format char '4' ----------------------------------
 
       ' -551.20CR'⍕¯1 10 ¯100
    -1.00     10.00CR -100.00  
@@ -84,20 +86,30 @@ DOMAIN ERROR+
       ' -551.40CR'⍕¯1 10 ¯100
    -1.00CR   10.00CR -100.00CR
 
-⍝ Format char '6' ----------------------------------
+      ⍝ Format char '6' ----------------------------------
 
       '0006/06/06 06:06'⍕1991 12 17 12 35
 1991/12/17 12:35
 
-⍝ Format char '7' ----------------------------------
+      ⍝ Format char '7' ----------------------------------
 
       '  ¯1.7000E¯01'⍕¯25.784 .0034
   ¯2.5784E 01   3.4000E¯03
 
-⍝ Format char '8' ----------------------------------
-
+      ⍝ Format char '8' ----------------------------------
+      ⍝
+      ⍝ Regression (Blake McBride, LanguageVariances.md #13, 2026-08-10):
+      ⍝ ⎕FC's default fill character for '8' positions used
+      ⍝ UNI_STAR_OPERATOR (⋆, U+22C6, GNU APL's own canonical glyph for
+      ⍝ the power primitive) instead of the ASCII asterisk (apl2lrm.txt
+      ⍝ Figure 33 p.291 gives the default ⎕FC as `.,*0_¯`). Fixed to use
+      ⍝ the already-existing UNI_ASTERISK constant (U+002A, tagged
+      ⍝ F12_POWER same as UNI_STAR_OPERATOR -- both were already
+      ⍝ recognized as alternate input glyphs for power, just the wrong
+      ⍝ one was used as ⎕FC's default).
+      ⍝
       '  85555.50'⍕17.3 56.43
-  ⋆⋆⋆17.30  ⋆⋆⋆56.43
+  ***17.30  ***56.43
 
       ⎕FC[3]←'∘'
       '  85555.50'⍕17.3 56.43
@@ -108,7 +120,7 @@ DOMAIN ERROR+
 
       ⎕FC←''
 
-⍝ Format char '9' ----------------------------------
+      ⍝ Format char '9' ----------------------------------
 
       '  9995.59'⍕14.7 0 56.43
   0014.70           0056.43
@@ -116,7 +128,7 @@ DOMAIN ERROR+
       '  9995.19-'⍕¯17.3 0 56.43
   0017.30-            0056.43 
 
-⍝ regression tests ----------------------------------
+      ⍝ regression tests ----------------------------------
 
       '06.006' ⍕ 11 37
 11.037
@@ -124,6 +136,204 @@ DOMAIN ERROR+
       'Hello 55.' ⍕ 33
 Hello 33.
 
-'Hello 55,550.' ⍕ 33.3
+      'Hello 55,550.' ⍕ 33.3
 Hello     33.
+
+      ⍝ regression (Blake McBride, Bugs12.md #6, 2026-08-06): an 'E' with
+      ⍝ no digit position after it (directly, or via a pending exponent
+      ⍝ flag reaching end-of-string / a right decorator before any digit
+      ⍝ position) used to abort: Assertion failed:
+      ⍝ row.size() == all_formats.size() in format_by_example()
+      ⍝ (Bif_F12_FORMAT.cc:986), or -- with asserts off -- leave part of
+      ⍝ the result's Cells uninitialized. Now rejected with DOMAIN ERROR.
+      ⍝ '9.9E' (E as a plain right-decorator char, no pending exponent
+      ⍝ flag) and '9E9' (E with a digit position) are unaffected.
+      ⍝
+      '9E'⍕0
+DOMAIN ERROR+
+      '9E'⍕0
+      ^   ^
+      )SIC
+
+      '99E'⍕0
+DOMAIN ERROR+
+      '99E'⍕0
+      ^    ^
+      )SIC
+
+      '9EE'⍕0
+DOMAIN ERROR+
+      '9EE'⍕0
+      ^    ^
+      )SIC
+
+      '9E '⍕0
+DOMAIN ERROR+
+      '9E '⍕0
+      ^    ^
+      )SIC
+
+      '9.7E'⍕0
+DOMAIN ERROR+
+      '9.7E'⍕0
+      ^     ^
+      )SIC
+
+      '9.9E'⍕1.5
+1.5E
+
+      '9E9'⍕0
+ E0
+
+      ⍝ ⎕FC[5] print-as-blank (Blake McBride, LanguageVariances.md #14,
+      ⍝ 2026-08-10) ----------------------------------
+      ⍝
+      ⍝ apl2lrm.txt p.141: ⎕FC[5] (default '_') marks a fixed separator
+      ⍝ position within a picture's digit group -- it must not terminate
+      ⍝ the digit group early (Bif_F12_FORMAT::is_control_char() didn't
+      ⍝ recognize it at all, so the parser treated it as a trailing
+      ⍝ decorator and truncated the digit group there) and must render
+      ⍝ as a literal space without consuming a value digit.
+      ⍝
+      '555_555_5555'⍕8324632190
+832 463 2190
+
+      ⍝ print-as-blank in both the integer and fractional parts
+      ⍝
+      '55_55.55_55'⍕1234.5678
+12 34.56 78
+
+      ⍝ leading print-as-blank
+      ⍝
+      '_55555'⍕123
+   123
+
+      ⍝ regression for the fix's own self-referential trap: is_control_
+      ⍝ char() is also used by Quad_FC::assign() to validate a *proposed*
+      ⍝ ⎕FC[5] value (SystemVariable.cc) -- an earlier version of this
+      ⍝ fix folded the ⎕FC[5] check directly into is_control_char(),
+      ⍝ which made that validation self-referential: ⎕FC←'' (reset to
+      ⍝ defaults) checked its own new '_' default against the *current*
+      ⍝ ⎕FC[5] (already '_'), matched, and silently replaced it with a
+      ⍝ space. Confirmed live before the fix (cross-testcase-file state:
+      ⍝ ⎕FC[5] showed as space, not '_', partway through a full `make
+      ⍝ test` run) and fixed by adding a separate is_picture_char() used
+      ⍝ only by the picture parser, leaving is_control_char() untouched.
+      ⍝
+      ⎕FC←''
+      ⎕FC
+.,*0_¯
+
+      '555_555_5555'⍕8324632190
+832 463 2190
+
+      ⍝ Regression: Bugs25 #3 (Blake McBride). A '0'/'9' zero-fill digit
+      ⍝ combined with a ',' (or other non-digit decoration) in the same
+      ⍝ sub-field always raised a bare DOMAIN ERROR -- Format_sub::
+      ⍝ map_field() seeded/decremented min_len over *character* count
+      ⍝ (including the comma) instead of *digit* count, so the field's
+      ⍝ minimum digit requirement came out one too high and
+      ⍝ insert_int_commas() ran out of digit slots. Fixed in
+      ⍝ Bif_F12_FORMAT.cc by counting only Avec::is_digit() positions.
+      ⍝
+      '0,000'⍕1234
+1,234
+
+      '9,999'⍕1234
+1,234
+
+      '99,999'⍕1234
+01,234
+
+      '$9,999'⍕1234
+$1,234
+
+      '0,000.00'⍕1234.5
+1,234.50
+
+      ⍝ Regression: Bugs25 #3b, same root cause: fill_data_fields()'s
+      ⍝ integer-part overflow check compared the digit count against
+      ⍝ out_len (output *character* width, includes commas) instead of
+      ⍝ the number of digit positions, so an overflowing value with a
+      ⍝ comma in its picture slipped past the check and died later
+      ⍝ inside insert_int_commas() with no )MORE explanation instead of
+      ⍝ the proper "integer part exceeds A specification" message. Fixed
+      ⍝ by comparing against the new Format_sub::digit_count instead.
+      ⍝
+      '5,555'⍕12345
+DOMAIN ERROR+
+      '5,555'⍕12345
+      ^      ^
+      )MORE
+A⍕B : B does not fit into A (the integer part of 12345 has more digits than A)
+
+      ⍝ Bugs28 #46: formatting a negative B through a picture with no
+      ⍝ conditional ('1', '2', or '3') decorator is a DOMAIN ERROR, per
+      ⍝ APL2 LRM p.141 ("'5' alone does not allow display of negative
+      ⍝ values. Use 1 and 2 to control the display of signed numbers").
+      ⍝
+      ⍝ A sign decorator ('¯' or '-') without such a digit is a simple
+      ⍝ decorator that is always displayed (LRM p.140). SVN 3711 had made
+      ⍝ it float only-if-negative, which dropped the '-' after a field-
+      ⍝ ending '6' in date patterns (reported by Christian Robert).
+      ⍝
+      '¯5.5'⍕1.5
+¯1.5
+
+
+
+      '-5.5'⍕1.5
+-1.5
+
+
+
+      '⊂5.5⊃'⍕1.5
+⊂1.5⊃
+
+
+
+      '0006-06-06 @ 06:06:06'⍕2026 10 12 5 40 47
+2026-10-12 @ 05:40:47
+
+
+
+      '0006/06/06 06:06'⍕1991 12 17 12 35
+1991/12/17 12:35
+
+
+
+      '55.55'⍕¯1.5
+DOMAIN ERROR+
+      '55.55'⍕¯1.5
+      ^      ^
+      )MORE
+A⍕B : B does not fit into A (B is negative, but A has no conditional ('1', '2', or '3') non-blank decorator to show that, APL2 LRM p.141)
+
+      )SIC
+
+
+
+      '-5.5'⍕¯1.5
+DOMAIN ERROR+
+      '-5.5'⍕¯1.5
+      ^     ^
+      )MORE
+A⍕B : B does not fit into A (B is negative, but A has no conditional ('1', '2', or '3') non-blank decorator to show that, APL2 LRM p.141)
+
+      )SIC
+
+
+
+      ⍝ the sign decorator floats only-if-negative with an explicit '1'
+      ⍝
+      '¯515'⍕1.5 ¯1.5
+   2  ¯2
+
+
+
+      '-51.5'⍕1.5 ¯1.5
+  1.5 -1.5
+
+
+
 

@@ -1,6 +1,8 @@
 ⍝ Quad_PR.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE FOO
 ∇Z←FOO
  ⍞←'ENTER NAME: '

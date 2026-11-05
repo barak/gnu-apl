@@ -1,6 +1,8 @@
 ⍝ Binding.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ Vector notation vs. left function arg
       ⍝
       A←1 2 3
@@ -19,7 +21,7 @@
       C
 1 2 3
 
-⍝ dyadic operator ----------------------------------
+      ⍝ dyadic operator ----------------------------------
 
 ∇z←(f glue l) r
  ⍝ From Intro to APL2, p72
@@ -39,7 +41,7 @@
 
       )ERASE glue AND
 
-⍝ bracked index and function axis
+      ⍝ bracked index and function axis
 
 ∇Z←A DyMon B
 ⊃('Monadic' 'Dyadic')[Z←,1+0≠⎕NC 'A']
@@ -61,7 +63,7 @@ Monadic
 Dyadic
 2
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       D←(A B C)←4 5 6
       A
@@ -83,7 +85,67 @@ Dyadic
       D
  4 5 6 
 
-⍝ IBM APL2 compatibility ----------------------------------
+      )ERASE A B C D
+
+      ⍝ regression (Blake McBride, Bugs31 #24): a read-only system
+      ⍝ variable (e.g. ⎕TS) in a NON-FINAL vector-assignment position
+      ⍝ used to pass Symbol::can_be_assigned() (NC_left alone doesn't
+      ⍝ exclude it) and reach Symbol::vector_assignment(), whose
+      ⍝ assign() is a silent no-op for a read-only variable -- so ⎕TS
+      ⍝ was silently dropped while the other names in the same vector
+      ⍝ assignment still got assigned. Must be consistent with plain
+      ⍝ ⎕TS←7 (SYNTAX ERROR) instead, with NO partial assignment to any
+      ⍝ of the other names either, regardless of ⎕TS's position.
+      ⍝
+      A←0 ⋄ B←0
+      (⎕TS A B)←7 8 9
+SYNTAX ERROR+
+      (⎕TS A B)←7 8 9
+             ^  ^
+      )MORE
+Assignment to read-only system variable ⎕TS
+      )SIC
+      A B
+0 0
+
+      (⎕TS A)←7 8
+SYNTAX ERROR+
+      (⎕TS A)←7 8
+           ^  ^
+      )SIC
+      A
+0
+
+      (A ⎕TS B)←7 8 9
+SYNTAX ERROR+
+      (A ⎕TS B)←7 8 9
+             ^  ^
+      )SIC
+      A B
+0 0
+
+      ⍝ control: ⎕TS as the FINAL (rightmost) name already correctly
+      ⍝ SYNTAX ERRORed before this fix too (a different code path --
+      ⍝ Symbol::resolve_left() -- handles the last name)
+      ⍝
+      (A ⎕TS)←7 8
+SYNTAX ERROR+
+      (A ⎕TS)←7 8
+            ^ ^
+      )SIC
+      A
+0
+
+      ⍝ control: an all-ordinary vector assignment is unaffected
+      ⍝
+      A←0 ⋄ B←0 ⋄ C←0
+      (A B C)←7 8 9
+      A B C
+7 8 9
+
+      )ERASE A B C
+
+      ⍝ IBM APL2 compatibility ----------------------------------
 
       ∇Z←SHOW_NC B¯B;N
        N←8↑B,':'
@@ -116,40 +178,40 @@ Dyadic
       ⍝ binding of bracket index
       ⍝
       1 2 3[2]
-RANK ERROR
+      RANK ERROR
 
       ⍝ binding of left operand (literal)
       ⍝
       11 22 33 OPER1 1 2 3
-A       : Unused Name
-LO      : Value  11 22 33
-OPER1   : Operator
-B       : Value  1 2 3
+      A       : Unused Name
+      LO      : Value  11 22 33
+      OPER1   : Operator
+      B       : Value  1 2 3
 
       ⍝ binding of left operand (parser)
       ⍝
       (UU VV WW)←11 22 33
-A       : Unused Name
-LO      : Value  11 22 33
-OPER1   : Operator
-B       : Value  1 2 3
+      A       : Unused Name
+      LO      : Value  11 22 33
+      OPER1   : Operator
+      B       : Value  1 2 3
 
       ⍝ binding of left operand (in parentheses)
       ⍝
       11 22 (33 OPER1) 1 2 3
-A       : 11
-LO      : Value  22 33
-OPER1   : Operator
-B       : Value  1 2 3
+      A       : 11
+      LO      : Value  22 33
+      OPER1   : Operator
+      B       : Value  1 2 3
 
       ⍝ binding of left and right operands (literal)
       ⍝
       11 22 33 'lop' OPER2 'rop' 1 2 3
-A:      Value Unused Name
-LO:     Value lop
-OPER1:  Operator
-RO:     Value rop
-B:      Value 1 2 3
+      A:      Value Unused Name
+      LO:     Value lop
+      OPER1:  Operator
+      RO:     Value rop
+      B:      Value 1 2 3
        »»»
 
 
@@ -171,20 +233,20 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-      ⎕FX'R←(F L G)Y' 'R←F Y'
-L
-      ⎕FX'R←(F R G)Y' 'R←G Y'
-R
-      + L × R - 33
+      ⎕FX'R←(F LOP G)Y' 'R←F Y'
+LOP
+      ⎕FX'R←(F ROP G)Y' 'R←G Y'
+ROP
+      + LOP × ROP - 33
 ¯33
-      (+ L ×) R - 33
+      (+ LOP ×) ROP - 33
 ¯33
-      + L (× R -) 33
+      + LOP (× ROP -) 33
 33
 
-      )ERASE L R
+      )ERASE LOP ROP
 
-⍝ ==================================
+      ⍝ ==================================
 
       )ERASE A B C D
 

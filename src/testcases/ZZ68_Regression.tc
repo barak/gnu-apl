@@ -1,0 +1,117 @@
+⍝ ZZ68_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ 2026-08-19, error-caret cleanup (devel_doc/Carets.txt, "Path E"):
+      ⍝
+      ⍝ 1. Tokenizer.cc lexical errors (SYNTAX ERROR, unterminated
+      ⍝    string, bad number literal, ...) used to propagate as a bare
+      ⍝    ErrorCode through Tokenizer::tokenize() -> Parser::parse() ->
+      ⍝    Executable::parse_body_line(), which rebuilt an EMPTY Error
+      ⍝    from that code -- so a top-level lexical error printed only
+      ⍝    line 1, never the failed-statement/caret lines. Fixed by
+      ⍝    letting the fully-populated Error (built immediately at the
+      ⍝    true throw site, with a precise per-lexeme range) propagate
+      ⍝    via a normal C++ throw instead of being reduced to a code.
+      ⍝
+      ⍝ 2. The same "no line 2/3" gap existed for Token_string::
+      ⍝    all_brackets_closed() (unmatched/mismatched brackets) --
+      ⍝    fixed the same way, but rendered Path-A style (full statement
+      ⍝    text with carets spanning the mismatched opener..closer, via
+      ⍝    the new Token_string::build_error_line_2()), since a bracket
+      ⍝    mismatch is an inter-token relationship, unlike a lexical
+      ⍝    error's single isolated lexeme.
+      ⍝
+      ⍝ 3. That fix exposed a latent crash: Token::canonical() had no
+      ⍝    case for TC_LIT_ITEM (the raw TOK_INTEGER/TOK_REAL/TOK_COMPLEX
+      ⍝    representation Tokenizer.cc produces, before
+      ⍝    optimize_short_primitives() packs runs of them into a real
+      ⍝    Value_P) -- so rendering carets for a bracket error whose
+      ⍝    statement contained a bare numeric literal (e.g. "1 2 3)")
+      ⍝    hit an Assert (or, unguarded, a segfault). Fixed by adding
+      ⍝    that case.
+      ⍝
+      ⍝ 4. Auditing every TokenTag the Tokenizer can push (not just the
+      ⍝    one that happened to crash first) found TC_COLON (':', only
+      ⍝    legal inside a ∇-defined function) had the exact same missing
+      ⍝    -case crash -- fixed the same way. Also found (cosmetic, not a
+      ⍝    crash) that TOK_IF_THEN/TOK_IF_ELSE/TOK_IF_END (old-style
+      ⍝    "→→"/"←→"/"←←") share TC_END with plain ◊ and were all being
+      ⍝    rendered as "◊"; fixed to render their real text.
+      ⍝
+      ⍝    Verified live (no crash, ∇FOO / [1] LOOP:1 2 3) / ∇).
+      ⍝
+      ⍝ 5. Item 4's own scenario -- a SYNTAX ERROR on a function body
+      ⍝    line during ∇-editing -- turned out to hide a separate,
+      ⍝    independent bug: Nabla::edit_body_line()'s error path
+      ⍝    (CERR "SYNTAX ERROR"...; return 0;) is correct for an
+      ⍝    interactive user (stay in the editor, let them retry the
+      ⍝    same line) but was applied unconditionally -- from a script
+      ⍝    or -T testcase, with no interactive user, Nabla::edit()'s
+      ⍝    while loop just kept reading and silently discarding
+      ⍝    whatever came next (INCLUDING entire later, unrelated
+      ⍝    testcase files' own content) as further retry attempts,
+      ⍝    forever. Confirmed by bisection against the real suite:
+      ⍝    this exact scenario, followed by ZZZ0_Standard_10x.tc,
+      ⍝    cascaded into 217 diffs in that unrelated file alone (218
+      ⍝    total across the 268-file suite). Fixed by adding the same
+      ⍝    InputFile::running_script()-style escalation Nabla::edit()
+      ⍝    already used for a sibling failure (the whole function
+      ⍝    failing to compile once fully typed) to this per-line retry
+      ⍝    path too -- extended to InputFile::is_validating() as well,
+      ⍝    since -T testcase files have running_script() false (a
+      ⍝    second, separate catch site, Nabla::edit()'s own try/catch
+      ⍝    around execute_oper(), needed the identical is_validating()
+      ⍝    addition, or it silently swallowed the new escalation and
+      ⍝    kept looping anyway). Confirmed live and via the full
+      ⍝    268-file suite: 0 errors, and the ZZZ0_Standard_10x.tc
+      ⍝    cascade is gone.
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ 1. lexical error, top level: line 2/3 must now appear.
+      ⍝
+      A←'unterminated
+No string end found+
+      'unterminated
+      ^            ^
+      )SIC
+
+      ⍝ 2./3. bracket mismatch with NO matching opener at all (single
+      ⍝ caret pair on the offending closer only) -- also exercises the
+      ⍝ TC_LIT_ITEM crash fix (raw integer literals 1 2 3 in the
+      ⍝ statement).
+      ⍝
+      A←1 2 3)
+Unbalanced right parenthesis+
+      A←1 2 3)
+             ^
+      )SIC
+
+      ⍝ 2./3. bracket mismatch WITH a matching opener (carets span
+      ⍝ opener..closer, Path-A style) -- also exercises TC_LIT_ITEM for
+      ⍝ float/negative/complex literals.
+      ⍝
+      A←(1.5 ¯2.3 3J4]
+Unbalanced right square bracket+
+      A←(1.5 ¯2.3 3J4]
+        ^            ^
+      )SIC
+
+      ⍝ 4./5. TC_COLON crash fix (needs PM_FUNCTION mode) + the
+      ⍝ Nabla.cc script-mode escalation fix: this must NOT hang or
+      ⍝ leak into whatever runs after it (the real regression test for
+      ⍝ item 5 IS this file's position in the suite -- 267 more files
+      ⍝ run after it in the same make test3 session).
+      ⍝
+      ∇FOO
+      [1] LOOP:1 2 3)
+DEFN ERROR+
+      ∇FOO
+         ^
+      )SIC
+
+      ]NEXTFILE
+

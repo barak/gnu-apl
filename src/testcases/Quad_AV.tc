@@ -1,6 +1,8 @@
 ⍝ Quad_AV.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍴⎕AV
 256
 
@@ -11,6 +13,7 @@
 
       ⍝ replace ⎕AV control chars and DEL by ☹
       ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit); ⎕AV differs between interpreters
       AV←⎕AV
       AV[127,⍳32]←'☹'
 
@@ -25,7 +28,7 @@
  p q r s t u v w x y z { | } ~ ☹
  ¥ € ⇄ ∧ ∼ « ⋆ ⋸ ⌸ ² ⌼ μ ⍁ » ⍣ ⍅
  ⎕ ⍞ ⌹ ⍆ ⍤ ⍇ ⍈ ⍊ ⊤ λ ⍍ ⍏ £ ⊥ ⍶ ⌶
- ⍐ ⍑ χ ≢ ⍖ ⍗ ⍘ ⍚ ⍛ ⌈ ⍜ ⍢ ∪ ⍨ ⍕ ⍎
+ ⍐ ⍑ χ ≢ ⍖ ⍗ ⍘ ∊ ⍛ ⌈ ⍜ ⍢ ∪ ⍨ ⍕ ⍎
  ⍬ ⍪ ∣ │ ┤ ⍟ ∆ ∇ → ╣ ║ ╗ ╝ ← ⌊ ┐
  └ ┴ ┬ ├ ─ ┼ ↑ ↓ ╔ ╚ ╩ ╦ ╠ ═ ╬ ≡
  ⍸ ⍷ ∵ ⌷ ⍂ ⌻ ⊢ ⊣ ◊ ┘ ┌ █ ▄ ▌ ▐ ▀
@@ -33,6 +36,7 @@
  ⌿ ⍀ ≥ ≤ ≠ × ÷ ⍙ ∘ ⍵ ⍫ ⍋ ⍒ ¯ ¨  
 
 
+      ]FILE_CTL NO_SKIP
       ⎕PW←80
       ⎕UCS ⎕AV[⍳32]
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29
@@ -46,5 +50,31 @@
 
       ⎕IO←1
 
-⍝ ==================================
+      ⍝ Regression (Blake McBride, LanguageVariances.md #36, 2026-08-10):
+      ⍝ ⎕AV omitted the Member/Enlist symbol ∊ (U+220A) entirely, one of
+      ⍝ the APL2 primitive characters apl2lrm.txt p.273/Appendix A says
+      ⍝ must be present -- GNU APL's own primary glyph for this primitive
+      ⍝ is ϵ (U+03F5, still unchanged below), but ∊ must also be
+      ⍝ representable. Took over the ⎕AV slot vacated by demoting the
+      ⍝ unused legacy IBM filler character DIAMOND_UNDERBAR (⍚).
+      ⍝
+      ⍴⎕AV
+256
+
+      '∊'∊⎕AV
+1
+
+      'ϵ'∊⎕AV
+1
+
+      ⍝ this also fixes LanguageVariances.md #34a (2⎕TF needlessly
+      ⍝ escaping ∊ via ⎕UCS, since it wasn't in ⎕AV before)
+      ⍝
+      ⎕FX 'Z←E1 R' 'Z←0∊R'
+E1
+
+      2 ⎕TF 'E1'
+⎕FX 'Z←E1 R' 'Z←0∊R'
+
+      ⍝ ==================================
 

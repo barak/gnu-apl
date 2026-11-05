@@ -1,5 +1,14 @@
-#! /usr/local/bin/apl --script
+#! /usr/local/bin/apl --id 1010
 
-      ⊃⎕ARG      ⍝ show command line options
-      )OFF      ⍝ leave the interpreter
+⍝ show command line options
+⍝
+⊃⎕ARG
+
+⍝ show --id argument (1010)
+⍝
+↑⎕AI
+
+⍝ leave the interpreter
+⍝
+)OFF
 

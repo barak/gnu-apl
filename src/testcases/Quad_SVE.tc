@@ -1,6 +1,15 @@
 ⍝ Quad_SVE
 ⍝ ----------------------------------
 
+⍝@ test3.
+
+      ⍝ this testcase requires shared variables, which --noSV or
+      ⍝ SharedVars Disabled (or a failed connection to APserver) turn off
+      ⍝
+      ]NEXTFILE NO-SVARS
+
+
+
       ⍝ clear all events
       ⍝
       ⎕SVE←0
@@ -21,5 +30,5 @@
       ⎕SVR 'OS'
 2
 
-⍝ ==================================
+      ⍝ ==================================
 

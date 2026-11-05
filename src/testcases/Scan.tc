@@ -1,11 +1,13 @@
 ⍝ Scan.tc
 ⍝ ----------------------------------
 
-	+\1 2 3 4 5
+⍝@ test3.
+
+      +\1 2 3 4 5
 1 3 6 10 15
 
 
-	+\(1 2)(3 4)(5 6)
+      +\(1 2)(3 4)(5 6)
  1 2  4 6  9 12 
 
 
@@ -21,5 +23,21 @@
  4  4 5  4 5 6 
 
 
-⍝ ==================================
+      ⍝ empty-other-axis regression: LO\B with a user-defined LO used to
+      ⍝ hit an INDEX ERROR whenever B had a non-scanned axis of length 0
+      ⍝ while the scanned axis itself had length >1 (the empty-B guard
+      ⍝ was checked after, not before, the macro dispatch for a defined
+      ⍝ LO). The scanned axis itself being 0 already worked (m_len==0
+      ⍝ returns early); this exercises the "some *other* axis is 0" case.
+
+      LO←{⍺+⍵}
+      ⍴LO\(0 3⍴0)
+0 3
+
+      LO\(0 3⍴0)
+
+      ⍴LO\(3 0⍴0)
+3 0
+
+      ⍝ ==================================
 

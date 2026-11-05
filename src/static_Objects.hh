@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,21 +24,24 @@
 #ifndef STATIC_OBJECTS_HH_DEFINED
 #define STATIC_OBJECTS_HH_DEFINED
 
+//════════════════════════════════════════════════════════════════════════════
 /// a class that triggers logging when static objects are abeing initialized
 class static_Objects
 {
 public:
    /// constructor
+   /// @param l source location string (typically LOC)
+   /// @param w human-readable description of the object being constructed
    static_Objects(const char * l, const char * w);
 
    /// destructor
    ~static_Objects();
 
-   /// object description
-   const char * what;
-
    /// where the object was created (source location)
    const char * loc;
+
+   /// object description
+   const char * what;
 
    /// enable debug output for construction
    static bool show_constructors;
@@ -46,6 +49,7 @@ public:
    /// enable debug output for destruction
    static bool show_destructors;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 
 #endif // STATIC_OBJECTS_HH_DEFINED

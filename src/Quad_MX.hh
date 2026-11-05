@@ -30,14 +30,16 @@
 #include <random>
 
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕MX
 class Quad_MX : public QuadFunction
 {
-  typedef std::complex<double> Dcomplex;
-
 public:
-   /// Constructor. Sorts \b sub_function_infos by name (as needed by bsearch()).
+   /// Constructor. Sorts \b sub_function_infos by name (as needed for binary
+   /// searches).
   Quad_MX();
+
+  typedef std::complex<double> Dcomplex;
 
   enum MX_ops
      {
@@ -49,22 +51,13 @@ public:
    static Quad_MX fun;   ///< Built-in function.
 
 protected:
-   /// properties of subfunctions
-   static const FunctionGroup::function_info subfunction_infos[];
-
-   /// overloaded FunctionGroup::print_fun_syntax()
-   virtual void print_fun_syntax(ostream & out,
-                                const function_info & info) const;
-
-   /// overloaded FunctionGroup::print_map_syntax()
-   virtual void print_map_syntax(ostream & out,
-                                 const function_info & info) const;
-
   /// a matrix suitable for libgsl
   class GSL_Matrix
      {
        public:
          /// constructor: un-initialzed r×c matrix
+         /// @param r number of rows
+         /// @param c number of columns
          GSL_Matrix(int r, int c)
          : krows(r),
            kcols(c),
@@ -72,23 +65,28 @@ protected:
          {}
 
          /// return the value at \b row and \b col
+         /// @param row zero-based row index
+         /// @param col zero-based column index
          Dcomplex val(int row, int col) const
             {
               return vals[col + row * kcols];
             }
-    
+
          /// set the value at \b row and \b col to \b value
+         /// @param row zero-based row index
+         /// @param col zero-based column index
+         /// @param value complex value to store
          void set_val(int row, int col, Dcomplex value)
             {
               vals[col + row * kcols] = value;
             }
-    
+
          /// return the number of rows
          int rows() const   { return krows; }
-    
+
          /// return the number of columns
          int cols() const   { return kcols; }
-    
+
          /// print \b this matrix to stderr
          void show() const
             {
@@ -104,6 +102,7 @@ protected:
             }
 
          /// return true iff vector (!) has complex items
+         /// @param vector vector of complex numbers to inspect
          static bool is_complex(const vector<Dcomplex> & vector)
             {
               loop(i, vector.size())
@@ -119,82 +118,159 @@ protected:
          vector<Dcomplex> vals;   ///< the matrix items
      };
 
+   /// overloaded FunctionGroup::print_fun_syntax()
+   /// @param out output stream to write to
+   /// @param info descriptor of the subfunction whose syntax is to be printed
+   virtual void print_fun_syntax(ostream & out,
+                                const function_info & info) const;
+
+   /// overloaded FunctionGroup::print_map_syntax()
+   /// @param out output stream to write to
+   /// @param info descriptor of the subfunction whose map syntax is to be printed
+   virtual void print_map_syntax(ostream & out,
+                                 const function_info & info) const;
+
    /// overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param X axis APL value
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 
    /// overloaded Function::eval_XB().
-  virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis APL value
+   /// @param B right argument APL value
+  virtual Token eval_XB(cValue_R X, cValue_R B) const;
 
   /// overloaded Function::eval_AB().
-  virtual Token eval_AB(Value_P A, Value_P B) const;
+  /// @param A left argument APL value
+  /// @param B right argument APL value
+  virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_B().
-  virtual Token eval_B(Value_P B) const;
+  /// @param B right argument APL value
+  virtual Token eval_B(cValue_R B) const;
 
   /// return the cros product of all rows in \b mtx
+  /// @param mtx matrix whose row cross-product is to be computed
   static vector<Dcomplex> getCross(GSL_Matrix * mtx);
 
   /// return mtx with \b row and \b col removed
+  /// @param mtx source matrix
+  /// @param row row to exclude
+  /// @param col column to exclude
   static GSL_Matrix * genCofactor(GSL_Matrix * mtx, int row, int col);
 
   /// return the determinant of \b mtx
+  /// @param mtx square matrix whose determinant is to be computed
   static Dcomplex getDet(GSL_Matrix * mtx);
 
   /// return the magnitude of \b v
-  static Dcomplex magnitude(vector<Dcomplex> & v);
+  /// @param v complex vector whose magnitude (Euclidean norm) is returned
+  static Dcomplex magnitude(const vector<Dcomplex> & v);
 
   /// normalize \b v to length 1
+  /// @param v real vector to normalize in-place
   static void normalise(vector<double> & v);
 
   /// generate a matrix suitable for libgsl
+  /// @param B APL matrix value to convert
+  /// @param padded true to add an extra column of zeros (for augmented matrices)
   static GSL_Matrix * genMtx(Value_P B, bool padded);
 
   /// return the eigenvectors of \b B
+  /// @param B APL matrix value
   static Value_P eigenvectors(Value_P B);
 
   /// print value \b B to file \b A
+  /// @param filename_A APL character value containing the output filename
+  /// @param B APL value to print
   static Value_P printit(Value_P filename_A, Value_P B);
 
   /// open file indicated by filename.
+  /// @param filename APL character value containing the path to open
+  /// @param close_file set to true if the caller must close the returned FILE*
   static FILE * open_file(const Value & filename, bool & close_file);
 
   //// return the eigencalues of \b B
+  /// @param B APL matrix value
   static Value_P eigenvalues(Value_P B);
 
   /// set the random number generators seed
+  /// @param B APL integer value containing the desired seed
   static Value_P set_rng_seed(Value_P B);
 
   //// return the determinant of \b B
+  /// @param B APL matrix value
   static Value_P determinant(Value_P B);
 
   //// return the cross product of all vectors in \b B
+  /// @param B APL matrix value whose rows are the input vectors
   static Value_P monadicCrossProduct(Value_P B);
 
   //// return the cross product of \b A and \b B
+  /// @param A left APL vector value
+  /// @param B right APL vector value
   static Value_P dyadicCrossProduct(Value_P A, Value_P B);
 
   //// return the angle between \b A and \b B
+  /// @param A left APL vector value
+  /// @param B right APL vector value
   static Value_P vectorAngle(const Value_P A, const Value_P B);
 
   //// return the (complex) identity matrix
+  /// @param B APL integer scalar giving the size of the identity matrix
   static Value_P ident(const Value_P B);
 
   //// return the monadic Covariance
+  /// @param B APL matrix value (rows are observations)
   static Value_P monadicCovariance(const Value_P B);
 
+  /// @param A left APL value (group labels or second data set)
+  /// @param B right APL value (data vector or matrix)
   static Value_P histogram(const Value_P A, const Value_P B);
 
   //// return the dyadic Covariance
+  /// @param A left APL data vector or matrix
+  /// @param B right APL data vector or matrix
   static Value_P dyadicCovariance(const Value_P A, const Value_P B);
 
   /// return random numbers
+  /// @param opt_A optional left argument specifying distribution parameters
+  /// @param B right argument giving count or shape of the result
+  /// @param dist distribution selector (e.g. uniform, normal)
   static Value_P randoms(Value_P opt_A, Value_P B, int dist);
 
+  /// remap the axes 100...103 (documented shorthands for ⎕MX[10, D]) onto
+  /// OP_RANDOMS with the corresponding distribution D in \b modifier;
+  /// no-op for any other \b op. Must run before every subfun_count range
+  /// check, since that check treats subfun_count (the .def row count) as
+  /// a maximum axis number, which is wrong for the sparse 100...103 range.
+  /// The bounds are the named OP_RANDOMS_1xx constants (from Quad_MX.def)
+  /// rather than literals, so an out-of-range axis like 104 correctly
+  /// falls through to bad_subfun_number_ERROR() instead of being
+  /// silently absorbed into an invalid distribution index.
+  static void remap_randoms_subfun(MX_ops & op, int & modifier)
+     {
+       if (op >= OP_RANDOMS_100 && op <= OP_RANDOMS_103)
+          {
+            modifier = op - 100;
+            op = OP_RANDOMS;
+          }
+     }
+
+  /// @param B APL vector or matrix value
   static Value_P norm(const Value_P B);
 
+  /// @param B APL value representing the rotation (angle or quaternion)
   static Value_P monadicRotation(Value_P B);
 
+  /// @param tp rotation type selector
+  /// @param A left APL value (rotation parameters)
+  /// @param B right APL vector to rotate
   static Value_P dyadicRotation(int tp, Value_P A, Value_P B);
+
+   /// properties of subfunctions
+   static const FunctionGroup::function_info subfunction_infos[];
 
   /// true if the random number generators were initialized
   static bool rng_initialised;
@@ -211,5 +287,6 @@ protected:
   /// random number generator fore imaginary parts
   static mt19937_64 igen;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif  // __Quad_MX_DEFINED__

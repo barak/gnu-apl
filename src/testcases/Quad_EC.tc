@@ -1,6 +1,8 @@
 ⍝ Quad_EC.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕EC 'ι4.5'
  0  5 4  DOMAIN ERROR 
                ⍳4.5   
@@ -42,9 +44,9 @@ foo_fails[1]  ÷0
 0 2 2 1 0
 
       ⎕EC 'foo_fails 2'
- 0  5 4  DOMAIN ERROR 
-                      
-                      
+ 0  5 4  DOMAIN ERROR     
+         foo_fails[1]  ÷0 
+                       ^  
       
       
       ⎕SI 2
@@ -60,10 +62,14 @@ foo_fails[1]  ÷0
 
 
       ⎕EC¨'1¯' 
-  1  0 0  1    0  2 2  SYNTAX ERROR  
+  1  0 0  1    0  2 1538  Bad number  
+                                ¯     
+                                ^^    
 
       ⎕EC¨'¯1'
-  0  2 2  SYNTAX ERROR    1  0 0  1  
+  0  2 1538  Bad number    1  0 0  1  
+                   ¯                  
+                   ^^                 
 
       )ERASE f
 
@@ -86,5 +92,114 @@ f
 
 
 
-⍝ ==================================
+
+      ⍝ Bugs28 #27 regression: a nested ⎕EC/⎕EA used to strip the
+      ⍝ outer ⎕EC/⎕EA of its own result wrapper (and protection)
+      ⍝ entirely -- Quad_EC::eval_B()'s clear_safe_execution() reset
+      ⍝ the CURRENT frame's safe-execution depth to its parent's,
+      ⍝ rather than restoring the value it actually had before this
+      ⍝ call, which is wrong whenever that frame was itself already a
+      ⍝ safe-execution frame (i.e. itself the B of an enclosing ⎕EC).
+      ⍝
+      ⎕EC '⎕EC ''1+1'''
+ 1  0 0   1  0 0  2  
+
+      ⎕EC '⎕EC ''1÷0'' ⋄ 8'
+ 0  5 4  DOMAIN ERROR 
+               1÷0    
+               ^^     
+ 1  0 0  8 
+
+      )SIC
+      ⎕EC '⎕EC ''7'' ⋄ ⍳'
+ 1  0 0  7 
+ 0  2 2  SYNTAX ERROR+
+               ⍳
+               ^
+         Missing mandatory right argument of function ⍳ (at the right end of the
+       statement)
+
+      )SIC
+      '8' ⎕EA '⎕EC ''⍳'''
+ 0  2 2  SYNTAX ERROR+
+               ⍳
+               ^
+         Missing mandatory right argument of function ⍳ (at the right end of the
+       statement)
+
+      )SIC
+
+      ⍝ regression (Bugs28 #95): ⎕EC of a ⍎ that hits an SI-modifying
+      ⍝ command ()LOAD, )QLOAD, )CLEAR, )RESET, )SIC) can never actually
+      ⍝ let that command run -- ⎕EC's whole point is isolating the
+      ⍝ caller from exactly this kind of disruption (a )CLEAR from
+      ⍝ inside ⎕EC would destroy the very workspace ⎕EC is running in)
+      ⍝ -- so the command used to be silently dropped while still being
+      ⍝ reported as if it were a real (if oddly-worded, "Command
+      ⍝ Pushed") error. Refused with a real, honestly-worded DOMAIN
+      ⍝ ERROR instead, and the workspace is left untouched.
+      ⍝
+      V←42
+      Z←⎕EC '⍎'')CLEAR'''
+      V
+42
+
+      Z
+ 0  5 4  DOMAIN ERROR
+         the SI-modifying command ')CLEAR' cannot be executed from within ⎕EC/⎕E
+      A
+       
+
+      )ERASE V Z
+
+      ⍝ regression (Bugs28 #100(e)): Quad_EC::eoc() folded )MORE info
+      ⍝ into Z3 in two broken ways: (1) err.get_error_line_1() may
+      ⍝ already carry a trailing '+' of its own (Error's ctor adds one
+      ⍝ at throw time whenever )MORE info exists then, which is exactly
+      ⍝ whenever this folding applies), so unconditionally appending a
+      ⍝ second one gave e.g. "DOMAIN ERROR++"; (2) multi-line )MORE text
+      ⍝ (embedded UNI_LF, e.g. Quad_FIO.cc's "Too few arguments..."
+      ⍝ messages) was appended as a single (very wide) PrintBuffer row
+      ⍝ instead of one row per real line, so ⎕PW-based output wrapping
+      ⍝ later cut it at column boundaries instead of the author's
+      ⍝ intended line breaks.
+      ⍝
+      Z←⎕EC '0J1 2⍸1'
+      ⊃Z[3]
+DOMAIN ERROR+
+      0J1 2⍸1
+      ^    ^
+A⍸B: A contains items that cannot be compared with each other
+
+      Z←⎕EC '(''%d %d'' 5) ⎕FIO[22] 0'
+      ⊃Z[3]
+LENGTH ERROR+
+      '%d %d' 5 ⎕FIO[22]0
+      ^         ^
+Too few arguments in argument B of: ⎕FIO.fprintf B
+    Only 1 argument(s) were provided in B.
+    The format string was: '%d %d'
+
+      )ERASE Z
+
+      ⍝ regression (Bugs28 #100(z)): ⎕EC (unlike ⍎) ran B through
+      ⍝ ExecuteList::fix() as ordinary APL code even when B is a
+      ⍝ )command, so ⎕EC ')CLEAR' mis-parsed ")CLEAR" and gave a bogus
+      ⍝ "Unbalanced right parenthesis" instead of either running it (a
+      ⍝ non-SI-modifying command) or refusing it the same honest way a
+      ⍝ )command reached via ⍎ already does (Bugs28 #95).
+      ⍝
+      QECA←1
+      ⎕EC ')VARS QECA'
+ 1  0 0   QECA  
+
+      ⎕EC ')CLEAR'
+ 0  5 4  DOMAIN ERROR
+         the SI-modifying command ')CLEAR' cannot be executed from within ⎕EC/⎕E
+      A
+       
+
+      )ERASE QECA
+
+      ⍝ ==================================
 

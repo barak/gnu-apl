@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@
 
 #include <iostream>
 #include <iomanip>
+#include <new>
+#include <string>
+#include <vector>
 
 #include "../Common.hh"
 #include "Gtk_enums.hh"
@@ -65,7 +68,7 @@ static void adjust_object(GObject * obj);
 
 ostream & get_CERR() { return std::cerr; }
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static GtkBuilder * builder = 0;
 static GObject * window     = 0;
 static GObject * selected   = 0;
@@ -81,6 +84,13 @@ static struct _ID_DB
     widget_name(strdup(wn)),
     obj(0)
     {
+       if (!xml_class || !xml_id || !widget_name)
+          {
+            free(const_cast<char *>(xml_class));
+            free(const_cast<char *>(xml_id));
+            free(const_cast<char *>(widget_name));
+            throw std::bad_alloc();
+          }
        if (verbosity > 2)
           cerr << "Add class='" << cls << "' id='" << id
                    << "' wname ='" << wn << "' to DB" << endl;
@@ -102,7 +112,7 @@ static struct _ID_DB
    const GObject * obj;
 } * id_db = 0;
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static struct _draw_param
 {
   _draw_param()
@@ -155,13 +165,13 @@ static struct _draw_param
    bool upside_down;
 } draw_param;
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 indent(int level)
 {
    for (int l = 0; l < level; ++l)   cerr << "  ";
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static const char *
 init_id_db(const char * gui, bool from_file)
 {
@@ -221,10 +231,23 @@ char line[200];
          while (*s == ' ')   ++s;   // skip leading whilespace
          if (!strncmp(s, "<object", 7))   ++level;
 
-         char * cb = class_buf       + 100*level;
-         char * ib = id_buf          + 100*level;
-         char * wb = widget_name_buf + 100*level;
-         if (2 == sscanf(line, " <object class=\"%s id=\"%s>", cb, ib))
+         // level indexes 100-byte slots in the MAX_level-sized buffers
+         // below; unchecked it can reach MAX_level (>10 levels of
+         // nested <object>, pointing past the end of the buffers) --
+         // the sscanf() calls further down would then write out of
+         // bounds. level == -1 (no <object> seen yet, e.g. still on
+         // header lines like <?xml...?> or <interface>) is normal and
+         // not an error by itself; it only becomes unsafe if a
+         // <property name="name"> line (which needs a valid slot) is
+         // matched while in that state, which the level >= 0 guards on
+         // cb/wb below prevent.
+         if (level >= MAX_level)
+            return "malformed .ui/.glade: <object> nesting too deep";
+
+         char * cb = level >= 0 ? class_buf       + 100*level : 0;
+         char * ib = level >= 0 ? id_buf          + 100*level : 0;
+         char * wb = level >= 0 ? widget_name_buf + 100*level : 0;
+         if (cb && 2 == sscanf(line, " <object class=\"%99s id=\"%99s>", cb, ib))
             {
               if (char * qu = strchr(cb, '"'))   *qu = 0;
               if (char * qu = strchr(ib, '"'))   *qu = 0;
@@ -243,7 +266,7 @@ char line[200];
                          << endl;
                  }
             }
-         else if (1 == sscanf(line, " <property name=\"name\">%s", wb))
+         else if (wb && 1 == sscanf(line, " <property name=\"name\">%99s", wb))
             {
               if (char * ob = strchr(wb, '<'))   *ob = 0;
 
@@ -284,7 +307,7 @@ char line[200];
    if (file)   fclose(file);
    return 0;   // OK
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 cmd_1_load_GUI(const char * gui)
 {
@@ -347,7 +370,7 @@ const bool from_file = !strchr(gui, UNI_LF);
 
    verbosity > 0 && cerr << "GUI signals connected.\n";
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
 {
@@ -394,31 +417,31 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
    verbose__calls && cerr << "gtk_drawingarea_draw_commands() done." << endl;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 gtk_drawingarea_set_Y_origin(GtkDrawingArea * widget, int data)
 {
   draw_param.upside_down = true;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 gtk_text_view_add_row(GtkTextView * view, const char * text)
 {
 size_t text_len = strlen(text);
-char cc[text_len + 10];
+std::vector<char> cc(text_len + 10);
 GtkTextBuffer * buffer = gtk_text_view_get_buffer(view);
    if (gtk_text_buffer_get_char_count(buffer))   // subsequent line
-       { snprintf(cc, sizeof(cc), "\n%s", text);   ++text_len; }
+       { snprintf(cc.data(), cc.size(), "\n%s", text);   ++text_len; }
    else                                          // first line
-       { snprintf(cc, sizeof(cc), "%s", text); }
+       { snprintf(cc.data(), cc.size(), "%s", text); }
 
 
 GtkTextIter end;   gtk_text_buffer_get_end_iter(buffer, &end);
-   gtk_text_buffer_insert(buffer, &end, cc, text_len);
+   gtk_text_buffer_insert(buffer, &end, cc.data(), text_len);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 cmd_2_load_CSS(const char * css)
 {
@@ -465,7 +488,7 @@ GtkCssProvider * css_provider = gtk_css_provider_new();
            }
       }
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 gtk_drawingarea_set_area_size(GtkDrawingArea * widget, long data)
 {
@@ -477,7 +500,7 @@ const int height = data & 0xFFFF;
    gtk_widget_set_size_request(GTK_WIDGET(widget), width, height);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 static cmd_3_show_GUI()
 {
@@ -519,7 +542,7 @@ pthread_t thread = 0;
    assert(thread);
    usleep(200000);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 static cmd_4_get_widget_class(const char * id)
 {
@@ -528,7 +551,7 @@ GObject * obj = gtk_builder_get_object(builder, id);
    if (obj)   cerr << "object " << id << " exists" << endl;
    else       cerr << "object " << id << " DOES NOT EXIST" << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 static cmd_6_select_widget(const char * id)
 {
@@ -537,7 +560,7 @@ static cmd_6_select_widget(const char * id)
   if (!selected)
      cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 enum Gtype
 {
   gtype_V = 0,   // Void
@@ -545,7 +568,7 @@ enum Gtype
   gtype_I = 2,   // Integer
   gtype_F = 3,   // Float
 };
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 print_fun(Fnum N,              // function number N (deprecated)
           const char * gfun,   // widget prefix, e.g. entry, text_view, ...
@@ -563,7 +586,7 @@ print_fun(Fnum N,              // function number N (deprecated)
 
    cout << "| " << help << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 print_number(Fnum N,              // function number N (deprecated)
           const char * prefix,    // widget prefix, e.g. entry, text_view, ...
@@ -580,7 +603,7 @@ char gfname[100];   snprintf(gfname, sizeof(gfname), "%s_%s()", prefix, gfun);
         << " │ " << setw(37) << gclass
         << "║"   << right << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 print_numbers()
 {
@@ -601,7 +624,7 @@ print_numbers()
 "╚══════╧══════════════════════════════════╧══════════════════════════════════════╝"
         << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 print_funs()
 {
@@ -611,7 +634,7 @@ print_funs()
 
 #include "Gtk_map.def"
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 print_ev2(const char * ev_name, int _argc, const char * signature,
           const char * wid_name, const char * wid_id, const char *  wid_class)
@@ -648,7 +671,7 @@ print_ev2(const char * ev_name, int _argc, const char * signature,
         }
    cout << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 static print_events(int how)
 {
@@ -665,7 +688,7 @@ static print_events(int how)
       }
    else assert(0 && "internal error: bad how");
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 send_TLV(int tag, const char * data)
 {
@@ -697,7 +720,7 @@ char TLV[TLV_len + 1];
              << strerror(errno) << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 //
 // conversion functions. A TLV always uses a char string for values, which
 // is being converted to ther types by the functions below.
@@ -712,7 +735,7 @@ char TLV[TLV_len + 1];
 inline gdouble S2F(const gchar * s) { return strtod(s, 0); }
 inline long    S2I(const gchar * s) { return strtol(s, 0, 10); }
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static const gchar *
 S2S(const gchar * str)
 {
@@ -742,7 +765,7 @@ unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld", long(i));
 
  return buffer;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // APL string → Gtk type
 #define arg_V(X)
 #define arg_S(X) , X
@@ -765,7 +788,7 @@ unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld", long(i));
 #define result_F(fcall) const gchar * res = F2S(fcall);
 #define result_I(fcall) const gchar * res = I2S(fcall);
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 main(int argc, char * argv[])
 {
@@ -834,7 +857,9 @@ const int flags = fcntl(3, F_GETFD);
         return 1;
       }
 
-// cerr << "Flags = " << hex << flags << endl;
+   // prevent any subprocess spawned by GTK/GLib (e.g. via g_spawn_sync for
+   // SVG rendering) from inheriting the TLV socket and corrupting the stream.
+   fcntl(3, F_SETFD, flags | FD_CLOEXEC);
 
    if (getenv("DISPLAY") == 0)   // DISPLAY not set
       setenv("DISPLAY", ":0", true);
@@ -869,7 +894,8 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                continue;
              }
 
-          // expand buffer if needed
+          // expand buffer if needed; capture exact expected length for recv
+          ssize_t expected_rx_len = 8;
           {
             errno = 0;
             const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
@@ -885,18 +911,26 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                                      | (TLV[5] & 0xFF) << 16
                                      | (TLV[6] & 0xFF) << 8
                                      | (TLV[7] & 0xFF);
+            expected_rx_len = V_len + 8;
 
             if ((V_len + 8) > TLV_buflen)   // re-allocate a larger buffer
                {
                  delete [] TLV;
-                 TLV_buflen = V_len + 8;
+                 // +1: V[V_len] = 0 below writes one byte past the
+                 // V_len value bytes (a trailing NUL terminator); size
+                 // the allocation with room for it instead of exactly
+                 // V_len + 8, which left zero slack -- an off-by-one
+                 // heap overflow on every reallocation.
+                 TLV_buflen = V_len + 8 + 1;
                  TLV = new char[TLV_buflen];
                  assert(TLV);
                  V = TLV + 8;
                }
           }
 
-          const ssize_t rx_len = recv(3, TLV, TLV_buflen, 0);
+          // MSG_WAITALL receives exactly the one TLV packet, preventing
+          // TCP coalescing from delivering two packets in one recv call.
+          const ssize_t rx_len = recv(3, TLV, expected_rx_len, MSG_WAITALL);
           if (rx_len < 8)
              {
                cerr << "TLV socket closed (2): " << strerror(errno) << endl;
@@ -917,10 +951,13 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
           if (rx_len != V_len + 8)
              {
-
                cerr << "TLV socket closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
+               cerr << "  first 16 bytes (hex):";
+               for (int hx = 0; hx < 16 && hx < rx_len; ++hx)
+                   cerr << " " << hex << (TLV[hx] & 0xFF) << dec;
+               cerr << endl;
                close(3);
                __sem_destroy(drawarea_sema);
                return 0;
@@ -1003,7 +1040,7 @@ int64_t get_main()
    return reinterpret_cast<int64_t>(&main);
 
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 generic_callback(GtkWidget * widget, const char * callback, const char * sig)
 {
@@ -1018,11 +1055,10 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
                    << " id=" << entry->xml_id << " name="
                    << entry->widget_name << endl;
 
-              char data[strlen(10 + callback) + strlen(entry->xml_class)
-                        + strlen(entry->xml_id) + strlen(entry->widget_name)];
-              sprintf(data, "H%s:%s:%s:%s", entry->widget_name, callback,
-                             entry->xml_id, entry->xml_class);
-              send_TLV(Event_widget_fun_id_class, data);
+              const std::string data = std::string("H") + entry->widget_name
+                                       + ":" + callback + ":" + entry->xml_id
+                                       + ":" + entry->xml_class;
+              send_TLV(Event_widget_fun_id_class, data.c_str());
               verbosity > 0 &&
                   cerr << "callback " << callback << "(new-style) done" << endl;
               return;
@@ -1036,15 +1072,15 @@ gchar * widget_name = none;
    g_object_get(widget, "name", &widget_name, NULL);
    verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
                          << "    callback is: " << callback << endl;
+//════════════════════════════════════════════════════════════════════════════
 
-char data[strlen(callback) + strlen(widget_name) + 10];
-   sprintf(data, "H%s:%s", widget_name, callback);
-   send_TLV(Event_widget_fun, data);
+const std::string data = std::string("H") + widget_name + ":" + callback;
+   send_TLV(Event_widget_fun, data.c_str());
 
    if (verbosity > 0)
       cerr << "callback " << callback << "(old-style) done" << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline void
 cairo_set_source_rgba(cairo_t * cr, const GdkRGBA & color)
 {
@@ -1053,7 +1089,7 @@ cairo_set_source_rgba(cairo_t * cr, const GdkRGBA & color)
                              color.blue  / 255.0,
                              color.alpha / 100.0);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 draw_line(cairo_t * cr, const GdkRGBA & color, int x0, int y0, int x1, int y1)
 {
@@ -1092,7 +1128,7 @@ const double rad = 1.0;
 
    cairo_fill(cr);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 do_draw_cmd(GtkWidget * drawing_area, const char * cmd, const char * cmd_end)
 {
@@ -1151,7 +1187,7 @@ const int cmd_len = cmd_end - cmd;
         return;
       }
 
-   count = sscanf(cmd, "font-family %s", s1);
+   count = sscanf(cmd, "font-family %99s", s1);
    if (count == 1)
       {
         s1[sizeof(s1) - 1] = 0;
@@ -1161,7 +1197,7 @@ const int cmd_len = cmd_end - cmd;
         return;
       }
 
-   count = sscanf(cmd, "font-slant %s", s1);
+   count = sscanf(cmd, "font-slant %99s", s1);
    if (count == 1)
       {
         s1[sizeof(s1) - 1] = 0;
@@ -1176,7 +1212,7 @@ const int cmd_len = cmd_end - cmd;
         return;
       }
 
-   count = sscanf(cmd, "font-weight %s", s1);
+   count = sscanf(cmd, "font-weight %99s", s1);
    if (count == 1)
       {
         s1[sizeof(s1) - 1] = 0;
@@ -1343,8 +1379,8 @@ const int cmd_len = cmd_end - cmd;
               ++point_count;
               ++p;   // skip (
             }
-        double x[point_count];
-        double y[point_count];
+        std::vector<double> x(point_count);
+        std::vector<double> y(point_count);
         int point_idx = 0;
         for (const char * p = cmd; p < cmd_end;)
             {
@@ -1412,7 +1448,13 @@ const int cmd_len = cmd_end - cmd;
                                     draw_param.font_weight);
         cairo_set_font_size(cr1, draw_param.font_size);
         const char * start = cmd + i3;
-        const int slen = cmd_len - i3;
+        int slen = cmd_len - i3;
+        // clamp to the buffer bound: strncpy() below already stops
+        // copying at sizeof(s1)-1, but slen itself is the full
+        // (unbounded, caller-controlled) remaining text length and
+        // was being used unclamped as the NUL-terminator index below,
+        // writing past the end of s1 for text >= sizeof(s1) bytes.
+        if (slen >= int(sizeof(s1)))   slen = sizeof(s1) - 1;
         strncpy(s1, start, sizeof(s1) - 1);
         s1[slen] = 0;
         cairo_show_text(cr1, s1);
@@ -1424,7 +1466,7 @@ const int cmd_len = cmd_end - cmd;
    for (const char * s = cmd; s < cmd_end; ++s)   cerr << *s;
    cerr << endl << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 
 // declare all callbacks that the XML .ui <signal...>  can connect to
@@ -1445,7 +1487,7 @@ clicked_0(GtkWidget * button, gpointer user_data = 0)
 }
  */
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 gboolean
 mouse_press(GtkTextView * tview, GdkEventButton * ev)
 {
@@ -1493,7 +1535,7 @@ const char * name = gtk_widget_get_name(GTK_WIDGET(tview));
    send_TLV(Event_widget_ev_X_Y_B_L, data);
    return RET;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 gboolean
 do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 {
@@ -1538,7 +1580,7 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 
    return false;   // propagate the event further
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 gboolean
 top_level_done(GtkWidget * window, gpointer user_data)
 {
@@ -1558,7 +1600,7 @@ const unsigned int slen = snprintf(data, sizeof(data),
 }
 
 }   // extern "C"
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 dump_widget(ostream & out, const char * prefix, GtkWidget * widget)
 {
@@ -1617,13 +1659,13 @@ char cc[100];   // should suffice
 
    out << endl;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 dump_all()
 {
   if (verbose__dump)   dump_widget(cerr, "", GTK_WIDGET(window));
 };
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 adjust_object(GObject * obj)
 {
@@ -1634,4 +1676,4 @@ GtkWidget * widget = GTK_WIDGET(obj);
 const gchar * widget_name = gtk_widget_get_name(widget);
    if (!widget_name)   return;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

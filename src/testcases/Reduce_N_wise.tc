@@ -1,7 +1,9 @@
 ⍝ Reduce_N_wise.tc
 ⍝ ----------------------------------
 
-⍝ positive left argument ----------------------------------
+⍝@ test3.
+
+      ⍝ positive left argument ----------------------------------
 
       R←1 2 3 4 5 6
       6+/R
@@ -22,7 +24,7 @@
       1+/R
 1 2 3 4 5 6
 
-⍝ additional examples ----------------------------------
+      ⍝ additional examples ----------------------------------
 
       2+/(1 2)(3 4)(5 6)
  4 6  8 10 
@@ -55,7 +57,7 @@ GHI
  DE EF 
  GH HI 
 
-⍝ negative left argument ----------------------------------
+      ⍝ negative left argument ----------------------------------
 
       ¯2-/1 4 9 16 25
 3 5 7 9
@@ -80,14 +82,14 @@ GHI
       ¯3×/ι6
 6 24 60 120
 
-⍝ zero left argument ----------------------------------
+      ⍝ zero left argument ----------------------------------
 
       0×/ι5
 1 1 1 1 1 1
 
-⍝ Regression
+      ⍝ Regression
 
-     0 +/ 99
+      0 +/ 99
 0 0
 
       0 +/ 10 20 30
@@ -96,5 +98,28 @@ GHI
       0 ×/ 100 200 300 400
 1 1 1 1 1
 
-⍝ ==================================
+      ⍝ huge left argument regression ----------------------------------
+      ⍝ A f/B computed n_wise as a plain (32-bit) int from A (a full 64-
+      ⍝ bit APL_Integer), so a huge A truncated down to whatever 32 bits
+      ⍝ it happened to land on -- occasionally negative, which then
+      ⍝ slipped past the "n_wise > B's axis length" DOMAIN ERROR check
+      ⍝ (negative is never > a small positive bound), while the actual
+      ⍝ reduction loop further down still used the untruncated, huge,
+      ⍝ unchecked A to compute an out-of-bounds ravel offset into B --
+      ⍝ a real SEGV. Any of these hanging or crashing (instead of
+      ⍝ DOMAIN ERROR) is a regression; the exact numbers are otherwise
+      ⍝ arbitrary.
 
+      3550579489682168305 +/ 1 2 3 4 5
+DOMAIN ERROR+
+      3550579489682168305+/1 2 3 4 5
+      ^                  ^
+
+      →
+
+      ¯9223372036854775808 +/ 1 2 3 4 5
+DOMAIN ERROR
+      ¯9.223372036854776E18+/1 2 3 4 5
+      ^                    ^
+
+      →

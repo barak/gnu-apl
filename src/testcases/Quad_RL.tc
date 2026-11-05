@@ -1,15 +1,47 @@
 ⍝ Quad_RL.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕RL←16807
       ⎕RL
 16807
 
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
       ?5
 2
 
       ⎕RL
-¯9188674207750822742
+34697829103953066
 
-⍝ ==================================
+      ⍝ regression (Blake McBride, LanguageVariances.md #31, 2026-08-11):
+      ⍝ ⎕RL is documented as non-negative (apl2lrm.txt p.322); GNU APL's
+      ⍝ internal 64-bit LCG state used to be exposed to ⎕RL completely
+      ⍝ unmasked (raw, could be negative and far outside any documented
+      ⍝ domain) -- now masked to its low 63 bits (positive values only,
+      ⍝ scaled up to GNU APL's native 64-bit integers, not clamped down
+      ⍝ to APL2's original 32-bit ¯2+2*31 upper bound -- user's explicit
+      ⍝ design call). Negative assignments are rejected immediately;
+      ⍝ 0 is accepted (confirmed via the Hull-Dobell full-period
+      ⍝ theorem that this specific LCG -- a≡1 mod 4, c odd, m=2^64 --
+      ⍝ has no fixed point, so no seed, including 0, can ever produce a
+      ⍝ degenerate/constant sequence).
+      ⍝
+      ⎕RL←¯1
+DOMAIN ERROR+
+      ⎕RL←¯1
+      ^  ^
+      )MORE
+⎕RL must be a non-negative integer; GNU APL's valid range is 0 to 9223372036854775807 (2*63-1) -- wider than APL2's documented ¯2+2*31, scaled up to GNU APL's native 64-bit integers (see LanguageVariances.md #31)
+
+      ]FILE_CTL NO_SKIP
+      ⎕RL←0
+      ⎕RL
+0
+
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      ?5
+5
+
+      ⍝ ==================================
 

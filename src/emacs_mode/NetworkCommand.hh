@@ -29,15 +29,31 @@
 
 class NetworkConnection;
 
+//════════════════════════════════════════════════════════════════════════════
+/// abstract base for one named command of the emacs-mode network protocol
+/// (one subclass per command, e.g. DefCommand, RunCommand, ...)
 class NetworkCommand {
 public:
+    /// constructor: remember this command's protocol name (e.g. "def")
     NetworkCommand( std::string name_in ) : name( name_in ) {};
+
+    /// destructor
     virtual ~NetworkCommand() {};
+
+    /// carry out this command, reading any further input it needs and
+    /// writing its reply back
+    /// @param conn the connection to read further input from and write
+    ///   the reply to
+    /// @param args the command line, split into whitespace-separated words
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args ) = 0;
+
+    /// this command's protocol name
     virtual std::string get_name( void ) { return name; };
 
 private:
+    /// this command's protocol name
     std::string name;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

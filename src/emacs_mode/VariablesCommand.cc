@@ -32,6 +32,7 @@ enum TypeSpec {
     VARIABLE,
     FUNCTION
 };
+//════════════════════════════════════════════════════════════════════════════
 
 void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -83,3 +84,4 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
     out << END_TAG << "\n";
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

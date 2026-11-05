@@ -20,12 +20,23 @@
    function FIO∆SockHelper in woekspace FILE_IO.
 */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <netinet/in.h>
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif // HAVE_NETINET_IN.H
+
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET.H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
 
 #define P(a) printf ("t←t⍪'%s' %d\n", #a, a)
 

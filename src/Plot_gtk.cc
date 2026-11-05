@@ -22,6 +22,8 @@
 /** @file
 */
 
+#include <vector>
+
 #include "Common.hh"
 #if HAVE_LOCALE_H
 # include <locale.h>
@@ -51,9 +53,14 @@
 const char * FONT_NAME = "sans-serif";
 
 /// the size of the font to be used for texts
-enum {  FONT_SIZE = 10 };
+static const int FONT_SIZE = 10;
 
-// ===========================================================================
+/// close \b window on the gtk_main() thread (via g_idle_add()); see
+/// GTK_context::plot_stop()'s comment for why this must not call
+/// gtk_window_close() directly from the interpreter thread.
+static gboolean close_GTK_window_idle(gpointer window);
+
+//════════════════════════════════════════════════════════════════════════════
 /** a structure that aggregates:
 
      plot data and plot attributes (Plot_window_properties) and
@@ -88,7 +95,17 @@ public:
    /// overloaded PLOT_context::plot_stop()
    virtual void plot_stop()
       {
-        gtk_window_close(GTK_WINDOW(window));
+        // gtk_window_close() must run on the gtk_main() thread, not here
+        // (the interpreter thread) -- same cross-thread widget-ownership
+        // hazard as plot_main_GTK()'s window creation (see its comment),
+        // and the same fix the WIN32 driver already uses for its own
+        // HWND-vs-worker-thread version of this (Plot_win32.cc's
+        // plot_stop(): PostMessage instead of a direct HWND call).
+        // window itself stays valid until the "destroy" signal actually
+        // fires (on the gtk_main() thread, which is what frees pctx) --
+        // nothing on this (interpreter) thread deletes it in between.
+        //
+        if (window)   g_idle_add(close_GTK_window_idle, window);
       }
 
    /// return the required width of the entire plot area
@@ -159,7 +176,7 @@ protected:
    /// stored in w_props.
    Pixel_Y legend_Y0, legend_Y1;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// same as standard cairo_set_RGB_source() but with Color instead of double
 /// red, green, and blue values.
 static inline void
@@ -171,7 +188,7 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
                              (color >>  8 & 0xFF) / 255.0,
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a line from P0 to P1
 static void
 draw_line(cairo_t * cr, Color line_color, int line_style, int line_width,
@@ -200,7 +217,7 @@ double dashes_3[] = { 10.0, 5.0 };     // ─╴─╴─╴─╴
 
    if (line_style != 1)   cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a circle with diameter \b size around P0
 static void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
@@ -209,7 +226,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
    cairo_arc(cr, P0.x, P0.y, 0.5*size, 0.0, 2*M_PI);
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a ▲ or ▼ with given \b size around P0
 static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
@@ -237,7 +254,7 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
 
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a ■ or ◆ with given \b size around P0
 static void
 draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
@@ -261,7 +278,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a cross with thw given \b size around P0
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
@@ -291,7 +308,7 @@ const double half = 0.5*size;
 
    cairo_stroke(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a point with given \b point_style and \b size around P
 static void
 draw_point(cairo_t * cr, Pixel_XY P, int point_style,
@@ -331,14 +348,14 @@ const bool es = ! (point_style & 1);   // even style
         case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return;   // ■
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a red marker for debugging purposes (to show where pixel P0 is)
 inline void
 draw_marker(cairo_t * cr, Pixel_XY P0)
 {
    draw_point(cr, P0, 1, 0xFF0000, 10, 0, 0);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw an arrow from O to A
 static void
 draw_arrow(cairo_t * cr, Pixel_XY O, Pixel_XY A, const Color color)
@@ -356,7 +373,7 @@ const double Uy = dy/len;
 
    // arrow dimensions (pixel)
    //
-   enum { SHAFT = 20, WING  = 5, TIP = 15 };
+const int SHAFT = 20, WING  = 5, TIP = 15;
 
    // draw the shaft
    //
@@ -376,7 +393,7 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
    cairo_close_path(cr);
    cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// format \b val according to \b format (with \b percent pointing to % in
 /// format, e.g. %d or %f like in printf()).
 const char *
@@ -418,6 +435,7 @@ static char cc[100] = "";   // should suffice
            }
 
         strncpy(cc, tick_text, tick_len);
+        cc[tick_len] = 0;
         return cc;
       }
    else if (strchr("gvSIHhDdMmQqYy", percent[1]))   // some kind of date
@@ -488,13 +506,40 @@ bool round = false;
         if (cc == 'u')  { round = true;   break; }   // %u
       }
 
+   // format is the FULL user-supplied string, used as-is below as a
+   // printf format with exactly one argument (val, or a rounded
+   // int(val)). Extra or mismatched conversions in format are otherwise
+   // honored against a nonexistent/wrong-typed vararg: %n is a write
+   // primitive, and %s/%p (or any other non-numeric conversion) reads a
+   // nonexistent vararg as a pointer -- validate that format has
+   // exactly one, numeric, conversion before using it.
+   {
+     int conversions = 0;
+     bool safe = true;
+     for (const char * p = format; *p; ++p)
+         {
+           if (*p != '%')   continue;
+           ++p;
+           if (*p == '%')   continue;   // %% is a literal percent
+           ++conversions;
+           while (*p && strchr("-+ #0123456789.", *p))   ++p;   // flags/width/precision
+           if (!*p || !strchr("diouxXeEfFgGaA", *p))   safe = false;
+         }
+     if (conversions != 1 || !safe)
+        {
+          CERR << "⎕PLOT: bad tick format '" << format << "'" << endl;
+          SPRINTF(cc, "%g", val);
+          return cc;
+        }
+   }
+
    if (!round)         SPRINTF(cc, format, val)
    else if (val > 0)   SPRINTF(cc, format, int(rint(val) + 0.5))
    else                SPRINTF(cc, format, int(rint(val) - 0.5))
 
    return cc;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// format the text of tick \b idx (with value \b val) according to \b format.
 const char *
 format_tick(double val, double dV, int idx, const char * format)
@@ -543,7 +588,7 @@ short digits = 0;
    // skip leading 0 in -0.xxx
    return cc;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// return the size of single_line string \b text when printed with font \b
 /// font_name of /// size \b font_size
 void
@@ -572,7 +617,7 @@ cairo_text_extents_t extends;
              <<  lx << " pixels" << endl;
      }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// return the size len_x:len_y of the multi_line string \b lines when
 /// printed with font \b font_name of size \b font_size
 void
@@ -582,7 +627,7 @@ cairo_multiline_size(double & len_x, double & len_y, cairo_t * cr,
 {
   len_x = 0;
   len_y = 0;
-char line[strlen(lines) + 10];
+std::vector<char> line(strlen(lines) + 10);
 
    // split lines into single strings line and cumulate the sizes
    for (;;)
@@ -592,11 +637,11 @@ char line[strlen(lines) + 10];
          if (const char * nl = strchr(lines, '\n'))   // more lines coming
             {
               const size_t len = nl - lines;
-              memcpy(line, lines, len);
+              memcpy(line.data(), lines, len);
               line[len] = 0;
               lines = nl + 1;
 
-              cairo_string_size(lx, ly, cr, line, font_name, font_size);
+              cairo_string_size(lx, ly, cr, line.data(), font_name, font_size);
               if (len_x < lx)   len_x = lx;   // horizontal: take maximum
               if (len_y)   len_y += 2;        // space between lines
               len_y += ly;                    // vertical: add height
@@ -611,7 +656,7 @@ char line[strlen(lines) + 10];
             }
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw single-line string \b text at position xy
 void
 draw_text(cairo_t * cr, const char * text, const Pixel_XY & xy)
@@ -627,7 +672,7 @@ draw_text(cairo_t * cr, const char * text, const Pixel_XY & xy)
   cairo_text_path(cr, text);
   cairo_fill(cr);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw multi-line string \b lines at position xy
 void
 draw_multiline(cairo_t * cr, const char * lines, Pixel_XY xy, double width)
@@ -640,23 +685,23 @@ const int font_size = FONT_SIZE;
 
   cairo_set_font_size(cr, font_size);
 
-char line[strlen(lines) + 10];
+std::vector<char> line(strlen(lines) + 10);
 
    for (;;)
        {
          if (const char * nl = strchr(lines, '\n'))   // more lines coming
             {
               const size_t len = nl - lines;
-              memcpy(line, lines, len);
+              memcpy(line.data(), lines, len);
               line[len] = 0;
               lines = nl + 1;
 
               double line_w = 0, line_h = 0;   // size of line
-              cairo_string_size(line_w, line_h, cr, line, font_name, font_size);
+              cairo_string_size(line_w, line_h, cr, line.data(), font_name, font_size);
               const double indent = 0.5*(width - line_w);
 
               cairo_move_to(cr, xy.x + indent, xy.y);
-              cairo_text_path(cr, line);
+              cairo_text_path(cr, line.data());
               xy.y += 2 + FONT_SIZE;
               cairo_fill(cr);
             }
@@ -669,10 +714,10 @@ char line[strlen(lines) + 10];
             }
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 double
 longest_legend_string(cairo_t * cr, int line_count, 
-                      Plot_line_properties const * const * l_props)
+                      const Plot_line_properties * const * l_props)
 {
 double ly = FONT_SIZE;
 double longest_len = 0.0;
@@ -685,7 +730,7 @@ double longest_len = 0.0;
        }
    return longest_len;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a legend for the different plot lines
 void
 draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
@@ -693,7 +738,7 @@ draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
 const Plot_window_properties & w_props = pctx.w_props;
    if (!w_props.get_show_legend())   return;   // no legend
 
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
 const int line_count = surface_plot ? 1 : w_props.get_line_count();
 
@@ -739,7 +784,7 @@ const Pixel_Y dy = w_props.get_legend_dY();
      //
      const double ly2 = 0.5*FONT_SIZE;
 
-     enum { BORDER = 10 };   // border around legend block
+     const int BORDER = 10;   // border around legend block
      const double X0 = x0                             - BORDER;
      const double X1 = xe                             + BORDER;
      const double Y0 = y0 - ly2                       - BORDER;
@@ -791,7 +836,7 @@ const Pixel_Y dy = w_props.get_legend_dY();
          draw_text(cr, lp.get_legend_name().c_str(), Pixel_XY(xt, y1 + 5));
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// swap pixels P0 with value Y0, and P1 with value Y1
 static inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
@@ -799,7 +844,7 @@ pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a 3D triangle where one point P0 is at visual height H0 and the
 /// other two points P1 and P2 are the same at visual height H12.
 void
@@ -835,7 +880,7 @@ const double dH = (H12 - H0) / steps;
          draw_line(cr, line_color, 1, 1, P0_P1, P0_P2);
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a 3D triangle where the points P0, P1, and P2 are at visual
 /// heights H0, H1, and H2 respectively. This is done by splitting the
 /// triangle into two triangles that each have 2 points at the same height.
@@ -893,7 +938,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
         draw_triangle(cr, pctx, verbosity, P2, H2, P1, P, H1);
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the (vertical) X grid-lines of the plot (starting from the Y axis)
 /// and proceeding with equal distances w_props.get_value_per_tile_X().
 void
@@ -959,7 +1004,7 @@ const int grid_style = w_props.get_gridX_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw (vertical) X grid-lines where plot points exist.
 void
 draw_X_vargrid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
@@ -1043,7 +1088,7 @@ const Plot_data & data = w_props.get_plot_data();
            }
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the (horizontal) Y grid-lines of the plot (starting at the Y axis)
 void
 draw_Y_grid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
@@ -1131,7 +1176,7 @@ const int grid_style = w_props.get_gridY_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the (slanted) Z grid-lines of the plot
 void
 draw_Z_grid(cairo_t * cr, const GTK_context & pctx)
@@ -1251,14 +1296,14 @@ int grid_style = w_props.get_gridZ_style();
            }
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw normal (2D) data lines
 void
 draw_plot_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
    loop(l, data.get_row_count())
        {
@@ -1297,14 +1342,14 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
              }
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw surface (3D) data lines
 void
 draw_surface_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp0 = *l_props[0];
 
 const Color canvas_color = w_props.get_canvas_color();
@@ -1466,7 +1511,7 @@ const int point_style  = lp0.get_point_style();
         draw_point(cr, P0, point_style, point_color, 2, canvas_color, 0);
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// plot the data
 static void
 do_plot(GtkWidget * drawing_area, GTK_context & pctx, cairo_t * cr)
@@ -1499,7 +1544,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   //
   draw_legend(cr, pctx, surface_plot);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // event handlers (callbacks). They should be declared extern "C" as to be
 // linked properly... In our case every event handler has a trailing
 // GTK_context * pctc argument
@@ -1508,7 +1553,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// callback when the mouse button is pressed. This may or may not start
 /// the dragging of the legend.
 Event_handler(Button_press_event, GtkWidget * widget, GdkEventButton * ev)
@@ -1535,7 +1580,7 @@ const int y = ev->y;
    pctx->legend_drag_Y = y;
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the mouse button was released. Stop any ongoing dragging of the legend
 Event_handler(Button_release_event, GtkWidget * widget, GdkEventButton *)
 {
@@ -1547,7 +1592,7 @@ Event_handler(Button_release_event, GtkWidget * widget, GdkEventButton *)
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the mouse was moved.
 Event_handler(Motion_notify_event, GtkWidget * widget, GdkEventMotion * ev)
 {
@@ -1581,7 +1626,7 @@ const int dy = y - pctx->legend_drag_Y;
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // the plot window is closed
 Event_handler(Hide, GtkWidget * widget)
 {
@@ -1590,7 +1635,7 @@ Event_handler(Hide, GtkWidget * widget)
    if (pctx->w_props.get_with_border())   pctx->save_to_file_with_border();
    return FALSE;   // propagate this event further further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // the plot window is destroyed
 Event_handler(Destroy, GtkWidget * widget)
 {
@@ -1604,7 +1649,7 @@ Event_handler(Destroy, GtkWidget * widget)
 
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// callback when the plot window shall be (re-)drawn
 Event_handler(Draw, GtkWidget * widget, cairo_t * cr)
 {
@@ -1659,7 +1704,7 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
       CERR << "Draw() done." << endl;
    return TRUE;   // event handled, do not propagate it further
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 GTK_context::save_to_file_no_border(cairo_surface_t * surface)
 {
@@ -1687,7 +1732,7 @@ cairo_status_t stat = cairo_surface_write_to_png(surface, fname.c_str());
        //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 GTK_context::save_to_file_with_border()
 {
@@ -1747,7 +1792,7 @@ cairo_surface_t *
              << strerror(errno) << endl;
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** gtk_main_wrapper() makes gtk_main() suitable for pthread_create()
     and warn if it returns (which is not expected to happen).
 
@@ -1758,13 +1803,16 @@ cairo_surface_t *
              → do_plot_data()
                  → plot_main_GTK()
                    ↓
-                   ↓ → → pthread_create(gtk_main_wrapper) → return immediately
+                   ↓ g_idle_add(post_gtk_started)
+                   ↓ → → pthread_create(gtk_main_wrapper)
                    ↓                            ↓
-            ┌─────────────┐           ┌────── thread ──────┐
-            │ GTK_context │           │ gtk_main_wrapper() │
-            └─────────────┘           │ → gtk_main()       │
-                   ↓                  └────────────────────┘
-                   ↓                            ↓
+                   ↓ sem_wait(gtk_started_sema) ↓
+                   ↓         ⇐⇐⇐⇐⇐⇐⇐⇐⇐⇐⇐  ┌────── thread ──────┐
+                   ↓  (idle fires)            │ gtk_main_wrapper() │
+                   ↓                          │ → gtk_main()       │
+            ┌─────────────┐                   └────────────────────┘
+            │ GTK_context │                              ↓
+            └─────────────┘                             ↓
                    ↓ → → gtk_window_new() → → event
                    ↓                            ↓
            all_PLOT_windows → GTK_context → → window
@@ -1772,6 +1820,23 @@ cairo_surface_t *
    NOTE that gtk_main_wrapper() is called only once (and not per window).
    Therefore the functions called from it must not throw any APL ERRORs.
  */
+
+/// semaphore posted by the GLib idle callback once gtk_main() is running
+static sem_t gtk_started_sema;
+
+static gboolean
+post_gtk_started(gpointer data)
+{
+   sem_post(static_cast<sem_t *>(data));
+   return G_SOURCE_REMOVE;   // one-shot: remove after first call
+}
+//────────────────────────────────────────────────────────────────────────────
+static gboolean
+close_GTK_window_idle(gpointer window)
+{
+   gtk_window_close(GTK_WINDOW(window));
+   return G_SOURCE_REMOVE;   // one-shot
+}
 
 static void *
 gtk_main_wrapper(void *)
@@ -1784,37 +1849,28 @@ gtk_main_wrapper(void *)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
-void
-Quad_PLOT::plot_main_GTK(void * vp_props, Handle handle)
+/// arguments for create_GTK_window_idle(), heap-allocated per call and
+/// freed by the idle callback itself once it has read them.
+struct GTK_window_create_args
 {
-// CERR << "plot_main(" << vp_props << ")" << endl;
+   Plot_window_properties * w_props;
+   Quad_PLOT::Handle handle;
+};
 
-   if (getenv("DISPLAY") == 0)   // DISPLAY not set
-      setenv("DISPLAY", ":0", true);
-
-Plot_window_properties & w_props =
-      *reinterpret_cast<Plot_window_properties *>(vp_props);
-   verbosity = w_props.get_verbosity();
-
-   MAYBE_XInitThreads();
-
-   if (!gtk_init_done)
-      {
-        int argc = 0;
-        char ** argv = { 0 };
-        gtk_init(&argc, &argv);   setlocale(LC_ALL, "C");
-        gtk_init_done = true;
-
-        pthread_t thread = 0;
-        pthread_create(&thread, 0, gtk_main_wrapper, 0);
-
-# if HAVE_PTHREAD_SETNAME_NP
-         // show with e.g.   ps H -o 'pid tid cmd comm'
-         pthread_setname_np(thread, "apl/GTK");
-# endif
-      }
+/** create (and show) one ⎕PLOT window. Runs as a GLib idle callback, i.e.
+    on the SAME thread as gtk_main() -- see plot_main_GTK()'s comment for
+    why this must not run directly on the interpreter thread.
+ */
+static gboolean
+create_GTK_window_idle(gpointer data)
+{
+GTK_window_create_args * args =
+      static_cast<GTK_window_create_args *>(data);
+Plot_window_properties & w_props = *args->w_props;
+const Quad_PLOT::Handle handle = args->handle;
+   delete args;
 
 GTK_context * pctx = new GTK_context(w_props, handle);
    Assert(pctx);
@@ -1880,6 +1936,95 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    Connect_signal(pctx->drawing_area, "draw",           Draw)
 
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
+   return G_SOURCE_REMOVE;   // one-shot
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+void
+Quad_PLOT::plot_main_GTK(void * vp_props, Handle handle)
+{
+// CERR << "plot_main(" << vp_props << ")" << endl;
+
+   if (getenv("DISPLAY") == 0)   // DISPLAY not set
+      setenv("DISPLAY", ":0", true);
+
+Plot_window_properties & w_props =
+      *reinterpret_cast<Plot_window_properties *>(vp_props);
+   verbosity = w_props.get_verbosity();
+
+   if (!gtk_init_done)
+      {
+        MAYBE_XInitThreads();
+        int argc = 0;
+        char ** argv = { 0 };
+        gtk_init(&argc, &argv);   setlocale(LC_ALL, "C");
+        gtk_init_done = true;
+
+        // Register a one-shot idle callback that posts gtk_started_sema once
+        // gtk_main() has started its event loop.  On slow (e.g. 32-bit) systems,
+        // gtk_widget_realize() crashes with g_source_set_name_by_id() if the GLib
+        // main context has not yet been acquired by gtk_main(); the sem_wait below
+        // ensures the loop is running before we create any GTK windows.
+        //
+        sem_init(&gtk_started_sema, 0, 0);
+        g_idle_add(post_gtk_started, &gtk_started_sema);
+
+        pthread_t thread = 0;
+        const int perr = pthread_create(&thread, 0, gtk_main_wrapper, 0);
+        if (perr)
+           {
+             // Bill Heagy, 2026-08-09 (/tmp/trouble.eml): on his 32-bit
+             // system, ⎕PLOT hangs (^C needed to escape) with no crash.
+             // Reproduced locally by forcing this pthread_create() to fail:
+             // with the old unconditional code, the un-postable
+             // gtk_started_sema wait below hung until ^C, and start_GUI()'s
+             // own sem_wait_safe(expose_sema) right after this function
+             // returns hung the exact same way -- ^C only ever escapes the
+             // *current* wait, so the caller needed one ^C per queued
+             // semaphore to get out at all, and the ⎕PLOT call never
+             // actually completed or raised a proper error either way.
+             // gtk_init_done was already set (just above) before we knew
+             // this would fail; reset it so a later ⎕PLOT retries the
+             // whole gtk_init()/pthread_create() sequence instead of
+             // skipping straight to g_idle_add() for a loop that was
+             // never started.
+             //
+             gtk_init_done = false;
+             MORE_ERROR() << "A ⎕PLOT B: pthread_create() for the GTK event "
+                             "loop thread failed: " << strerror(perr);
+             DOMAIN_ERROR;
+           }
+
+# if HAVE_PTHREAD_SETNAME_NP
+        // show with e.g.   ps H -o 'pid tid cmd comm'
+        pthread_setname_np(thread, "apl/GTK");
+# endif
+
+        sem_wait_safe_I(&gtk_started_sema, "the GTK event loop to start");
+      }
+
+   // Marshal window creation onto the gtk_main() thread via g_idle_add(),
+   // for every call -- not just the first. The !gtk_init_done block above
+   // only guarantees gtk_main()'s event loop has STARTED; it does not make
+   // it safe to call gtk_window_new()/gtk_widget_show_all()/etc. directly
+   // from this (interpreter) thread while that loop is now CONCURRENTLY
+   // running on its own thread. GTK+3 is not thread-safe for that: every
+   // widget must be created/manipulated on the thread running gtk_main().
+   // The first ⎕PLOT call in a session got away with it by accident (nothing
+   // else was racing yet); the second and later ones raced gtk_main()'s
+   // live event dispatch, observed as an intermittent SIGSEGV inside
+   // gtk_widget_realize()/gtk_widget_map()/g_signal_emit() (Bill Heagy,
+   // 2026-08-07, /tmp/trouble.eml) -- the exact same failure mode the
+   // !gtk_init_done synchronisation above was originally added to prevent
+   // (SVN r3304, David Alden), just for the N-th window instead of the 1st.
+   // The caller (Quad_PLOT::start_GUI()) already sem_waits on expose_sema
+   // right after this function returns, so returning immediately here
+   // (instead of running the creation code synchronously) needs no change
+   // on the caller's side.
+   //
+GTK_window_create_args * args = new GTK_window_create_args;
+   args->w_props = &w_props;
+   args->handle  = handle;
+   g_idle_add(create_GTK_window_idle, args);
+}
+//════════════════════════════════════════════════════════════════════════════
 #endif // apl_GTK3

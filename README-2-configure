@@ -17,7 +17,7 @@ the option will not occur.
    This option builds GNU APL as a shared library (libapl.so) rather than an
    executable program. This option is often combined with option
    --with-android, and is automatically set by option --with-erlang. The
-   --with-libapl option not only creates approproate Makefiles, but it also
+   --with-libapl option not only creates appropriate Makefiles, but it also
    changes the GNU APL code in some places.
 
    It is important to note that the libapl.so library needs to be initialized
@@ -36,6 +36,12 @@ the option will not occur.
    The first argument of init_libapl() is, by convention, the name of the
    executable program. The second argument, if non-zero, enables start-up
    logging of the interpreter (for debugging purposes).
+
+   When --with-libapl is given (directly, or implied by --with-erlang),
+   'make install' also installs a pkg-config file libapl.pc, so that
+   programs embedding libapl.so can find its compile/link flags with
+   'pkg-config --cflags --libs libapl' instead of hard-coding the
+   $(includedir)/apl and $(libdir)/apl paths.
 
 --with-sqlite3=[ARG]
    Build the native function for SQL using sqlite3. ARG may provide the
@@ -64,7 +70,7 @@ ASSERT_LEVEL_WANTED=n
     ./configure ASSERT_LEVEL_WANTED=2
 
 SECURITY_LEVEL_WANTED=n
-   Some capabilities of the APL intepreter can be disabled to improve the
+   Some capabilities of the APL interpreter can be disabled to improve the
    security of, for example, a web server that uses CGI scripts written in APL.
    SECURITY_LEVEL_WANTED=2 disables all capabilities that can be disabled
    SECURITY_LEVEL_WANTED=1 disables those capabilities that are configured in
@@ -110,9 +116,9 @@ APSERVER_PATH
 
 CORE_COUNT_WANTED
    This experimental option specifies the number of CPU cores the
-   intepreter shall use. The value is either a number, or else one of
+   interpreter shall use. The value is either a number, or else one of
    the strings 'all', 'argv', or 'syl' (without quotes). For some of its
-   pimitives the GNU APL interpreter has both sequential and parallel code
+   primitives the GNU APL interpreter has both sequential and parallel code
    which is selected with ./configure as follows:
 
    ╔═════════════════╤════════════╤═══════════════════════════════════════════╗
@@ -196,7 +202,7 @@ DEVELOP_WANTED
     ./configure DEVELOP_WANTED=yes
 
     Users who wish to submit patches for GNU APL should compile and test the
-    patched intepreter with DEVELOP_WANTED=yes.
+    patched interpreter with DEVELOP_WANTED=yes.
 
 MAX_RANK_WANTED=n
     Set the maximum rank of APL values to n. The default value is 8. Max ranks
@@ -210,7 +216,7 @@ ALT_MAP_WANTED=n
     Enable an APL input mechanism that allows the input of APL characters
     without installing a keyboard mapping. This is primarily for Windows
     machines where no reliable mechanism for entering APL characters exists.
-    The parameter n specifies a profile as sollows:
+    The parameter n specifies a profile as follows:
 
     n=0 : disable the mecxhanism
     n=1 : ^A (ASCII SOH) maps the next ASCII character to an APL character
@@ -240,7 +246,6 @@ VALUE_HISTORY_WANTED=yes
     decreases its performance. Example:
 
     ./configure VALUE_HISTORY_WANTED=yes
-
 
 PERFORMANCE_COUNTERS_WANTED=yes
     GNU APL has some build-in counters for performace measurements. These
@@ -312,7 +317,7 @@ RATIONAL_NUMBERS_WANTED=yes
     ./configure RATIONAL_NUMBERS_WANTED=yes
 
 without-optional_libs
-   This option pretends that any of yje optional library is missing.
+   This option pretends that any of the optional library is missing.
    It patches the config.h file produced by ./configure (though not the LIBS
    shell variable set by ./configure). IOW: the compiler is told that these
    libraries are not available, but the liker will still link agains them

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,34 +97,18 @@
 #define __APL_FLOAT_AS_CLASS_HH_DEFINED__
 
 #ifndef __APL_TYPES_HH_DEFINED__
-# error This file shall not be #included directly, but by #including APL_types.hh
+#  error This file shall not be #included directly, but by #including APL_types.hh
 #endif
 
 class APL_Float;
 
+//════════════════════════════════════════════════════════════════════════════
 /// the essential data of an APL_Float, so that it can be used in a union
 class APL_Float_Base
 {
 public:
    /// return the value as double
    double _get() const
-      { return dval; }
-
-   /// set the value from a double
-   APL_Float_Base & _set(double d)
-      { dval = d;    return *this; }
-
-   /// cast to APL_Float (creates a copy)
-   inline operator APL_Float() const;
-
-   /// up-cast const APL_Float_Base * to const APL_Float *
-   inline const APL_Float * pAPL_Float() const;
-
-   /// up-cast APL_Float_Base * to APL_Float *
-   inline APL_Float * pAPL_Float();
-
-   /// cast to double
-   inline operator double()
       { return dval; }
 
    /// cast to APL_Integer
@@ -135,11 +119,29 @@ public:
         return -pa;
       }
 
+   /// cast to APL_Float (creates a copy)
+   inline operator APL_Float() const;
+
+   /// up-cast const APL_Float_Base * to const APL_Float *
+   inline const APL_Float * pAPL_Float() const;
+
+   /// set the value from a double
+   /// @param d the double value to store
+   APL_Float_Base & _set(double d)
+      { dval = d;    return *this; }
+
+   /// cast to double
+   inline operator double()
+      { return dval; }
+
+   /// up-cast APL_Float_Base * to APL_Float *
+   inline APL_Float * pAPL_Float();
+
 protected:
    /// the value
    double dval;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a non-rational APL floating point value
 class APL_Float : public APL_Float_Base
 {
@@ -148,38 +150,42 @@ public:
    APL_Float()                      { dval = 0.0; }
 
    /// constructor from a \b double value \b d
+   /// @param d the initial floating-point value
    APL_Float(double d)              { dval = d; }
 
    /// assingment from another APL_Float
+   /// @param other the source APL_Float value
    APL_Float & operator =(const APL_Float & other)
       { dval = other.dval; return *this; }
 };
+//════════════════════════════════════════════════════════════════════════════
 /// isnormal() for APL_Float
+/// @param val the APL_Float value to test
 inline bool isnormal(const APL_Float & val)
 {
   return std::isnormal(val._get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// cast from APL_Float_Base to APL_Float
 APL_Float_Base::operator APL_Float() const
 {
    return APL_Float(dval);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// up-cast from const APL_Float_Base * to const APL_Float *
 const APL_Float *
 APL_Float_Base::pAPL_Float() const
 {
    return static_cast<const APL_Float *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// up-cast from APL_Float_Base * to APL_Float *
 APL_Float *
 APL_Float_Base::pAPL_Float()
 {
    return static_cast<APL_Float *>(this);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #define wrap1(type, fun)                                                \
 inline type fun(const APL_Float_Base & d)                               \
@@ -276,7 +282,9 @@ assop_wrap1(-)
 assop_wrap1(*)
 assop_wrap1(/)
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// complex square root
+/// @param x the complex APL_Float operand
 inline complex<APL_Float>
 complex_sqrt(complex<APL_Float> x)
 {
@@ -284,7 +292,9 @@ const complex<double> cx(x.real()._get(), x.imag()._get());
 const complex<double> cz = sqrt(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// complex exponent (e^x)
+/// @param x the complex APL_Float exponent
 inline complex<APL_Float>
 complex_exponent(complex<APL_Float> x)
 {
@@ -292,7 +302,10 @@ const complex<double> cx(x.real()._get(), x.imag()._get());
 const complex<double> cz = exp(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// complex power (x^y)
+/// @param x the complex APL_Float base
+/// @param y the complex APL_Float exponent
 inline complex<APL_Float>
 complex_power(complex<APL_Float> x, complex<APL_Float> y)
 {
@@ -301,6 +314,6 @@ const complex<double> cy(y.real()._get(), y.imag()._get());
 const complex<double> cz = pow(cx, cy);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #endif // __APL_FLOAT_AS_CLASS_HH_DEFINED__
 

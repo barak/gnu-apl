@@ -1,0 +1,375 @@
+⍝ ZZ64_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ bug-apl@gnu.org, 6/21/2026 (Blake McBride):
+      ⍝ Multiple bugs found by Claude Code audit.
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ Bug 1: 4-byte UTF-8 lead byte decoded with wrong bit mask (0x0E vs 0x07)
+      ⍝ in UCS_string.cc. Every U+10000..U+10FFFF character decoded to wrong
+      ⍝ codepoint. Fixed in UCS_string.cc.
+      ⎕UCS ⎕UCS 128512
+128512
+      ⎕UCS ⎕UCS 128077
+128077
+
+      ⍝ Bug 2: UTF8_string::getc() buffer cc[4] too small for 5/6-byte
+      ⍝ lead bytes (len up to 5 → write 7 bytes including NUL). Fixed by
+      ⍝ enlarging cc to cc[8].
+
+      ⍝ Bug 3: find_closing_bracket / find_closing_parent both tested the
+      ⍝ closing token in the else-if branch (dead code), so nesting depth
+      ⍝ was never incremented and nested brackets/parens returned the wrong
+      ⍝ closing position. Fixed in Token_string.cc.
+      A ← 3 3 ⍴ ⍳ 9
+      A[A[1;1];]
+1 2 3
+
+      ⍝ Bug 5: 41 ⎕CR B packed-bit unpacker returned Idx0(LOC) (always 0)
+      ⍝ and read bits from wrong memory (&get_cfirst() → static cell).
+      ⍝ Fixed in Quad_CR.cc.
+      B ← 16 ⍴ 0 1
+      41 ⎕CR 40 ⎕CR B
+0 1 0 1 0 1 0 1 0 1 0 1 0 1 0 1
+
+      ⍝ Bug 6: ⎕XML treated CR codepoint as array index into string_B,
+      ⍝ causing out-of-bounds read. Fixed in Quad_XML.cc.
+      ⊃ ⍴ ⎕XML '<a>',(⎕UCS 13),'b</a>'
+8 2
+
+      ⍝ Bug 7: ComplexCell::get_near_int() used result+0.3 for both positive
+      ⍝ and negative near-integers; negative values rounded toward zero by 1.
+      ⍝ Fixed in ComplexCell.cc.
+      (¯3J0) ↑ ⍳ 10
+8 9 10
+
+      ⍝ Bug 8: FloatCell::is_big() table last entry was 10^18 instead of 10^17,
+      ⍝ so ⎕PP←17 used decimal for values ≥ 10^17 (threshold 10x too large).
+      ⍝ Fixed in FloatCell.cc.
+      ⎕PP ← 17
+      ⍕ 1E17
+1E17
+      ⎕PP ← 10
+
+      ⍝ Bug 11: ComplexCell::bif_power tested imag()>0 instead of real()>0
+      ⍝ for the 0⋆N case; 0⋆N with N a complex with imag 0 gave DOMAIN ERROR.
+      ⍝ Fixed in ComplexCell.cc.
+      0 ⋆ 3J0
+0
+
+      ⍝ Bugs13 #1 (Blake McBride): ComplexCell::get_near_int() had its
+      ⍝ imaginary-part validation commented out, so a significant imaginary
+      ⍝ part was silently dropped wherever get_near_int() is used (⍴ ↑ ↓ ⌽
+      ⍝ ⍳ /), while is_near_int() (used elsewhere) correctly required both
+      ⍝ parts near-integer. Fixed in ComplexCell.cc.
+      2J3⍴5
+DOMAIN ERROR
+      2J3⍴5
+      ^  ^
+      2J3↑⍳5
+DOMAIN ERROR
+      2J3↑⍳5
+      ^  ^
+      3J¯4⌽⍳5
+DOMAIN ERROR
+      3J¯4⌽⍳5
+      ^   ^
+      ⍳2J3
+DOMAIN ERROR
+      ⍳2J3
+      ^
+      2J3/1 2
+DOMAIN ERROR
+      2J3/1 2
+      ^  ^
+      2J0⍴5
+5 5
+      )SIC
+
+      ⍝ Bugs13 #2 (Blake McBride): Tokenizer::tokenize_real() did not check
+      ⍝ errno/isfinite() after strtod(), so a numeric literal beyond the
+      ⍝ double range (e.g. 1E999) silently became ∞ instead of being
+      ⍝ rejected -- inconsistent with every arithmetic primitive, which
+      ⍝ all refuse to produce (or consume) a non-finite value. Underflow
+      ⍝ to 0 (e.g. 1E¯999) is benign and unaffected. Fixed in Tokenizer.cc.
+      1E999
+Bad number+
+      1E999
+      ^    ^
+      1E¯999
+0
+      ¯1E¯999
+0
+      1E308
+1E308
+
+      ⍝ Bugs13 #3 (Blake McBride): NumericCell::bif_and() (∧, LCM) real
+      ⍝ branch called FloatCell::zF() without an isfinite() check, unlike
+      ⍝ every sibling FloatCell arithmetic primitive -- so an LCM whose
+      ⍝ true result overflows double range silently produced ∞ instead of
+      ⍝ DOMAIN ERROR. Fixed in NumericCell.cc.
+      ⍝
+      ⍝ NOTE (Bugs28 #43, 2026-09-05): this example used to be
+      ⍝ 1E300∧1E30 -- but flt_gcd()'s own imprecision (see below) is
+      ⍝ exactly why that particular pair used to overflow: 1E30 truly
+      ⍝ does (tolerantly) divide 1E300, so the correct gcd is 1E30 and
+      ⍝ the correct lcm is the perfectly finite 1E300, not an overflow
+      ⍝ at all. Replaced with a pair whose lcm genuinely exceeds double
+      ⍝ range even with a correctly-computed (small) gcd, so this still
+      ⍝ tests bif_and()'s isfinite() check rather than the old bug.
+      ⍝
+      8.11044318132503E299∧6.744967127130588E287
+DOMAIN ERROR
+      8.11044318132503E299∧6.744967127130588E287
+      ^                   ^
+      ]FILE_CTL SKIP_APL2   ⍝ GCD/LCM (non-boolean ∧ ∨) is a GNU APL extension
+      4∧6
+12
+      1.5∧2.5
+7.5
+
+      ⍝ Bugs13 #4 (Blake McBride): NumericCell::flt_gcd() looped forever on
+      ⍝ a non-finite operand -- fmod(x,NaN) is NaN forever, and
+      ⍝ is_near_zero(NaN) is always false, so the Euclidean loop never
+      ⍝ terminated and never checked for attention/interrupt. Fixing
+      ⍝ Bugs13 #2/#3 closed the two known ways to get a non-finite value
+      ⍝ into a workspace in the first place, but flt_gcd() itself is now
+      ⍝ also hardened directly (isfinite() check + iteration cap), in case
+      ⍝ some other path reaches it in the future. Fixed in NumericCell.cc.
+      4∧6
+12
+      4∨6
+2
+
+      ⍝ Bugs13 #5 (Blake McBride): UCS_string's decimal formatter special-
+      ⍝ cased |value| < 1E¯305 as exactly 0, but double reaches down to
+      ⍝ ≈4.9E¯324 (subnormal) -- roughly three orders of magnitude of
+      ⍝ perfectly ordinary, exactly representable doubles printed as 0,
+      ⍝ causing silent data loss on 2 ⎕TF / )OUT (⎕SAVE/)LOAD, which use
+      ⍝ the binary archive format, were unaffected). Replaced the special
+      ⍝ case with a plain value==0.0 test, letting the existing scaling
+      ⍝ loop handle subnormals like everything else. While in there, also
+      ⍝ removed dead code after an unconditional break a few lines below
+      ⍝ (Blake's 12a note). Fixed in UCS_string.cc.
+      ⍝
+      ⍝ (This also exposed a related bug introduced earlier in this same
+      ⍝ report by Bugs13 #2's fix: glibc's strtod() sets errno==ERANGE for
+      ⍝ *any* underflow, including a non-zero subnormal result, not just
+      ⍝ true overflow -- so the ERANGE check wrongly rejected legitimate
+      ⍝ subnormal literals like 4.9E¯324 as "Bad number". Fixed by relying
+      ⍝ on isfinite() of the actual strtod() result instead of errno.)
+      ]FILE_CTL NO_SKIP
+      2.5E¯306
+2.5E¯306
+      2.5E¯306 = 0
+0
+      ÷1E¯306
+1E306
+      4.9E¯324
+4.940656458E¯324
+      X←2.5E¯306 ⋄ R←2 ⎕TF 'X' ⋄ ⎕EX 'X' ⋄ R
+1
+X←2.5E¯306
+
+      ⍝ Bugs13 #6 (Blake McBride): XML_node::collect()'s node loop pushed
+      ⍝ each start tag onto a stack and popped it on the matching end tag,
+      ⍝ but never checked that the stack was empty once the loop finished
+      ⍝ -- so any still-open element at end of document was silently
+      ⍝ accepted, with its entire (unclosed) content discarded rather than
+      ⍝ raising an error. Fixed in Quad_XML.cc.
+      0 ⎕XML ⎕XML '<a><b>text</b></a>'
+<a><b>text</b></a>
+      0 ⎕XML ⎕XML '<a><b>text</b>'
+DOMAIN ERROR+
+      0 ⎕XML ⎕XML '<a><b>text</b>'
+             ^
+      0 ⎕XML ⎕XML '<a>hello'
+DOMAIN ERROR+
+      0 ⎕XML ⎕XML '<a>hello'
+             ^
+      )SIC
+
+      ⍝ Bugs13 #7 (Blake McBride): Quad_JSON.cc's APL_to_JSON_string() hit
+      ⍝ a bare FIXME (which prints a diagnostic and calls exit(0), killing
+      ⍝ the whole session) for any doubly-enclosed non-char-vector value,
+      ⍝ e.g. 2 ⎕JSON ⊂⊂1 2 3 -- ordinary user data, not a "cannot happen"
+      ⍝ condition. Replaced with the same MORE_ERROR()+DOMAIN_ERROR style
+      ⍝ already used a few lines below for the sibling "bad JSON literal"
+      ⍝ case. (Audited the other two FIXMEs Blake flagged as maybe
+      ⍝ reachable, Quad_CR.cc:926 and Quad_XML.cc:609 -- both confirmed
+      ⍝ genuinely unreachable by tracing their callers, so left as-is.)
+      ⍝ Fixed in Quad_JSON.cc.
+      2 ⎕JSON ⊂⊂1 2 3
+DOMAIN ERROR+
+      2 ⎕JSON⊂⊂1 2 3
+      ^ ^
+      ⍝ (the carets of the next line used to be one token off, since
+      ⍝ the error display counted 3 tokens for every folded ⊂B)
+      2 ⎕JSON ⊂⊂2 2⍴'ab'
+DOMAIN ERROR+
+      2 ⎕JSON⊂⊂2 2⍴'ab'
+      ^ ^
+      2 ⎕JSON ⊂⊂'true'
+true
+      )SIC
+
+      ⍝ Bugs13 #8 (Blake McBride): ⎕FX-loaded .so libraries had no ABI/
+      ⍝ version guard: a library built against a different, binary-
+      ⍝ incompatible GNU APL (e.g. a stale library left in the
+      ⍝ unversioned, bare-name-resolved /usr/local/lib/apl/ after an
+      ⍝ interpreter upgrade) was dlopen()ed and its function pointers
+      ⍝ called anyway, silently corrupting the interpreter's heap via a
+      ⍝ mismatched Value/Cell layout (confirmed under gdb: a stale
+      ⍝ library's inlined Value_P constructor wrote past a Value's
+      ⍝ check_ptr at the wrong offset). Added a mandatory
+      ⍝ get_ABI_version() that every native library (template.hh and
+      ⍝ file_io.cc) now exports, checked in NativeFunction's constructor
+      ⍝ against NATIVE_ABI_VERSION (Native_interface.hh) before any other
+      ⍝ function pointer from the library is used; a missing or
+      ⍝ mismatched version is rejected with MORE_ERROR()+DOMAIN_ERROR
+      ⍝ (⎕FX returns 0) instead of loading the incompatible library.
+      ⍝ Fixed in NativeFunction.cc, Native_interface.hh, native/
+      ⍝ template.hh, native/file_io.cc.
+      ⍝
+      ⍝ Blake also called the build-tree fallback search path in
+      ⍝ open_so_file() "wrong" (it lists "./native"/"./emacs_mode", but
+      ⍝ libtool actually builds into "./native/.libs"/"./emacs_mode/
+      ⍝ .libs", so those two entries never match anything) and suggested
+      ⍝ adding the .libs directories, searched before the installed
+      ⍝ location. That part was tried (twice) and then deliberately
+      ⍝ reverted on Jürgen's direction: the normal, established workflow
+      ⍝ is to `make install` before testing native-function changes, at
+      ⍝ which point apl_DIR__pkglib -- already first in the search order,
+      ⍝ and exactly what `apl --show_lib_dir` reports, regardless of
+      ⍝ where apl is started from -- already has the current library.
+      ⍝ The two dead entries are unreachable but harmless under that
+      ⍝ workflow, and the search path had worked without a real problem
+      ⍝ for years, so it was left as-is rather than changed on the
+      ⍝ strength of one report. (This does mean a bare-name ⎕FX right
+      ⍝ after `make -C src apl`, with no `make install` in between, will
+      ⍝ resolve to whatever is currently installed rather than the just-
+      ⍝ built tree -- by design, not a bug, per the above.)
+      ⍝
+      ⍝ Below: the ABI guard exercised via a full path (so the test does
+      ⍝ not depend on `make install` having been run against this
+      ⍝ checkout). The rejection path itself isn't practical to cover
+      ⍝ here either, since it requires a second, ABI-incompatible build
+      ⍝ of GNU APL to load against -- manually verified against a real
+      ⍝ stale installed copy. Full make test, 272/272 files: clean; this
+      ⍝ was previously an assertion-failure abort; see testcases/
+      ⍝ NativeFunctions.tc for the normal-path native-function coverage.
+      './native/.libs/lib_template_F0.so' ⎕FX 'NATIVE_F0'
+NATIVE_F0
+      NATIVE_F0
+eval_() called
+
+      ⍝ Bugs13 #9 (Blake McBride): ⎕FIO[7] (fwrite) and ⎕FIO[38] (send)
+      ⍝ used get_near_int() to convert each element of A to a byte,
+      ⍝ silently truncating out-of-range values (e.g. 300 -> 0x2C) instead
+      ⍝ of raising an error, unlike the sibling write functions ⎕FIO[42]/
+      ⍝ [43] which correctly use get_byte_value() (-128..255 range).
+      ⍝ Switched ⎕FIO[7]/[38] to get_byte_value() too. Fixed in
+      ⍝ Quad_FIO.cc.
+      H←'w' ⎕FIO[3] '/tmp/ZZ64_v8.bin'
+      (300 65 ¯1 1000) ⎕FIO[7] H
+DOMAIN ERROR+
+      300 65 ¯1 1000 ⎕FIO[7]H
+      ^              ^
+      (65 66 67) ⎕FIO[7] H
+3
+      ⎕FIO[4] H
+0
+      ⎕FIO[26] '/tmp/ZZ64_v8.bin'
+ABC
+      ⎕FIO[19] '/tmp/ZZ64_v8.bin'
+0
+
+      ⍝ Bugs13 #10 (Blake McBride): 2 ⎕TF did not preserve structured
+      ⍝ variables -- tf2_var() just walked the value's raw shape/ravel
+      ⍝ (a plain N×2 nested matrix, since that is literally how a
+      ⍝ structured value is represented internally), losing the
+      ⍝ "structured" property, so a round-trip through 2 ⎕TF degraded X
+      ⍝ to a plain nested matrix (member access, e.g. X.a, then failed
+      ⍝ with DOMAIN ERROR). Fixed by having tf2_var()/tf2_ravel() wrap a
+      ⍝ structured value's encoding in "(38⎕CR(...))" (Quad_CR.cc's
+      ⍝ existing "plain array -> structured value" conversion; the extra
+      ⍝ outer parens keep it unambiguous when it appears as one strand
+      ⍝ element among others -- without them, e.g. "38" could get
+      ⍝ stranded with a *preceding* element instead of binding to ⎕CR)
+      ⍝ instead of a bare "(...)", and adding a general tf2_reduce_CR38()
+      ⍝ pass to the existing tf2_reduce_XXX() pipeline (alongside
+      ⍝ tf2_reduce_RHO() etc.) that folds any "(38 ⎕CR VALUE)" -- at any
+      ⍝ nesting depth, not just the top level -- into do_CR38()'s actual
+      ⍝ result, rather than just the plain matrix. This also covers a
+      ⍝ structured variable whose own member value is *itself* structured
+      ⍝ (e.g. X.sub.c, arbitrarily many levels deep), which an earlier,
+      ⍝ narrower version of this fix (special-casing only the top-level
+      ⍝ "SYM←(38⎕CR VALUE)" pattern in tf2_inverse(), now removed as
+      ⍝ redundant) did not. Fixed in Quad_TF.cc/.hh, Quad_CR.hh.
+      X←⎕JSON '{"a":1,"b":2}'
+      X.a
+1
+      S←2 ⎕TF 'X'
+      S
+X←(38⎕CR(8 2⍴0 0 0 0 0 0 0 0 0 0 0 0 (1⍴'b') 2 (1⍴'a') 1))
+      E←⎕EX 'X'
+      R←2 ⎕TF S
+      X.a
+1
+      X.b
+2
+
+      ⍝ nested case: a structured value whose own member is itself
+      ⍝ structured.
+      Y←⎕JSON '{"a":1,"sub":{"c":3}}'
+      Y.a
+1
+      Y.sub.c
+3
+      T←2 ⎕TF 'Y'
+      E←⎕EX 'Y'
+      U←2 ⎕TF T
+      Y.a
+1
+      Y.sub.c
+3
+
+      ⍝ Bugs13 #11 (Blake McBride): ⎕FIO[55]/[48] scanf's "%[a-c]"
+      ⍝ character-range handling expanded the a-c range correctly, but
+      ⍝ then fell through to the generic "add this character to the
+      ⍝ range" code with funi still holding the '-', so '-' itself was
+      ⍝ also (wrongly) added to the class -- unlike C's sscanf(), which
+      ⍝ stops at '-'. Fixed by continuing the loop (skipping the fall-
+      ⍝ through) right after expanding a range. Fixed in Quad_FIO.cc.
+      '%[a-c]' ⎕FIO[55] 'ab-cX'
+ ab 
+      '%[abc]' ⎕FIO[55] 'ab-cX'
+ ab 
+      '%[^a-c]' ⎕FIO[55] 'xyz-abc'
+ xyz- 
+
+      ⍝ Bugs13 #12 (Blake McBride): smaller items.
+      ⍝ 12a: UTF8_string::round_0_1() had no callers anywhere in the tree
+      ⍝ (confirmed) and misbehaved for a single-digit string besides.
+      ⍝ Deleted (UTF8_string.cc/.hh).
+      ⍝ 12d: the 5-/6-byte UTF-8 lead-byte masks in UCS_string.cc's
+      ⍝ toUni()-equivalent decoder were one bit too wide (0x07/0x03
+      ⍝ instead of 0x03/0x01), unlike UTF8_string::toUni()'s own decoder,
+      ⍝ which already had the correct masks. Harmless in practice (RFC
+      ⍝ 3629 caps valid UTF-8 at 4 bytes, i.e. U+10FFFF, so a conformant
+      ⍝ encoder never emits a 5-/6-byte sequence for the extra bit to
+      ⍝ affect), but aligned the two decoders. Fixed in UCS_string.cc.
+      ⍝ No APL-level regression test for either -- 12a removed code with
+      ⍝ no caller to exercise, and 12d only differs for byte sequences
+      ⍝ that cannot arise from any valid Unicode codepoint.
+      ⍝
+      ⍝ 12b (⎕FIO security flags) and 12c (⎕JSON parser leniency) are
+      ⍝ policy questions Blake explicitly flagged as possibly intentional
+      ⍝ rather than bugs -- left for a deliberate decision, not fixed
+      ⍝ here.
+
+      ]NEXTFILE

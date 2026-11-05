@@ -1,6 +1,8 @@
 ⍝ ZZ35_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
@@ -31,5 +33,5 @@ OK      - no stale indices
 OK      - no duplicate parents
 
 
-⍝ ==================================
+      ⍝ ==================================
 

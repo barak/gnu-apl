@@ -106,7 +106,7 @@ static int find_free_connection( void )
 }
 
 static Token
-open_database(const Value & A, const Value & B)
+open_database(const cValue & A, const cValue & B)
 {
     if (!A.is_apl_char_vector() )
        {
@@ -136,7 +136,7 @@ static void throw_illegal_db_id( void )
     MORE_ERROR() << "Illegal database id";
     DOMAIN_ERROR;
 }
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Connection *db_id_to_connection( int db_id )
 {
    if( db_id < 0 || db_id >= int(connections.size())) {
@@ -156,7 +156,8 @@ static Connection *value_to_db_id( Value_P value )
         throw_illegal_db_id();
     }
 
-    int db_id = value->get_cravel( 0 ).get_int_value();
+    Cell cache;
+    int db_id = value->get_cravel( 0, cache ).get_int_value();
     return db_id_to_connection( db_id );
  }
 
@@ -167,7 +168,8 @@ static Token close_database( Value_P B )
         DOMAIN_ERROR;
     }
 
-    int db_id = B->get_cravel( 0 ).get_int_value();
+    Cell cache;
+    int db_id = B->get_cravel( 0, cache ).get_int_value();
     if (db_id < 0 || db_id >= int(connections.size())) {
         throw_illegal_db_id();
     }
@@ -181,14 +183,15 @@ static Token close_database( Value_P B )
 
     return Token( TOK_APL_VALUE1, Str0( LOC ) );
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Value_P
 run_generic_one_query(ArgListBuilder *arg_list, Value_P B,
                       int start, int num_args, bool ignore_result)
 {
    loop(i, num_args)
        {
-         const Cell & cell_B = B->get_cravel(start + i);
+         Cell cache;
+         const Cell & cell_B = B->get_cravel(start + i, cache);
          if (cell_B.is_integer_cell())
             {
               arg_list->append_long(cell_B.get_int_value(), i);
@@ -274,7 +277,7 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
          RANK_ERROR;
        }
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Token
 run_query(Connection *conn, Value_P A, Value_P B)
 {
@@ -306,7 +309,7 @@ Connection *conn = value_to_db_id(B);
     conn->transaction_rollback();
     return Token( TOK_APL_VALUE1, Idx0(LOC));
 }
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Token
 show_tables(Value_P B)
 {
@@ -335,7 +338,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Token( TOK_APL_VALUE1, Z);
 }
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Token
 show_cols(Value_P A, Value_P B)
 {
@@ -384,7 +387,7 @@ Value_P Z;
     Z->check_value(LOC);
     return Token( TOK_APL_VALUE1, Z );
 }
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Fun_signature get_signature()
 {
     init_provider_map();
@@ -414,7 +417,8 @@ Token eval_AB( Value_P A, Value_P B )
 
 Token eval_XB(Value_P X, Value_P B)
 {
-const int function_number = X->get_cfirst().get_near_int( );
+Cell cache;
+const int function_number = X->get_cfirst( cache ).get_near_int( );
 
     switch(function_number)
        {
@@ -437,19 +441,21 @@ param_to_db( Value_P X)
         MORE_ERROR() << "Database id missing from axis parameter";
         RANK_ERROR;
     }
-    return db_id_to_connection( X->get_cravel( 1 ).get_near_int( ) );
+    Cell cache;
+    return db_id_to_connection( X->get_cravel( 1, cache ).get_near_int( ) );
 }
 
 Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 {
-    const int function_number = X->get_cravel( 0 ).get_near_int( );
+    Cell cache;
+    const int function_number = X->get_cravel( 0, cache ).get_near_int( );
 
     switch( function_number ) {
     case 0:
         return list_functions(CERR);
 
     case 1:
-        return open_database(*A, *B);
+        return open_database(*A.get(), *B.get());
 
     case 3:
         return run_query(param_to_db(X), A, B);

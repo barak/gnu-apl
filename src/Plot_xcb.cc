@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,15 +40,18 @@
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
 # include "Quad_PLOT.hh"
+# include "Sys.hh"
 # include "Workspace.hh"
 
 // UTF8 support for XCB windows needs additional libraries that may
-// not be present. You can enable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
-// in this file or better:
+// not be present. You can disable that with:
+// CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure
 //
-//  CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=1 ./configure. The
-//
-// default is disabled.
+// The default is enabled (Blake McBride, Bugs16 minor: this comment
+// used to say "default is disabled", which was backwards -- the #define
+// right below it has always defaulted to 1, so the XOpenDisplay()/
+// XGetXCBConnection() path fixed in Bugs16 #1 is the default build,
+// not an opt-in one).
 //
 # ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
    /// undefined → 1
@@ -92,7 +95,7 @@ using namespace std;
 /// 4 byte little endian
 #define LE4(x) LE2((x)), LE2((x >> 16))
 
-// ===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// Some xcb IDs (returned from the X server)
 class XCB_context : public Quad_PLOT::PLOT_context
 {
@@ -104,14 +107,26 @@ public:
      caption(0),
      w_props(props),
      window_goon(true),
-     file_saved(false)
+     file_saved(false),
+     connected(false)
    {}
 
    /// destructor
    virtual ~XCB_context()
       {
         free(const_cast<char *>(caption));
-        delete &w_props;
+
+        // only take ownership of (and delete) w_props once the X-server
+        // connection actually succeeded: on the connection-failure path
+        // (Bugs16 #1) this destructor runs immediately, while start_GUI()
+        // (on the interpreter thread) still needs to read
+        // w_props.get_gui_thread_error() afterwards -- deleting it here
+        // would be a use-after-free there. w_props is intentionally
+        // leaked on that path instead (same as the pre-existing
+        // pthread_create()-failure paths in start_GUI(), none of which
+        // delete w_props either).
+        //
+        if (connected)   delete &w_props;
       }
 
    /// overloaded PLOT_context::plot_stop()
@@ -151,8 +166,12 @@ public:
 
    /// plot window was written to an output file
    bool file_saved;
+
+   /// true once the X-server connection succeeded and this context has
+   /// taken ownership of w_props (see the destructor)
+   bool connected;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the supposed width and the height of a string (in pixels)
 struct string_width_height
 {
@@ -165,7 +184,7 @@ struct string_width_height
    /// the height of the string (pixels)
    Pixel_Y height;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 string_width_height::string_width_height(const XCB_context & pctx,
                                          const char * string)
 {
@@ -196,7 +215,7 @@ const xcb_query_text_extents_cookie_t cookie =
         height = 13;
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// return the length (in pixels) of string
 Pixel_X
 string_width(const XCB_context & pctx, const char * string)
@@ -204,7 +223,7 @@ string_width(const XCB_context & pctx, const char * string)
 string_width_height wh(pctx, string);
    return wh.width;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// test a returned cookie for errors (and print \b errMessage if any).
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
@@ -219,7 +238,7 @@ testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
         exit (-1);
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// return a xcb_gcontext_t for font \b font_name
 xcb_gcontext_t
 setup_font_gc(XCB_context & pctx, const char * font_name, Color canvas_color)
@@ -237,7 +256,7 @@ uint32_t values[3] = { 0x00FFFFFF & ~canvas_color, canvas_color, pctx.font };
               pctx.conn, "can't create font gc");
    return gc;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 # define XFT   0   /**< draw text with Xdt */
 # define PANGO 0   /**< draw text with pango */
 # if XFT
@@ -309,7 +328,7 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
               "xcb_image_text_8_checked() failed.");
 # endif
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// return the text of a grid tick with value \b val
 char *
 format_tick(double val)
@@ -351,20 +370,20 @@ const char * unit = 0;
 
    if (unit == 0)   // very large or very small
       {
-        snprintf(cp, end - cc, "%.2E", val);
+        snprintf(cp, end - cp, "%.2E", val);
         NULL_TERMINATE(cc)
         return cc;
       }
 
    // at this point: 1 ≤ val < 1000
    //
-   if      (val < 10)    snprintf(cp, end - cc, "%.2f%s", val, unit);
-   else if (val < 100)   snprintf(cp, end - cc, "%.1f%s", val, unit);
-   else                  snprintf(cp, end - cc, "%.0f%s", val, unit);
+   if      (val < 10)    snprintf(cp, end - cp, "%.2f%s", val, unit);
+   else if (val < 100)   snprintf(cp, end - cp, "%.1f%s", val, unit);
+   else                  snprintf(cp, end - cp, "%.0f%s", val, unit);
    NULL_TERMINATE(cc)
    return cc;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a line from P0 to P1
 void
 draw_line(const XCB_context & pctx, xcb_gcontext_t gc,
@@ -373,7 +392,7 @@ draw_line(const XCB_context & pctx, xcb_gcontext_t gc,
 const xcb_segment_t segment = { I1616(P0.x, P0.y), I1616(P1.x, P1.y) };
    xcb_poly_segment(pctx.conn, pctx.window, gc, 1, &segment);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// swap pixels at P0 (with value Y0) and P1 (with value Y1) and 
 inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
@@ -381,7 +400,7 @@ pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline double
 intersection(double Ax, double Ay, double Bx, double By,
              double Cx, double Cy, double Dx, double Dy)
@@ -444,7 +463,7 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
 
    return /* beta == */ numer/denom;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// set the an attribute of a xcb_gcontext_t
 inline void
 set_GC_attr(const XCB_context & pctx, xcb_gcontext_t gc,
@@ -452,21 +471,21 @@ set_GC_attr(const XCB_context & pctx, xcb_gcontext_t gc,
 {
    xcb_change_gc(pctx.conn, gc, mask, &value);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// set the foreground color of a xcb_gcontext_t
 inline void
 set_GC_foreground(const XCB_context & pctx, xcb_gcontext_t gc, Color color)
 {
    set_GC_attr(pctx, gc, XCB_GC_FOREGROUND, color);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// set the line width of a xcb_gcontext_t
 inline void
 set_GC_line_width(const XCB_context & pctx, xcb_gcontext_t gc, int width)
 {
    set_GC_attr(pctx, gc, XCB_GC_LINE_WIDTH, width);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a triangular area of a 3D plot
 void
 draw_triangle(const XCB_context & pctx, int verbosity,
@@ -500,7 +519,7 @@ const double dH = (H12 - H0) / steps;
          draw_line(pctx, pctx.fill, P0_P1, P0_P2);
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a triangular plot point (∆ or ∇)
 void
 draw_triangle(const XCB_context & pctx, int verbosity, Pixel_XY P0, double H0,
@@ -547,7 +566,7 @@ draw_triangle(const XCB_context & pctx, int verbosity, Pixel_XY P0, double H0,
         draw_triangle(pctx, verbosity, P2, H2, P1, P, H1);
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw a plot point (representing one data value) at position \b xy
 void
 draw_point(const XCB_context & pctx, const Pixel_XY & xy, Color canvas_color,
@@ -688,21 +707,24 @@ const Color point_color = l_props.get_point_color();
 
    // otherwise: draw no point
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the legend
 void
-draw_legend(const XCB_context & pctx, const Plot_window_properties & w_props)
+draw_legend(const XCB_context & pctx, const Plot_window_properties & w_props,
+            bool surface_plot)
 {
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
-const int line_count = w_props.get_line_count();
+   if (!w_props.get_show_legend())   return;   // no legend
+
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
+const int line_count = surface_plot ? 1 : w_props.get_line_count();
 
    // estimate the box size from the length of the longest legend string
    //
 Pixel_X longest_legend = 20;
    for (int l = 0; l < line_count; ++l)
        {
-         const char * lstr = l_props[l]->get_legend_name().c_str();
-         const Pixel_X width = string_width(pctx, lstr);
+         const String & lname = l_props[l]->get_legend_name();
+         const Pixel_X width = string_width(pctx, lname.c_str());
          if (longest_legend < width)   longest_legend = width;
        }
 
@@ -747,7 +769,7 @@ const int dy = w_props.get_legend_dY();
        }
      xcb_flush(pctx.conn);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the (vertical) grid lines that start at the X axis
 void
 draw_X_grid(const XCB_context & pctx, const Plot_window_properties & w_props,
@@ -797,7 +819,7 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
            }
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the (horizontal) grid lines that start at the Y axis
 void
 draw_Y_grid(const XCB_context & pctx, const Plot_window_properties & w_props,
@@ -849,7 +871,7 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
 
    if (!surface)   return;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the grid lines that start at the Z axis
 void
 draw_Z_grid(const XCB_context & pctx, const Plot_window_properties & w_props)
@@ -885,14 +907,14 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
         draw_text(pctx, cc, Pixel_XY(px1 + 10, py0 + wh.height/2 - 1));
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the plot lines
 void
 draw_plot_lines(const XCB_context & pctx,
                 const Plot_window_properties & w_props, const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 
    loop(l, data.get_row_count())
        {
@@ -927,7 +949,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
              }
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the surface plot lines
 void
 draw_surface_lines(const XCB_context & pctx,
@@ -935,7 +957,7 @@ draw_surface_lines(const XCB_context & pctx,
                    const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp0 = *l_props[0];
 
    // 1. setup graphic contexts
@@ -1102,7 +1124,7 @@ const int verbosity = w_props.get_verbosity();
          draw_point(pctx, P0, canvas_color, *l_props[0]);
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// draw the content of a plot window
 void
 do_plot(const XCB_context & pctx,
@@ -1134,9 +1156,9 @@ const bool surface = data.is_surface_plot();   // 2D or 3D plot ?
 
    // draw legend...
    //
-   draw_legend(pctx, w_props);
+   draw_legend(pctx, w_props, surface);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// obtain an ID for \b name
 xcb_atom_t
 get_atom_ID(xcb_connection_t * conn, int only_existing, const char * name)
@@ -1146,7 +1168,7 @@ xcb_intern_atom_cookie_t cookie = xcb_intern_atom(conn, only_existing,
 xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
    return reply.atom;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// save plot window to file named \b outfile
 void
 XCB_context::save_file(const char * outfile)
@@ -1228,8 +1250,8 @@ UTF8_string outfile_utf8(outfile);
    CERR << "writing ⎕PLOT output file " << outfile_utf8 << "..." << endl;
 
    errno = 0;
-FILE * bmp = fopen(outfile_utf8.c_str(), "w");
-   if (bmp == 0)
+FileWriter writer(outfile_utf8.c_str());
+   if (!writer)
       {
         CERR << "open " << outfile << ": " << strerror(errno) << endl;
         MORE_ERROR() << "save_file() failed: cannot open output file "
@@ -1266,7 +1288,7 @@ int file_bytes = 0;
           LE4(0),              // reserved
           LE4(pixel_offset),   // offset
        };
-     file_bytes += fwrite(file_header, 1, sizeof(file_header), bmp);
+     file_bytes += writer.fwrite(file_header, sizeof(file_header));
    };
 
    {
@@ -1284,7 +1306,7 @@ int file_bytes = 0;
           LE4(0),    // colors used
           LE4(0),    // importantcolors
         };
-     file_bytes += fwrite(dib_header, 1, sizeof(dib_header), bmp);
+     file_bytes += writer.fwrite(dib_header, sizeof(dib_header));
    }
 
 const Colormap cmap = XDefaultColormap(display, screen);
@@ -1301,14 +1323,13 @@ const Colormap cmap = XDefaultColormap(display, screen);
                *s++ = uint8_t(c.red  /256);
              }
           while ((s - scanline) & 3)   *s++ = 0;   // scanline padding
-          file_bytes += fwrite(scanline, 1, s - scanline, bmp);
+          file_bytes += writer.fwrite(scanline, s - scanline);
        }
 
    XFree(image);
-   fclose(bmp);
    CERR << "output file " << outfile_utf8 << " written" << endl;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 Quad_PLOT::plot_main_XCB(void * vp_props)
 {
@@ -1316,7 +1337,11 @@ Quad_PLOT::plot_main_XCB(void * vp_props)
 
 Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
-const char * outfile = strdup(w_props.get_output_filename().c_str());
+// std::string (RAII), not strdup()/free(): several early returns/throws
+// below (e.g. the X-server connection failure and the pctx.caption
+// check) used to skip the single free() at the end of this function,
+// leaking outfile on those paths (Blake McBride, Bugs14 #14e).
+const std::string outfile = w_props.get_output_filename();
 
 const Quad_PLOT::Handle handle = Quad_PLOT::next_handle;
 XCB_context pctx(w_props, handle);
@@ -1330,7 +1355,11 @@ const Plot_data & data = w_props.get_plot_data();
    //
    pctx.display = XOpenDisplay(0);
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
-   pctx.conn = XGetXCBConnection(pctx.display);
+   // XOpenDisplay() returns 0 when DISPLAY is unset, empty, or names an
+   // unreachable server (Blake McBride, Bugs16 #1); XGetXCBConnection(0)
+   // would dereference that null pointer immediately, before the
+   // connection-error check below ever runs.
+   pctx.conn = pctx.display ? XGetXCBConnection(pctx.display) : 0;
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
    pctx.conn = xcb_connect(0, 0);
@@ -1338,10 +1367,44 @@ const Plot_data & data = w_props.get_plot_data();
 
    if (pctx.conn == 0 || xcb_connection_has_error(pctx.conn))
       {
-        xcb_disconnect(pctx.conn);
-        MORE_ERROR() << "could not connect to the X-server ";
-        DOMAIN_ERROR;
+        if (pctx.conn)   xcb_disconnect(pctx.conn);
+
+        // undo the push_back() above: pctx is about to be destroyed (we
+        // are returning without ever reaching the X main loop below,
+        // which is what normally keeps this stack frame -- and therefore
+        // pctx -- alive for the life of the window), so leaving &pctx in
+        // all_PLOT_windows would dangle for e.g. the next "⎕PLOT ¯3" or
+        // window-close-by-handle lookup.
+        //
+        loop(h, Quad_PLOT::all_PLOT_windows.size())
+           {
+             if (Quad_PLOT::all_PLOT_windows[h] == &pctx)
+                {
+                  Quad_PLOT::all_PLOT_windows[h] =
+                     Quad_PLOT::all_PLOT_windows.back();
+                  Quad_PLOT::all_PLOT_windows.pop_back();
+                  break;
+                }
+           }
+
+        // plot_main_XCB() is a pthread start routine (pthread_create() in
+        // Quad_PLOT::start_GUI()), not the interpreter thread: throwing
+        // DOMAIN_ERROR here would escape the thread entry function and
+        // call std::terminate() instead of unwinding, and would skip the
+        // sem_post() below, hanging start_GUI()'s
+        // sem_wait_safe_I(expose_sema, ...) forever (Blake McBride,
+        // Bugs16 #1 -- the XCB-side twin of Bill Heagy's GTK pthread_create()
+        // hang fixed in r2070/r2072). Record the error in w_props instead
+        // and let start_GUI() raise it once back on the interpreter thread.
+        // (pctx.connected is still false, so ~XCB_context() below will not
+        // delete w_props -- start_GUI() still needs to read it.)
+        //
+        w_props.set_gui_thread_error("could not connect to the X-server");
+        sem_post(Quad_PLOT::expose_sema);   // unleash the interpreter
+        return vp_props;
       }
+
+   pctx.connected = true;   // ~XCB_context() may now delete w_props
 
    // get the first screen
    //
@@ -1406,6 +1469,7 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
        SPRINTF(cc, "%s-XCB %d", w_props.get_caption().c_str(), handle);
        pctx.caption = strdup(cc);
       }
+   if (!pctx.caption)   return vp_props;
 
    {
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
@@ -1490,9 +1554,9 @@ const xcb_get_input_focus_reply_t * focusReply =
                   do_plot(pctx, w_props, data);
                   xcb_flush(pctx.conn);
 
-                  if (outfile && *outfile)
+                  if (!outfile.empty())
                      {
-                       pctx.save_file(outfile);
+                       pctx.save_file(outfile.c_str());
                        if (w_props.get_auto_close())
                           {
                             // unleash the APL interpreter
@@ -1567,18 +1631,32 @@ const xcb_get_input_focus_reply_t * focusReply =
 
                        // make this thread a zombie
                        //
-                       sem_wait(Quad_PLOT::all_PLOT_windows_sema);
-                          const int count = Quad_PLOT::all_PLOT_windows.size();
-                          const pthread_t thread = pthread_self();
-                          loop(pt, count)
-                              if (all_PLOT_windows[pt]->get_thread() == thread)
-                                 {
-                                   Quad_PLOT::all_PLOT_windows[pt] =
-                                      Quad_PLOT::all_PLOT_windows[count - 1];
-                                   Quad_PLOT::all_PLOT_windows.pop_back();
-                                   break;
-                                 }
-                       sem_post(Quad_PLOT::all_PLOT_windows_sema);
+                       // this runs on the XCB driver's own per-window
+                       // thread, so it must not raise a C++/APL exception
+                       // on failure (see Sys::sem_wait_safe()'s comment);
+                       // if the lock can't be acquired in time, just leave
+                       // our entry in all_PLOT_windows behind (stale but
+                       // harmless) instead of touching the vector without
+                       // holding its semaphore.
+                       //
+                       if (Sys::sem_wait_safe(Quad_PLOT::all_PLOT_windows_sema,
+                                          "the ⎕PLOT window list lock "
+                                          "(XCB window close)",
+                                          PLOT_SEM_TIMEOUT_SECONDS)
+                           == Sys::WAIT_OK)
+                          {
+                            const int count = Quad_PLOT::all_PLOT_windows.size();
+                            const pthread_t thread = pthread_self();
+                            loop(pt, count)
+                                if (all_PLOT_windows[pt]->get_thread() == thread)
+                                   {
+                                     Quad_PLOT::all_PLOT_windows[pt] =
+                                        Quad_PLOT::all_PLOT_windows[count - 1];
+                                     Quad_PLOT::all_PLOT_windows.pop_back();
+                                     break;
+                                   }
+                            sem_post(Quad_PLOT::all_PLOT_windows_sema);
+                          }
 
                        pctx.window_goon = false;   // break the outer for ()
                        continue;   // for ()
@@ -1613,11 +1691,10 @@ const xcb_get_input_focus_reply_t * focusReply =
    }
 
    xcb_disconnect(pctx.conn);
-   free(const_cast<char *>(outfile));
 
    return 0;
 }
-// ===========================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // HAVE_LIBX11 && HAVE_LIBXCB && HAVE_LIBX11_XCB && HAVE_X11_XLIB_XCB_H
 

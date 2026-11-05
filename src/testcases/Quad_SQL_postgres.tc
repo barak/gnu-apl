@@ -1,10 +1,12 @@
 ⍝ Quad_SQL_postgres.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ]NEXTFILE no-POSTGRES   ⍝ done if POSTGRES is not available
 
       0 0⍴"""
-NOTE: unlike SQLite, PostgreSAL requires that a user is created before the
+      NOTE: unlike SQLite, PostgreSAL requires that a user is created before the
       database can be accessed (from APL or otherwise). For example, for
       APL user eedjsa one should (as root) do something along the lines of:
 
@@ -18,17 +20,17 @@ NOTE: unlike SQLite, PostgreSAL requires that a user is created before the
       Otherwise PostgreSQL will probably produce an error like:
 
       )MORE
-Error connecting to Postgres database: FATAL:  role "eedjsa" does not exist
+      Error connecting to Postgres database: FATAL:  role "eedjsa" does not exist
 
       FATAL:  role "eedjsa" does not exist
 
       For troubleshooting this testcase from the command line,
       the following PostgreSQL commands may also be useful:
 
-$ createdb --owner=eedjsa --no-password apl_quadSQL   # create database
-$ psql jsadb                               i          # connect to database
-$ dropdb jsadb                                        # delete database
-$ dropuser eedjsa                                     # delete user eedjsa
+      $ createdb --owner=eedjsa --no-password apl_quadSQL   # create database
+      $ psql jsadb                               i          # connect to database
+      $ dropdb jsadb                                        # delete database
+      $ dropuser eedjsa                                     # delete user eedjsa
           """
 
       ⍝ erase old database (if any). This fails with 256 (if the database
@@ -44,12 +46,12 @@ $ dropuser eedjsa                                     # delete user eedjsa
 
       ⍝ SQL create table command
       create←,⊃"""
-CREATE TABLE COMPANY(
-   ID INT PRIMARY KEY     NOT NULL,
-   NAME           TEXT    NOT NULL,
-   AGE            INT     NOT NULL,
-   ADDRESS        CHAR(50),
-   SALARY         REAL);
+      CREATE TABLE COMPANY(
+      ID INT PRIMARY KEY     NOT NULL,
+      NAME           TEXT    NOT NULL,
+      AGE            INT     NOT NULL,
+      ADDRESS        CHAR(50),
+      SALARY         REAL);
                """
 
       ⍝ connect to DB and list tables
@@ -109,5 +111,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ ==================================
 

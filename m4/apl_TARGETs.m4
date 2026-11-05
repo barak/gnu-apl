@@ -41,6 +41,30 @@ fi
 AM_CONDITIONAL(apl_TARGET_ERLANG, apl_YES($apl_TARGET_ERLANG))
 AC_MSG_RESULT([$apl_TARGET_ERLANG])
 
+# --with-erlang only says the user *wants* the Erlang interface; it says
+# nothing about whether an Erlang toolchain is actually installed (e.g. a
+# machine that intentionally omits Erlang to save memory, per its own
+# nightly-build policy). Check separately for erlc itself -- AC_PATH_PROG
+# searches $PATH for an executable (not merely present) file named erlc,
+# which is normally a symlink to erlang's own installation, e.g.
+# /usr/lib/erlang/bin/erlc -- and record the result so that
+# erlang/Makefile.am can skip the actual build (rather than fail it) when
+# --with-erlang was requested but no working erlc was found.
+#
+if apl_YES($apl_TARGET_ERLANG); then
+   AC_PATH_PROG([ERLC], [erlc], [no])
+   if test "x$ERLC" = xno; then
+      AC_MSG_WARN([--with-erlang was given but erlc was not found in \$PATH;
+the Erlang interface will be skipped, not built, this configure run])
+      apl_HAVE_ERLC=no
+   else
+      apl_HAVE_ERLC=yes
+   fi
+else
+   apl_HAVE_ERLC=no
+fi
+AM_CONDITIONAL(apl_HAVE_ERLC, apl_YES($apl_HAVE_ERLC))
+
 
 ###############################################################################
 # check if the user wants to build libapl.so
@@ -75,7 +99,7 @@ AC_ARG_WITH( [python],
 if apl_YES($apl_TARGET_PYTHON); then
    AC_DEFINE([apl_TARGET_PYTHON], [1], [Define if building lib_gnu_apl.so])
     AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
-    if apl_YES($PKG_CONFIG); then             # we have pkg-config
+    if apl_NNO($PKG_CONFIG); then             # we have pkg-config
        if $PKG_CONFIG --exists python3; then   # and pkg-config knows python3
             PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
        fi
@@ -83,5 +107,45 @@ if apl_YES($apl_TARGET_PYTHON); then
 fi
 AM_CONDITIONAL(apl_TARGET_PYTHON, apl_YES($apl_TARGET_PYTHON))
 AC_MSG_RESULT([$apl_TARGET_PYTHON])
+
+
+###############################################################################
+# check if the user wants to cross-compile for Windows (MinGW-w64)
+#
+# This section runs early (before LT_INIT) so that setting host_alias here
+# is seen by AC_CANONICAL_HOST (called inside LT_INIT).  AM_CONDITIONAL and
+# AC_DEFINE for MINGW_SRC live in configure.ac's case $host_os block because
+# $host_os is only available after AC_CANONICAL_HOST.
+#
+AC_MSG_CHECKING([if the build target is Windows (MinGW-w64 cross-compilation)])
+AC_ARG_WITH([mingw],
+            [AS_HELP_STRING([--with-mingw],
+                            [cross-compile for Windows using MinGW-w64])],
+            [apl_TARGET_MINGW=$withval],
+            [apl_TARGET_MINGW=no])
+
+if apl_YES($apl_TARGET_MINGW); then
+   # Set cross-compilation defaults; override with environment variables if needed.
+   : ${host_alias:=x86_64-w64-mingw32}
+   : ${CC:=x86_64-w64-mingw32-gcc}
+   : ${CXX:=x86_64-w64-mingw32-g++}
+   : ${LDFLAGS:=-L/usr/x86_64-w64-mingw32/lib -lws2_32 -lgdiplus -lgdi32 -static-libgcc -static-libstdc++ -lwinpthread}
+   : ${with_sqlite3:=no}
+   : ${with_postgresql:=no}
+   # Cross-compilation: AC_FUNC_MALLOC/AC_FUNC_REALLOC cannot run the test
+   # binary, so they default to "broken" and emit #define malloc rpl_malloc
+   # in config.h.  That macro then corrupts c++/stdlib.h's "using std::malloc"
+   # into "using std::rpl_malloc" (undeclared).  Cache the result to tell
+   # autoconf that Windows CRT malloc/realloc are standard-compliant.
+   : ${ac_cv_func_malloc_0_nonnull=yes}
+   : ${ac_cv_func_realloc_0_nonnull=yes}
+   # GCC 10-win32: various Windows headers include <stdlib.h> in C++ mode;
+   # GCC intercepts that with c++/stdlib.h which pulls in <cstdlib>; if
+   # ::malloc is not yet declared at that point the build fails.  Force-
+   # including <cstdlib> first ensures ::malloc and std::malloc are both
+   # declared before any Windows header triggers c++/stdlib.h.
+   CXXFLAGS="-include cstdlib $CXXFLAGS"
+fi
+AC_MSG_RESULT([$apl_TARGET_MINGW])
 
 ###############################################################################

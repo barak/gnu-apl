@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "Quad_SVx.hh"
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -50,7 +51,7 @@ Quad_SVS Quad_SVS::fun;
 
 APL_time_us Quad_SVE::timer_end = 0;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 // there is a different prog_name() function around (in APserver) so we
 // declare the one for the APL interpreter here
 const char *
@@ -59,25 +60,12 @@ prog_name()
    return "apl";
 }
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 TCP_socket get_TCP_for_key(SV_key key)
 {
    return Svar_DB::get_DB_tcp();
 }
-//============================================================================
-/**
-    return true iff \b filename is an executable file
- **/
-bool
-Quad_SVx::is_executable(const char * file_and_args)
-{
-string filename(file_and_args);
-const char * end = strchr(file_and_args, ' ');
-   if (end)   filename.resize(end - file_and_args);
-
-   return access(filename.c_str(), X_OK) == 0;
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Quad_SVx::start_AP(AP_num ap)
 {
@@ -87,8 +75,8 @@ Quad_SVx::start_AP(AP_num ap)
            {
              // user wanted APs, but something went wrong
              //
-             CERR << "*** Not starting AP << ap because the connecton to "
-                     " APserver has failed earlier." << endl;
+             CERR << "*** Not starting AP " << ap << " because the "
+                     "connection to APserver has failed earlier." << endl;
            }
         else                        // user gave --noSV
            {
@@ -130,63 +118,75 @@ bool found_executable = false;
         return;
       }
 
-FILE * fp = popen(filename, "r");
-   if (fp == 0)
+PipeReader reader(filename);
+   if (!reader)
       {
         CERR << "popen(" << filename << " failed: " << strerror(errno)
              << endl;
         return;
       }
 
-   for (int cc; (cc = getc(fp)) != EOF;)   CERR << char(cc);
+   for (int cc; (cc = reader.fgetc()) != EOF;)   CERR << char(cc);
    CERR << endl;
-
-   pclose(fp);
 
    usleep(100000);   // give new AP time to register with APserver
 }
-//============================================================================
-Token
-Quad_SVC::eval_AB(Value_P A, Value_P B) const
+//════════════════════════════════════════════════════════════════════════════
+/**
+    return true iff \b filename is an executable file
+ **/
+bool
+Quad_SVx::is_executable(const char * file_and_args)
 {
-   if (A->get_rank() > 2)   RANK_ERROR;
-   if (B->get_rank() > 2)   RANK_ERROR;
+string filename(file_and_args);
+const char * end = strchr(file_and_args, ' ');
+   if (end)   filename.resize(end - file_and_args);
 
-const ShapeItem var_count = B->get_rows();
-   if (A->get_rows() != var_count)               LENGTH_ERROR;
-   if (A->get_rank() > 0 && A->get_cols() != 4)   LENGTH_ERROR;
-const UCS_string_vector vars(*B, false);
+   return access(filename.c_str(), X_OK) == 0;
+}
+//════════════════════════════════════════════════════════════════════════════
+Token
+Quad_SVC::eval_AB(cValue_R A, cValue_R B) const
+{
+   if (A.get_rank() > 2)   RANK_ERROR;
+   if (B.get_rank() > 2)   RANK_ERROR;
 
-const Cell * cA = &A->get_cfirst();
+const ShapeItem var_count = B.get_rows();
+   if (A.get_rows() != var_count)               LENGTH_ERROR;
+   if (A.get_rank() > 0 && A.get_cols() != 4)   LENGTH_ERROR;
+const UCS_string_vector vars(B, false);
 
 Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
    sh_Z.add_shape_item(4);
 Value_P Z(sh_Z, LOC);
 
+ShapeItem aI = 0;
    loop(z, var_count)
       {
         // construct control value
         //
         int ctl = 0;
-        if (A->is_scalar())
+        if (A.is_scalar())
            {
-             const bool val = A->get_cfirst().get_near_bool();
+             const bool val = A.get_near_bool(0);
               ctl = val ? ALL_SVAR_CONTROLS : NO_SVAR_CONTROL;
            }
-        else if (A->is_vector())
+        else if (A.is_vector())
            {
-             if (A->get_cfirst().get_near_bool())   ctl |= SET_BY_1;
-             if (A->get_cravel(1).get_near_bool())   ctl |= SET_BY_2;
-             if (A->get_cravel(2).get_near_bool())   ctl |= USE_BY_1;
-             if (A->get_cravel(3).get_near_bool())   ctl |= USE_BY_2;
+             if (A.get_near_bool(0))   ctl |= SET_BY_1;
+             if (A.get_near_bool(1))   ctl |= SET_BY_2;
+             if (A.get_near_bool(2))   ctl |= USE_BY_1;
+             if (A.get_near_bool(3))   ctl |= USE_BY_2;
            }
         else // matrix
            {
-             if (cA++->get_near_bool())   ctl |= SET_BY_1;
-             if (cA++->get_near_bool())   ctl |= SET_BY_2;
-             if (cA++->get_near_bool())   ctl |= USE_BY_1;
-             if (cA++->get_near_bool())   ctl |= USE_BY_2;
+             if (A.get_near_bool(aI++))   ctl |= SET_BY_1;
+             if (A.get_near_bool(aI++))   ctl |= SET_BY_2;
+             if (A.get_near_bool(aI++))   ctl |= USE_BY_1;
+             if (A.get_near_bool(aI++))   ctl |= USE_BY_2;
            }
 
         // set control.
@@ -204,30 +204,38 @@ Value_P Z(sh_Z, LOC);
         Z->next_ravel_Int(ctl & USE_BY_2 ? 1 : 0);
       }
 
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Quad_SVC::eval_B(Value_P B) const
+Quad_SVC::eval_B(cValue_R B) const
 {
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (B.get_rank() > 2)   RANK_ERROR;
 
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
+const ShapeItem var_count = B.get_rows();
+const UCS_string_vector vars(B, false);
 
 Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
    sh_Z.add_shape_item(4);
 Value_P Z(sh_Z, LOC);
 
    loop(z, var_count)
       {
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   Error::throw_symbol_error(vars[z], LOC);
 
-        const SV_key key = sym->get_SV_key();
-        const Svar_Control control = Svar_DB::get_control(key);
+        // an undefined name is trivially "not shared with anyone" --
+        // same all-false control state as an existing, ordinary
+        // (non-shared) variable, not an error (LRM p.323,
+        // LanguageVariances.md #41).
+        //
+        const Svar_Control control = sym
+                                    ? Svar_DB::get_control(sym->get_SV_key())
+                                    : Svar_Control(0);
 
         Z->next_ravel_Int(control & SET_BY_1 ? 1 : 0);
         Z->next_ravel_Int(control & SET_BY_2 ? 1 : 0);
@@ -235,16 +243,17 @@ Value_P Z(sh_Z, LOC);
         Z->next_ravel_Int(control & USE_BY_2 ? 1 : 0);
       }
 
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_SVE::Quad_SVE()
    : NL_SystemVariable(ID_Quad_SVE)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_SVE::assign(Value_P value, bool clone, const char * loc)
 {
@@ -253,7 +262,7 @@ Quad_SVE::assign(Value_P value, bool clone, const char * loc)
    //
    if (!value->is_scalar())   RANK_ERROR;
 
-const APL_time_us duration = 1000000 * value->get_cfirst().get_real_value();
+const APL_time_us duration = 1000000 * value->get_real_value(0);
    if (duration < 0)   DOMAIN_ERROR;
 
    if (duration == 0.0)
@@ -269,7 +278,7 @@ const APL_time_us duration = 1000000 * value->get_cfirst().get_real_value();
    //
    timer_end = now() + duration;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVE::get_apl_value() const
 {
@@ -301,29 +310,31 @@ const APL_Float remaining = timer_end - now();
 
    return FloatScalar(0.000001 * remaining, LOC);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
  ** Offer variables in B to corresponding processors in A
  **/
 Token
-Quad_SVO::eval_AB(Value_P A, Value_P B) const
+Quad_SVO::eval_AB(cValue_R A, cValue_R B) const
 {
-   if (A->get_rank() > 1)   RANK_ERROR;
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (A.get_rank() > 1)   RANK_ERROR;
+   if (B.get_rank() > 2)   RANK_ERROR;
 
-const ShapeItem var_count = B->get_rows();
-   if (A->get_rank() == 1 && A->element_count() != var_count)   LENGTH_ERROR;
+const ShapeItem var_count = B.get_rows();
+   if (A.get_rank() == 1 && A.element_count() != var_count)   LENGTH_ERROR;
 
-const UCS_string_vector apl_vars(*B, false);
-const UCS_string_vector surrogates(*B, true);
+const UCS_string_vector apl_vars(B, false);
+const UCS_string_vector surrogates(B, true);
 
 Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
    loop(z, var_count)
       {
-        ShapeItem a = A->is_scalar() ? 0 : z;
+        ShapeItem a = A.is_scalar() ? 0 : z;
         uint32_t vname[MAX_SVAR_NAMELEN + 1];
         const int vlen = surrogates[z].size();
         if (vlen > MAX_SVAR_NAMELEN)   DOMAIN_ERROR;
@@ -343,12 +354,35 @@ Value_P Z(sh_Z, LOC);
              continue;
            }
 
+        // apl_vars[z] is empty if row z of B is a name and a surrogate
+        // name (LRM p. 323). The APL name is then the first name in row z.
+        //
+        UCS_string apl_var = apl_vars[z];
+        if (apl_var.size() == 0)
+           {
+             const ShapeItem cols = B.get_cols();
+             loop(c, cols)
+                {
+                  const Unicode uni = B.get_char_value(z*cols + c);
+                  if (uni == UNI_SPACE)
+                     {
+                       if (apl_var.size())   break;   // end of first name
+                       continue;                      // leading space
+                     }
+                  apl_var << uni;
+                }
+           }
+
         // make sure current name class allows ⎕SVO
         //
-        Symbol * sym = Workspace::lookup_symbol(apl_vars[z]);
-        assert(sym);
+        Symbol * sym = Workspace::lookup_symbol(apl_var);
+        if (sym == 0)   // bad APL name (Bugs37 #6)
+           {
+             Z->next_ravel_Int(NO_COUPLING);
+             continue;
+           }
 
-        const AP_num proc = AP_num(A->get_cravel(a).get_int_value());
+        const AP_num proc = AP_num(A.get_int_value(a));
 
         ValueStackItem * vsp = sym->top_of_stack();
         Assert(vsp);
@@ -383,10 +417,55 @@ Value_P Z(sh_Z, LOC);
         Z->next_ravel_Int(coupling);
       }
 
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/**
+ ** Return degree of coupling for variables in B
+ **/
+Token
+Quad_SVO::eval_B(cValue_R B) const
+{
+   if (B.get_rank() > 2)   RANK_ERROR;
+
+const ShapeItem var_count = B.get_rows();
+const UCS_string_vector vars(B, false);
+
+Shape sh_Z;
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
+Value_P Z(sh_Z, LOC);
+
+   loop(z, var_count)
+      {
+        Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
+        if (sym == 0)   // variable does not exist
+           {
+             Z->next_ravel_0();
+             continue;
+           }
+
+        // the coupling of a non-shared variables has coupling 0
+        //
+        if (sym->get_NC() != NC_SYSTEM_VAR)
+           {
+             Z->next_ravel_0();
+             continue;
+           }
+
+        const SV_key key = sym->get_SV_key();
+        const SV_Coupling coupling = Svar_DB::get_coupling(key);
+         Z->next_ravel_Int(coupling);
+      }
+
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Quad_SVO::share_one_variable(AP_num to_ap, const uint32_t * vname,
                              SV_Coupling & coupling)
@@ -439,72 +518,31 @@ const SV_key key = Svar_DB::match_or_make(vname, to_proc, from);
 
    return key;
 }
-//----------------------------------------------------------------------------
-/**
- ** Return degree of coupling for variables in B
- **/
+//════════════════════════════════════════════════════════════════════════════
 Token
-Quad_SVO::eval_B(Value_P B) const
+Quad_SVQ::eval_B(cValue_R B) const
 {
-   if (B->get_rank() > 2)   RANK_ERROR;
-
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
-
-Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
-Value_P Z(sh_Z, LOC);
-
-   loop(z, var_count)
-      {
-        Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   // variable does not exist
-           {
-             Z->next_ravel_0();
-             continue;
-           }
-
-        // the coupling of a non-shared variables has coupling 0
-        //
-        if (sym->get_NC() != NC_SYSTEM_VAR)
-           {
-             Z->next_ravel_0();
-             continue;
-           }
-
-        const SV_key key = sym->get_SV_key();
-        const SV_Coupling coupling = Svar_DB::get_coupling(key);
-         Z->next_ravel_Int(coupling);
-      }
-
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-//============================================================================
-Token
-Quad_SVQ::eval_B(Value_P B) const
-{
-   if (B->get_rank() > 1)        RANK_ERROR;
-   if (B->element_count() > 1)   LENGTH_ERROR;
+   if (B.get_rank() > 1)        RANK_ERROR;
+   if (B.element_count() > 1)   LENGTH_ERROR;
 
 Value_P Z;
 
    // B is empty or has 1 element.
    //
-   if (B->element_count()  == 0)    // B empty: return processors offering
+   if (B.element_count()  == 0)    // B empty: return processors offering
       {
         Z = get_processors();
       }
    else                            // return variables offered by processor ↑B
       {
-        const AP_num proc = AP_num(B->get_cfirst().get_int_value());
+        const AP_num proc = AP_num(B.get_int_value(0));
         Z = get_variables(proc);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVQ::get_processors()
 {
@@ -559,7 +597,7 @@ const char * dirs[] = { "", "/APs" };
 
                 if (!is_executable(filename))   continue;
 
-                int apnum;
+                unsigned int apnum;   // %u into an int* is formally UB
                 if (sscanf(entry->d_name, "AP%u", &apnum) != 1)   continue;
 
                 char expected[APL_PATH_MAX + 1];
@@ -611,7 +649,7 @@ Value_P Z(sorted.size(), LOC);
    loop(z, sorted.size())   Z->next_ravel_Int(sorted[z]);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
@@ -626,7 +664,16 @@ int last_zero = -1;
       {
         if (varnames[v] == 0)
            {
-             var_lengths.push_back(v + 1 - last_zero);
+             // distance from (one past) the previous terminator to and
+             // including this one; last_zero's initial -1 sentinel
+             // already makes this come out right for the first name.
+             // The "+ 1" this replaces double-counted the terminator,
+             // inflating every length by one -- which in turn inflated
+             // max_len below and made the fill loop's
+             // next_ravel_Char(Unicode(varnames[v++])) run one
+             // iteration too far, reading past varnames (garbage into
+             // the returned array) even for a single offered variable.
+             var_lengths.push_back(v - last_zero);
              last_zero = v;
            }
       }
@@ -641,11 +688,23 @@ Value_P Z(shZ, LOC);
 int v = 0;
 
    loop(z, count)
+      {
+        // v points at the previous row's terminating 0 here (except for
+        // z==0, where it's already at the first real character) -- skip
+        // it before reading this row's characters.
+        if (z > 0 && varnames[v] == 0)   ++v;
+
    loop(c, max_len)
       {
-        if (c < var_lengths[z])
+        // var_lengths[z] includes the terminating 0 (see max_len above,
+        // which correctly uses var_lengths[z]-1) -- the old condition
+        // here used the un-adjusted length, letting c reach the
+        // terminator position itself for any name shorter than max_len,
+        // "consuming" it via a since-removed ++v and then reading the
+        // *next* name's first character (or, for the last name in the
+        // vector, reading past varnames entirely).
+        if (c < var_lengths[z] - 1)
            {
-             if (varnames[v] == 0)   ++v;
              Z->next_ravel_Char(Unicode(varnames[v++]));
            }
         else
@@ -653,21 +712,24 @@ int v = 0;
              Z->next_ravel_Char(UNI_SPACE);
            }
       }
+      }
 
    Z->set_proto_Spc();   // prototype: character
    return Z;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
-Quad_SVR::eval_B(Value_P B) const
+Quad_SVR::eval_B(cValue_R B) const
 {
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (B.get_rank() > 2)   RANK_ERROR;
 
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
+const ShapeItem var_count = B.get_rows();
+const UCS_string_vector vars(B, false);
 
 Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
    loop(z, var_count)
@@ -684,38 +746,46 @@ Value_P Z(sh_Z, LOC);
            }
       }
 
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Token
-Quad_SVS::eval_B(Value_P B) const
+Quad_SVS::eval_B(cValue_R B) const
 {
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (B.get_rank() > 2)   RANK_ERROR;
 
-const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(*B, false);
+const ShapeItem var_count = B.get_rows();
+const UCS_string_vector vars(B, false);
 
 Shape sh_Z;
-   if (var_count > 1)   sh_Z.add_shape_item(var_count);
+   // ⍴Z ←→ ¯1↓⍴B (,4): a matrix B gives a row axis also for 0 or 1 rows
+   // (LRM p.323, p.328, Bugs35 #78)
+   if (B.get_rank() == 2)   sh_Z.add_shape_item(var_count);
    sh_Z.add_shape_item(4);
 Value_P Z(sh_Z, LOC);
 
    loop(z, var_count)
       {
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   Error::throw_symbol_error(vars[z], LOC);
 
-        const SV_key key = sym->get_SV_key();
-        const Svar_state state = Svar_DB::get_state(key);
+        // see the matching comment in Quad_SVC::eval_B() above --
+        // an undefined name is trivially "not shared", not an error
+        // (LRM p.323, LanguageVariances.md #41).
+        //
+        const Svar_state state = sym
+                                ? Svar_DB::get_state(sym->get_SV_key())
+                                : Svar_state(0);
 
-        Z->next_ravel_Int(state & SET_BY_1 ? 1 : 0);
-        Z->next_ravel_Int(state & SET_BY_2 ? 1 : 0);
-        Z->next_ravel_Int(state & USE_BY_1 ? 1 : 0);
-        Z->next_ravel_Int(state & USE_BY_2 ? 1 : 0);
+        Z->next_ravel_Int(int(state) & int(SET_BY_1) ? 1 : 0);
+        Z->next_ravel_Int(int(state) & int(SET_BY_2) ? 1 : 0);
+        Z->next_ravel_Int(int(state) & int(USE_BY_1) ? 1 : 0);
+        Z->next_ravel_Int(int(state) & int(USE_BY_2) ? 1 : 0);
       }
 
+   if (Z->is_empty())   Z->set_proto_Int();   // e.g. 0 rows (Bugs35 #78)
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

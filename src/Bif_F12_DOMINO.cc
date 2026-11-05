@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,10 +23,12 @@
 
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
+#include "Bif_F12_TRANSPOSE.hh"
 #include "ComplexCell.hh"
 #include "LibPaths.hh"
 #include "Polynomial.hh"
 #include "PythonPipe.hh"
+#include "Sys.hh"
 #include "Tokenizer.hh"
 #include "Value.hh"
 #include "Workspace.hh"
@@ -59,81 +61,131 @@ const FunctionGroup::function_info Bif_F12_DOMINO::subfunction_infos[] =
   domino_def(20, integral       , "compute integral for B"                    )
 #undef domino_def
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Bif_F12_DOMINO::Bif_F12_DOMINO()
    : NonscalarFunction_default_identity(TOK_F12_DOMINO)
 {
 enum { count = sizeof(subfunction_infos) / sizeof(*subfunction_infos) };
    init_function_group(subfunction_infos, count, "⌹");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Bif_F12_DOMINO::eval_B(Value_P B) const
+Bif_F12_DOMINO::eval_B(cValue_R B) const
 {
-   if (B->is_scalar())
+   if (B.is_scalar())
       {
         Value_P Z(LOC);
 
-        B->get_cscalar().bif_reciprocal(&Z->get_wscalar());
+        Cell cache;
+        // ⌹0 is singular: bif_reciprocal() returns E_DOMAIN_ERROR
+        // without writing Z for a zero operand, and that ErrorCode
+        // was being silently discarded here, so the pre-initialised
+        // (zero) short ravel cell was returned as if it were a valid
+        // result (Blake McBride, Bugs22 #2).
+        const ErrorCode ec = B.get_cscalar(cache)
+                              .bif_reciprocal(&Z->get_wscalar());
+        if (ec != E_NO_ERROR)   throw_apl_error(ec, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (B->get_rank() == 1)   // help or inversion at the unit sphere
+   if (B.get_rank() == 1)   // help or inversion at the unit sphere
       {
-        if (B->element_count() == 0)   // '' or ⍬: help
+        if (B.element_count() == 0)   // '' or ⍬: help
            {
-             if (B->get_cfirst().is_character_cell())      list_functions(CERR);
-             else if (B->get_cfirst().is_integer_cell())   list_mappings(CERR);
-             else                                          DOMAIN_ERROR;
+             if (B.is_character_cell(0))      list_functions(CERR);
+             else if (B.is_integer_cell(0))   list_mappings(CERR);
+             else
+                {
+                  MORE_ERROR() << "⌹B: B is empty; expecting '' (list"
+                                  " functions) or ⍬ (list mappings)";
+                  DOMAIN_ERROR;
+                }
              return Token(TOK_APL_VALUE1, Idx0_0(LOC));
            }
 
-        const double qct = Workspace::get_CT();
-        const ShapeItem len = B->get_shape_item(0);
-        APL_Complex r2(0.0);
+        // Least-squares inversion at the unit sphere is (+B)÷+/|B|⋆2 --
+        // conjugate(B) over the sum of B's SQUARED MAGNITUDES -- matching
+        // what the matrix path and dyadic A⌹B use. This used to instead
+        // accumulate Σ(b×b) (the sum of b SQUARED, not |b|²: genuinely
+        // complex-valued for a complex B, not the always-real quantity
+        // this formula needs) and divide plain B (not its conjugate) by
+        // that, which drops the imaginary parts entirely and never
+        // conjugates. See Bugs27 #26.
+        //
+        // Σ|b|² is computed with B scaled by its largest magnitude M (like
+        // hypot()), so that it neither overflows (|b| ≥ 1E154) nor
+        // underflows (|b| ≤ 1E¯154): Z = conjugate(B÷M) ÷ M×Σ|B÷M|⋆2.
+        // ⎕CT is a relative tolerance and has no say here; only B=0 (M=0)
+        // cannot be inverted. Bugs37 #10.
+        //
+        const ShapeItem len = B.get_shape_item(0);
+        APL_Float M = 0.0;    // max |b|
+        bool b_real = true;
         loop(l, len)
             {
-              const APL_Complex b = B->get_cravel(l).get_complex_value();
-              r2 += b*b;
+              const APL_Complex b = B.get_complex_value(l);
+              const APL_Float abs_b = abs(b);
+              if (M < abs_b)   M = abs_b;
+              if (b.imag() != 0.0)   b_real = false;
             }
 
-        if (r2.real() < qct && r2.real() > -qct &&
-            r2.imag() < qct && r2.imag() > -qct)
-            DOMAIN_ERROR;
+        if (M == 0.0 || !isfinite(M))
+           {
+             MORE_ERROR() << "⌹B: B is 0 (or not finite) and cannot be"
+                             " inverted at the unit sphere";
+             DOMAIN_ERROR;
+           }
+
+        APL_Float r2 = 0.0;   // Σ|b÷M|², always real and in [1, len]
+        loop(l, len)
+            {
+              const APL_Complex b = B.get_complex_value(l) / M;
+              r2 += b.real()*b.real() + b.imag()*b.imag();
+            }
+        const APL_Float Mr2 = M * r2;
+        if (!isfinite(1.0 / Mr2))   // largest |z|, e.g. ⌹,1E¯320
+           {
+             MORE_ERROR() << "⌹B: the inverse of B is too large";
+             DOMAIN_ERROR;
+           }
 
         Value_P Z(len, LOC);
 
-        if (r2.imag() < qct && r2.imag() > -qct)   // real result
+        if (b_real)   // real B: conjugate(b) == b
            {
              loop(l, len)
                  {
-                   const APL_Float b = B->get_cravel(l).get_real_value();
-                   Z->next_ravel_Float(b / r2.real());
+                   const APL_Float b = B.get_real_value(l) / M;
+                   Z->next_ravel_Float(b / Mr2);
                  }
            }
         else                                       // complex result
            {
              loop(l, len)
                  {
-                   const APL_Complex b = B->get_cravel(l).get_complex_value();
-                   Z->next_ravel_Complex(b / r2);
+                   const APL_Complex b = B.get_complex_value(l) / M;
+                   Z->next_ravel_Complex(conj(b) / Mr2);
                  }
            }
 
-        Z->set_default(*B.get(), LOC);
+        Z->set_default(B, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (B->get_rank() > 2)   RANK_ERROR;
+   if (B.get_rank() > 2)
+      {
+        MORE_ERROR() << "⌹B: expecting ⍴⍴B ≤ 2; ⍴⍴B is " << B.get_rank();
+        RANK_ERROR;
+      }
 
-const ShapeItem rows = B->get_shape_item(0);
-const ShapeItem cols = B->get_shape_item(1);
+const ShapeItem rows = B.get_shape_item(0);
+const ShapeItem cols = B.get_shape_item(1);
    if (cols > rows)
       {
-        MORE_ERROR() <<
-        "⌹B : B is under-specified (B has more columns than rows)";
+        MORE_ERROR() << "⌹B : Bad shape " << rows << UNI_SPACE << cols
+                     << " of argument B (expecting rows ≥ columns)";
         LENGTH_ERROR;
       }
 
@@ -145,12 +197,12 @@ Value_P I(shape_I, LOC);
    loop(y, rows)
    loop(x, rows)   I->next_ravel_Float(y == x ? 1.0 : 0.0);
 
-Token result = eval_AB(I, B);
+Token result = eval_AB(*I, B);
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
+Bif_F12_DOMINO::eval_XB(cValue_R X, cValue_R B) const
 {
    // X shall be a scalar with:
    //
@@ -158,7 +210,11 @@ Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
    // b. integer 0 for the QR factorization with the Helzer algorithm, or
    // c. integer 1 for the QR factorization with LApack
    //
-   if (!X->is_scalar())   RANK_ERROR;
+   if (!X.is_scalar())
+      {
+        MORE_ERROR() << "⌹[X]B: X must be a scalar; ⍴⍴X is " << X.get_rank();
+        RANK_ERROR;
+      }
 
 enum { ALGO_BAD,         ///< bad algorithm number
        ALGO_QR_HELZER,   ///< QR factorization with Gary Helzer's algorithm
@@ -170,7 +226,8 @@ enum { ALGO_BAD,         ///< bad algorithm number
        ALGO_LU_GSL,      ///< LU factorization (libgsl based)
      } algo = ALGO_BAD;
 
-const Cell & X0 = X->get_cscalar();
+Cell cache;
+const Cell & X0 = X.get_cscalar(cache);
 double EPS = Workspace::get_CT();
 
    if (X0.is_float_cell())   // a.
@@ -189,34 +246,43 @@ double EPS = Workspace::get_CT();
         else if (x0 ==  5)   algo = ALGO_QL_GSL;
         else if (x0 ==  6)   algo = ALGO_LU_GSL;
 #endif
-        else if (x0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(*B));
-        else if (x0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(*B));
-        else if (x0 == 20)   return Token(TOK_APL_VALUE1, integral(0, *B));
+        else if (x0 ==  7)   return Token(TOK_APL_VALUE1, print_polynomial(B));
+        else if (x0 == 11)   return Token(TOK_APL_VALUE1, scan_polynomial(B));
+        else if (x0 == 20)   return Token(TOK_APL_VALUE1, integral(0, B));
       }
 
    if (algo == ALGO_BAD)   // none of the above
       {
-        MORE_ERROR() << "⌹[X]B: Invalid algorithm X";
+        MORE_ERROR() << "⌹[" << X0 << "]B : Bad value of argument X"
+                        " (expecting a valid algorithm number)";
         DOMAIN_ERROR;
       }
 
-   if (B->get_rank() != 2)   RANK_ERROR;
+   if (B.get_rank() != 2)
+      {
+        MORE_ERROR() << "⌹[X]B: expecting ⍴⍴B = 2; ⍴⍴B is " << B.get_rank();
+        RANK_ERROR;
+      }
 
    // if rank of A or B is < 2 then treat it as a
    // 1 by n (or 1 by 1) matrix..
    //
-const ShapeItem M = B->get_rows();
-const ShapeItem N = B->get_cols();
-   if (M*N == 0)   LENGTH_ERROR;   // empty B
+const ShapeItem M = B.get_rows();
+const ShapeItem N = B.get_cols();
+   if (M*N == 0)
+      {
+        MORE_ERROR() << "⌹[X]B: B is empty (⍴B is " << B.get_shape() << ")";
+        LENGTH_ERROR;   // empty B
+      }
 
-const bool need_complex = B->is_complex(true);
+const bool need_complex = B.is_complex(true);
 Value_P Z(3, LOC);
 
    if (algo == ALGO_QR_HELZER)
       {
         LA_DEBUG && CERR <<
                     "QR factorization with Gary Helzer's algorithm...\n";
-        QR_Helzer(Z, need_complex, M, N, &B->get_cfirst(), EPS);
+        QR_Helzer(Z, need_complex, M, N, B, 0, EPS);
       }
 #if apl_GSL
    else if (algo == ALGO_QR_GSL)
@@ -224,42 +290,42 @@ Value_P Z(3, LOC);
         LA_DEBUG && CERR << "QR factorization with libgsl algorithm...\n";
         if (need_complex)
            {
-             GSL::QR_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QR_factorize_ZZ_matrix(*Z, M, N, B, 0);
            }
         else   // real
            {
-             GSL::QR_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QR_factorize_DD_matrix(*Z, M, N, B, 0);
            }
       }
    else if (algo == ALGO_RQ_GSL)
       {
         if (need_complex)
            {
-             MORE_ERROR() << "RQ factorization is only available "
-                             "for real matrices.";
+             MORE_ERROR() << "⌹[X]B : Bad type of argument B"
+                             " (expecting a real matrix for RQ factorization)";
              DOMAIN_ERROR;
            }
 
         LA_DEBUG && CERR << "RQ factorization with libgsl algorithm...\n";
-        GSL::RQ_factorize(*Z, M, N, B);
+        GSL::RQ_factorize(*Z, M, N, CLONE(&B, LOC));
       }
    else if (algo == ALGO_LQ_GSL)
       {
         LA_DEBUG && CERR << "LQ factorization with libgsl algorithm...\n";
-        GSL::LQ_factorize(*Z, M, N, B, need_complex);
+        GSL::LQ_factorize(*Z, M, N, CLONE(&B, LOC), need_complex);
       }
    else if (algo == ALGO_QL_GSL)
       {
         LA_DEBUG && CERR << "QL factorization with libgsl algorithm...\n";
         if (need_complex)
            {
-             MORE_ERROR() << "LQ factorization is only available "
-                             "for real matrices.";
+             MORE_ERROR() << "⌹[X]B : Bad type of argument B"
+                             " (expecting a real matrix for QL factorization)";
              DOMAIN_ERROR;
            }
         else   // real
            {
-             GSL::QL_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::QL_factorize_DD_matrix(*Z, M, N, B, 0);
            }
       }
    else if (algo == ALGO_LU_GSL)
@@ -267,11 +333,11 @@ Value_P Z(3, LOC);
         LA_DEBUG && CERR << "LU factorization with libgsl algorithm...\n";
         if (need_complex)
            {
-             GSL::LU_factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::LU_factorize_ZZ_matrix(*Z, M, N, B, 0);
            }
         else
            {
-             GSL::LU_factorize_DD_matrix(*Z, M, N, &B->get_cfirst());
+             GSL::LU_factorize_DD_matrix(*Z, M, N, B, 0);
            }
       }
 #endif
@@ -280,9 +346,30 @@ Value_P Z(3, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-Bif_F12_DOMINO::eval_AB(Value_P A, Value_P B) const
+Bif_F12_DOMINO::eval_AXB(cValue_R A, cValue_R X, cValue_R B) const
+{
+const APL_Integer X0 = X.get_sole_integer();
+   if (X0 < 7)     VALENCE_ERROR;
+   switch(X0)
+      {
+        case  7: return Token(TOK_APL_VALUE1, print_polynomial(A, B));
+        case  8: return Token(TOK_APL_VALUE1, polynomial_product(A, B));
+        case  9: return Token(TOK_APL_VALUE1, poly_quotient(A, B));
+        case 10: return Token(TOK_APL_VALUE1, poly_quotient_NO(A, B, 0, 0));
+        case 11: return Token(TOK_APL_VALUE1, scan_polynomial(A, B));
+        case 12: return Token(TOK_APL_VALUE1, poly_quotient_N(A, B));
+        case 20: return Token(TOK_APL_VALUE1, integral(&A, B));
+      }
+
+   MORE_ERROR() << "A⌹[" << X0 << "]B : Bad value of argument X"
+                   " (expecting a valid function number)";
+   DOMAIN_ERROR;
+}
+//────────────────────────────────────────────────────────────────────────────
+Token
+Bif_F12_DOMINO::eval_AB(cValue_R A, cValue_R B) const
 {
 ShapeItem rows_A = 1;
 ShapeItem cols_A = 1;
@@ -293,94 +380,108 @@ ShapeItem cols_B = 1;
    // 1 by n (or 1 by 1) matrix..
    //
 Shape shape_Z;   // ⍴Z ←→ (¯1↓⍴A), (1↓⍴B)
-   switch(B->get_rank())
+   switch(B.get_rank())
       {
          case 0:  break;
 
-         case 1:  rows_B = B->get_shape_item(0);
+         case 1:  rows_B = B.get_shape_item(0);
                   break;
 
-         case 2:  cols_B = B->get_shape_item(1);
-                  rows_B = B->get_shape_item(0);
+         case 2:  cols_B = B.get_shape_item(1);
+                  rows_B = B.get_shape_item(0);
                   shape_Z.add_shape_item(cols_B);
                   break;
 
-         default: RANK_ERROR;
+         default:
+              MORE_ERROR() << "A⌹B: expecting ⍴⍴B ≤ 2; ⍴⍴B is "
+                           << B.get_rank();
+              RANK_ERROR;
       }
 
-   switch(A->get_rank())
+   switch(A.get_rank())
       {
          case 0:  break;
 
-         case 1:  rows_A = A->get_shape_item(0);
+         case 1:  rows_A = A.get_shape_item(0);
                   break;
 
-         case 2:  cols_A = A->get_shape_item(1);
-                  rows_A = A->get_shape_item(0);
+         case 2:  cols_A = A.get_shape_item(1);
+                  rows_A = A.get_shape_item(0);
                   shape_Z.add_shape_item(cols_A);
                   break;
 
-         default: RANK_ERROR;
+         default:
+              MORE_ERROR() << "A⌹B: expecting ⍴⍴A ≤ 2; ⍴⍴A is "
+                           << A.get_rank();
+              RANK_ERROR;
       }
 
    if (rows_B < cols_B)
       {
-        MORE_ERROR() <<
-        "A⌹B : B is under-specified (B has more columns than rows)";
+        MORE_ERROR() << "A⌹B : Bad shape " << rows_B << UNI_SPACE << cols_B
+                     << " of argument B (expecting rows ≥ columns)";
         LENGTH_ERROR;
        }
 
    if (rows_A != rows_B)
       {
-        MORE_ERROR() << "A÷B : number of rows in A ≠ number of rows in B";
+        MORE_ERROR() << "A⌹B : Bad rows " << rows_A << " of argument A"
+                        " (expecting rows A = rows B = " << rows_B << ")";
         LENGTH_ERROR;
       }
 
-const bool need_complex = A->is_complex(true) || B->is_complex(true);
+const bool need_complex = A.is_complex(true) || B.is_complex(true);
 Value_P Z(shape_Z, LOC);
 const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
-                                          cols_A, &A->get_cfirst(),
-                                          cols_B, &B->get_cfirst())
+                                          cols_A, A,
+                                          cols_B, B)
                                 :  LA_pack::divide_DD_matrix(*Z, rows_A,
-                                          cols_A, &A->get_cfirst(),
-                                          cols_B, &B->get_cfirst());
+                                          cols_A, A,
+                                          cols_B, B);
 
    if (rank < cols_B)
       {
         const char * type = need_complex ? "complex" : "real";
-        MORE_ERROR() << "A⌹B : linearly dependent (" << type << ") B?"
-                        " ⍴B is " << rows_A << " " << cols_B
-                     << ", but the estimated rank is " << rank << ".\n"
-                     << "      NOTE that the estimated rank "
-                        "is controlled by ⎕CT.";
+        MORE_ERROR() << "A⌹B : Bad rank " << rank << " of " << type
+                     << " argument B (expecting rank ≥ " << cols_B
+                     << " for ⍴B = " << rows_A << UNI_SPACE << cols_B
+                     << "; is B linearly dependent? the estimated rank"
+                        " is controlled by ⎕CT)";
         DOMAIN_ERROR;
       }
 
-   Z->set_default(*B.get(), LOC);
+   Z->set_default(B, LOC);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-Bif_F12_DOMINO::eval_fill_B(Value_P B) const
+Bif_F12_DOMINO::eval_fill_B(cValue_R B) const
 {
-   return Bif_F12_TRANSPOSE::do_eval_B(B.get());
+   return Bif_F12_TRANSPOSE::do_eval_B(B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Bif_F12_DOMINO::eval_fill_AB(Value_P A, Value_P B) const
+Bif_F12_DOMINO::eval_fill_AB(cValue_R A, cValue_R B) const
 {
 Shape shape_Z;
-   loop(r, A->get_rank() - 1)  shape_Z.add_shape_item(A->get_shape_item(r + 1));
-   loop(r, B->get_rank() - 1)  shape_Z.add_shape_item(B->get_shape_item(r + 1));
+   // A.get_rank()/B.get_rank() return uRank (uint32_t); a rank-0 argument
+   // (e.g. a scalar chunk from Bif_OPER2_RANK::do_ALyXB()'s empty-frame
+   // path) makes "- 1" wrap to ~4 billion instead of going negative --
+   // cast to the signed sRank first (Blake McBride, Bugs12.md #7).
+   //
+   loop(r, sRank(A.get_rank()) - 1)
+      shape_Z.add_shape_item(A.get_shape_item(r + 1));
+   loop(r, sRank(B.get_rank()) - 1)
+      shape_Z.add_shape_item(B.get_shape_item(r + 1));
 
 Value_P Z(shape_Z, LOC);
    while (Z->more())   Z->next_ravel_0();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::print_fun_syntax(ostream & out,
                                 const function_info & info) const
@@ -410,7 +511,7 @@ const char * A = "←   ";   // left arg
    out << Z << A << "LO ⌹[" << setw(2) << axis << "] B   ⍝ "
        << "dito with optional monomial order LO" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Bif_F12_DOMINO::print_map_syntax(ostream & out,
                                  const function_info & info) const
@@ -420,27 +521,7 @@ const UCS_string blanks(max_function_name_length - strlen(name), UNI_SPACE);
    out << "    ⌹[" << setw(2) << info.axis << "]  ←→  ⌹['" << name << "']"
        << blanks << "  ←→  ⌹." << name << endl;
 }
-//----------------------------------------------------------------------------
-Token
-Bif_F12_DOMINO::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-const APL_Integer X0 = X->get_sole_integer();
-   if (X0 < 7)     VALENCE_ERROR;
-   switch(X0)
-      {
-        case  7: return Token(TOK_APL_VALUE1, print_polynomial(*A, *B));
-        case  8: return Token(TOK_APL_VALUE1, polynomial_product(*A, *B));
-        case  9: return Token(TOK_APL_VALUE1, poly_quotient(*A, *B));
-        case 10: return Token(TOK_APL_VALUE1, poly_quotient_NO(*A, *B, 0, 0));
-        case 11: return Token(TOK_APL_VALUE1, scan_polynomial(*A, *B));
-        case 12: return Token(TOK_APL_VALUE1, poly_quotient_N(*A, *B));
-        case 20: return Token(TOK_APL_VALUE1, integral(A.get(), *B));
-      }
-
-   MORE_ERROR() << "A ⌹[X] B: invalid function number X (=" << X0 << ").";
-   DOMAIN_ERROR;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print debug infos for \b this real matrix
 template<>
 void Bif_F12_DOMINO::Matrix<false>::debug(const char * name) const
@@ -458,12 +539,12 @@ Value_P A(2, LOC);   // A←0 4
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
-Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
+Value_P Z = Bif_F12_FORMAT::format_by_specification(A.get(), B.get());
    CERR << name;
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// print debug infos for \b this complex matrix
 template<>
 void Bif_F12_DOMINO::Matrix<true>::debug(const char * name) const
@@ -481,15 +562,15 @@ Value_P A(2, LOC);
    A->next_ravel_Int(4);   // number of fractional digits
    A->check_value(LOC);
 
-Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
+Value_P Z = Bif_F12_FORMAT::format_by_specification(A.get(), B.get());
    CERR << name;
    Z->print_boxed(CERR, 0);
 #endif // DOMINO_DEBUG
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Bif_F12_DOMINO::QR_Helzer(Value_P Z, bool need_complex, ShapeItem M,
-                          ShapeItem N, const Cell * cB, double EPS)
+                          ShapeItem N, cValue_R B, ShapeItem idx, double EPS)
 {
    /* We want to store all floating point variables (including complex ones)
       in a single double[]. Before and after each variable we leave one double
@@ -519,8 +600,16 @@ const ShapeItem base_S  = 1 + base_R  + CPLX*len_QR + 1;
 const ShapeItem end     = 1 + base_S  + CPLX*len_QR + 1;
 #define base_AUG  base_Q   /* reuse Q */
 
-double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
-   memset(data, 0, end*sizeof(double));
+if ((size_t)end > SIZE_MAX / CPLX)   WS_FULL;
+
+   // owned by a vector (not a raw new[]/delete[] pair) so that a
+   // DOMAIN_ERROR thrown below (a non-finite Q/R element, which does
+   // happen for an ill-conditioned matrix) unwinds the stack without
+   // leaking this buffer -- confirmed leak: the matching delete[] was
+   // only reached via the normal, non-throwing return path.
+   //
+std::vector<double> data_vec(end*CPLX, 0.0);
+double * const data = data_vec.data();
    data[base_B - 1]  = 42.0;   data[base_B  + CPLX*len_B] = 43.0;
    data[base_Q - 1]  = 44.0;   data[base_Q  + CPLX*len_QR]   = 45.0;
    data[base_Qi - 1] = 46.0;   data[base_Qi + CPLX*len_QR]   = 47.0;
@@ -536,11 +625,11 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    // ⍴R is M N  (since ⍴B ←→ ⍴Q+.×R) and upper triangular
    if (need_complex)   // complex B
       {
-        setup_complex_B(cB, data + base_B, len_B);
+        setup_complex_B(B, idx, data + base_B, len_B);
         double * Q = householder<true>(data + base_B, M, N, data + base_Q,
                           data + base_Qi, data + base_R, data + base_S, EPS);
 
-        setup_complex_B(cB, data + base_B, len_B);   // restore B
+        setup_complex_B(B, idx, data + base_B, len_B);   // restore B
         const Matrix<true> Bm(data + base_B, M, N);
         Matrix<true> Qm(Q, M, M);
         Qm.transpose(M);
@@ -552,12 +641,12 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    else                // real B
       {
    Assert(data[base_B + CPLX*len_B]  == 43.0);
-        setup_real_B(cB, data + base_B, len_B);
+        setup_real_B(B, idx, data + base_B, len_B);
    Assert(data[base_B + CPLX*len_B]  == 43.0);
         double * Q = householder<false>(data + base_B, M,N, data + base_Q,
                            data + base_Qi, data + base_R, data + base_S, EPS);
 
-        setup_real_B(cB, data + base_B, len_B);   // restore B
+        setup_real_B(B, idx, data + base_B, len_B);   // restore B
         const Matrix<false> Bm(data + base_B, M, N);
         Matrix<false> Qm(Q, M, M);
         Qm.transpose(M);
@@ -711,42 +800,9 @@ const ShapeItem D = M < N ? M : N;   // length of the diagonal
         Z->next_ravel_Pointer(Z3.get());
       }
 
-   delete[] data;
 #undef base_AUG
 }
-//----------------------------------------------------------------------------
-void
-Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
-{
-   // initialize the homogeneous complex vector D from the mixed APL ravel cB
-   //
-   loop(b, count)
-      {
-        const Cell & cell = *cB++;
-        if (cell.is_float_cell())
-           { *D++ = cell.get_real_value();   *D++ = 0.0; }
-        else if (cell.is_integer_cell())
-           { *D++ = cell.get_real_value();   *D++ = 0.0; }
-        else if (cell.is_complex_cell())
-           { *D++ = cell.get_real_value(); *D++ = cell.get_imag_value(); }
-        else   DOMAIN_ERROR;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
-{
-   // initialize the homogeneous real vector D from the mixed APL ravel cB
-   //
-   loop(b, count)
-      {
-        const Cell & cell = *cB++;
-        if (cell.is_float_cell())          *D++ = cell.get_real_value();
-        else if (cell.is_integer_cell())   *D++ = cell.get_real_value();
-        else                               DOMAIN_ERROR;
-      }
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 template<bool cplx>
 double *
 Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
@@ -905,28 +961,9 @@ mB.debug("[13] B");
          --rows;
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
-Bif_F12_DOMINO::print_polynomial(const Value & B)
-{
-const uRank rank_B = B.get_rank();
-   if (rank_B > 8)   RANK_ERROR;
-
-const char * xyz = "xyzuwvst";
-UCS_string_vector vars;   vars.reserve(8);
-   loop(v, rank_B)
-       {
-         const Unicode var = Unicode(xyz[v]);
-         const UCS_string var_ucs(var);
-         vars.push_back(var_ucs);
-       }
-
-const UCS_string Z = print_polynomial(vars, B);
-   return Value_P(Z, LOC);
-}
-//----------------------------------------------------------------------------
-Value_P
-Bif_F12_DOMINO::print_polynomial(const Value & A, const Value & B)
+Bif_F12_DOMINO::print_polynomial(const cValue & A, const cValue & B)
 {
    /* A is a vector of names for the indeterminants (typically
       'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
@@ -955,7 +992,7 @@ UCS_string_vector vars;
              if (ec_A != B.get_rank())   LENGTH_ERROR;
              loop(a, ec_A)
                  {
-                   const UCS_string x(A.get_cravel(a).get_char_value());
+                   const UCS_string x(A.get_char_value(a));
                    vars.push_back(x);
                  }
            }
@@ -967,12 +1004,11 @@ UCS_string_vector vars;
         if (B.get_rank() > ec_A)   LENGTH_ERROR;
         loop(a, ec_A)
             {
-              const Cell & cell = A.get_cravel(a);
-              const Value & x = *cell.get_pointer_value();
+              const cValue & x = *A.get_pointer_value(a);
               if (!x.is_char_array())
                  {
-                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
-                                 << a << "]";
+                    MORE_ERROR() << "A ⌹.print_poly B : Bad type of A["
+                                 << a << "] (expecting a variable name)";
                     DOMAIN_ERROR;
                  }
               const UCS_string var(x);
@@ -983,10 +1019,10 @@ UCS_string_vector vars;
 const UCS_string Z_ucs = print_polynomial(vars, B);
    return Value_P(Z_ucs, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_DOMINO::print_polynomial(const UCS_string_vector & vars,
-                                 const Value & B)
+                                 const cValue & B)
 {
 const UTF8_string expo_digits_utf("⁰¹²³⁴⁵⁶⁷⁸⁹");
 const UCS_string expo_digits(expo_digits_utf);
@@ -999,86 +1035,77 @@ int term = 0;
    loop(n, ec_B)   // loop over terms
       {
         const size_t b = ec_B - n - 1;
-        const Cell & coeff = B.get_cravel(b);
+        Cell cache;
+        const Cell & coeff = B.get_cravel(b, cache);
 
         if (coeff.is_near_zero())   continue;   // hide zero terms entirely
 
         const bool subsequent_term = term++;
 
-        // hide coefficient 1 (unless the term is constant)
-        if (coeff.is_near_one())
+        if (!coeff.is_numeric())
            {
-             if (subsequent_term)   poly << " + ";
-             if (b == 0)            poly << "1";
+             MORE_ERROR() << "A ⌹.poly_print B : Bad type of argument B"
+                             " (expecting numeric coefficients)";
+             DOMAIN_ERROR;
            }
-        else if (coeff.is_near_int() && coeff.get_checked_near_int() == -1)
-           {
-             if (subsequent_term && b)   poly << " - ";
-             else if (subsequent_term)   poly << " - 1";
-             else if (b == 0)            poly << "¨1";
-             else                        poly << "-";
-           }
-        else if (coeff.is_integer_cell())   // integer coefficient
-           {
-             const int value = coeff.get_int_value();
-             if (value < 0)
-                {
-                  if (subsequent_term)   poly << " - " << - value;
-                  else                   poly << "¯"   << - value;
-                }
-             else
-                {
-                  if (subsequent_term)   poly << " + " << value;
-                  else                   poly << value;
-                }
-           }
-        else if (coeff.is_float_cell())   // real coefficient
-           {
-             const double value = coeff.get_real_value();
-             if (value < 0)
-                {
-                   if (subsequent_term)   poly << " - " << - value;
-                   else                   poly << "¯"   << - value;
-                }
-             else
-                {
-                  if (subsequent_term)   poly << " + " << value;
-                  else                   poly << value;
-                }
-           }
-        else if (coeff.is_complex_cell())   // complex coefficient
-           {
-             double c_real = coeff.get_real_value();
-             double c_imag = coeff.get_imag_value();
-             if (c_real < 0 && c_imag < 0)
-                {
-                  if (subsequent_term)
-                     poly << " - " << (-c_real) << (-c_imag);
-                  else
-                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
-                }
-             else if (c_real < 0)   // and c_imag > 0
-                {
-                  if (subsequent_term)
-                     poly << " - " << (-c_real) << "J" << c_imag;
-                  else
-                     poly << "¯" << (-c_real) << "J¯" << (-c_imag);
-                }
-             else if (c_imag < 0)   // and c_real > 0
-               {
-                  if (subsequent_term)   poly << " + ";
-                  poly << c_real << "J¯" << (-c_imag);
-               }
-             else   // both positive
-                {
-                  if (subsequent_term)   poly << " + ";
-                  poly << c_real << "J" << c_imag;
-                }
-           }
+
+        // a subsequent negative coefficient c is printed as " - " followed
+        // by -c. Every coefficient is printed as the APL number it is (⎕PP,
+        // complex, and large integers included, Bugs35 #22).
+        //
+        bool negative;
+        if (coeff.is_integer_cell())     negative = coeff.get_int_value() < 0;
+        else if (coeff.is_complex_cell())
+           negative = coeff.get_real_value() < 0 ||
+                      (coeff.get_real_value() == 0 &&
+                       coeff.get_imag_value() < 0);
+        else                             negative = coeff.get_real_value() < 0;
+
+        if (subsequent_term)   poly << (negative ? " - " : " + ");
+        const bool print_neg = negative && subsequent_term;
+
+        // hide coefficient 1 (or -1) unless the term is constant
+        //
+        if (b && coeff.is_near_int() &&
+            coeff.get_checked_near_int() == (print_neg ? -1 : 1))   ;
+        else if (b && !subsequent_term && coeff.is_near_int() &&
+                 coeff.get_checked_near_int() == -1)   poly << "-";   // -x
         else
            {
-             MORE_ERROR() << "A ⌹.poly_print B: non-numeric coefficient in B";
-             DOMAIN_ERROR;
+             const PrintContext pctx =
+                   Workspace::get_PrintContext(PR_APL_MIN);
+             if (!print_neg)
+                {
+                  poly << UCS_string(coeff.character_representation(pctx),
+                                     0, MAX_Quad_PW);
+                }
+             else if (coeff.is_integer_cell())
+                {
+                  const APL_Integer v = coeff.get_int_value();
+                  if (v == INT64_MIN)   // -v overflows: print 2⋆63 exactly
+                     {
+                       poly << UCS_string(UTF8_string("9223372036854775808"));
+                     }
+                  else
+                     {
+                       const IntCell neg(-v);
+                       poly << UCS_string(neg.character_representation(pctx),
+                                          0, MAX_Quad_PW);
+                     }
+                }
+             else if (coeff.is_complex_cell())
+                {
+                  const ComplexCell neg(-coeff.get_real_value(),
+                                        -coeff.get_imag_value());
+                  poly << UCS_string(neg.character_representation(pctx),
+                                     0, MAX_Quad_PW);
+                }
+             else
+                {
+                  const FloatCell neg(-coeff.get_real_value());
+                  poly << UCS_string(neg.character_representation(pctx),
+                                     0, MAX_Quad_PW);
+                }
            }
 
         // show the indeterminant()
@@ -1126,9 +1153,28 @@ int term = 0;
    if (poly.size() == 0)   poly << UNI_0;
    return poly;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
-Bif_F12_DOMINO::polynomial_product(const Value & A, const Value & B)
+Bif_F12_DOMINO::print_polynomial(const cValue & B)
+{
+const uRank rank_B = B.get_rank();
+   if (rank_B > 8)   RANK_ERROR;
+
+const char * xyz = "xyzuwvst";
+UCS_string_vector vars;   vars.reserve(8);
+   loop(v, rank_B)
+       {
+         const Unicode var = Unicode(xyz[v]);
+         const UCS_string var_ucs(var);
+         vars.push_back(var_ucs);
+       }
+
+const UCS_string Z = print_polynomial(vars, B);
+   return Value_P(Z, LOC);
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Bif_F12_DOMINO::polynomial_product(const cValue & A, const cValue & B)
 {
    // the rank is the number of indeterminants (which should be the same for
    // A and B).
@@ -1146,8 +1192,8 @@ const ShapeItem ec_B = B.element_count();
    if (ec_A == 0)   LENGTH_ERROR;   // at least a₀ is required
    if (ec_B == 0)   LENGTH_ERROR;   // at least b₀ is required
 
-   loop(a, ec_A)   if (!A.get_cravel(a).is_numeric())   DOMAIN_ERROR;
-   loop(b, ec_B)   if (!B.get_cravel(b).is_numeric())   DOMAIN_ERROR;
+   loop(a, ec_A)   if (!A.is_numeric(a))   DOMAIN_ERROR;
+   loop(b, ec_B)   if (!B.is_numeric(b))   DOMAIN_ERROR;
 
 Shape shape_Z;
    loop(r, rank)
@@ -1161,12 +1207,14 @@ vector<Complex> vZ(shape_Z.get_volume(), Complex(0));
 
    loop(a, ec_A)
        {
-        const Cell & cell_A = A.get_cravel(a);
+        Cell cache_A;
+        const Cell & cell_A = A.get_cravel(a, cache_A);
         if (cell_A.is_near_zero())   continue;
         const Shape idx_A = shape_A.offset_to_index(a, /* ⎕IO */ 0);
         loop(b, ec_B)
            {
-             const Cell & cell_B = B.get_cravel(b);
+             Cell cache_B;
+             const Cell & cell_B = B.get_cravel(b, cache_B);
              if (cell_B.is_near_zero())   continue;
              const Shape idx_B = shape_B.offset_to_index(b, /* ⎕IO */ 0);
 
@@ -1228,21 +1276,33 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
-Bif_F12_DOMINO::poly_quotient(const Value & A, const Value & B)
+Bif_F12_DOMINO::poly_quotient(const cValue & A, const cValue & B)
 {
    if (A.get_rank() > 1)   RANK_ERROR;
    if (B.get_rank() > 1)   RANK_ERROR;
 
 const ShapeItem ec_A = A.element_count();
-const ShapeItem ec_B = B.element_count();
+ShapeItem ec_B = B.element_count();
 
    if (ec_A == 0 )   LENGTH_ERROR;
    if (ec_B == 0 )   LENGTH_ERROR;
 
+   // zero coefficients of the highest powers of B do not change the
+   // polynomial B, but the division below divides by the highest one
+   // (Bugs35 #23). Ignore them, and refuse the zero polynomial.
+   //
+   for (Cell cache; ec_B > 0 &&
+                    B.get_cravel(ec_B - 1, cache).is_near_zero();)   --ec_B;
+   if (ec_B == 0)
+      {
+        MORE_ERROR() << "A⌹[9]B: B is the zero polynomial";
+        DOMAIN_ERROR;
+      }
+
    // if the degree of A is less than the degree of B, then the quotient
-   // Q←A÷B is 0 and the remainder A∣B is B.
+   // Q←A÷B is 0 and the remainder A∣B is A (since A = 0×B + A).
    //
    if (ec_A < ec_B)
       {
@@ -1255,8 +1315,11 @@ const ShapeItem ec_B = B.element_count();
         }
 
         {
-          Value_P Z2 = CLONE(&B, LOC);
-          Z->next_ravel_Pointer(Z2.get());         // and remainder B
+          Value_P Z2(ec_A, LOC);   // remainder ,A
+          Cell cache;
+          loop(a, ec_A)   Z2->next_ravel_Cell(A.get_cravel(a, cache));
+          Z2->check_value(LOC);
+          Z->next_ravel_Pointer(Z2.get());
         }
         Z->check_value(LOC);
         return Z;
@@ -1269,7 +1332,7 @@ vector<size_t> powers_B;   powers_B.reserve(ec_B);
 bool need_complex = false;
    loop(a, ec_A)
        {
-          if (A.get_cravel(a).is_complex_cell())
+          if (A.is_complex_cell(a))
              {
                need_complex = true;
                break;
@@ -1278,7 +1341,8 @@ bool need_complex = false;
 
    loop(b, ec_B)
        {
-         const Cell & cell = B.get_cravel(b);
+         Cell cache;
+         const Cell & cell = B.get_cravel(b, cache);
          if (cell.is_near_zero())   continue;
          powers_B.push_back(b);   // remember b
          if (cell.is_complex_cell())   need_complex = true;
@@ -1295,17 +1359,17 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
         vector<Complex> R;   R.reserve(ec_A + ec_B - 1);   // remainder
         loop(a, ec_A)
             {
-              const Cell & cell = A.get_cravel(ec_A - a - 1);
-               R.push_back(Complex(cell.get_real_value(),
-                                   cell.get_imag_value()));
+              const ShapeItem idx = ec_A - a - 1;
+               R.push_back(Complex(A.get_real_value(idx),
+                                   A.get_imag_value(idx)));
             }
         loop(b, ec_B - 1)   R.push_back(0);
 
         loop(b, ec_B)
             {
-              const Cell & cell = B.get_cravel(ec_B - b - 1);
-               D.push_back(Complex(cell.get_real_value(),
-                                   cell.get_imag_value()));
+              const ShapeItem idx = ec_B - b - 1;
+               D.push_back(Complex(B.get_real_value(idx),
+                                   B.get_imag_value(idx)));
             }
 
         loop(q, ec_Q)
@@ -1371,14 +1435,12 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
         vector<double> R;   R.reserve(ec_A);   // remainder
         loop(a, ec_A)
             {
-              const Cell & cell = A.get_cravel(ec_A - a - 1);
-               R.push_back(cell.get_real_value());
+               R.push_back(A.get_real_value(ec_A - a - 1));
             }
 
         loop(b, ec_B)
             {
-              const Cell & cell = B.get_cravel(ec_B - b - 1);
-               D.push_back(cell.get_real_value());
+               D.push_back(B.get_real_value(ec_B - b - 1));
             }
 
         loop(q, ec_Q)
@@ -1435,10 +1497,10 @@ Value_P Z(2, LOC);   // Z is quotient Z1 and remainder Z2
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
-Bif_F12_DOMINO::poly_quotient_NO(const Value & A, const Value & B,
-                              const Value * order_A, const Value * order_B)
+Bif_F12_DOMINO::poly_quotient_NO(const cValue & A, const cValue & B,
+                              const cValue * order_A, const cValue * order_B)
 {
    // divide multivariate polynomials.
    //
@@ -1449,11 +1511,10 @@ const int rank = A.get_rank();
    if (rank != sRank(B.get_rank()))
       {
         const char * sub_fun = order_A ? "poly_divideNO" : "poly_divideN";
-        MORE_ERROR() << "A ⌹." << sub_fun << " B: ⍴⍴A="
-                     << rank << " (= number of indeterminants in A; ⍴⍴B="
-                     << B.get_rank() << " (= number of\n"
-                        "    indeterminants in B. Omitted indeterminants "
-                        "count.";
+        MORE_ERROR() << "A ⌹." << sub_fun << " B : Bad rank "
+                     << B.get_rank() << " of argument B (expecting"
+                        " ⍴⍴B = ⍴⍴A = " << rank
+                     << "; omitted indeterminants count)";
         RANK_ERROR;
       }
 
@@ -1527,9 +1588,9 @@ Value_P Z(2, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
-Bif_F12_DOMINO::poly_quotient_N(const Value & A, const Value & B)
+Bif_F12_DOMINO::poly_quotient_N(const cValue & A, const cValue & B)
 {
    // A contains 2 "planes": the real polynomial A[1;...] and the item
    // order A[2;...] for the corresponding coefficient in A[1[...].
@@ -1539,8 +1600,9 @@ Bif_F12_DOMINO::poly_quotient_N(const Value & A, const Value & B)
 
    if (A.get_shape_item(0) != 2)
       {
-        MORE_ERROR() << "A ⌹.poly_divideNO B: ↑⍴A must be 2 (polynomial "
-                        "A[1;...] and\nmonomial order A[2;...])";
+        MORE_ERROR() << "A ⌹.poly_divideN B : Bad shape of argument A"
+                        " (expecting ↑⍴A = 2, for A[1;...]=polynomial and"
+                        " A[2;...]=monomial order)";
         LENGTH_ERROR;
       }
 
@@ -1550,18 +1612,26 @@ Value_P order_A(shape_A, LOC);  // A[2;...]
    {
      const ShapeItem len = shape_A.get_volume();
 
-     const Cell & order0 = A.get_cravel(len);
+     Cell cache0;
+     const Cell & order0 = A.get_cravel(len, cache0);
      if (!order0.is_near_zero())
         {
-          MORE_ERROR() << "A ⌹.poly_divideNO B: the order value ("
-                       << order0 << ") of the constant term is ≠ 0.";
+          MORE_ERROR() << "A ⌹.poly_divideN B : Bad order " << order0
+                       << " of the constant term in A (expecting 0)";
           DOMAIN_ERROR;
         }
 
-     const Cell * cell = &A.get_cfirst();
-
-     loop(l, len)   poly_A->next_ravel_Cell(*cell++);
-     loop(l, len)   order_A->next_ravel_Cell(*cell++);
+     ShapeItem cellI = 0;
+     loop(l, len)
+         {
+           Cell cache;
+           poly_A->next_ravel_Cell(A.get_cravel(cellI++, cache));
+         }
+     loop(l, len)
+         {
+           Cell cache;
+           order_A->next_ravel_Cell(A.get_cravel(cellI++, cache));
+         }
 
      poly_A->check_value(LOC);
      order_A->check_value(LOC);
@@ -1573,18 +1643,26 @@ Value_P order_B(shape_B, LOC);  // B[2;...]
    {
      const ShapeItem len = shape_B.get_volume();
 
-     const Cell & order0 = B.get_cravel(len);
+     Cell cache0;
+     const Cell & order0 = B.get_cravel(len, cache0);
      if (!order0.is_near_zero())
         {
-          MORE_ERROR() << "B ⌹.poly_divideNO B: the order value ("
-                       << order0 << ") of the constant term is ≠ 0.";
+          MORE_ERROR() << "A ⌹.poly_divideN B : Bad order " << order0
+                       << " of the constant term in B (expecting 0)";
           DOMAIN_ERROR;
         }
 
-     const Cell * cell = &B.get_cfirst();
-
-     loop(l, len)   poly_B->next_ravel_Cell(*cell++);
-     loop(l, len)   order_B->next_ravel_Cell(*cell++);
+     ShapeItem cellI = 0;
+     loop(l, len)
+         {
+           Cell cache;
+           poly_B->next_ravel_Cell(B.get_cravel(cellI++, cache));
+         }
+     loop(l, len)
+         {
+           Cell cache;
+           order_B->next_ravel_Cell(B.get_cravel(cellI++, cache));
+         }
 
      poly_B->check_value(LOC);
      order_B->check_value(LOC);
@@ -1592,7 +1670,246 @@ Value_P order_B(shape_B, LOC);  // B[2;...]
 
    return poly_quotient_NO(*poly_A, *poly_B, order_A.get(), order_B.get());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const cValue & A, const cValue & B)
+{
+   /* A is a vector of names for the indeterminants (typically
+      'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
+      the indeterminants.
+
+      We support the following variants of A and B:
+
+      1. 1-dimensional B and single string A (varname = indeterminant)
+      2. N-dimensional B and single string A (N 1-character indeterminants)
+      3. N-dimensional B and N strings A (N variable-length indeterminants)
+    */
+const ShapeItem ec_A = A.element_count();
+
+   if (A.get_rank() > 1)   RANK_ERROR;   // neither name nor vector of names
+
+UCS_string_vector vars;
+   if (A.is_char_array())   // case 1. or 2.
+      {
+        if (B.get_rank() <= 1)   // case 1. (single indeterminant)
+           {
+             const UCS_string x(A);
+             vars.push_back(x);
+           }
+        else                      // case 2: N 1-character indeterminant
+           {
+             if (ec_A != B.get_rank())   LENGTH_ERROR;
+             loop(a, ec_A)
+                 {
+                   const UCS_string x(A.get_char_value(a));
+                   vars.push_back(x);
+                 }
+           }
+      }
+   else                     // case 3.
+      {
+        // every axis of B is one indeterminant of the polynomial
+        //
+        if (B.get_rank() > ec_A)   LENGTH_ERROR;
+        loop(a, ec_A)
+            {
+              const cValue & x = *A.get_pointer_value(a);
+              if (!x.is_char_array())
+                 {
+                    MORE_ERROR() << "A ⌹.print_poly B : Bad type of A["
+                                 << a << "] (expecting a variable name)";
+                    DOMAIN_ERROR;
+                 }
+              const UCS_string var(x);
+              vars.push_back(var);
+            }
+      }
+
+   return scan_polynomial(vars, B);
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const cValue & B)
+{
+const uRank rank_B = B.get_rank();
+   if (rank_B > 8)   RANK_ERROR;
+
+const char * xyz = "xyzuwvst";
+UCS_string_vector vars;   vars.reserve(8);
+   loop(v, 8)
+       {
+         const Unicode var = Unicode(xyz[v]);
+         const UCS_string var_ucs(var);
+         vars.push_back(var_ucs);
+       }
+
+   return scan_polynomial(vars, B);
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Bif_F12_DOMINO::scan_polynomial(const UCS_string_vector & vars, const cValue & B)
+{
+   if (B.get_rank() > 1)     RANK_ERROR;
+   if (!B.is_char_array())   DOMAIN_ERROR;
+
+UCS_string text(B);
+   text.remove_leading_and_trailing_whitespaces();
+
+   // an empty polynomial is the empty sum 0 (was 1, Bugs35 #24)
+   //
+   if (text.size() == 0)   return IntScalar(0, LOC);
+
+Unicode_source src(text);
+
+   // scanner state
+   //
+char term_sign = '+';
+bool got_j = false;
+bool got_overbar = false;
+
+vector<Monomial> terms;
+Monomial T;
+   if (src.has_more() && *src == '-')   { term_sign = '-';   ++src; }
+   T.set_real(got_overbar, term_sign, 1.0);
+
+   while (src.has_more())
+     {
+       switch(const Unicode uni = *src)
+          {
+             case UNI_SPACE:
+                  ++src;
+                  continue;
+
+             case '+': 
+             case '-': terms.push_back(T);
+                       T = Monomial();   // reuse T's expos buffer, not
+                                         // new (&T) Monomial (leaked it)
+                       term_sign = uni;
+                       T.set_real(got_overbar, term_sign, 1.0);
+                        ++src;
+                       continue;
+
+             case 'J':
+             case 'j': got_j = true;
+                       ++src;   // was missing: *src stayed 'J' forever
+                       continue;
+
+             case UNI_OVERBAR: got_overbar = true;
+                  ++src;
+                  continue;
+
+             case '0'...'9':
+                       T.scan_coefficient(src, term_sign, got_j, got_overbar);
+                       continue;
+
+             default: T.scan_indeterminants(vars, src);
+          }
+     }
+   terms.push_back(T); 
+
+   // check for duplicate terms
+   //
+   loop(t1, terms.size() - 1)
+   for (size_t t2 = t1 + 1; t2 < terms.size(); ++t2)
+       {
+         if (!(terms[t1].same_expos(terms[t2])))   continue;   // OK
+
+         const Monomial & term = terms[t1];
+
+         UCS_string & more = MORE_ERROR();
+         more << "⌹[11]B : Bad term ";
+         loop(var, term.expos.size())
+             {
+               if (const int expo = term.expos[var])
+                  {
+                    more << vars[var];
+                    if (expo > 1) more << UCS_string::power(expo);
+                  }
+             }
+         more << " of argument B (expecting unique terms)";
+
+         DOMAIN_ERROR;
+       }
+
+   // construct the result.
+   //
+
+   // A. figure the largestindefinite
+   //
+   // max_powers is sized to vars.size() rather than a fixed 8: the dyadic
+   // A ⌹[11] B allows an arbitrary number of named indeterminants in A, and
+   // term.expos can grow up to that many entries (Monomial::
+   // scan_indeterminants), so a fixed-size-8 vector would be written out
+   // of bounds for more than 8 named indeterminants.
+   //
+vector<int> max_powers(vars.size(), -1);
+   loop(t, terms.size())
+       {
+         const Monomial & term = terms[t];
+         loop (i, term.expos.size())
+             {
+               const int expo = term.expos[i];
+               max_powers[i] = max(max_powers[i], expo);
+             }
+       }
+
+   // figure the largest indeterminant present in the terms.
+   // This largest indeterminant determines the rabk of Z.
+   //
+int max_var = -1;
+   loop(r, max_powers.size())   if (max_powers[r] != -1)   max_var = r;
+
+   // construct the shape of Z. Each max_powers[r] determines the corresponding
+   // axis length of Z (+1 for the constant term).
+   //
+Shape shape_Z;
+   loop(r, max_var + 1)   shape_Z.add_shape_item(max_powers[r] + 1);
+
+Value_P Z(shape_Z, LOC);
+   loop(e, Z->element_count())   Z->next_ravel_0();
+
+   // fill in the terms
+   //
+   loop(t, terms.size())   // loop over terms
+       {
+         const Monomial & term = terms[t];
+         Cell * dest = &Z->get_wfirst();
+         // CERR << "\nTERM " << t << ":" << endl;
+
+         // compute the position of the term in Z
+         //
+         if (term.expos.size())   // no, not constant
+            {
+              Shape index;
+              loop(r, shape_Z.get_rank())   index.add_shape_item(0);
+
+              loop (v, term.expos.size())
+                  {
+                    const int expo = term.expos[v];
+                    index.set_shape_item(v, expo);
+                  }
+
+              dest += shape_Z.ravel_pos(index);
+            }
+
+         if (term.get_imag() != 0)                      // complex coefficient
+            {
+              new (dest) ComplexCell(term.get_real(), term.get_imag());
+            }
+         else if (Cell::is_near_int(term.get_real()))   // integer coefficient
+            {
+              new (dest) IntCell(Cell::near_int(term.get_real()));
+            }
+         else                                         // real coefficient
+            {
+              new (dest) FloatCell(term.get_real());
+            }
+       }
+
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
 #if 0 // not used
 void
 Bif_F12_DOMINO::run_script(const UTF8_string & script,
@@ -1624,16 +1941,16 @@ UTF8_string script_path("./");
    // construct command
    //
 const char * pythons[] = { "python3", "python" };
-FILE * fp_python = 0;
+PipeReader reader;
    loop(p, sizeof(pythons) / sizeof(*pythons))
        {
          UTF8_string cmd(pythons[p]);
-         cmd << UNI_SPACE << script_path << UNI_SPACE << args;
-         fp_python = popen(cmd.c_str(), "r");
-         if (fp_python)   break;
+         cmd << " " << script_path << " " << args;
+         new (&reader) PipeReader(cmd.c_str());
+         if (+reader)   break;   // success opening cmd
       }
 
-   if (fp_python == 0)
+   if (!reader)
       {
         MORE_ERROR() << "A ⌹.poly_quotient2 B: Could not start python.";
         DOMAIN_ERROR;
@@ -1643,33 +1960,40 @@ enum { BUFSIZE = 80 };
 char buffer[BUFSIZE + 1];
    for (;;)
        {
-           const char * s = fgets(buffer, BUFSIZE, fp_python);
+           const char * s = reader.fgets(buffer, BUFSIZE);
            if (s == 0)   break;
            buffer[BUFSIZE] = 0;   // to secure strlen()
            size_t len = strlen(buffer);
-           if (buffer[len - 1] == '\n')   buffer[--len] = 0;   // trailing \n
-           if (buffer[len - 1] == '\r')   buffer[--len] = 0;   // trailing \r
-           if (len == 0)   continue;
-           // COUT << "──── " << buffer << " ────" << endl;
-           const UTF8_string buffer_utf(buffer);
-           const UCS_string buffer_ucs(buffer_utf);
-           result.push_back(buffer_ucs);
-       }
+           if (len && buffer[len - 1] == '\n')   // discard trailing \n
+              buffer[--len] = 0;
 
-   // pclose() returns ECHILD even if the script runs successfully.
-   pclose(fp_python);
+           if (len && buffer[len - 1] == '\r')   // discard trailing \r
+              buffer[--len] = 0;
+
+           if (len == 0)   continue;   // if nothing left
+
+           // COUT << "──── " << buffer << " ────" << endl;
+           try   // proposed by Claude Code
+              {
+                const UTF8_string buffer_utf(buffer);
+                const UCS_string buffer_ucs(buffer_utf);
+                result.push_back(buffer_ucs);
+              }
+           catch (std::bad_alloc &) { WS_FULL; }
+           catch (...)              { FIXME; }
+       }
 }
 #endif
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
-Bif_F12_DOMINO::integral(const Value * A, const Value & B)
+Bif_F12_DOMINO::integral(const cValue * A, const cValue & B)
 {
 int printer = 1;
    if (A)   // optional attributes
       {
         if (A->get_rank() > 1)        RANK_ERROR;
         if (A->element_count() > 1)   LENGTH_ERROR;
-        printer = A->get_cravel(0).get_int_value();
+        printer = A->get_int_value(0);
       }
 
    // B shall be a character string with the expression to be integrated
@@ -1695,9 +2019,9 @@ PythonPipe p(script);
            const UCS_string message = p.read();
            if (message != expected)
               {
-                MORE_ERROR() << "Error starting python script '" << script<< "'.\n"
-                                "Expected '" << expected <<
-                                "' but got '" << message << "'.";
+                MORE_ERROR() << "⌹[20]B : Bad startup message '" << message
+                             << "' from " << script
+                             << " (expecting '" << expected << "')";
                 DOMAIN_ERROR;
               }
          }
@@ -1761,231 +2085,56 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
-Value_P
-Bif_F12_DOMINO::scan_polynomial(const Value & B)
+//────────────────────────────────────────────────────────────────────────────
+void
+Bif_F12_DOMINO::setup_complex_B(cValue_R V, ShapeItem idx, double * D,
+                                 ShapeItem count)
 {
-const uRank rank_B = B.get_rank();
-   if (rank_B > 8)   RANK_ERROR;
-
-const char * xyz = "xyzuwvst";
-UCS_string_vector vars;   vars.reserve(8);
-   loop(v, 8)
-       {
-         const Unicode var = Unicode(xyz[v]);
-         const UCS_string var_ucs(var);
-         vars.push_back(var_ucs);
-       }
-
-   return scan_polynomial(vars, B);
-}
-//----------------------------------------------------------------------------
-Value_P
-Bif_F12_DOMINO::scan_polynomial(const Value & A, const Value & B)
-{
-   /* A is a vector of names for the indeterminants (typically
-      'x', 'x'y, 'x'z, ...) and B is the coefficients of the powers of
-      the indeterminants.
-
-      We support the following variants of A and B:
-
-      1. 1-dimensional B and single string A (varname = indeterminant)
-      2. N-dimensional B and single string A (N 1-character indeterminants)
-      3. N-dimensional B and N strings A (N variable-length indeterminants)
-    */
-const ShapeItem ec_A = A.element_count();
-
-   if (A.get_rank() > 1)   RANK_ERROR;   // neither name nor vector of names
-
-UCS_string_vector vars;
-   if (A.is_char_array())   // case 1. or 2.
-      {
-        if (B.get_rank() <= 1)   // case 1. (single indeterminant)
+   // initialize the homogeneous complex vector D from the mixed APL ravel V
+   //
+const RavelType rt = V.get_ravel_type();
+   if (rt == RPT_CELLS)
+      { loop(b, count)
            {
-             const UCS_string x(A);
-             vars.push_back(x);
-           }
-        else                      // case 2: N 1-character indeterminant
-           {
-             if (ec_A != B.get_rank())   LENGTH_ERROR;
-             loop(a, ec_A)
-                 {
-                   const UCS_string x(A.get_cravel(a).get_char_value());
-                   vars.push_back(x);
-                 }
+             Cell cache;
+             const Cell & cell = V.get_cravel(idx + b, cache);
+             if (cell.is_float_cell())
+                { *D++ = cell.get_real_value();   *D++ = 0.0; }
+             else if (cell.is_integer_cell())
+                { *D++ = cell.get_real_value();   *D++ = 0.0; }
+             else if (cell.is_complex_cell())
+                { *D++ = cell.get_real_value(); *D++ = cell.get_imag_value(); }
+             else   DOMAIN_ERROR;
            }
       }
-   else                     // case 3.
-      {
-        // every axis of B is one indeterminant of the polynomial
-        //
-        if (B.get_rank() > ec_A)   LENGTH_ERROR;
-        loop(a, ec_A)
-            {
-              const Cell & cell = A.get_cravel(a);
-              const Value & x = *cell.get_pointer_value();
-              if (!x.is_char_array())
-                 {
-                    MORE_ERROR() << "A ⌹.print_poly B: Bad variable name A["
-                                 << a << "]";
-                    DOMAIN_ERROR;
-                 }
-              const UCS_string var(x);
-              vars.push_back(var);
-            }
-      }
-
-   return scan_polynomial(vars, B);
+   else if (rt & RPT_real)    // RPT_BOOL, RPT_INT64, RPT_FLOAT64
+      { loop(b, count)   { *D++ = V.get_real_value(idx + b); *D++ = 0.0; } }
+   else if (rt == RPT_COMPLEX)
+      { loop(b, count)   { *D++ = V.get_real_value(idx + b);
+                           *D++ = V.get_imag_value(idx + b); } }
+   else   DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
-Value_P
-Bif_F12_DOMINO::scan_polynomial(const UCS_string_vector & vars, const Value & B)
+//────────────────────────────────────────────────────────────────────────────
+void
+Bif_F12_DOMINO::setup_real_B(cValue_R V, ShapeItem idx, double * D,
+                              ShapeItem count)
 {
-   if (B.get_rank() > 1)     RANK_ERROR;
-   if (!B.is_char_array())   DOMAIN_ERROR;
-
-UCS_string text(B);
-   text.remove_leading_and_trailing_whitespaces();
-Unicode_source src(text);
-
-   // scanner state
+   // initialize the homogeneous real vector D from the mixed APL ravel V
    //
-char term_sign = '+';
-bool got_j = false;
-bool got_overbar = false;
-
-vector<Monomial> terms;
-Monomial T;
-   if (src.has_more() && *src == '-')   { term_sign = '-';   ++src; }
-   T.set_real(got_overbar, term_sign, 1.0);
-
-   while (src.has_more())
-     {
-       switch(const Unicode uni = *src)
-          {
-             case UNI_SPACE:
-                  ++src;
-                  continue;
-
-             case '+': 
-             case '-': terms.push_back(T);
-                       new (&T) Monomial;
-                       term_sign = uni;
-                       T.set_real(got_overbar, term_sign, 1.0);
-                        ++src;
-                       continue;
-
-             case 'J': 
-             case 'j': got_j = true;
-                       continue;
-
-             case UNI_OVERBAR: got_overbar = true;
-                  ++src;
-                  continue;
-
-             case '0'...'9':
-                       T.scan_coefficient(src, term_sign, got_j, got_overbar);
-                       continue;
-
-             default: T.scan_indeterminants(vars, src);
-          }
-     }
-   terms.push_back(T); 
-
-   // check for duplicate terms
-   //
-   loop(t1, terms.size() - 1)
-   for (size_t t2 = t1 + 1; t2 < terms.size(); ++t2)
-       {
-         if (!(terms[t1].same_expos(terms[t2])))   continue;   // OK
-
-         const Monomial & term = terms[t1];
-
-         UCS_string & more = MORE_ERROR();
-         more << "⌹[11] B: duplicate term: ";
-         loop(var, term.expos.size())
-             {
-               if (const int expo = term.expos[var])
-                  {
-                    more << vars[var];
-                    if (expo > 1) more << UCS_string::power(expo);
-                  }
-             }
-
-         DOMAIN_ERROR;
-       }
-
-   // construct the result.
-   //
-
-   // A. figure the largestindefinite
-   //
-vector<int> max_powers(8, -1);
-   loop(t, terms.size())
-       {
-         const Monomial & term = terms[t];
-         loop (i, term.expos.size())
-             {
-               const int expo = term.expos[i];
-               max_powers[i] = max(max_powers[i], expo);
-             }
-       }
-
-   // figure the largest indeterminant present in the terms.
-   // This largest indeterminant determines the rabk of Z.
-   //
-int max_var = -1;
-   loop(r, 8)   if (max_powers[r] != -1)   max_var = r;
-
-   // construct the shape of Z. Each max_powers[r] determines the corresponding
-   // axis length of Z (+1 for the constant term).
-   //
-Shape shape_Z;
-   loop(r, max_var + 1)   shape_Z.add_shape_item(max_powers[r] + 1);
-
-Value_P Z(shape_Z, LOC);
-   loop(e, Z->element_count())   Z->next_ravel_0();
-
-   // fill in the terms
-   //
-   loop(t, terms.size())   // loop over terms
-       {
-         const Monomial & term = terms[t];
-         Cell * dest = &Z->get_wfirst();
-         // CERR << "\nTERM " << t << ":" << endl;
-
-         // compute the position of the term in Z
-         //
-         if (term.expos.size())   // no, not constant
-            {
-              Shape index;
-              loop(r, shape_Z.get_rank())   index.add_shape_item(0);
-
-              loop (v, term.expos.size())
-                  {
-                    const int expo = term.expos[v];
-                    index.set_shape_item(v, expo);
-                  }
-
-              dest += shape_Z.ravel_pos(index);
-            }
-
-         if (term.get_imag() != 0)                      // complex coefficient
-            {
-              new (dest) ComplexCell(term.get_real(), term.get_imag());
-            }
-         else if (Cell::is_near_int(term.get_real()))   // integer coefficient
-            {
-              new (dest) IntCell(Cell::near_int(term.get_real()));
-            }
-         else                                         // real coefficient
-            {
-              new (&dest) FloatCell(term.get_real());
-            }
-       }
-
-   Z->check_value(LOC);
-   return Z;
+const RavelType rt = V.get_ravel_type();
+   if (rt == RPT_CELLS)
+      { loop(b, count)
+           {
+             Cell cache;
+             const Cell & cell = V.get_cravel(idx + b, cache);
+             if (cell.is_float_cell())          *D++ = cell.get_real_value();
+             else if (cell.is_integer_cell())   *D++ = cell.get_real_value();
+             else                               DOMAIN_ERROR;
+           }
+      }
+   else if (rt & RPT_real)    // RPT_BOOL, RPT_INT64, RPT_FLOAT64
+      { loop(b, count)   { *D++ = V.get_real_value(idx + b); } }
+   else   DOMAIN_ERROR;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

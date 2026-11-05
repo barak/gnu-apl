@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "fntag" network command: report the creator tag (source location)
+/// of a user-defined function, for Emacs' tag-jump-to-definition
 class FnTagCommand : public NetworkCommand {
 public:
+    /// constructor
     FnTagCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

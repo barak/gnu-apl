@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "Bif_F12_RHO.hh"
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
 #include "Common.hh"
@@ -34,6 +35,8 @@
 #include "LibPaths.hh"
 #include "Output.hh"
 #include "ScalarFunction.hh"
+#include "Sys.hh"
+#include "SystemVariable.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
@@ -48,12 +51,14 @@ UserPreferences UserPreferences::uprefs;
 #undef _B
 #endif
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 UserPreferences::UserPreferences()
    :
      append_summary(false),
      auto_OFF(false),
      backup_before_save(false),
+     strict_IBM_APL2_formatting(false),
+     nested_parentheses(false),
      plot_ASCII_rows(0),          //  0: preference was not provided
      plot_ASCII_columns(0),       //  0: preference was not provided
      plot_ASCII_background(-1),   // -1: preference was not provided
@@ -74,7 +79,7 @@ UserPreferences::UserPreferences()
      line_history_len(500),
      no_xmodmap(false),
      line_history_path(".apl.history"),
-     mem_arg(0),
+     mem_arg(0),  // no --mem and mo MEMORY preference
      old_multi_line_strings(true),
      new_multi_line_strings(true),
      multi_line_literals(true),
@@ -86,19 +91,41 @@ UserPreferences::UserPreferences()
      requested_id(0),
      requested_par(0),
      safe_mode(false),
+     show_status(false),
      script_argc(0),
      silence(FULL_BANNER),
+#if MINGW_SRC
+     // Shared variables (⎕SVx) require the APserver auxiliary processor,
+     // which exists for backward compatibility with IBM APL2 and is rarely
+     // used. APserver is not supported on Windows, so default to the
+     // equivalent of --noSV there to avoid a spurious "Svar_DB not
+     // connected" message on every startup. Still overridable via SharedVars
+     // in the preferences file or the --noSV/--SV command line options.
+     //
+     system_do_svars(false),
+#else
      system_do_svars(true),
+#endif
      tcp_port(0),
      tcp_websocket(false),
+#if MINGW_SRC
+     user_do_svars(false),
+#else
      user_do_svars(true),
+#endif
      user_profile(0),
+     no_prefs(false),
      wait_ms(0),
      WINCH_sets_pw(false)
 {
    gettimeofday(&session_start, 0);
+
+#if MINGW_SRC
+   feature_off("shared variables", "DEF",
+               "disabled by default on Windows (no APserver)");
+#endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::collect_preferences(const std::vector<const char *> & args)
 {
@@ -124,23 +151,32 @@ const bool log_startup = parse_args_1() || log_startup0;
 
    init_modules(args[0], log_startup);
 
-   // read /etc/gnu-apl.d/preferences
-   read_config_file(true,  log_startup);
+   if (no_prefs)   // --noPrefs: built-in defaults only
+      {
+        if (log_startup)
+           CERR << "--noPrefs: not reading preferences and"
+                   " parallel_thresholds files" << endl;
+      }
+   else
+      {
+        // read /etc/gnu-apl.d/preferences
+        read_config_file(true,  log_startup);
 
-   // read $HOME/.config/gnu_apl/preferences
-   read_config_file(false, log_startup);
+        // read $HOME/.config/gnu_apl/preferences
+        read_config_file(false, log_startup);
 
-  // read /etc/gnu-apl.d/parallel_thresholds
-   read_threshold_file(true, log_startup);
+        // read /etc/gnu-apl.d/parallel_thresholds
+        read_threshold_file(true, log_startup);
 
-  // read $HOME/.config/gnu_apl/parallel_thresholds
-   read_threshold_file(false, log_startup);
+        // read $HOME/.config/gnu_apl/parallel_thresholds
+        read_threshold_file(false, log_startup);
+      }
 
   parse_args_2(log_startup);
 
   return log_startup0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// print args
 void
 UserPreferences::show_args(const std::vector<const char *> & args)
@@ -151,6 +187,7 @@ UserPreferences::show_args(const std::vector<const char *> & args)
 
    // tell if stdin is open or closed
    //
+#if ! MINGW_SRC
    if (fcntl(STDIN_FILENO, F_GETFD))
       CERR << "stdin is: CLOSED" << endl;
    else
@@ -162,8 +199,9 @@ UserPreferences::show_args(const std::vector<const char *> & args)
       CERR << "fd 3 is:  CLOSED" << endl;
    else
       CERR << "fd 3 is:  OPEN" << endl;
+#endif // MINGW_SRC
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::usage(const char * prog)
 {
@@ -206,16 +244,19 @@ UserPreferences::usage(const char * prog)
 "    --tcp_port port      redirect CIN/COUT/CERR to/from TCP port 'port')\n"
 "    --[no]Color          start with ]XTERM ON [OFF])\n"
 "    --noCONT             do not )LOAD CONTINUE or SETUP workspace on startup\n"
+"    --noPrefs            do not read preferences and parallel_thresholds files\n"
 "    --emacs              run in (classical) emacs mode\n"
 "    --emacs_arg arg      run in emacs mode with argument 'arg'\n"
 "    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
-"    --huge [arg]         memory management\n"
+"    --mem limit          memory limit\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
+"    --libroot dir        use library root dir (workspaces, wslib1...wslib9)\n"
 "    --LX expr            execute APL expression expr first\n"
 "    --OFF                automatically )OFF after last input file\n"
 "    -p N                 use profile N in preferences files\n"
 "    --par proc           use processor parent ID proc (default: no parent)\n"
+"    --pack_min N         min. element count for packed ravels (sets ⎕SYL[34;2])\n"
 "    --PW value           initial value of ⎕PW\n"
 "    -q, --silent         do not print the welcome banner\n"
 "    -s, --script         shortcut for --silent --noCIN --noCONT --noColor\n"
@@ -226,6 +267,10 @@ UserPreferences::usage(const char * prog)
 "    --show_lib_dir       show library directory and exit\n"
 "    --show_src_dir       show source directory and exit\n"
 "    --show_all_dirs      show all directories above and exit\n"
+"    --status             show the optional features (like ]STATUS) and exit\n"
+"    --strict_IBM_APL2_formatting mode\n"
+"                         output format: no, yes, or parentheses (overrides\n"
+"                         the preference STRICT_IBM_APL2_FORMATTING)\n"
 "    --[no]SV             [do not] start APnnn (a shared variable server)\n"
 "    -T testcases ...     run testcases\n"
 "    --TM mode            test mode (for -T files):\n"
@@ -249,7 +294,7 @@ UserPreferences::usage(const char * prog)
 "\n"
 "Please report problems to: bug-apl@gnu.org\n" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_GPL(ostream & out)
 {
@@ -295,7 +340,7 @@ UserPreferences::show_GPL(ostream & out)
 "   See also: http://www.netlib.org/lapack/LICENSE\n"
 "\n";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::is_APL_script(const char * filename)
 {
@@ -313,7 +358,12 @@ int fd = open(filename, O_RDONLY);
    if (fd == -1)   return false;
 
 char buf[2];
-const size_t len = read(fd, buf, sizeof(buf));
+   // read() returns ssize_t (-1 on error); assigning that to a size_t
+   // (Blake McBride, Bugs16 minor) made a read() error become SIZE_MAX,
+   // which the "!= 2" check below happened to still handle correctly,
+   // but only by accident of unsigned wraparound.
+   //
+const ssize_t len = read(fd, buf, sizeof(buf));
    close(fd);
 
    if (len != 2)        return false;
@@ -321,19 +371,23 @@ const size_t len = read(fd, buf, sizeof(buf));
    if (buf[1] != '!')   return false;
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UserPreferences::parse_args_0(const std::vector<const char *> & args)
 {
-   for (size_t a = 1; a < (args.size() - 1); ++a)
+   for (size_t a = 1; (a + 1) < args.size(); ++a)
        {
-         if (!strcmp(args[a], "-l") && atoi(args[a+1]) == LID_startup)
+         if (!strcmp(args[a], "-l") && strtol(args[a+1], 0, 10) == LID_startup)
             return true;
        }
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+
+#define IFOPT(x)     if (!strcmp(opt, #x))
+#define IFOPT2(x, y) if ((!strcmp(opt, #x)) || (!strcmp(opt, #y)))
+
 bool
 UserPreferences::parse_args_1()
 {
@@ -343,7 +397,7 @@ bool log_startup = false;
          const char * opt = expanded_args[a++];
          const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
-         if (!strcmp(opt, "-l"))
+         IFOPT( -l )
             {
               ++a;
               if (!val)
@@ -356,7 +410,7 @@ bool log_startup = false;
               continue;
             }
 
-         if (!strcmp(opt, "-p"))
+         IFOPT( -p )
             {
               ++a;
               if (!val)
@@ -369,7 +423,33 @@ bool log_startup = false;
               continue;
             }
 
-         if (!strcmp(opt, "-C"))
+         IFOPT( --noPrefs )
+            {
+              no_prefs = true;
+              continue;
+            }
+
+         IFOPT( --libroot )
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "--libroot without directory" << endl;
+                   exit(a);
+                 }
+
+              if (!LibPaths::is_lib_root(val))
+                 {
+                   CERR << "--libroot " << val << ": not a library root"
+                           " (needs workspaces and wslib1 in it)" << endl;
+                   exit(a);
+                 }
+
+              LibPaths::set_root_from_arg(val);
+              continue;
+            }
+
+         IFOPT( -C )
             {
               ++a;
               if (!val)
@@ -379,12 +459,14 @@ bool log_startup = false;
                  }
 
 #ifndef WINDOWS
+#if ! MINGW_SRC
               if (chroot(val))
                  {
                    CERR << "chroot(" << val << ") failed: "
                         << strerror(errno) << endl;
                    exit(a);
                  }
+#endif // ! MINGW_SRC
 #endif // WINDOWS
 
               if (chdir("/"))
@@ -398,7 +480,7 @@ bool log_startup = false;
             }
 
 #ifndef WINDOWS
-         if (!strcmp(opt, "-u"))
+         IFOPT( -u )
             {
               ++a;
               if (!val)
@@ -406,12 +488,14 @@ bool log_startup = false;
                    CERR << "-u without user ID" << endl;
                    exit(a);
                  }
+#if ! MINGW_SRC
               if (setuid(strtoll(val, 0, 10)))
                  {
                    CERR << "setuid(" << val << ") failed: "
                         << strerror(errno) << endl;
                    exit(a);
                  }
+#endif // ! MINGW_SRC
               continue;
             }
 #endif // WINDOWS
@@ -419,7 +503,131 @@ bool log_startup = false;
 
    return log_startup;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+std::map<std::string, bool>
+UserPreferences::feature_states() const
+{
+   // the run-time switchable features that ]STATUS reports (the features
+   // that can only be switched by ./configure are reported by ]STATUS
+   // directly). The names are shown by ]STATUS.
+   //
+std::map<std::string, bool> ret;
+   ret["shared variables"]             = user_do_svars;
+
+   // security: --safe, and the disable_xxx preferences (which are only
+   // effective with SECURITY_LEVEL_WANTED=1; level 2 disables everything)
+   //
+#if cfg_SECURITY_LEVEL_WANTED == 0
+# define SEC_OFF(x) false
+#elif cfg_SECURITY_LEVEL_WANTED == 1
+# define SEC_OFF(x) x
+#else
+# define SEC_OFF(x) true
+#endif
+const bool fio_off = SEC_OFF(disable_Quad_FIO);
+   ret[")HOST"]                = !safe_mode;
+   ret["⎕FIO processes"]       = !(safe_mode || fio_off ||
+                                   SEC_OFF(disable_Quad_FIO__exec));
+   ret["native functions"]     = !(safe_mode ||
+                                   SEC_OFF(disable_native_functions));
+   ret["⎕FIO"]                 = !fio_off;
+   ret["⎕FIO open/close"]      = !(fio_off || SEC_OFF(disable_Quad_FIO__open));
+   ret["⎕FIO sockets"]         = !(fio_off ||
+                                   SEC_OFF(disable_Quad_FIO__socket));
+   ret["⎕FIO write"]           = !(fio_off || SEC_OFF(disable_Quad_FIO__write));
+   ret["⎕GTK (security)"]      = !SEC_OFF(disable_Quad_GTK);
+   ret["⎕PLOT (security)"]     = !SEC_OFF(disable_Quad_PLOT);
+   ret["⎕SQL (security)"]      = !SEC_OFF(disable_Quad_SQL);
+   ret[")SAVE and )DUMP"]      = !SEC_OFF(disable_SAVE_command);
+#undef SEC_OFF
+
+   ret["colours"]                      = do_Color;
+   ret["welcome banner"]               = silence != NO_BANNER;
+   ret["CONTINUE workspace"]           = do_CONT;
+   ret["echo of input lines"]          = !do_not_echo;
+   ret["emacs mode"]                   = emacs_mode;
+   ret["raw input"]                    = raw_cin;
+   ret["automatic )OFF"]               = auto_OFF;
+   ret["backup before )SAVE"]          = backup_before_save;
+   ret["∇-editor lines in history"]    = nabla_to_history != 0;
+   ret["xmodmap"]                      = !no_xmodmap;
+   ret["IBM APL2 formatting"]          = strict_IBM_APL2_formatting;
+   ret["nested items in parentheses"]  = nested_parentheses;
+   ret["new multi-line strings"]       = new_multi_line_strings;
+   ret["old multi-line strings"]       = old_multi_line_strings;
+   ret["discard indentation"]          = discard_indentation;
+   return ret;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+UserPreferences::note_feature_changes(const std::map<std::string, bool> & before,
+                                      const char * source,
+                                      const std::string & detail)
+{
+const std::map<std::string, bool> after = feature_states();
+   for (const auto & fa : after)
+       {
+         const auto fb = before.find(fa.first);
+         if (fb == before.end() || fb->second == fa.second)   continue;
+         if (fa.second)   feature_on(fa.first);
+         else             feature_off(fa.first, source, detail);
+       }
+}
+//────────────────────────────────────────────────────────────────────────────
+namespace
+{
+/// records the features that one line of a preferences file or one command
+/// line option switches on or off (for ]STATUS). The destructor runs at the
+/// end of the line or option, no matter how the loop iteration ends.
+class Feature_watch
+{
+public:
+   /// a line of a preferences file
+   Feature_watch(UserPreferences & up, const char * src, const string & det)
+   : uprefs(up),
+     before(up.feature_states()),
+     source(src),
+     detail(det),
+     args(0),
+     first_arg(0),
+     next_arg(0)
+   {}
+
+   /// a command line option (and its values, if any)
+   Feature_watch(UserPreferences & up, const std::vector<const char *> & av,
+                 size_t first, const size_t & next)
+   : uprefs(up),
+     before(up.feature_states()),
+     source("ARGV"),
+     args(&av),
+     first_arg(first),
+     next_arg(&next)
+   {}
+
+   ~Feature_watch()
+      {
+        if (args)   // a command line option: the option and its values
+           {
+             for (size_t a = first_arg; a < *next_arg && a < args->size(); ++a)
+                 {
+                   if (a != first_arg)   detail += " ";
+                   detail += (*args)[a];
+                 }
+           }
+        uprefs.note_feature_changes(before, source, detail);
+      }
+
+protected:
+   UserPreferences & uprefs;
+   const std::map<std::string, bool> before;
+   const char * source;
+   string detail;
+   const std::vector<const char *> * args;
+   size_t first_arg;
+   const size_t * next_arg;
+};
+}   // namespace
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::parse_args_2(bool logit)
 {
@@ -439,8 +647,10 @@ UserPreferences::parse_args_2(bool logit)
       const char * prog = expanded_args[0];
       if (strlen(prog) >= 6 && !strcmp("script", (prog + strlen(prog) - 6)))
          {
+            const Feature_watch watch(*this, "ARGV",
+                                      "started as aplscript (--script)");
             do_CONT = false;               // --noCONT
-            do_not_echo = true;            // -noCIN
+            do_not_echo = true;            // --noCIN
             do_Color = false;              // --noColor
             silence = NO_BANNER;           // --silent
          }
@@ -450,13 +660,17 @@ UserPreferences::parse_args_2(bool logit)
        {
          if (a == script_argc)   { ++a;   continue; }   // skip scriptname
 
+         // ]STATUS: record the features that this option switches on or off
+         //
+         const Feature_watch watch(*this, expanded_args, a, a);
+
          const char * opt = expanded_args[a++];
          const char * val = (a < expanded_args.size()) ? expanded_args[a] : 0;
 
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
          //
-         if (!strcmp(opt, "--"))   // end of options marker
+         IFOPT( -- )   // end of options marker
             {
               break;   // for (size_t a = 1; ...
             }
@@ -472,14 +686,14 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-C"))
+         IFOPT( -C )
             {
               ++a;
               continue;   // -C already handled in parse_args_1()
             }
 
 #if cfg_CORE_COUNT_WANTED == -2
-         if (!strcmp(opt, "--cc"))
+         IFOPT( --cc )
             {
               ++a;
               if (!val)
@@ -491,13 +705,13 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 #endif
-         if (!strcmp(opt, "--cfg"))
+         IFOPT( --cfg )
             {
               show_configure_options();
               exit(0);
             }
 
-         if (!strcmp(opt, "--CPU_limit_secs"))
+         IFOPT( --CPU_limit_secs )
             {
               ++a;
               if (!val)
@@ -509,19 +723,19 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--Color"))
+         IFOPT( --Color )
             {
               do_Color = true;
               continue;
             }
 
-         if (!strcmp(opt, "-d"))
+         IFOPT( -d )
             {
               daemon = true;
               continue;
             }
 
-         if (!strcmp(opt, "--echoCIN"))
+         IFOPT( --echoCIN )
             {
               echo_CIN = true;
               do_not_echo = true;
@@ -529,13 +743,13 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--emacs"))
+         IFOPT( --emacs )
             {
               emacs_mode = true;
               continue;
             }
 
-         if (!strcmp(opt, "--emacs_arg"))
+         IFOPT( --emacs_arg )
             {
               ++a;
               if (!val)
@@ -549,7 +763,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--eval"))
+         IFOPT( --eval )
             {
               ++a;
               if (!val)
@@ -563,7 +777,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-f"))
+         IFOPT( -f )
             {
               ++a;
               if (!val)
@@ -579,21 +793,21 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--gpl"))
+         IFOPT( --gpl )
             {
               show_GPL(cout);
               exit(0);
             }
 
-         if (!strcmp(opt, "-h") || !strcmp(opt, "--help"))
+         IFOPT2( -h , --help )
             {
               usage(expanded_args[0]);
               exit(0);
             }
 
-         if (!strcmp(opt, "--mem"))
+         IFOPT( --mem )
             {
-              mem_arg = "";   // assume no value
+              mem_arg = "50%";   // assume no value
               if (val)   // --huge with user-supplied value
                  {
                    ++a;   // skip val
@@ -604,7 +818,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--id"))
+         IFOPT( --id )
             {
               ++a;
               if (!val)
@@ -617,7 +831,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-L"))
+         IFOPT( -L )
             {
               ++a;
               if (!val)
@@ -630,7 +844,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--LX"))
+         IFOPT( --LX )
             {
               ++a;
               if (!val)
@@ -643,10 +857,11 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-l"))
+         IFOPT( -l )
             {
               ++a;
               if (val && atoi(val) == LID_startup)   logit = true;
+
 #ifdef cfg_DYNAMIC_LOG_WANTED
               if (val)   Log_control(LogId(atoi(val)), true);
               else
@@ -654,59 +869,70 @@ UserPreferences::parse_args_2(bool logit)
                    CERR << "-l without log facility" << endl;
                    exit(a);
                  }
-#else
+#else // ! cfg_DYNAMIC_LOG_WANTED
    if (val && atoi(val) == LID_startup)   ;
    else  CERR << "the -l option was ignored (requires ./configure "
                    "DYNAMIC_LOG_WANTED=yes)" << endl;
-#endif // cfg_DYNAMIC_LOG_WANTED
+#endif // ! cfg_DYNAMIC_LOG_WANTED
 
               continue;
             }
 
-         if (!strcmp(opt, "--noCIN"))
+         IFOPT( --noCIN )
             {
               do_not_echo = true;
               continue;
             }
 
-         if (!strcmp(opt, "--to_COUT"))
+         IFOPT( --to_COUT )
             {
               output_to_cout = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noColor"))
+         IFOPT( --noColor )
             {
               do_Color = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noCONT"))
+         IFOPT( --noCONT )
             {
               do_CONT = false;
               continue;
             }
 
-         if (!strcmp(opt, "--noSV"))
+         IFOPT( --noSV )
             {
               user_do_svars = false;
               system_do_svars = false;
               continue;
             }
 
-         if (!strcmp(opt, "--OFF"))
+         IFOPT( --OFF )
             {
               auto_OFF = true;
               continue;
             }
 
-         if (!strcmp(opt, "-p"))
+         IFOPT( -p )
             {
               ++a;
               continue;   // -p already handled in parse_args_1()
             }
 
-         if (!strcmp(opt, "--par"))
+         IFOPT( --noPrefs )
+            {
+              continue;   // already handled in parse_args_1()
+            }
+
+         IFOPT( --libroot )
+            {
+              ++a;
+              continue;   // already handled in parse_args_1()
+            }
+
+         IFOPT( --par )
             {
               ++a;
               if (!val)
@@ -718,7 +944,7 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--PW"))
+         IFOPT( --PW )
             {
               ++a;
               if (!val)
@@ -742,66 +968,67 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--rawCIN"))
+         IFOPT( --rawCIN )
             {
               raw_cin = true;
               continue;
             }
 
-         if (!strcmp(opt, "--SV"))
+         IFOPT( --SV )
             {
               user_do_svars = true;
               system_do_svars = true;
               continue;
             }
 
-         if (!strcmp(opt, "--safe"))
+         IFOPT( --safe )
             {
               safe_mode = true;
               user_do_svars = false;
               system_do_svars = false;
               continue;
             }
-         if (!strcmp(opt, "-s") || !strcmp(opt, "--script"))
+
+         IFOPT2( -s , --script )
             {
               do_CONT = false;               // --noCONT
-              do_not_echo = true;            // -noCIN
+              do_not_echo = true;            // --noCIN
               do_Color = false;              // --noColor
               silence = NO_BANNER;           // --silent
               continue;
             }
 
-         if (!strcmp(opt, "--show_bin_dir"))
+         IFOPT( --show_bin_dir )
             {
               COUT << apl_DIR__bin << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_doc_dir"))
+         IFOPT( --show_doc_dir )
             {
               COUT << apl_DIR__doc << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_etc_dir"))
+         IFOPT( --show_etc_dir )
             {
               COUT << apl_DIR__sysconf << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_lib_dir"))
+         IFOPT( --show_lib_dir )
             {
               COUT << apl_DIR__pkglib << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_src_dir"))
+         IFOPT( --show_src_dir )
             {
               COUT << apl_DIR__src << endl;
               exit(0);
             }
 
-         if (!strcmp(opt, "--show_all_dirs"))
+         IFOPT( --show_all_dirs )
             {
               COUT << "bindir: " << apl_DIR__bin     << endl
                    << "docdir: " << apl_DIR__doc     << endl
@@ -811,13 +1038,13 @@ UserPreferences::parse_args_2(bool logit)
               exit(0);
             }
 
-         if (!strcmp(opt, "--silent") || !strcmp(opt, "-q"))
+         IFOPT2( --silent , -q )
             {
               silence = NO_BANNER;
               continue;
             }
 
-         if (!strcmp(opt, "-T"))
+         IFOPT( -T )
             {
               do_CONT = false;
 
@@ -852,7 +1079,40 @@ UserPreferences::parse_args_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "--TM"))
+         IFOPT( --status )
+            {
+              show_status = true;
+              continue;
+            }
+
+         IFOPT( --strict_IBM_APL2_formatting )
+            {
+              ++a;
+              if (val && !strcasecmp(val, "no"))
+                 {
+                   strict_IBM_APL2_formatting = false;
+                   nested_parentheses = false;
+                 }
+              else if (val && !strcasecmp(val, "yes"))
+                 {
+                   strict_IBM_APL2_formatting = true;
+                   nested_parentheses = false;
+                 }
+              else if (val && !strcasecmp(val, "parentheses"))
+                 {
+                   strict_IBM_APL2_formatting = false;
+                   nested_parentheses = true;
+                 }
+              else
+                 {
+                   CERR << "--strict_IBM_APL2_formatting needs one of no, "
+                           "yes, or parentheses" << endl;
+                   exit(a);
+                 }
+              continue;
+            }
+
+         IFOPT( --TM )
             {
               ++a;
               if (!val)
@@ -860,24 +1120,31 @@ UserPreferences::parse_args_2(bool logit)
                    CERR << "--TM without test mode" << endl;
                    exit(a);
                  }
-              const int mode = 1 << atoi(val);
+              const int shift = atoi(val);
+              if (shift < 0 || shift > 6)
+                 {
+                   CERR << "--TM " << val << ": test mode number must be "
+                           "between 0 and 6" << endl;
+                   exit(a);
+                 }
+              const int mode = 1 << shift;
               IO_Files::test_mode = IO_Files::TestMode(mode);
               continue;
             }
 
-         if (!strcmp(opt, "--TR"))
+         IFOPT( --TR )
             {
               randomize_testfiles = true;
               continue;
             }
 
-         if (!strcmp(opt, "--TS"))
+         IFOPT( --TS )
             {
               append_summary = true;
               continue;
             }
 
-         if (!strcmp(opt, "--tcp_port"))
+         IFOPT( --tcp_port )
             {
               ++a;
               if (!val)
@@ -886,30 +1153,45 @@ UserPreferences::parse_args_2(bool logit)
                    exit(a);
                  }
               tcp_port = atoi(val);
+
+              // Bugs28 #100(v): an out-of-range port (0, negative, or
+              // > 65535) used to be accepted silently and truncated to
+              // 16 bits by htons() in main.cc, so e.g. --tcp_port 99999
+              // actually listened on 99999 mod 65536 = 34463 -- a
+              // confusing, unannounced substitution instead of a clear
+              // rejection.
+              //
+              if (tcp_port < 1 || tcp_port > 65535)
+                 {
+                   CERR << "--tcp_port: invalid port number " << tcp_port
+                        << " (expecting 1-65535)" << endl;
+                   exit(a);
+                 }
+
               user_do_svars = system_do_svars = false;   // aka. --noSV
               raw_cin = true;                            // aka. --rawCIN
          //   do_not_echo = true;                        // aka. --noCIN
               continue;
             }
 
-         if (!strcmp(opt, "--tcp_websocket"))
+         IFOPT( --tcp_websocket )
             {
               tcp_websocket = true;
               continue;
             }
 
-         if (!strcmp(opt, "-v") || !strcmp(opt, "--version"))
+         IFOPT2( -v , --version )
             {
               show_version(cout);
               exit(0);
             }
-         if (!strcmp(opt, "-u"))
+         IFOPT( -u )
             {
               ++a;
               continue;   // -u already handled in parse_args_1()
             }
 
-         if (!strcmp(opt, "-w"))
+         IFOPT( -w )
             {
               ++a;
               if (!val)
@@ -917,7 +1199,35 @@ UserPreferences::parse_args_2(bool logit)
                    CERR << "-w without milli(seconds)" << endl;
                    exit(a);
                  }
-              wait_ms = atoi(val);
+              // a negative value would become a huge usleep() (Bugs37 #64)
+              char * end = 0;
+              const long ms = strtol(val, &end, 10);
+              if (end == val || *end || ms < 0 || ms > 1000000)
+                 CERR << "bad -w value " << val
+                      << " (expecting 0-1000000 milliseconds, ignored)"
+                      << endl;
+              else
+                 wait_ms = ms;
+              continue;
+            }
+
+         IFOPT( --pack_min )
+            {
+              ++a;
+              if (!val)
+                {
+                  CERR << "--pack_min without element count" << endl;
+                  exit(a);
+                }
+              const int n = atoi(val);
+              if (n < 1)
+                {
+                  CERR << "--pack_min value must be ≥ 1 (ignored)" << endl;
+                }
+              else
+                {
+                  Quad_SYL::pack_min_length = n;
+                }
               continue;
             }
 
@@ -925,6 +1235,8 @@ UserPreferences::parse_args_2(bool logit)
          usage(expanded_args[0]);
          exit(a);
        }
+#undef IFOPT
+#undef IFOPT2
 
    if (logit)
       {
@@ -979,7 +1291,7 @@ UserPreferences::parse_args_2(bool logit)
    //
    IO_Files::testcase_count = InputFile::testcase_file_count();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
     GNU APL can be started in a number of ways:
 
@@ -1097,7 +1409,9 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
          if (arg_end)   // more arguments
             {
               const int arg_len = arg_end - apl_args;
-              const char * arg = strndup(apl_args, arg_len);
+              char * arg = new char[arg_len + 1];
+              memcpy(arg, apl_args, arg_len);
+              arg[arg_len] = 0;
               expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               apl_args += arg_len;
@@ -1105,13 +1419,14 @@ const char * apl_args = args[1];   // the args after e.g. /usr/bin/apl
          else           // last argument
             {
               const char * arg = strdup(apl_args);
+              if (!arg)   break;
               expanded_args.insert(expanded_args.begin() + index++, arg);
               ++script_argc;
               break;
             }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_version(ostream & out)
 {
@@ -1135,7 +1450,7 @@ UserPreferences::show_version(ostream & out)
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::show_configure_options()
 {
@@ -1191,6 +1506,9 @@ UserPreferences::show_configure_options()
    "    MAX_RANK_WANTED="     << cfg_MAX_RANK_WANTED
         << is_default(cfg_MAX_RANK_WANTED == 8)
    << endl <<
+   "    MAX_DEPTH_WANTED="    << cfg_MAX_DEPTH_WANTED
+        << is_default(cfg_MAX_DEPTH_WANTED == 254)
+   << endl <<
 
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
    "    RATIONAL_NUMBERS_WANTED=yes"
@@ -1235,6 +1553,31 @@ UserPreferences::show_configure_options()
 #endif
    << endl
    << endl
+
+   // optional-library capabilities: whether this exact binary was built
+   // with each optional feature or not (compile-time, from config.h) --
+   // NOT whether the feature is usable/reachable at runtime (e.g.
+   // apl_POSTGRES=1 only means the PostgreSQL client library was found and
+   // linked at build time; it says nothing about whether a PostgreSQL
+   // server is actually running or reachable). Printed here (and so
+   // captured for free by anything that already runs 'apl --cfg', such as
+   // Automated_Test_Report.sh's culprits_env.txt) so a bug report never
+   // has to leave this as a guess -- matches Cmd_HOST::have_capability()'s
+   // ]NEXTFILE HAVE-/NO- capability names one-for-one where one exists.
+   << "optional-library capabilities (this binary):" << endl
+   << "---------------------------------------------" << endl
+   << "    ⎕FFT (FFT)        =" << apl_FFT      << endl
+   << "    GSL                =" << apl_GSL      << endl
+   << "    GTK (GTK3)         =" << apl_GTK3     << endl
+   << "    GUI                =" << apl_GUI      << endl
+   << "    ⎕RE (PCRE)         =" << apl_PCRE     << endl
+   << "    ⎕PNG (PNG)         =" << apl_PNG      << endl
+   << "    POSTGRES           =" << apl_POSTGRES << endl
+   << "    SQLITE3            =" << apl_SQLITE3  << endl
+   << "    X11                =" << apl_X11      << endl
+   << "    XCB                =" << apl_XCB      << endl
+   << endl
+
    << "how ./configure was (probably) called:" << endl
    << "--------------------------------------" << endl
    << "    " cfg_CONFIGURE_ARGS << endl
@@ -1242,15 +1585,22 @@ UserPreferences::show_configure_options()
 
    show_version(CERR);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 FILE *
 UserPreferences::open_user_file(const char * fname, char * filename,
                                 bool sys, bool log_startup)
 {
    if (sys)   // filename in /etc/gnu-apl.d/preferences
       {
+#if MINGW_SRC
+        // On Windows the install directory ($PROFILE\apl) serves the same
+        // role as /etc/gnu-apl.d: preferences lives directly inside it.
+        snprintf(filename, APL_PATH_MAX,
+                 "%s\\%s", LibPaths::get_APL_lib_root(), fname);
+#else // ! MINGW_SRC
         snprintf(filename, APL_PATH_MAX,
                  "%s/gnu-apl.d/%s", apl_DIR__sysconf, fname);
+#endif // MINGW_SRC
       }
    else       // try $HOME/.gnu_apl
       {
@@ -1291,14 +1641,15 @@ FILE * f = fopen(filename, "r");
 
    return f;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::read_config_file(bool sys, bool log_startup)
 {
 char filename[APL_PATH_MAX + 1];
 
-FILE * f = open_user_file("preferences", filename, sys, log_startup);
-   if (f == 0)   return;
+FILE * fp = open_user_file("preferences", filename, sys, log_startup);
+FileReader reader(fp);
+   if (!reader)   return;
 
 int line = 0;
 int file_profile = 0;   // the current profile in the preferences file
@@ -1306,7 +1657,7 @@ int file_profile = 0;   // the current profile in the preferences file
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         const char * s = fgets(buffer, BUFSIZE, f);
+         const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
 
          buffer[BUFSIZE] = 0;
@@ -1351,6 +1702,13 @@ int file_profile = 0;   // the current profile in the preferences file
               continue;
             }
          d[0] = strtoll(arg, 0, 16);
+
+         // ]STATUS: record the features that this line switches on or off
+         //
+         char where[BUFSIZE + 40];
+         SPRINTF(where, "line %d: %s %s", line, opt, arg)
+         const Feature_watch watch(*this, sys ? "PSYS" : "PUSER", where);
+
          const bool yes = !strcasecmp(arg, "YES"     )
                        || !strcasecmp(arg, "ENABLED" )
                        || !strcasecmp(arg, "ON"      );
@@ -1385,6 +1743,9 @@ int file_profile = 0;   // the current profile in the preferences file
               if (*p == 0)   break;
 
               if (p[0] == '/' && p[1] == '/')   break;   // comment
+
+              // leave room for the "NUL" terminator stored below
+              if (sargs_idx >= int(sizeof(sargs)/sizeof(*sargs)) - 1)   break;
 
               const char * arg = p;
               sargs[sargs_idx++] = arg;         // store start of argument
@@ -1453,77 +1814,77 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "CIN-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                  Output::color_CIN[sa] = decode_ASCII(sargs[sa + 1]);
+                  Output::color_CIN[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "COUT-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                  Output::color_COUT[sa] = decode_ASCII(sargs[sa + 1]);
+                  Output::color_COUT[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "CERR-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                  Output::color_CERR[sa] = decode_ASCII(sargs[sa + 1]);
+                  Output::color_CERR[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "UERR-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                  Output::color_UERR[sa] = decode_ASCII(sargs[sa + 1]);
+                  Output::color_UERR[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "RESET-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                 Output::color_RESET[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::color_RESET[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "CLEAR-EOL-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                 Output::clear_EOL[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::clear_EOL[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "CLEAR-EOS-SEQUENCE"))
             {
               loop(sa, sargs_idx)
-                 Output::clear_EOS[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::clear_EOS[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-UP"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorUp[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorUp[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-DOWN"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorDown[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorDown[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-RIGHT"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorRight[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorRight[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-LEFT"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorLeft[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorLeft[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-END"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorEnd[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorEnd[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-HOME"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_CursorHome[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_CursorHome[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-INSMODE"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_InsertMode[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_InsertMode[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "KEY-DELETE"))
             {
               loop(sa, sargs_idx)
-                 Output::ESC_Delete[sa] = decode_ASCII(sargs[sa + 1]);
+                 Output::ESC_Delete[sa] = decode_ASCII(sargs[sa + 1], filename, line);
             }
          else if (!strcasecmp(opt, "CIN-FOREGROUND"))
             {
@@ -1568,6 +1929,9 @@ int file_profile = 0;   // the current profile in the preferences file
                    continue;
                  }
 
+              // option --libroot overrides the LIBREF-N settings
+              if (LibPaths::is_root_from_arg())   continue;
+
               const UTF8_string arg_utf(arg);
               LibPaths::set_lib_dir(LibRef(lib_ref), arg_utf,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
@@ -1575,7 +1939,17 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "READLINE_HISTORY_LEN"))
             {
-              line_history_len = atoi(arg);
+              const int n = atoi(arg);
+              if (n < 0)
+                 {
+                   CERR << "READLINE_HISTORY_LEN value must be >= 0 "
+                           "(ignored) at line " << line << " of config "
+                           "file " << filename << endl;
+                 }
+              else
+                 {
+                   line_history_len = n;
+                 }
             }
          else if (!strcasecmp(opt, "READLINE_HISTORY_PATH"))
             {
@@ -1601,7 +1975,13 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "MEMORY"))
             {
+              // a bad MEMORY line here used to be misreported as a
+              // --mem command-line problem (parse_mem()'s messages
+              // hardcoded that name regardless of caller). See
+              // Bugs27 #59(f).
+              //
               mem_arg = strdup(arg);
+              Quad_WA::parse_mem(false, "MEMORY (preferences file)");
             }
          else if (!strcasecmp(opt, "NABLA-TO-HISTORY"))
             {
@@ -1616,13 +1996,42 @@ int file_profile = 0;   // the current profile in the preferences file
             {
               backup_before_save = yes;
             }
+         else if (!strcasecmp(opt, "STRICT_IBM_APL2_FORMATTING"))
+            {
+              if (yes_no)
+                 {
+                   strict_IBM_APL2_formatting = yes;
+                   nested_parentheses = false;
+                 }
+              else if (!strcasecmp(arg, "PARENTHESES"))
+                 {
+                   strict_IBM_APL2_formatting = false;
+                   nested_parentheses = true;
+                 }
+              else   CERR << "bad value " << arg
+                          << " for STRICT_IBM_APL2_FORMATTING"
+                          << " at line " << line << " of config file "
+                          << filename << " (ignored)" << endl;
+            }
          else if (!strcasecmp(opt, "plot-ASCII-rows"))
             {
-              plot_ASCII_rows = atoi(arg);
+              const int n = atoi(arg);
+              if (n < 0)
+                 CERR << "plot-ASCII-rows value must be >= 0 (ignored) "
+                         "at line " << line << " of config file "
+                      << filename << endl;
+              else
+                 plot_ASCII_rows = n;
             }
          else if (!strcasecmp(opt, "plot-ASCII-columns"))
             {
-              plot_ASCII_columns = atoi(arg);
+              const int n = atoi(arg);
+              if (n < 0)
+                 CERR << "plot-ASCII-columns value must be >= 0 (ignored) "
+                         "at line " << line << " of config file "
+                      << filename << endl;
+              else
+                 plot_ASCII_columns = n;
             }
          else if (!strcasecmp(opt, "plot-ASCII-background"))
             {
@@ -1698,16 +2107,15 @@ int file_profile = 0;   // the current profile in the preferences file
 
          else
             {
-              CERR << "Invalid option '" << opt << " in preferences file "
+              CERR << "Invalid option '" << opt << "' in preferences file "
                    << filename << " (ignored)" << endl;
             }
        }
-
-   fclose(f);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
-UserPreferences::decode_ASCII(const char * strg)
+UserPreferences::decode_ASCII(const char * strg, const char * filename,
+                               int line)
 {
    if (!strcmp(strg, "NUL"))   return 0x00;
    if (!strcmp(strg, "SOH"))   return 0x01;
@@ -1744,24 +2152,29 @@ UserPreferences::decode_ASCII(const char * strg)
 
    if (strlen(strg) == 1)   return *strg;                  // single char
    if (strlen(strg) == 2)   return strtoll(strg, 0, 16);   // hex value, e.g. 4C
-   CERR << "invalid parameter " << strg << " in preferences file" << endl;
+   CERR << "invalid parameter " << strg;
+   if (filename)   CERR << " at line " << line << " of config file "
+                         << filename;
+   else            CERR << " in preferences file";
+   CERR << " (ignored)" << endl;
    return -1;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::read_threshold_file(bool sys, bool log_startup)
 {
 char filename[APL_PATH_MAX + 1];
 
-FILE * f = open_user_file("parallel_thresholds", filename, sys, log_startup);
-   if (f == 0)   return;
+FileReader reader(open_user_file("parallel_thresholds",
+                  filename, sys, log_startup));
+   if (!reader)   return;
 
 int line = 0;
    for (;;)
        {
          enum { BUFSIZE = 200 };
          char buffer[BUFSIZE + 1];
-         const char * s = fgets(buffer, BUFSIZE, f);
+         const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
 
          buffer[BUFSIZE] = 0;
@@ -1826,9 +2239,8 @@ int line = 0;
             CERR << "Bad macro format in file " << filename
                  << " line " << line << endl;
        }
-   fclose(f);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
                                ShapeItem threshold)
@@ -1839,5 +2251,5 @@ UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
    if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
    else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

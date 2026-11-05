@@ -1,12 +1,14 @@
 ⍝ Quad_SYL
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
       ⎕IO←1
 
-]NEXTFILE
+      ]NEXTFILE
 
 ⍝ SI limit ----------------------------------
 

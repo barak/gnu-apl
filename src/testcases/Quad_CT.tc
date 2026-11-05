@@ -1,13 +1,17 @@
 ⍝ Quad_CT.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ check that assigned values > 1E¯9 are rounded down to 1E¯9
       ⍝
       ⎕PP←15
       ⎕CT←0.1
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕CT/⎕PP limits differ (documented)
       ⎕CT
 1E¯9
 
+      ]FILE_CTL NO_SKIP
       A←12
       D←1E¯12
 
@@ -33,13 +37,13 @@
   Z←M1 M2 M3
 ∇
 
-⍝ A differs by: 10E¯12
-⍝ ⎕CT           1E¯10 (left matrix),
-⍝ or            1E¯14 (middle matrix)
-⍝ Differences shown in right matrix
-⍝
-⍝
-⍝
+      ⍝ A differs by: 10E¯12
+      ⍝ ⎕CT           1E¯10 (left matrix),
+      ⍝ or            1E¯14 (middle matrix)
+      ⍝ Differences shown in right matrix
+      ⍝
+      ⍝
+      ⍝
 
       = CT_OP A
  1 1 1   1 0 0   _≠≠ 
@@ -86,6 +90,7 @@
  1 1 1   0 1 0   ≠_≠ 
  1 1 1   0 0 1   ≠≠_ 
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⍳ with a vector argument is a GNU APL extension
       ⍳ CT_OP A
  1 1 1   1 2 2   _≠≠ 
  1 1 1   2 1 2   ≠_≠ 
@@ -98,18 +103,19 @@
  0 0 0   11.999999999999 12 0.00000000000000E0     ≠≠_ 
 
 
-⍝ other functions depending on ⎕CT ----------------------------------
+      ⍝ other functions depending on ⎕CT ----------------------------------
 
+      ]FILE_CTL NO_SKIP
       ⎕CT←1E¯10
 
       ⌊ A
 12 12 12
 
-   (A,13) ∼ 1↑A
+      (A,13) ∼ 1↑A
 13
-   (A,13) ∼ 2↑A
+      (A,13) ∼ 2↑A
 13
-   (A,13) ∼ 3↑A
+      (A,13) ∼ 3↑A
 13
 
       ⌈ A
@@ -123,17 +129,17 @@
       ⌈ A
 12 12 13
 
-   (A,13) ∼ 1↑A
+      (A,13) ∼ 1↑A
 12 12.000000000001 13
 
-   (A,13) ∼ 2↑A
+      (A,13) ∼ 2↑A
 12.000000000001 13
 
-   (A,13) ∼ 3↑A
+      (A,13) ∼ 3↑A
 13
 
 
-⍝ Localizing ⎕CT ----------------------------------
+      ⍝ Localizing ⎕CT ----------------------------------
 
       )ERASE FOO
 ∇FOO;⎕CT
@@ -149,7 +155,7 @@
       ⎕CT
 1E¯12
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       ⍝ reset to default
       ⍝
@@ -158,5 +164,5 @@
       )ERASE CT_OP
       )ERASE FOO
 
-⍝ ==================================
+      ⍝ ==================================
 

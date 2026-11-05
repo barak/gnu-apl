@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,8 +27,25 @@
 class PrimitiveFunction;
 
 #include "Assert.hh"
-#include "ConstCell_P.hh"
 #include "PrimitiveFunction.hh"
+
+/// float64 dyadic vector-vector fast-path function pointer
+using pf_vv_f64 = void (*)(double * pZ,
+                            const double * pA, int incA,
+                            const double * pB, int incB,
+                            ShapeItem N);
+
+/// float64 monadic vector fast-path function pointer
+using pf_v_f64 = void (*)(double * pZ, const double * pB, ShapeItem N);
+
+/// int64 dyadic vector-vector fast-path function pointer
+using pf_vv_i64 = void (*)(int64_t * pZ,
+                            const int64_t * pA, int incA,
+                            const int64_t * pB, int incB,
+                            ShapeItem N);
+
+/// int64 monadic vector fast-path function pointer
+using pf_v_i64 = void (*)(int64_t * pZ, const int64_t * pB, ShapeItem N);
 
 /**
  A PJob is a computation that can be carried out in parallel on different
@@ -39,7 +56,7 @@ class PrimitiveFunction;
  ravels of the result Z, the right argument B, and possibly (for dyadic Cell
  functions) the left argument A.
  **/
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// one monadic scalar job
 class PJob_scalar_B
 {
@@ -49,27 +66,41 @@ public:
    : len_Z(0),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0)
+     fun1(0),
+     float64_fv(nullptr),
+     int64_fv(nullptr)
    {}
 
    /// constructor
-   PJob_scalar_B(Value_P Z, Value_P B)
-   : value_B(B, LOC),
+   /// @param Z the result APL value (pre-allocated)
+   /// @param B the right APL argument value. B is read-only here (every
+   ///        scalar function only ever writes into the freshly-allocated
+   ///        Z, never into A/B). Jobs for nested sub-values can sit in
+   ///        the parallel worklist across several outer loop iterations,
+   ///        outliving the caller's local (possibly freshly synthesized,
+   ///        sole-owner) Value_P/cValue_R that named B -- so the job
+   ///        takes its own cheap owner-count-bump share (not a deep
+   ///        copy, see CLONE/NEW_CLONE) rather than a bare pointer.
+   PJob_scalar_B(Value_P Z, cValue_R B)
+   : value_B(const_cast<Value *>(static_cast<const Value *>(&B)), LOC),
      value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
      error(E_NO_ERROR),
      fun(0),
-     fun1(0)
+     fun1(0),
+     float64_fv(nullptr),
+     int64_fv(nullptr)
    {}
 
    /// destructor
    ~PJob_scalar_B()
       {
-        value_Z.clear(LOC);
         value_B.clear(LOC);
+        value_Z.clear(LOC);
       }
 
-   /// the left argument for the value being computed
+   /// the left argument for the value being computed (owned, see
+   /// the constructor comment)
    Value_P value_B;
 
    /// the value being computed
@@ -87,15 +118,32 @@ public:
    /// the monadic cell function to be computed
    prim_f1 fun1;   // not initialized by constructor!
 
-   /// return Bbz]
-   const Cell & B_at(ShapeItem b) const
-      { return value_B->get_cravel(b); }
+   /// non-null when the parallel float64 fast path is in use
+   pf_v_f64 float64_fv;
+
+   /// non-null when the parallel int64 fast path is in use
+   pf_v_i64 int64_fv;
+
+   /// return B[b], materialising a packed cell into the caller-supplied
+   /// \b cache. Use this from a parallel worker thread's per-cell loop:
+   /// value_B is a single Value shared by every worker thread of this
+   /// job, so fetching via a shared (non-per-thread) cache races when
+   /// two threads materialise different packed elements concurrently
+   /// -- confirmed live as a SEGFAULT inside
+   /// ScalarFunction::PF_scalar_B/PF_scalar_AB's cell-by-cell fallback
+   /// for a primitive without a packed fast path (e.g. A⍟B on packed
+   /// int64 operands under CORE_COUNT_WANTED>1).
+   /// @param b ravel index into the right argument
+   /// @param cache caller-owned (e.g. per-thread stack) Cell to fetch into
+   const Cell & B_at(ShapeItem b, Cell & cache) const
+      { return value_B->get_cravel(b, cache); }
 
    /// return Z[z]
+   /// @param z ravel index into the result
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// one dyadic scalar job
 class PJob_scalar_AB
 {
@@ -107,34 +155,50 @@ public:
      inc_B(0),
      error(E_NO_ERROR),
      fun(0),
-     fun2(0)
+     fun2(0),
+     float64_fvv(nullptr),
+     int64_fvv(nullptr)
    {}
 
    /// constructor
-   PJob_scalar_AB(Value_P Z, Value_P A, Value_P B)
-   : value_A(A, LOC),
-     value_B(B, LOC),
+   /// @param Z the result APL value (pre-allocated)
+   /// @param A the left APL argument value. A and B are read-only here
+   ///        (every scalar function only ever writes into the freshly-
+   ///        allocated Z, never into A/B). Jobs for nested sub-values can
+   ///        sit in the parallel worklist across several outer loop
+   ///        iterations, outliving the caller's local (possibly freshly
+   ///        synthesized, sole-owner) Value_P/cValue_R that named A/B --
+   ///        so the job takes its own cheap owner-count-bump share (not
+   ///        a deep copy, see CLONE/NEW_CLONE) rather than bare pointers.
+   /// @param B the right APL argument value
+   PJob_scalar_AB(Value_P Z, cValue_R A, cValue_R B)
+   : value_A(const_cast<Value *>(static_cast<const Value *>(&A)), LOC),
+     value_B(const_cast<Value *>(static_cast<const Value *>(&B)), LOC),
      value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
-     inc_A(A->get_increment()),
-     inc_B(B->get_increment()),
+     inc_A(A.get_increment()),
+     inc_B(B.get_increment()),
      error(E_NO_ERROR),
      fun(0),
-     fun2(0)
+     fun2(0),
+     float64_fvv(nullptr),
+     int64_fvv(nullptr)
    {}
 
    /// destructor
    ~PJob_scalar_AB()
       {
-        value_Z.clear(LOC);
-        value_B.clear(LOC);
         value_A.clear(LOC);
+        value_B.clear(LOC);
+        value_Z.clear(LOC);
       }
 
-   /// the left argument for the value being computed
+   /// the left argument for the value being computed (owned, see
+   /// the constructor comment)
    Value_P value_A;
 
-   /// the right argument for the value being computed
+   /// the right argument for the value being computed (owned, see
+   /// the constructor comment)
    Value_P value_B;
 
    /// the value being computed
@@ -158,19 +222,33 @@ public:
    /// the dyadic cell function to be computed
    prim_f2 fun2;   // not initialized by constructor!
 
-   /// return A[z]
-   const Cell & A_at(ShapeItem a) const
-      { return value_A->get_cravel(a * inc_A); }
+   /// non-null when the parallel float64 fast path is in use
+   pf_vv_f64 float64_fvv;
 
-   /// return B[z]
-   const Cell & B_at(ShapeItem b) const
-      { return value_B->get_cravel(b * inc_B); }
+   /// non-null when the parallel int64 fast path is in use
+   pf_vv_i64 int64_fvv;
+
+   /// return A[a], materialising a packed cell into the caller-supplied
+   /// \b cache -- see PJob_scalar_B::B_at(b, cache) for why this matters
+   /// for a parallel worker thread's per-cell loop.
+   /// @param a ravel index into the left argument
+   /// @param cache caller-owned (e.g. per-thread stack) Cell to fetch into
+   const Cell & A_at(ShapeItem a, Cell & cache) const
+      { return value_A->get_cravel(a * inc_A, cache); }
+
+   /// return B[b], materialising a packed cell into the caller-supplied
+   /// \b cache -- see PJob_scalar_B::B_at(b, cache).
+   /// @param b ravel index into the right argument
+   /// @param cache caller-owned (e.g. per-thread stack) Cell to fetch into
+   const Cell & B_at(ShapeItem b, Cell & cache) const
+      { return value_B->get_cravel(b * inc_B, cache); }
 
    /// return Z[z]
+   /// @param z ravel index into the result
    Cell & Z_at(ShapeItem z)
       { return value_Z->get_wravel(z); }
 };
-// ============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// a number of jobs, where each job can be executed in parallel
 class Parallel_job_list_base
 {
@@ -178,7 +256,7 @@ public:
    /// from where the joblist was started
    static const char * started_loc;
 };
-// ----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** a list of parallel jobs. It is used to control the parallel computation
     of nested results. Initially the Parallel_job_list is created with one
     job. If nested values are encountered they are not computed immediately
@@ -194,6 +272,8 @@ public:
    {} 
 
    /// start execution of \b jobs
+   /// @param first_job the initial job to seed the list
+   /// @param loc caller location for diagnostics
    void start(const T & first_job, const char * loc)
       {
 #if 0
@@ -216,6 +296,7 @@ public:
    void cancel_jobs()
       {
         jobs.clear();
+        current_job = T();   // give up ownership of Value_P members, if any
         started_loc = 0;
       }
 
@@ -244,6 +325,7 @@ public:
       { return jobs.size(); }
 
    /// add \b job to \b jobs
+   /// @param job the job to append to the list
    void add_job(const T & job)
       { jobs.push_back(job); }
 
@@ -262,5 +344,5 @@ protected:
    /// the currently executed worklist item
    T current_job;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // PJOB_HH_DEFINED

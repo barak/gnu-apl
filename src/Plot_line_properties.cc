@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2022  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 Plot_line_properties::print(std::ostream & out) const
 {
@@ -39,7 +39,7 @@ char cc[100];
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Plot_line_properties::is_line_property(const char * prefix,
                                        const char * attribute)
@@ -57,5 +57,5 @@ const size_t att_len = strlen(attribute);
    if (*prefix == '-')   return true;
    return false;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

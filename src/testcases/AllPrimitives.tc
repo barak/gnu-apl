@@ -1,0 +1,885 @@
+⍝ AllPrimitives.tc
+⍝ ════════════════
+
+⊣««« ⍝ Function ON_ERROR ARGS: write /tmp/ALL_PRIMITIVES_ERROR_N.apl:
+ a self-contained script that reconstructs A, B, X (via 10 ⎕CR)
+ and then executes OPER, so the failure captured in
+ ARGS←(N A B X OPER KIND) can be reproduced later. KIND (from
+ ONE_PRIMITIVE/DESCRIBE_ERR) is a nested vector of one or two comment
+ lines identifying what kind of failure this is -- e.g. "EXECUTE: RANK
+ ERROR", "GENERATE B: DOMAIN ERROR" (a bad rval.def stim, not the
+ primitive itself), "CONSTRAINT: SYNTAX ERROR" (a bug in the table's
+ Z_constraint expression), or "POSTCONDITION FAILED" (OPER ran fine,
+ but Z fails the postcondition -- the most common and most interesting
+ case).
+ A genuine interpreter crash (assertion failure, segfault) can never
+ reach here: the process dies before ON_ERROR runs, so there is no
+ reproducer for those -- see the crash dump on stderr / core file
+ instead.
+»»»
+
+∇ON_ERROR ARGS;N;A;B;X;OPER;KIND;FH;LINES;NAME;FMT;TSTR
+ (N A B X OPER KIND)←ARGS
+ NAME←'/tmp/ALL_PRIMITIVES_ERROR_%d.apl' ⎕FIO.sprintf N
+ FH←'w' ⎕FIO.fopen NAME
+ FMT←'%s',(⎕UCS 10)
+ ⊣{⊣((⊂FMT),⊂('⍝ ',⍵)) ⎕FIO.fprintf FH}¨KIND
+ TSTR←'⍝ %d-%d-%d %d:%d:%d' ⎕FIO.sprintf 6↑⎕TS
+ ⊣((⊂FMT),⊂TSTR) ⎕FIO.fprintf FH
+ LINES←(10⎕CR 'A'),(10⎕CR 'B'),(10⎕CR 'X'),⊂OPER
+ ⊣{⊣((⊂FMT),⊂⍵) ⎕FIO.fprintf FH}¨LINES
+ ⊣⎕FIO.fclose FH
+∇
+
+⊣««« ⍝ Function DUMP_LASTCALL A B X OPER: unconditionally overwrite
+ /tmp/ALL_PRIMITIVES_LASTCALL.apl with a reproducer for the call about
+ to be made, BEFORE executing it. A genuine interpreter crash (segfault,
+ fatal assertion) kills the process before ON_ERROR ever runs, so
+ without this there is no way to recover what inputs caused it -- this
+ is the only reproducer a crash (as opposed to a caught error or a
+ postcondition violation) leaves behind. Overwritten every call, so it
+ always holds the LAST attempted call, i.e. the one that just crashed
+ the process if the process is no longer running.
+»»»
+
+∇DUMP_LASTCALL ARGS;A;B;X;OPER;FH;LINES;FMT
+ (A B X OPER)←ARGS
+ FH←'w' ⎕FIO.fopen '/tmp/ALL_PRIMITIVES_LASTCALL.apl'
+ FMT←'%s',(⎕UCS 10)
+ LINES←(10⎕CR 'A'),(10⎕CR 'B'),(10⎕CR 'X'),⊂OPER
+ ⊣{⊣((⊂FMT),⊂⍵) ⎕FIO.fprintf FH}¨LINES
+ ⊣⎕FIO.fclose FH
+∇
+
+⊣««« ⍝ Function Z←ALL_PRIMITIVES: run for CONTEXT.SECONDS seconds (or, in
+ single-arity mode, for a fixed iteration count), repeatedly calling
+ ONE_PRIMITIVE and accounting for successes vs. violations/failures.
+
+ Single-arity mode: pass ++ARITY '<arity string>' on the apl command
+ line (GNU APL's "ignored APL application option, 1 argument"
+ convention, see apl --help) to restrict CONTEXT.PRIM to exactly one
+ rval.def row -- e.g. --eval "'0 ⎕RVAL..." isn't needed, just:
+
+   apl -s --script testcases/AllPrimitives.tc --OFF ++ARITY 'Z←A+B'
+
+ Picking uniformly at random across ~60 rows wastes time when hunting
+ down which SPECIFIC primitives still have improper/incomplete
+ preconditions: with only ~1/60th of trials landing on the row you
+ care about, thousands of iterations are needed for a confident
+ per-primitive read. In this mode CONTEXT.SECONDS is ignored in favor
+ of a fixed count (++COUNT '<n>', default ITER_DEFAULT below), the
+ ⎕DL 0.1 rate limit is skipped (nothing else on the box to protect
+ against), and a per-failure-KIND tally is printed via ⎕← at the end
+ -- exactly the "where do we stand" answer, instead of just the first
+ 10 reproducer files.
+»»»
+
+∇Z←ALL_PRIMITIVES; ⎕IO;T0;LCNT;ECNT;PREV_BUDGET;PREV_TD;R;ARGV;IDX;ARITY;COUNT;FOCUSED;KINDS;KCOUNT;K;KIDX;SUCC;I;ITER_DEFAULT;ALLARITY;MAX_DUMPS;DUMPALL
+ ⊣««« ⍝ 0 ⎕RVAL B requires B to be a rank-1 byte vector (length 0, 8, 16,
+  ..., 256), hence the (8⍴256)⊤ encoding -- plain 0 12 31 24 60 60
+  1000⊥⎕TS alone would collapse to a scalar and fail with RANK ERROR.
+ »»»
+
+ ⊣0 ⎕RVAL (8⍴256)⊤0 12 31 24 60 60 1000⊥⎕TS   ⍝ seed from current time
+ ⊣««« ⍝ 5⎕RVAL / 3⎕RVAL change ⎕RVAL's global generator state, which
+  outlives this function -- remember the previous settings so they
+  can be restored before returning, or every ⎕RVAL call made by
+  unrelated code for the rest of the session would silently inherit
+  this fuzzer's budget/type mix (that leak once broke Domino_stress.tc
+  and Macros.tc, which assume ⎕RVAL's default settings).
+ »»»
+
+ ⍝ parse ++ARITY / ++COUNT / ++BUDGET from the command line (see header
+ ⍝ comment) BEFORE applying CONTEXT.BUDGET below, so single-arity mode
+ ⍝ can default to a much smaller ⍴∈ limit than the ~10000 used for the
+ ⍝ broad random sweep: with a real failure rate, ON_ERROR's reproducer
+ ⍝ dumps (10⎕CR of A/B, potentially deeply nested) get very expensive
+ ⍝ at budget 10000 -- multiply that by up to 10 dumps and a few hundred
+ ⍝ iterations, and a single-arity run that should take a second can
+ ⍝ take minutes. Small arrays are entirely sufficient for finding
+ ⍝ precondition bugs (found via this very budget being too large: it's
+ ⍝ what made the ⎕ARG sweep for this tool time out during development).
+
+ ITER_DEFAULT←1000
+ ARGV←⎕ARG ◊ ARITY←⍬ ◊ COUNT←ITER_DEFAULT
+ IDX←ARGV⍳⊂'++ARITY'
+ →(IDX>≢ARGV)/NOARITY
+ ARITY←(IDX+1)⊃ARGV
+NOARITY:
+ IDX←ARGV⍳⊂'++COUNT'
+ →(IDX>≢ARGV)/NOCOUNT
+ COUNT←⍎(IDX+1)⊃ARGV
+NOCOUNT:
+ FOCUSED←0<≢ARITY
+ →(~FOCUSED)/NOBUDGETOVERRIDE
+ CONTEXT.BUDGET←200
+ IDX←ARGV⍳⊂'++BUDGET'
+ →(IDX>≢ARGV)/NOBUDGETOVERRIDE
+ CONTEXT.BUDGET←⍎(IDX+1)⊃ARGV
+NOBUDGETOVERRIDE:
+ ⍝ ++DUMPALL: unconditionally write /tmp/ALL_PRIMITIVES_LASTCALL.apl
+ ⍝ before every OPER call (see DUMP_LASTCALL), so a crash that kills
+ ⍝ the process before ON_ERROR can run still leaves a reproducer behind.
+ ⍝ Off by default -- doing this on every call, not just failures, is
+ ⍝ noticeably slower (an extra 10⎕CR reconstruction per iteration), so
+ ⍝ only pay for it when actually hunting a crash.
+ DUMPALL←(ARGV⍳⊂'++DUMPALL')≤≢ARGV
+
+ PREV_BUDGET←5 ⎕RVAL CONTEXT.BUDGET   ⍝ apply the ⍴∈ limit
+ PREV_TD←3 ⎕RVAL CONTEXT.TD           ⍝ apply the type distribution
+ CONTEXT.PRIM←6 ⎕RVAL ⍬
+ MAX_DUMPS←10-7×FOCUSED               ⍝ 10 normally, 3 in single-arity mode
+
+ →(~FOCUSED)/NOFOCUS
+ CONTEXT.PRIM←(((CONTEXT.PRIM)[;1])ϵ⊂ARITY)⌿CONTEXT.PRIM
+ →(0<(⍴CONTEXT.PRIM)[1])/HAVEROWS
+ ⎕←'++ARITY ''',ARITY,''' matches no rval.def row. Available arities:'
+ ALLARITY←6 ⎕RVAL ⍬
+ ALLARITY←(ALLARITY)[;1]
+ I←0
+ALOOP:
+ I←I+1
+ →(I>≢ALLARITY)/ADONE
+ ⎕←I⊃ALLARITY
+ →ALOOP
+ADONE:
+ Z←¯1 ◊ →RESTORE
+HAVEROWS:
+NOFOCUS:
+
+ T0←24 60 60⊥⎕TS[4 5 6]
+ LCNT←0              ⍝ number of loop iterations so far
+ ECNT←0              ⍝ number of ON_ERROR dumps so far
+ SUCC←0 ◊ KINDS←⍬ ◊ KCOUNT←⍬   ⍝ per-KIND tally, only used when FOCUSED
+LOOP:
+ ⍝ checked once per iteration here (not just on the violation path
+ ⍝ below), so the time budget/count is enforced regardless of outcome.
+
+ →FOCUSED/CHECK_COUNT
+ →((24 60 60⊥⎕TS[4 5 6]) ≥ T0 + CONTEXT.SECONDS)/TIMEOUT
+ →AFTERCHECK
+CHECK_COUNT:
+ →(LCNT≥COUNT)/TIMEOUT
+AFTERCHECK:
+ LCNT←LCNT+1
+ →FOCUSED/SKIPDELAY
+ ⊣⎕DL 0.1   ⍝ rate limit (unconditional: caps load on server72 every iteration)
+SKIPDELAY:
+ ⍝ R.OK, and (if R.OK is 0) R.A R.B R.X R.OPER R.KIND
+
+ R←ONE_PRIMITIVE
+ →(~R.OK)/ISFAIL
+ SUCC←SUCC+1
+ →LOOP                        ⍝ invariant holds: keep fuzzing
+ISFAIL:
+ →(~FOCUSED)/SKIPTALLY
+ K←⊃(R.KIND)[1]                ⍝ first line only, for the tally key
+ KIDX←KINDS⍳⊂K
+ →(KIDX≤≢KINDS)/HAVEKIDX
+ KINDS←KINDS,⊂K ◊ KCOUNT←KCOUNT,0
+HAVEKIDX:
+ KCOUNT[KIDX]←KCOUNT[KIDX]+1
+SKIPTALLY:
+ ⊣««« ⍝ ON_ERROR needs the incremented count before the branch decides
+  whether to keep going, so it takes its own (ECNT+1) rather than
+  sharing the assignment folded into the branch below.
+ »»»
+
+ ⍝ dump a reproducer for each of the first MAX_DUMPS errors. In FOCUSED
+ ⍝ mode this must NOT stop the loop early -- COUNT is a fixed sample
+ ⍝ size for a reliable per-primitive success rate, not a "stop after
+ ⍝ the Nth failure" budget (that was fine for the original random-scan
+ ⍝ use case, where any 10 failures are equally informative, but here a
+ ⍝ handful of early failures would truncate the run to a tiny, biased
+ ⍝ sample instead of the requested COUNT attempts).
+
+ →(ECNT<MAX_DUMPS)/DODUMP
+ →FOCUSED/LOOP
+ →SKIPDUMP
+DODUMP:
+ ON_ERROR (ECNT+1) R.A R.B R.X R.OPER R.KIND
+ ECNT←ECNT+1
+ →FOCUSED/LOOP
+ →(ECNT<MAX_DUMPS)/LOOP
+SKIPDUMP:
+ Z←0 ◊ →RESTORE
+TIMEOUT:
+ Z←1
+RESTORE:
+ →(~FOCUSED)/NOSUMMARY
+ ⎕←''
+ ⎕←'=== ++ARITY ''',ARITY,''': ',(⍕LCNT),' attempts, ',(⍕SUCC),' ok, ',(⍕LCNT-SUCC),' failed ==='
+ I←0
+PLOOP:
+ I←I+1
+ →(I>≢KINDS)/NOSUMMARY
+ ⎕←(⍕I⊃KCOUNT),' x  ',I⊃KINDS
+ →PLOOP
+NOSUMMARY:
+ ⍝ undo the global ⎕RVAL state change from CONTEXT.BUDGET/CONTEXT.TD
+ ⍝ above, so the rest of the session sees ⎕RVAL's usual defaults again.
+
+ ⊣5 ⎕RVAL PREV_BUDGET
+ ⊣3 ⎕RVAL PREV_TD
+∇
+
+⊣««« ⍝ Function ZZ←ONE_PRIMITIVE: run one fuzzing iteration: pick a
+ random primitive row from CONTEXT.PRIM (the ⎕RVAL fuzz table),
+ generate A/B/X for it, execute it, and check its invariant.
+
+ Returns a structured ZZ (a GNU APL extension): ZZ.OK is 1 if the
+ invariant held, 0 if it was violated or if generation/execution
+ itself failed; ZZ.A ZZ.B ZZ.X ZZ.OPER are the exact values used,
+ for ON_ERROR's reproducer dump when ZZ.OK is 0.
+»»»
+
+⊣««« ⍝ Function Z←STAGE DESCRIBE_ERR (RC RES): turn a ⎕EC-style (RC RES)
+ pair -- RC=0 means TOK_ERROR, RES is then the 3-or-4-row char matrix
+ "like ⎕EM" that ⎕EC returns for it (row 1: error name, optionally
+ suffixed '+' when )MORE has content; rows 2-3: offending statement and
+ caret; row 4, only present since the QuadFunction.cc ⎕EC fix: the
+ )MORE detail itself, previously discarded entirely) -- into a nested
+ vector of one or two trimmed text lines prefixed with STAGE, suitable
+ for writing as ⍝-comment lines in a reproducer script.
+»»»
+
+ ⊣««« ⍝ TRIM: standard trailing-space-trim idiom. An earlier version of
+  this comment reported ⌽ on a boolean vector as unreliable (suspected
+  packed-BOOL ravel handling in Bif_ROTATE::reverse / Value::try_implode)
+  and had TRIM avoid ⌽ entirely via ⍸/⌈//↑ instead. That was traced to
+  Value::try_implode()'s single-pass validation, which could corrupt
+  ravel.cells[0] before discovering a later non-boolean cell -- already
+  fixed (Bugs18 #11, now two-pass). Re-verified: ~3.8M targeted
+  iterations of {(⌽∨\⌽⍵≠' ')/⍵} plus a full instrumented AllPrimitives
+  fuzz run (comparing both forms on every TRIM call) found zero
+  mismatches, so reverted to the plain idiom.
+ »»»
+
+∇Z←TRIM S
+ Z←(⌽∨\⌽S≠' ')/S
+∇
+
+∇Z←STAGE DESCRIBE_ERR ARGS;RC;RES;R1;R4
+ (RC RES)←ARGS
+ →(RC=0)/ISERROR
+ Z←,⊂STAGE,': unexpected ⎕EC result code ',⍕RC
+ →0
+ISERROR:
+ R1←TRIM RES[1;]
+ Z←,⊂STAGE,': ',R1
+ →((1↑⍴RES)<4)/0
+ R4←TRIM RES[4;]
+ Z←Z,⊂R4
+∇
+
+∇ZZ←ONE_PRIMITIVE;ROW;OPER;EXPD;RC;ET;RES;RC2;ET2;RES2;RCG;ETG;RESG;A;B;X;Z;KIND;DENSEB;RETRY
+ ⊣««« ⍝ Z is deliberately declared local here even though it's never read:
+  every row's OPER string is literally "Z←...", e.g. "Z←A+B" (baked
+  into the ⎕RVAL fuzz table). Without a local Z, that assignment
+  would reach the caller's own Z through dynamic scoping instead --
+  and since the result variable here is ZZ rather than Z, the
+  caller in question is ALL_PRIMITIVES, whose own result IS named Z.
+ »»»
+
+ ⊣««« ⍝ B is generated first; A_stim="~B" (set for rval.def rows whose Z
+  constraint requires (⍴A)⌈⍴B, i.e. scalar-extension pairs like A+B)
+  then calls 7 ⎕RVAL B to conform A to B (scalar or exactly ⍴B) instead
+  of generating A independently and hoping it happens to fit.
+  TODO: many other primitives (replicate A/B, reshape A⍴B, encode/decode
+  A⊤B/A⊥B, catenate, ...) still need their own per-primitive conforming
+  rule in ⎕RVAL; for now they keep generating A independently.
+ »»»
+
+ ⍝ pick a random primitive: arity A_stim B_stim X_stim Z_constraint
+
+ ROW←(CONTEXT.PRIM)[?≢CONTEXT.PRIM;]
+ ⊣««« ⍝ rval.def's ecount column is the literal placeholder token "RE"
+  (see rval.def's own header comment: "the APL test runner substitutes
+  a concrete value... before calling ⎕RVAL"); replace it here with
+  CONTEXT.BUDGET before ⍎'ing A_stim/B_stim/X_stim below, or every
+  single generation call fails with VALUE ERROR (RE is not an APL
+  name) -- which is exactly what happened before this fix: 100% of
+  fuzz iterations silently counted as "violations".
+
+  "SB" (Sqrt Budget) is a second such placeholder, for rows whose
+  result size is the PRODUCT of two independently-generated operand
+  sizes (A∘.fB: (×/⍴A)×(×/⍴B) elements) -- capping each operand at the
+  full CONTEXT.BUDGET still allows BUDGET² elements, which reliably
+  timed out the fuzzer. ⌊/⍎/⍕ can't be used unquoted inside rval.def's
+  B_stim/A_stim/X_stim fields (they get pasted into a C preprocessor
+  macro argument there, and GCC rejects those specific glyphs as
+  "not valid in an identifier" -- ¯ is the only APL glyph that macro
+  context tolerates unquoted); computing ⌊√CONTEXT.BUDGET⌋ out here
+  instead, in already-interpreted APL text, sidesteps that entirely.
+ »»»
+
+ ROW[2 3 4]←{c←('RE'≡¯2↑⍵)∧2≤≢⍵ ⋄ s←('SB'≡¯2↑⍵)∧2≤≢⍵ ⋄ (1+c+2×s)⊃⍵ ((¯2↓⍵),⍕CONTEXT.BUDGET) ((¯2↓⍵),⍕⌊0.5+CONTEXT.BUDGET*0.5)}¨ROW[2 3 4]
+ ⍝ arity expression (e.g. Z←A+B) and Z constraint, set first so
+ ⍝ the caller always has a valid OPER even if generation fails below
+
+ (OPER EXPD)←ROW[1 5]
+ ⊣««« ⍝ operator-taking primitives (f/,f¨,f.g,...): substitute a real
+  function for the placeholder(s) (?N already respects ⎕IO —
+  no +1 needed)
+ »»»
+
+ OPER[⍸OPER='f']←(CONTEXT.FPOOL)[?(+/OPER='f')⍴5]
+ OPER[⍸OPER='g']←(CONTEXT.FPOOL)[?(+/OPER='g')⍴5]
+ A←⍬ ◊ B←⍬ ◊ X←⍬             ⍝ safe defaults in case generation fails below
+ ⊣««« ⍝ B is generated first, so that A (and X) can conform to B's ACTUAL
+  shape/rank instead of being generated independently and hoping they
+  happen to fit (per SVN r2037 discussion: fix this inside ⎕RVAL, not
+  by post-hoc patching in this function).
+ »»»
+
+ ⊣««« ⍝ Indexing/pick primitives (A⌷B, A⍋B, A⍒B, A⊃B, B[A] and the
+  multi-axis B[...] forms) have NO valid index/pick whenever B has a
+  genuinely zero-length axis -- not a real primitive defect, just an
+  unavoidable consequence of B_stim's shape spec drawing each axis
+  length uniformly from 0..N-1, occasionally landing on 0 (see
+  fuzzer_findings/rare_errors/pass2_remaining_domain_errors.md).
+  Retry B's generation (bounded, to guarantee termination even in a
+  pathological case) until it has no zero-length axis, but ONLY for
+  these specific arities -- other rows may legitimately want to
+  exercise a zero-length-axis B (reshape, catenate, take/drop, ...),
+  so this must not change generation for the table as a whole.
+ »»»
+DENSEB←'Z←A⌷B' 'Z←A⍋B' 'Z←A⍒B' 'Z←A⊃B' 'Z←B[A]' 'Z←B[⊃A[1];⊃A[2]]' 'Z←B[⊃A[1];⊃A[2];⊃A[3]]'
+ RETRY←0
+GENB_RETRY:
+ (RCG ETG RESG)←⎕EC '{⎕RVAL⍣(0<≢⍵)⊢⍵}⍎3⊃ROW'
+ →(RCG=1)/GENB_OK        ⍝ generation itself failed (e.g. a bad rval.def stim)
+ KIND←'GENERATE B' DESCRIBE_ERR RCG RESG ◊ →FAIL
+GENB_OK:
+ RETRY←RETRY+1
+ →(((⊂OPER)∊DENSEB)∧(0∈⍴RESG)∧RETRY<20)/GENB_RETRY
+ B←RESG
+
+ ⊣««« ⍝ Z←⍎B feeds B to the tokenizer as raw, unquoted source text.
+  ⎕AV's role since APL1 has always been "the valid characters outside
+  string literals" -- originally that meant all 8-bit characters,
+  since that was all there was; GNU APL's Unicode support only added
+  arbitrary-codepoint characters *inside* string literals, it never
+  extended what ⎕AV itself means (confirmed: ⍎"'X'" with X outside
+  ⎕AV succeeds, bare ⍎"X" does not). B's unrestricted random-Unicode
+  generation (rval.def's plain char type distribution, ~0x0000-0x2FFF)
+  almost always lands outside ⎕AV, so this row nearly always just
+  re-tests the same boring "not in ⎕AV" rejection instead of
+  exercising genuinely interesting ⍎ territory (SYNTAX/VALUE errors
+  from malformed-but-tokenizable input, or successful execution).
+  Remap every generated element into ⎕AV so it always is one.
+ »»»
+ →(~(⊂OPER)≡⊂'Z←⍎B')/NOREMAPB
+ B←(⍴B)⍴⎕AV[⎕IO+(≢⎕AV)|⎕UCS,B]
+NOREMAPB:
+
+ ⊣««« ⍝ X is derived BEFORE A (moved here from after A -- was originally
+  generated last), so that markers needing to conform A to B's axis X
+  specifically (as opposed to always assuming the last axis) can see
+  the real X. Without this, ~BC/~BE (A/B, A\B, A⌿B, ... and their
+  [X] siblings) had no way to know which axis the [X] form would
+Bad edit op 'X' in line [105]
+??? Bad ∇-command
+  ERROR otherwise (found via a real fuzzer sweep: A/[X]B, A\[X]B,
+  A⊂[X]B all showed ~30% LENGTH ERROR from exactly this).
+  X_stim is still generated independently of B, with no idea what B's
+  actual rank turned out to be — that produced axis values with no
+  relation to B at all (observed: values like 7509335927660159858,
+  causing WS FULL in e.g. ⊃[X]B). Every axis-taking primitive in
+  rval.def is [X]B, so derive a valid axis from B's real rank instead,
+  when one is wanted (X_stim non-empty) and B actually has axes.
+ »»»
+
+ (RCG ETG RESG)←⎕EC '{⎕RVAL⍣(0<≢⍵)⊢⍵}⍎4⊃ROW'
+ →(RCG=1)/GENX_OK
+ KIND←'GENERATE X' DESCRIBE_ERR RCG RESG ◊ →FAIL
+GENX_OK:
+ X←RESG
+ ⊣««« ⍝ Whether an axis is wanted at all must be decided from the X_stim
+  SPEC, not from whether the GENERATED X happened to come out empty.
+  X_stim's own spec allows rank 0..1 with shape 0..3 (e.g. "¯1 ¯3
+  ..."), so a rank-1-length-0 draw is a perfectly ordinary outcome for
+  rows that DO want an axis -- checking (0=≢X) here left X as ⍬ on
+  exactly that draw, silently skipping the axis substitution below for
+  a primitive whose arity requires one (e.g. A↑[X]B), producing a
+  bracket index of ⍬ downstream and a guaranteed LENGTH ERROR (found
+  via a real fuzzer sweep).
+  The obvious-looking (0=≢4⊃ROW) is ALSO wrong, but for a subtler
+  reason: rval.def's "empty X_stim stands for ⍬" convention (its own
+  header comment) is implemented by storing the literal 2-character
+  TEXT "⍬" as the spec for a no-axis row (since ⍬ cannot appear
+  unquoted in the C preprocessor) -- so 4⊃ROW is NEVER truly empty; a
+  no-axis row's spec has tally 1 (one character, the zilde glyph
+  itself), same as a real spec would if it were one character long.
+  ≡'⍬' against that spec string is the correct emptiness test; ⍎'ing
+  it is what actually produces a genuine ⍬ at runtime (see NORMALA's
+  handling of 2⊃ROW for A_stim, which relies on exactly this same fact
+  for monadic rows).
+ »»»
+ →((,'⍬')≡4⊃ROW)/NOAXIS
+ →(0=≢⍴B)/NOAXIS
+ X←?≢⍴B
+NOAXIS:
+
+ →(~(2⊃ROW)≡'~B')/NOTPLAINB
+ (RCG ETG RESG)←⎕EC '7 ⎕RVAL B'   ⍝ A_stim="~B": conform to B (scalar or ⍴B)
+ →GOTA
+NOTPLAINB:
+ ⍝ any other ~xxx marker (~BL, ~BF, ~S, ...; see CONFORM_A) also
+ ⍝ conforms A to B, just with a different rule than plain ~B. Checked
+ ⍝ by leading '~' rather than requiring the CONFORM_A-marker name to
+ ⍝ start with "~B" specifically -- ~S (always scalar) doesn't.
+ →(~(0<≢2⊃ROW)∧((,'~')≡1↑2⊃ROW))/NORMALA
+ (RCG ETG RESG)←⎕EC '(2⊃ROW) CONFORM_A B'
+ →GOTA
+NORMALA:
+ ⍝ still independent for other primitives
+
+ (RCG ETG RESG)←⎕EC '{⎕RVAL⍣(0<≢⍵)⊢⍵}⍎2⊃ROW'
+GOTA:
+ →(RCG=1)/GENA_OK
+ KIND←'GENERATE A' DESCRIBE_ERR RCG RESG ◊ →FAIL
+GENA_OK:
+ A←RESG
+ ⍝ execute OPER; on success (RC=2) RES is the value OPER returned
+
+ →(~DUMPALL)/NODUMPALL
+ DUMP_LASTCALL A B X OPER
+NODUMPALL:
+ (RC ET RES)←⎕EC OPER
+ →(RC=2)/EXEC_OK         ⍝ OPER itself failed (e.g. non-conforming random A/B)
+ KIND←'EXECUTE' DESCRIBE_ERR RC RES ◊ →FAIL
+EXEC_OK:
+ ⍝ evaluate the invariant; a plain expr gives RC=1 on success
+
+ (RC2 ET2 RES2)←⎕EC EXPD
+ →(RC2=1)/EVAL_OK        ⍝ the constraint expression itself failed to evaluate
+ KIND←'CONSTRAINT' DESCRIBE_ERR RC2 RES2 ◊ →FAIL
+EVAL_OK:
+ ⍝ invariant held (1) or was violated (0)
+
+ KIND←,⊂'POSTCONDITION FAILED'   ⍝ OPER ran fine, but its result fails the postcondition
+ ZZ.OK←RES2
+ ZZ.A←A ◊ ZZ.B←B ◊ ZZ.X←X ◊ ZZ.OPER←OPER ◊ ZZ.KIND←KIND
+ →0
+FAIL:
+ ZZ.OK←0
+ ZZ.A←A ◊ ZZ.B←B ◊ ZZ.X←X ◊ ZZ.OPER←OPER ◊ ZZ.KIND←KIND
+∇
+
+⊣««« ⍝ Function Z←MARKER CONFORM_A B: generate a value A that structurally
+ conforms to B per the rule named by MARKER, one of:
+   ~BL  same rank as B, all axes but the Last one matching B, or scalar
+   ~BF  same rank as B, all axes but the First one matching B, or scalar
+   ~BC  rank-1 non-negative-int vector, length = B's last axis (for
+        A/B, A⊂B: the Count/boundary vector must match B's last axis
+        exactly, or LENGTH ERROR). Approximation for the [X] variants
+        too: X is derived from B's rank only *after* A is generated
+        (see ONE_PRIMITIVE), so the actual axis isn't known yet --
+        conforming to the last axis is right whenever X turns out to
+        be the last axis, and wrong (LENGTH ERROR, same as before this
+        fix) otherwise.
+   ~BE  boolean vector for A\B (expand): unlike A/B, values must be
+        strictly 0/1 (DOMAIN ERROR otherwise) and it's the *count* of
+        1s, not the total length, that must equal B's last axis; the
+        rest are zero-fill positions, so total length is >= that.
+   ~BR  rank-1 int vector, length = ⍴⍴B exactly (A↓B: one drop-count
+        per axis of B; magnitude is irrelevant -- drop clamps, so any
+        int works), or scalar.
+   ~BD  same rank as B minus 1, shape = B's leading axes (i.e. ⍴B with
+        the last axis dropped entirely, not just varied -- unlike
+        ~BL); or scalar. For A⌽B: one rotate-amount per row, magnitude
+        irrelevant since rotate wraps around.
+   ~BDF same as ~BD but drops B's *first* axis instead (for A⊖B, which
+        rotates along the first axis: one amount per column).
+   ~S   always scalar (int). For A⌽[X]B: a vector A would need to match
+        B's shape minus axis X specifically, but X is derived only
+        *after* A is generated (see ONE_PRIMITIVE) -- scalar A always
+        works regardless of which axis X turns out to be, so it's used
+        unconditionally here rather than only as one of two outcomes.
+   ~BP  permutation-like: length ⍴⍴B, each value independently 1..⍴⍴B
+        (for A⍉B: repeats are legal -- generalized/diagonal transpose
+        -- so this isn't a strict permutation, just right-length and
+        in-range). ⍬ if B is scalar.
+   ~BI  index vector for A⌷B: length ⍴⍴B, element i independently
+        1..(⍴B)[i] (a valid index into B's i-th axis specifically, not
+        just any value 1..⍴⍴B like ~BP). ⍬ if B is scalar.
+   ~BCF like ~BC but conforms to B's *first* axis instead of last (for
+        A⌿B, replicate-along-first-axis).
+   ~BEF like ~BE but conforms to B's *first* axis instead of last (for
+        A⍀B, expand-along-first-axis).
+   ~BDEC decode (A⊥B): A's *last* axis must equal B's *first* axis (or
+        A scalar); generates A as a vector of exactly that length
+        (under-tests the general case where A has other leading axes
+        too, but is always structurally valid).
+   ~BMM  matrix-multiply-style (Af.gB, inner product): A and B are
+        both rank-2 (per B_stim/A_stim already fixing rank=2); A's
+        column count (last axis) must equal B's row count (first
+        axis). Generates A with a fresh random row count and column
+        count = B's row count.
+   ~BDOM matrix divide (A⌹B, DOMINO): B is rank-2 (per B_stim already
+        fixing rank=2); A's *first* axis (row count) must equal B's
+        first axis, A itself rank 1 (vector) or rank 2 (matrix), with
+        any column count when rank 2.
+   ~FMT  dyadic format (A⍕B): A must have length 1 or 2 and be
+        non-negative (LENGTH/DOMAIN ERROR otherwise); generates a
+        1-or-2-element vector of small non-negative ints.
+   ~BIDX bracket index (A[B]): B (generated first, the array) must be
+        rank 1 (RANK ERROR on a matrix); A (the index) can be any
+        shape, values must be valid indices 1..≢B.
+   ~BPICK pick (A⊃B): B rank 0 (scalar) needs A=⍬; B rank 1 needs A a
+        plain scalar index 1..≢B; B rank≥2 needs A=⊂ of an
+        (⍴⍴B)-element vector, element i forced into 1..(⍴B)[i]
+        (confirmed directly: a flat, non-enclosed multi-element A into
+        a matrix B is RANK ERROR, must be enclosed as one index-path).
+   ~BIJ  multi-axis bracket index (B[I;J], B[I;J;K]): B's rank fixes
+        the number of semicolon-separated axes (2 or 3, via B_stim).
+        rval.def's arity string decomposes A itself into per-axis
+        index vectors -- "Z←B[⊃A[1];⊃A[2]]" etc -- rather than
+        needing ONE_PRIMITIVE to generate separate I/J/K variables
+        (it only ever generates A/B/X). A is generated here as an
+        (⍴⍴B)-element NESTED vector; element i is itself a vector of
+        random length 0..10 (an empty index vector is legal -- B[⍬;J]
+        selects a 0-row slice, confirmed directly), values forced into
+        1..(⍴B)[i]. Z_constraint then checks ⍴Z against (≢⊃A[1]),
+        (≢⊃A[2]) etc, matching B[I;J]'s real shape rule (confirmed
+        directly: ⍴(B[I;J]) ≡ (≢I),(≢J), independent per-axis lengths,
+        not requiring ≢I=≢J or any relation to B's own shape).
+   ~SCR shape-count vector for A↑B: rank-1 int, length = ⍴⍴B exactly
+        (LENGTH ERROR otherwise -- A↑B, unlike A⍴B, requires (≢,A)≡⍴⍴B).
+        Split off from ~SC (Bugs8 #6, Blake McBride): ~SC generates A
+        independent of B's shape, which is correct for A⍴B (any shape
+        is legal) but was wrong for A↑B, burning a third of the
+        fuzzer's error budget on guaranteed LENGTH ERRORs. Modeled on
+        ~BR/RANKVARY (A↓B's marker, same ⍴⍴B-length rule) with ~BD's
+        1000| magnitude cap (huge take counts can hang/crash, same
+        reasoning as the ~SC history below).
+   ~SC  shape/take-count vector for A⍴B: rank-1, independent of
+        B, length 0..8 (matching the original raw spec these rows used
+        before this marker existed). Generated by asking ⎕RVAL for a
+        THROWAWAY array's shape rather than 8 independent magnitude-
+        capped ints: ⎕RVAL already clips a generated array's own shape
+        internally so ×/shape ≤ CONTEXT.BUDGET (Quad_RVAL.cc's
+        do_eval_B), and since ×/R ≥ ⌈/R for non-negative R, that
+        product bound also bounds every individual axis length -- no
+        separate per-element cap needed, and the guarantee is tied to
+        the same budget the rest of the fuzzer already respects rather
+        than an arbitrary extra constant.
+        Found via the fuzzer: A↑B with 8 independently huge-magnitude
+        (near int64_max) int elements in A crashed the interpreter
+        outright (SEGV in Bif_F12_TAKE::fill, via a wrapped-negative
+        volume that slipped past Value::init_ravel()'s "small value"
+        fast path and got a too-small buffer); A⍴B with the same shape
+        of input didn't crash but silently produced a corrupted Value
+        (⍴ and ≢ report the bogus huge shape, but indexing it throws
+        INDEX ERROR -- worse than a crash, since it looks like it
+        worked). Both rows used the exact same unbounded raw A_stim
+        before this fix. Root cause: Shape::add_shape_item()'s
+        "volume *= len" has no overflow check, by design -- it's on a
+        hot path, and the maintainer's call was that generators must
+        never hand it values whose product can overflow, rather than
+        paying for a check there.
+ rval.def's A_stim field is preprocessor-tokenized (unquoted), so it
+ cannot hold an arbitrary APL expression -- MARKER is a bare ASCII
+ string instead, and this function does the real work in real APL.
+»»»
+
+∇Z←MARKER CONFORM_A B;RB;OV;LASTAX;N;EXTRA;I;SHP
+ RB←⍴⍴B
+ →(MARKER≡'~BL')/LASTVARY
+ →(MARKER≡'~BF')/FIRSTVARY
+ →(MARKER≡'~BC')/COUNTVARY
+ →(MARKER≡'~BE')/EXPANDVARY
+ →(MARKER≡'~BR')/RANKVARY
+ →(MARKER≡'~BD')/DROPVARY
+ →(MARKER≡'~BDF')/DROPVARYFIRST
+ →(MARKER≡'~S')/INTSCALAR
+ →(MARKER≡'~BP')/PERMVARY
+ →(MARKER≡'~BI')/INDEXVARY
+ →(MARKER≡'~BCF')/COUNTVARYFIRST
+ →(MARKER≡'~BEF')/EXPANDVARYFIRST
+ →(MARKER≡'~BDEC')/DECODEVARY
+ →(MARKER≡'~BMM')/MATMULVARY
+ →(MARKER≡'~BDOM')/DOMINOVARY
+ →(MARKER≡'~FMT')/FMTVARY
+ →(MARKER≡'~BIDX')/BIDXVARY
+ →(MARKER≡'~BPICK')/PICKVARY
+ →(MARKER≡'~BIJ')/BIJVARY
+ →(MARKER≡'~SC')/SHAPECNTVARY
+ →(MARKER≡'~SCR')/SHAPECNTVARYR
+ →(MARKER≡'~BGRADE')/GRADEVARY
+ Z←⍬ ◊ →0                     ⍝ unknown marker (shouldn't happen)
+LASTVARY:
+ →(0=RB)/SCALARFORM
+ ⊣««« ⍝ ecount here must be the EXACT volume of the shape being
+  requested, not the blanket CONTEXT.BUDGET: passing CONTEXT.BUDGET as
+  ecount lets do_eval_B's own clipping shrink the LAST axis of THIS
+  shape whenever its volume exceeds budget (common once B itself is
+  sizeable, since A must match B's other axes exactly) -- silently
+  breaking the exact-shape-match this marker exists to guarantee, and
+  producing a LENGTH ERROR downstream (found via a real fuzzer sweep
+  on A,B/A⍪B/A⌽B/A⊖B).
+ »»»
+ SHP←(¯1↓⍴B),¯1+?101
+ OV←RB SHP (1 1 1 1 1) 3 (×/SHP)
+ →DONE
+FIRSTVARY:
+ →(0=RB)/SCALARFORM
+ SHP←(¯1+?101),1↓⍴B
+ OV←RB SHP (1 1 1 1 1) 3 (×/SHP)
+ →DONE
+COUNTVARY:
+ ⊣««« ⍝ No 1⌈ clamp here: every ~BC/~BE/~BCF/~BEF caller's B_stim gives
+  rank 0 (scalar) a weight of 0, so B is never scalar for these rows --
+  the old "1⌈...(or 1 if B scalar)" fallback was dead code for its
+  stated purpose and instead miscorrected the different, genuinely
+  valid case of B's last axis being 0 (an empty B), generating A with
+  1 element/1-count when B actually needed 0, i.e. a guaranteed LENGTH
+  ERROR (found via a real fuzzer sweep: A/B, A\B, A⌿B, A⍀B, A⊂B,
+  A⊂[X]B, A/[X]B, A\[X]B all showed high LENGTH ERROR rates from this).
+
+  Conform to axis X, not always the last axis, when X is already known:
+  ONE_PRIMITIVE now derives X before calling CONFORM_A (X is visible
+  here via dynamic scoping, unlocalized), so for the [X] variants
+  (A/[X]B etc.) this conforms to whichever axis X actually turned out
+  to be, instead of blindly assuming the last one -- correct only by
+  luck before this fix (found the same fuzzer sweep: A/[X]B, A\[X]B,
+  A⊂[X]B all showed ~30% LENGTH ERROR from exactly this mismatch).
+ »»»
+ →(0<≢X)/COUNTVARY_X
+ LASTAX←¯1↑⍴B                  ⍝ no axis known: conform to B's last axis
+ →COUNTVARY_GO
+COUNTVARY_X:
+ LASTAX←(⍴B)[X]                ⍝ axis X already known: conform to THAT axis
+COUNTVARY_GO:
+ OV←1 LASTAX (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←4|⎕RVAL OV                  ⍝ ⎕RVAL ints are unbounded magnitude and
+ →0                            ⍝ signed; 4| forces 0..3, non-negative
+EXPANDVARY:
+ →(0<≢X)/EXPANDVARY_X
+ LASTAX←¯1↑⍴B
+ →EXPANDVARY_GO
+EXPANDVARY_X:
+ LASTAX←(⍴B)[X]
+EXPANDVARY_GO:
+ EXTRA←(?11)-1                 ⍝ 0..10 extra zero-fill slots
+ N←LASTAX+EXTRA
+ Z←(LASTAX⍴1),EXTRA⍴0
+ Z←Z[N?N]                      ⍝ shuffle so the 1s land at random spots
+ →0
+RANKVARY:
+ ⍝ int only, even for scalar B (RB=0) -- unlike LASTVARY/FIRSTVARY's
+ ⍝ shared SCALARFORM fallback (which deliberately allows any type for
+ ⍝ catenate/rotate-family A), ~BR feeds a drop/take-count and must
+ ⍝ never be char/float/complex/nested (confirmed via fuzzer: A↓B with
+ ⍝ scalar B was generating a character A, an immediate DOMAIN ERROR).
+ →(0≠RB)/RANKVARY_GO ⋄ RB←1
+RANKVARY_GO:
+ OV←1 RB (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←⎕RVAL OV
+ →0
+SHAPECNTVARYR:
+ ⍝ ~SCR: A↑B's take-count vector. Same ⍴⍴B-length rule and same
+ ⍝ scalar-B (RB=0 -> length 1) handling as RANKVARY (~BR, A↓B's
+ ⍝ marker) above, plus DROPVARY's 1000| magnitude cap -- unlike ~BR,
+ ⍝ an uncapped huge take count is exactly the crash the ~SC history
+ ⍝ documents (see the ~SC comment above).
+ →(0≠RB)/SHAPECNTVARYR_GO ⋄ RB←1
+SHAPECNTVARYR_GO:
+ OV←1 RB (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←1000|⎕RVAL OV
+ →0
+DROPVARY:
+ →(RB≤1)/INTSCALAR              ⍝ RB=0: scalar; RB=1: no leading axes left
+ SHP←¯1↓⍴B                      ⍝ exact-volume ecount -- see LASTVARY comment
+ OV←(RB-1) SHP (0 1 0 0 0) 0 (×/SHP)
+ Z←1000|⎕RVAL OV                ⍝ cap magnitude: GNU APL's ⌽/⊖ are O(N)
+ →0                             ⍝ in the rotate amount, huge values hang
+DROPVARYFIRST:
+ →(RB≤1)/INTSCALAR              ⍝ RB=0: scalar; RB=1: no trailing axes left
+ SHP←1↓⍴B
+ OV←(RB-1) SHP (0 1 0 0 0) 0 (×/SHP)
+ Z←1000|⎕RVAL OV
+ →0
+INTSCALAR:
+ OV←0 ⍬ (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←1000|⎕RVAL OV
+ →0
+PERMVARY:
+ ⍝ A⍉B requires A to be *dense*: every integer 1..(⌈/A) must occur at
+ ⍝ least once (each output axis needs at least one source axis), not
+ ⍝ just "each element independently 1..RB" as this used to generate --
+ ⍝ confirmed directly via reproducer (A←2 3 3 for a rank-3 B DOMAIN
+ ⍝ ERRORs with "axis 1 is missing in A", since 1 never got drawn).
+ ⍝ RB?RB (Deal) gives a true random permutation of 1..RB, which is
+ ⍝ trivially dense (a bijection).
+ →(0=RB)/EMPTYFORM
+ Z←RB?RB
+ →0
+INDEXVARY:
+ →(0=RB)/EMPTYFORM
+ OV←1 RB (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←1+(⍴B)|(⎕RVAL OV)-1           ⍝ element i forced into 1..(⍴B)[i]
+ →0
+EMPTYFORM:
+ Z←⍬
+ →0
+COUNTVARYFIRST:
+ ⊣««« ⍝ (⍴B)[1], not the "1↑⍴B,1" append trick: that trick only gives
+  B's first axis when B has rank ≥ 2 (appending a scalar there extends
+  the LAST axis by one slice, leaving the first axis untouched). For
+  rank-1 B -- which does happen here, B_stim gives rank 1 nonzero
+  weight -- appending a scalar to a plain vector just makes it one
+  element longer, so the trick silently returned B's length+1 instead
+  of its (only, and therefore also first) axis length. (⍴B)[1] is
+  correct regardless of rank, since B is never scalar here (so ⍴B
+  always has ≥1 element).
+ »»»
+ LASTAX←(⍴B)[1]                 ⍝ B's first axis size
+ OV←1 LASTAX (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←4|⎕RVAL OV
+ →0
+EXPANDVARYFIRST:
+ LASTAX←(⍴B)[1]
+ EXTRA←(?11)-1
+ N←LASTAX+EXTRA
+ Z←(LASTAX⍴1),EXTRA⍴0
+ Z←Z[N?N]
+ →0
+DECODEVARY:
+ ⊣««« ⍝ Same two bugs as COUNTVARYFIRST/LASTVARY had (see their comments):
+  "1↑⍴B,1" only extracts B's first axis correctly when B has rank ≥ 2
+  (A⊥B's B_stim allows rank 1, where the append trick instead returns
+  B's length+1); and CONTEXT.BUDGET as ecount lets do_eval_B clip the
+  requested shape's last axis whenever its volume exceeds budget,
+  corrupting the exact match this marker exists to guarantee. (⍴B)[1]
+  and an exact-volume ecount fix both, matching the same fix already
+  applied to COUNTVARYFIRST/LASTVARY/DROPVARY/MATMULVARY/DOMINOVARY.
+  This was very likely the direct cause of a real A⊥B segfault: the
+  reproducer had B of shape 0 76 (first axis 0), which the old 1⌈
+  clamp would have forced LASTAX to 1 instead, generating an A that
+  did not actually match B's real (empty) first axis.
+ »»»
+ LASTAX←(⍴B)[1]                 ⍝ B's first axis size (B is never scalar here)
+ OV←1 LASTAX (0 1 1 0 0) 0 LASTAX  ⍝ rank 1, shape LASTAX, ecount = volume = LASTAX
+ Z←⎕RVAL OV
+ →0
+MATMULVARY:
+ LASTAX←(⍴B)[1]                 ⍝ B's row count (first axis); B is always rank 2
+ SHP←(¯1+?101),LASTAX
+ ⍝ complex excluded: f (inner product's reduce step) can be ⌈/⌊, which
+ ⍝ have no total order on complex numbers -- A's type mask was
+ ⍝ hardcoded here independently of B's own (already-fixed) mask, so
+ ⍝ Af.gB kept generating complex A even after B's mask was corrected.
+ OV←2 SHP (0 1 1 0 0) 0 (×/SHP)
+ Z←⎕RVAL OV
+ →0
+DOMINOVARY:
+ ⊣««« ⍝ A⌹B (dyadic Domino) has the same "rows ≥ columns" requirement on
+  B as monadic ⌹B (see rval.def), so A⌹B's arity conditionally
+  transposes B whenever rows < columns, exactly like ⌹B's arity does.
+  A must then conform to B's EFFECTIVE (post-transpose) row count, not
+  its raw first-axis length -- ⌈/⍴B (the larger of the two axes) is
+  exactly that, since transposing (when it happens) always swaps to the
+  larger axis first.
+ »»»
+ LASTAX←⌈/⍴B                    ⍝ B's effective (post-transpose) row count
+ →((?2)=1)/DOMINOVEC
+ SHP←LASTAX,¯1+?101
+ OV←2 SHP (0 1 1 0 0) 0 (×/SHP)
+ Z←⎕RVAL OV
+ →0
+DOMINOVEC:
+ OV←1(,LASTAX)(0 1 1 0 0) 0 LASTAX
+ Z←⎕RVAL OV
+ →0
+FMTVARY:
+ N←?2                          ⍝ length 1 or 2 (⎕IO=1: ?2 is already 1 or 2)
+ OV←1(,N)(0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←21|⎕RVAL OV                 ⍝ non-negative, small (0..20)
+ ⍝ N=1: Z alone is DECIMALS (auto width, always safe). N=2: Z[1] is
+ ⍝ WIDTH, Z[2] DECIMALS -- an independently-random WIDTH is almost
+ ⍝ always too narrow to hold B's integer part + '.' + DECIMALS digits
+ ⍝ (confirmed directly: 3 5⍕0.56... and even 22 20⍕<10-digit int>.5
+ ⍝ both DOMAIN ERROR), so force WIDTH to 0 (auto) instead of leaving
+ ⍝ it to chance.
+ →(N=1)/FMTDONE ⋄ Z[1]←0
+FMTDONE:
+ →0
+BIDXVARY:
+ N←1⌈≢B                        ⍝ ≢B is B's own tally (works for scalar too)
+ OV←¯2 ¯5 (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←1+N|(⎕RVAL OV)-1            ⍝ every element forced into 1..≢B
+ →0
+PICKVARY:
+ →(0=RB)/EMPTYFORM             ⍝ scalar B: A must be ⍬
+ →(1=RB)/PICKSCALAR            ⍝ vector B: A is a plain scalar index
+ OV←1 RB (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←⊂1+(⍴B)|(⎕RVAL OV)-1        ⍝ rank≥2: one enclosed RB-element index
+ →0                            ⍝ path, element i forced into 1..(⍴B)[i]
+PICKSCALAR:
+ OV←0 ⍬ (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←1+(≢B)|(⎕RVAL OV)-1         ⍝ scalar index forced into 1..≢B
+ →0
+BIJVARY:
+ Z←⍬ ◊ I←0
+BIJLOOP:
+ I←I+1
+ →(I>RB)/0                     ⍝ Z now has RB nested per-axis index vectors
+ N←(?11)-1                     ⍝ this axis's index-vector length, 0..10
+ OV←1(,N)(0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←Z,⊂1+((⍴B)[I])|(⎕RVAL OV)-1 ⍝ values forced into 1..(⍴B)[I]
+ →BIJLOOP
+GRADEVARY:
+ ⍝ dyadic A⍋B / A⍒B: A is a vector of *distinct* characters defining a
+ ⍝ custom collating sequence, and every character in B must appear in
+ ⍝ A (else DOMAIN ERROR -- confirmed directly: 'cba'⍋B fails whenever B
+ ⍝ contains a char outside 'cba'). A generated independently of B
+ ⍝ almost never covers B's actual characters, so build A from B's own
+ ⍝ distinct characters instead, shuffled into a random order.
+ Z←∪,B
+ →(0=≢Z)/0                     ⍝ B has no characters at all: Z stays ⍬
+ Z←Z[(≢Z)?≢Z]
+ →0
+SHAPECNTVARY:
+ ⍝ generate a THROWAWAY array and take its OWN shape as Z, instead of
+ ⍝ generating up to 8 magnitude-capped ints independently: ⎕RVAL already
+ ⍝ clips a generated array's shape internally so ×/(that shape) ≤
+ ⍝ CONTEXT.BUDGET (see Quad_RVAL.cc's do_eval_B), and since ×/R ≥ ⌈/R
+ ⍝ for non-negative R, that ×/⍴Z≤budget bound also bounds every
+ ⍝ individual axis length in Z -- no separate per-element cap needed,
+ ⍝ and unlike the discarded 100| cap this ties the guarantee to the
+ ⍝ same budget the rest of the fuzzer already respects.
+ OV←¯8 ¯1000 (0 1 0 0 0) 0 CONTEXT.BUDGET
+ Z←⍴⎕RVAL OV
+ →0
+SCALARFORM:
+ OV←0 ⍬ (1 1 1 1 0) 0 CONTEXT.BUDGET
+DONE:
+ Z←⎕RVAL OV
+∇
+
+      ⊣««« ⍝ CONTEXT is a set of parameters that govern the testcase
+       execution in all sub-functions. To be adapted by the user
+       as needed. Uses structured variables (a GNU APL extension).
+      »»»
+
+      CONTEXT.BUDGET←10000        ⍝ desired ⍴∈ limit, see 5 ⎕RVAL B
+      CONTEXT.TD ← 15 70 15 5 5   ⍝ type distribution: char, int,
+                                  ⍝ double, complex, nested (in %)
+      CONTEXT.SECONDS←5           ⍝ how long ALL_PRIMITIVES fuzzes
+      ⊣««« ⍝ CONTEXT.FPOOL: scalar dyadic (also valid monadic) functions
+       that substitute for the 'f'/'g' placeholders used by
+       operator-taking primitives in the ⎕RVAL fuzz table
+       (e.g. f/, f¨, f.g).
+      »»»
+
+      CONTEXT.FPOOL←'+-×⌈⌊'
+
+      ALL_PRIMITIVES
+1
+
+      )ERASE CONTEXT
+
+      )CHECK BRIEF
+

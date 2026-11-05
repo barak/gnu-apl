@@ -1,6 +1,13 @@
 ⍝ APnnn.tc
 ⍝ ----------------------------------
 
+      ⍝ this testcase requires shared variables, which --noSV or
+      ⍝ SharedVars Disabled (or a failed connection to APserver) turn off
+      ⍝
+      ]NEXTFILE NO-SVARS
+
+
+
       )CLEAR
 CLEAR WS
 
@@ -49,7 +56,7 @@ SYNC OK
       1 0 1 0 ⎕SVC 'VAR444'
 1 ⁰ 1 ⁰
 
-  ]svars
+      ]svars
 
       VAR444←1 2 3 4
       VAR444
@@ -76,4 +83,18 @@ SYNC OK
 1
 
       )ERASE X
+
+
+      ⍝ retract VAR444 and give the partner (apl --id 1011) and AP100,
+      ⍝ which started it and exits after the partner, time to finish.
+      ⍝ Otherwise, a testcase that runs right after this one (--TR) may
+      ⍝ offer its OS to the exiting AP100, and the coupling is lost.
+      ⍝
+      ⎕SVR 'VAR444'
+2
+
+      0 0⍴⎕DL 2
+
+
+
 

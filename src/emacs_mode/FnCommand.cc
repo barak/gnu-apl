@@ -26,6 +26,7 @@
 #include "emacs.hh"
 
 #include <sstream>
+//════════════════════════════════════════════════════════════════════════════
 
 void FnCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -62,3 +63,4 @@ void FnCommand::run_command( NetworkConnection &conn, const std::vector<std::str
 
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

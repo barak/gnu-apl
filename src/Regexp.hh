@@ -29,40 +29,38 @@
 #define PCRE2_CODE_UNIT_WIDTH 32
 #include <pcre2.h>
 
+//════════════════════════════════════════════════════════════════════════════
 /// A Regular expression match
 class RegexpMatch
 {
 public:
    /// constructor
+   /// @param code compiled PCRE2 pattern to execute
+   /// @param B subject UCS string to match against
+   /// @param start byte offset within B at which to start matching
    RegexpMatch(pcre2_code * code, const UCS_string & B, PCRE2_SIZE start);
 
    /// destructor
    virtual ~RegexpMatch();
 
-   /// return the number of offset pairs in a match
-   uint32_t get_ovector_count() const
-       { return ovector_count; }
-
    /// return the offset pairs in a match
     const PCRE2_SIZE * get_ovector() const
        { return ovector; }
 
+   /// return the number of offset pairs in a match
+   uint32_t get_ovector_count() const
+       { return ovector_count; }
+
    /// return \b true if there was a match
     bool is_match() const;
-
-   /// return the number of matches
-    int num_matches() const;
 
    /// return the matched string
    UCS_string matched_string() const;
 
+   /// return the number of matches
+    int num_matches() const;
+
 protected:
-   /// the offset pairs
-   PCRE2_SIZE * ovector;
-
-   /// the number of offset pairs
-   uint32_t ovector_count;
-
    /// the data related to a match
    pcre2_match_data * match_data;
 
@@ -71,6 +69,12 @@ protected:
 
    /// the right argument B of ⎕RE
    const UCS_string & matched_B;
+
+   /// the offset pairs
+   PCRE2_SIZE * ovector;
+
+   /// the number of offset pairs
+   uint32_t ovector_count;
 };
 
 /// Helper class for ⎕RE
@@ -78,27 +82,33 @@ class Regexp
 {
 public:
     /// constructor
+    /// @param pattern the regular expression pattern string
+    /// @param flags PCRE2 compile-option flags
     Regexp(const UCS_string & pattern, int flags);
 
     /// destructor
     virtual ~Regexp();
 
-   /// return a new match
-    const RegexpMatch * match(const UCS_string & match, PCRE2_SIZE size) const;
-
-   /// return the number of matches
-    int expression_count() const;
-
    /// returned the compiled regular expression
     pcre2_code * get_code() const
        { return code; }
 
+   /// return the number of matches
+    int expression_count() const;
+
+   /// return a new match
+   /// @param match subject UCS string to match against
+   /// @param size length of the subject string in code units
+    const RegexpMatch * match(const UCS_string & match, PCRE2_SIZE size) const;
+
    /// return a description for error code \b eec
+   /// @param ec PCRE2 error code to describe
    static UCS_string pcre_error(int ec);
 
 protected:
    /// compiled regular expression
    pcre2_code * code;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Regexp_HH__DEFINED__

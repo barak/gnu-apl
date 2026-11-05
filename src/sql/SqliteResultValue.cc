@@ -29,6 +29,7 @@
 #include "FloatCell.hh"
 #include "CharCell.hh"
 #include "PointerCell.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 void
 IntResultValue::update(Value & Z) const
@@ -101,3 +102,4 @@ const int n = sqlite3_column_count( statement );
         values.push_back(value);
     }
 }
+//════════════════════════════════════════════════════════════════════════════

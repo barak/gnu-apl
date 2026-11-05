@@ -19,42 +19,52 @@
 */
 
 /** @file
+    The Command:: core: static data members, the )command dispatch table
+    (do_APL_command()), immediate-execution (do_APL_expression()), the
+    statement-execution driver (finish_context()), the REPL loop
+    (process_line()/process_lines()), and small helpers shared across the
+    Cmd_*.cc command-group files (is_lib_ref(), parse_from_to(),
+    split_arg(), check_params()).
+
+    The individual )-command handlers (cmd_XXX()) live in the Cmd_*.cc
+    files grouped by feature area: Cmd_WS.cc (workspace lifecycle),
+    Cmd_LISTING.cc (introspection), Cmd_SI.cc (SI stack), Cmd_DIAG.cc
+    (diagnostics), Cmd_SESSION.cc (session/UI settings), Cmd_HOST.cc
+    (host/file interaction), Cmd_HELP.cc () HELP), Cmd_USERCMD.cc
+    (]USERCMD) — as well as the pre-existing Cmd_IN.cc, Cmd_KEYB.cc, and
+    Cmd_LIB.cc. All of them are still, deliberately, part of this one
+    Command class, declared once in Command.hh.
 */
 
-#include <errno.h>
-#include <limits.h>
-#include <string.h>
+#include "config.h"
+
+#if HAVE_SYS_RESOURCE_C
 #include <sys/resource.h>
-#include <sys/stat.h>
+#endif // HAVE_SYS_RESOURCE_C
 
-#include "Common.hh"
+#include <stdlib.h>
+#include <string.h>
 
-#include "CharCell.hh"
-#include "ComplexCell.hh"
+#include "Avec.hh"
+#include "Cmd_DIAG.hh"
+#include "Cmd_HELP.hh"
+#include "Cmd_HOST.hh"
+#include "Cmd_LISTING.hh"
+#include "Cmd_SESSION.hh"
+#include "Cmd_SI.hh"
+#include "Cmd_USERCMD.hh"
+#include "Cmd_WS.hh"
 #include "Command.hh"
-#include "Doxy.hh"
+#include "Common.hh"
 #include "Executable.hh"
-#include "FloatCell.hh"
-#include "IO_Files.hh"
 #include "IndexExpr.hh"
-#include "InputFile.hh"
-#include "IntCell.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
-#include "NativeFunction.hh"
-#include "Output.hh"
 #include "Parser.hh"
 #include "Prefix.hh"
-#include "Quad_FX.hh"
-#include "Security.hh"
-#include <signal.h>
+#include "QuadFunction.hh"
 #include "StateIndicator.hh"
-#include "Svar_DB.hh"
-#include "Symbol.hh"
-#include "Tokenizer.hh"
-#include "UserFunction.hh"
 #include "UserPreferences.hh"
-#include "ValueHistory.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
@@ -66,179 +76,90 @@ int  Command::multiline_start = -1;   // read in IO_Files.cc
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
+bool Command::expression_failed = false;
 
 UCS_string_vector Command::copy_once_table;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
-Command::process_lines()
+Command::clear_copy_once_table()
 {
-UCS_string line;
-Multi_line_SM sm;
-ShapeItem multi_pos;
-UCS_string_vector content;   // for new-style multiline strings
-
-   {
-     bool eof = false;
-     InputMux::get_line(LIM_ImmediateExecution, Workspace::get_prompt(),
-                              line, eof, LineInput::get_history());
-     // InputMux::get_line() has removed the trailing \n.
-
-     if (eof)   CERR << "EOF at " << LOC << endl;
-
-     multi_pos = line.multi_pos();
-     if (multi_pos == -1)   // OUTSIDE
-        {
-          process_line(line, 0);
-          return;
-        }
-     content.push_back(UCS_string(line, 0, multi_pos));
-     sm.next(line[multi_pos]);
-   }
-
-   multiline_status = MLS_Start_of_multi;
-
-const bool multi_literal = sm.in_literal();
-
-const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
-
-   for (bool subsequent = false; ; subsequent = true)
-       {
-         if (subsequent)   // otherwise we use the line received above
-            {
-              line.clear();
-
-              bool eof = false;
-              InputMux::get_line(LIM_ImmediateExecution, prompt,
-                                 line, eof, LineInput::get_history());
-                // InputMux::get_line() has removed the trailing \n.
-          
-              if (eof) CERR << "EOF at " << LOC << endl;
-
-              multi_pos = line.multi_pos();
-              if (multi_pos != -1)   // some triple
-                 {
-                    sm.next(line[multi_pos]);
-                 }
-              content.push_back(line.do_escape(true));
-            }
-
-         if (!sm.inside_multi())   break;
-       }
-
-   multiline_status = MLS_APL_text;
-
-const UCS_string suffix(line, multi_pos + 3);
-
-    multiline_start = 0;   // inform IO_Files.cc
-
-   if (multi_literal)   // literal (not string)
+   if (const size_t count = copy_once_table.size())
       {
-        // top-level multiline literals are recursive and therefore more
-        // complicated tnan multiline strings
-        //
-        content[0] << "<<<";
-
-        Lit_DB literals;
-
-        Parser::replace_multi_line_strings(content, literals, false);
-        Parser::replace_multi_line_literals(content, literals, false);
-
-        // remove trailing empty lines (which would mess up the shape
-        // computation)
-        while (content.size() && !content.back().size())   content.pop_back();
-
-        if (literals.size() != 1)
-           {
-             MORE_ERROR() << "Multiline literal has more than one ("
-                          << literals.size() << "items";
-             SYNTAX_ERROR;
-           }
-
-        Value_P literal = literals.pull_last();
-        do_APL_expression(content[0], literal);
-      }
-   else                 // string (not literal)
-      {
-        // top-level multiline strings are flat and therefore much simpler
-        // tnan multiline literals, In particular there is no need for
-        // Parser::replace_multi_line_strings().
-        //
-        if (content.size() == 2)        // special case:  ««« »»»
-           {
-             const UTF8_string empty(" (0⍴⊂\"\")");   // 0⍴⊂""
-             content[0] << UCS_string(empty);
-           }
-        else if (content.size() == 3)   // special case: ««« string »»»
-          {
-            const UTF8_string encl("(,⊂\"");  // enclose content...
-            content[0] << UCS_string(encl) << content[1] << "\")";
-          }
-        else                            // general case: ««« string ... »»»
-          {
-            content[0] << "(";
-            for (size_t a = 1; a < content.size() - 1; ++a)
-                {
-                  if (a > 1)   content[0] << " ";
-                  content[0] << "\"" << content[a] << "\"";
-                }
-            content[0] << ")";
-          }
-
-        content[0] << " " << suffix;
-        process_line(content[0], 0);
+        copy_once_table.clear();
+        CERR << ")COPY_ONCE table cleared (" << count << " entries)" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Command::process_line(UCS_string & line, ostream * out)
+Command::cmd_OFF(ostream & out, const UCS_string & arg)
 {
-   line.remove_leading_whitespaces();
-   if (line.size() == 0)           return;   // empty input line
+   // the exit status has 8 bits: anything else would silently become a
+   // different exit status (Bugs37 #76)
+   //
+bool valid = arg.size() <= 3;
+   loop(a, arg.size())   if (!Avec::is_digit(arg[a]))   valid = false;
+   if (valid && arg.size() && arg.atoi() > 255)   valid = false;
 
-   /* at this point, line is not empty and starts with a non-blank.
-      The first character line[0] determines the nature of the line:
-
-      ')':       regular APL command
-      ']':       debug command (a GNU APL extension of IBM APL2)
-      '∇':       invocaton of the Nabla function editor
-      '⍝':       full line APL comment
-      '#':       full line APL comment (a GNU APL extension of IBM APL2)
-      otherwise: APL expression in immediate execution mode
-    */
-
-   switch(line[0])
+   if (!valid)
       {
-         case UNI_R_PARENT:      // regular command, e.g. )SI
-              if (out == 0)   out = &COUT;
-              do_APL_command(*out, line);
-              if (line.size())   break;
-              return;
-
-         case UNI_R_BRACK:       // debug command, e.g. ]LOG
-              if (out == 0)   out = &CERR;
-              do_APL_command(*out, line);
-              if (line.size())   break;
-              return;
-
-         case UNI_NABLA:         // Nabla editor, e.g. ∇FUN
-              Nabla::edit_function(line);
-              return;
-
-         case UNI_NUMBER_SIGN:         // e.g. # comment
-         case UNI_COMMENT:             // e.g. ⍝ comment
-              return;
-
-        default: break;
+        out << "BAD COMMAND+" << endl;
+        MORE_ERROR() << ")OFF " << arg << ": the exit code must be an"
+                        " integer from 0 to 255";
+        if (auto_MORE)   CERR << Workspace::more_error() << endl;
+        return;
       }
 
-   do_APL_expression(line, Value_P());
+   cmd_OFF(arg.size() ? arg.atoi() : 0);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Command::cmd_OFF(int exit_val)
+{
+   COUT << endl;
+   if (UserPreferences::uprefs.silence < NO_BANNER)
+      {
+        timeval end;
+        gettimeofday(&end, 0);
+        end.tv_sec -= UserPreferences::uprefs.session_start.tv_sec;
+        end.tv_usec -= UserPreferences::uprefs.session_start.tv_usec;
+        if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
+        COUT << "Goodbye." << endl
+             << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
+             << " seconds " << endl;
+      }
+
+   cleanup(true);
+
+   // restore the initial memory rlimit
+   //
+#ifndef RLIMIT_AS // BSD does not define RLIMIT_AS
+# define RLIMIT_AS RLIMIT_DATA
+#endif
+
+#if ! MINGW_SRC
+rlimit rl;
+   getrlimit(RLIMIT_AS, &rl);
+   rl.rlim_cur = Quad_WA::initial_rlimit;
+   setrlimit(RLIMIT_AS, &rl);
+#endif // ! MINGW_SRC
+
+   exit(exit_val);
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
-   out << left << dec << nouppercase << setfill(' ');
+   // reset the stream to its normal formatting state before processing
+   // this command -- a stray manual "left" here (instead of "right") once
+   // left the stream left-justified for the rest of the session, silently
+   // corrupting the next unrelated setfill('0') << setw(N) elsewhere
+   // (confirmed: this caused the workspace-load "SAVED ..." timestamp to
+   // print e.g. "70" instead of "07"). reset_format() copies from a single
+   // shared default_format_state instead, so there is nothing left to get
+   // wrong here.
+   //
+   out << reset_format;
 
    if (line.contains(UNI_COMMENT))   // unlikely, but valid
       {
@@ -286,15 +207,710 @@ UCS_string_vector args = split_arg(arg);
          const UTF8_string ucmd(Workspace::get_user_commands()[u].prefix);
          if (is_command(cmd, ucmd.c_str()))
             {
-              do_USERCMD(out, line, orig_line, cmd, args, u);
+              Cmd_USERCMD::do_USERCMD(out, line, orig_line, cmd, args, u);
               return true;
             }
        }
 
-     out << "BAD COMMAND" << endl;
+     out << "INCORRECT COMMAND" << endl;
      return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Command::do_APL_expression(const UCS_string & line, Value_P literal)
+{
+   ++APL_expression_count;
+   expression_failed = false;
+
+   // see the comment in do_APL_command() above
+   COUT << reset_format;
+   Workspace::more_error().clear();
+
+Executable * statements = 0;
+   try
+      {
+        statements = StatementList::fix(line, literal, LOC);
+      }
+   catch (const Error & err)
+      {
+        expression_failed = true;
+        bool plus = Workspace::more_error().size();   // assume + needed
+        const char * error_name = Error::error_name(err.get_error_code());
+        if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
+        if (Workspace::more_error().size() &&
+               Workspace::more_error().back() == UNI_PLUS)
+           plus = false; // dito.
+
+        UERR << error_name;
+        if (plus)   UERR << UNI_PLUS;
+        UERR << endl;
+        // line 2 (and thus line 3) already has its margin, like the
+        // error lines of every other error (Bugs37 #62)
+        //
+        if (err.get_error_line_2().size())
+           {
+             COUT << err.get_error_line_2() << endl
+                  << err.get_error_line_3() << endl;
+           }
+
+        // err.print() prints nothing further here in a non-verbose
+        // build (its body is gated behind Log(LOG_verbose_error),
+        // dead code in production) -- its only *reachable* effect was
+        // leaking the internal "*** Error printed twice ***"
+        // diagnostic to the user whenever err.print_loc happened to
+        // already be set (Blake McBride, Bugs24 #2), which the lines
+        // above already printed everything this call would have.
+        delete statements;
+        return;
+      }
+   catch (std::bad_alloc &)
+      {
+        CERR << "*** Command::process_line() caught other exception ***"
+             << endl;
+        delete statements;
+        cmd_OFF(0);
+      }
+   catch (...)
+      { FIXME; }
+
+   if (statements == 0)   // StatementList::fix() failed
+      {
+        expression_failed = true;
+        COUT << "main: Parse error";
+        if (Workspace::more_error().size())   COUT << "+";
+        else                                  COUT << ".";
+        COUT << endl;
+        return;
+      }
+
+   // At this point, the user command was parsed correctly.
+   // check for Escape (→)
+   //
+   {
+     const Token_string & body = statements->get_body();
+     if (body.size() == 3                &&
+         body[0].get_tag() == TOK_ESCAPE &&
+         body[1].get_Class() == TC_END   &&
+         body[2].get_tag() == TOK_RETURN_STATS)
+        {
+          // remove all SI entries up to (including) the next immediate
+          // execution context
+          //
+          for (bool goon = true; goon;)
+              {
+                StateIndicator * si = Workspace::SI_top();
+                if (si == 0)   break;   // SI empty
+
+                goon = si->get_parse_mode() != PM_STATEMENT_LIST;
+                si->escape();   // pop local vars of user defined functions
+                Workspace::pop_SI(LOC);
+              }
+
+          delete statements;
+          return;
+        }
+   }
+
+// statements->print(CERR);
+
+   // push a new context for the statements.
+   //
+   Workspace::push_SI(statements, LOC);
+   finish_context();
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Command::finish_context()
+{
+   for (;;)
+       {
+         //
+         // NOTE that the entire SI may change while executing this loop.
+         // We should therefore avoid references to SI entries.
+         //
+         Token token = Workspace::SI_top()->get_executable()->execute_body();
+
+// Q1(token)
+
+         // start over if execution has pushed a new SI entry
+         //
+         if (token.get_tag() == TOK_SI_PUSHED)   continue;
+
+check_EOC:
+         if (Quad_FIO::benchmark_cycles_from)   // a benchmark is ongoing
+            {
+              if (StateIndicator * si = Workspace::SI_top()->get_parent())
+                 {
+                   if (si->is_safe_execution_start())
+                      {
+                        // at this point token is the result of a defined
+                        // function which is being benchmarked. Replace the
+                        // result by the number of CPU cycles executed since
+                        // the start of the benchmark.
+                        //
+                        const uint64_t to = cycle_counter();
+                        const uint64_t from = Quad_FIO::benchmark_cycles_from;
+                        const uint64_t diff = to - from;
+                        Value_P val = IntScalar(diff, LOC);
+                        token.~Token();   // free the value (if any)
+                        new (&token) Token(TOK_APL_VALUE1, val);
+                        si->clear_safe_execution();
+                      }
+                 }
+            }
+         else if (Workspace::SI_top()->is_safe_execution_start())
+            {
+              if (Quad_FIO::benchmark_cycles_from)
+                 {
+                   // ⎕FIO[-1] has started a cycle measurement. Read the CPU
+                   // cycle counter, compute the cycle difference, stop the
+                   // measurement, and return the the cycle difference as int
+                   // scalar...
+                   //
+                   const uint64_t to = cycle_counter();
+                   const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
+                   token.copy(Token(TOK_APL_VALUE1, IntScalar(diff, LOC)), LOC);
+                   Quad_FIO::benchmark_cycles_from = 0;
+                 }
+              else
+                 {
+                   Quad_EC::eoc(token);
+                 }
+            }
+
+         // the far most frequent cases are TC_VALUE and TOK_VOID
+         // so we handle them first.
+         //
+         if (token.get_Class() == TC_VALUE || token.get_tag() == TOK_VOID )
+            {
+              if (Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST)
+                 {
+                   if (InterruptContext::attention_is_raised())
+                      {
+                        InterruptContext::clear_attention_raised(LOC);
+                        InterruptContext::clear_interrupt_raised(LOC);
+                        ATTENTION;
+                      }
+
+                   break;   // will return to calling context
+                 }
+
+              Workspace::pop_SI(LOC);
+
+              // we are back in the calling SI. There should be a TOK_SI_PUSHED
+              // token at the top of stack. Replace it with the result from
+              //  the called (just poped) SI.
+              //
+              {
+                Prefix & prefix = Workspace::SI_top()->get_prefix();
+                Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
+
+                prefix.replace_SI_PUSHED(token);
+              }
+              if (InterruptContext::attention_is_raised())
+                 {
+                   InterruptContext::clear_attention_raised(LOC);
+                   InterruptContext::clear_interrupt_raised(LOC);
+                   ATTENTION;
+                 }
+
+              continue;
+            }
+
+         if (token.get_tag() == TOK_BRANCH_INT ||
+             token.get_tag() == TOK_BRANCH_LAB)
+            {
+              const Function_Line line = Function_Line(token.get_int_val());
+              if (line == Function_Retry                                     &&
+                  Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST &&
+                  Workspace::SI_top()->get_parent())
+                 {
+                   Workspace::pop_SI(LOC);
+                   Workspace::SI_top()->retry(LOC);
+                   continue;
+                 }
+
+              StateIndicator * si = Workspace::SI_top_fun();
+
+              if (si == 0)
+                 {
+                   // an orphan branch (nothing suspended to resume into)
+                   // is normally invalid (lrm p.357: → in immediate
+                   // execution resumes a suspended statement, nothing
+                   // else) -- but an isolated one-statement execution
+                   // explicitly marked as such (Prefix::execute_EA_
+                   // fallback(), lrm p.349 Figure 38: such a branch
+                   // means "flow of execution returns to the invoking
+                   // expression") should simply complete with no
+                   // explicit result instead of erroring.
+                   //
+                   if (Workspace::SI_top()->get_void_on_orphan_branch())
+                      {
+                        token.copy(Token(TOK_VOID), LOC);
+                        goto check_EOC;
+                      }
+
+                    MORE_ERROR() <<
+                    "branch back into function (→N) without suspended function";
+                    SYNTAX_ERROR;   // →N without function,
+                 }
+
+              // a branch returned by ⍎ (e.g. 2+⍎'→3') is only executed if ⍎
+              // is the leftmost primitive of its statement (LRM p.121),
+              // i.e. if nothing of the calling statement is left
+              // (Bugs35 #52)
+              //
+              if (Workspace::SI_top()->get_parse_mode() == PM_EXECUTE)
+                 {
+                   StateIndicator * caller = Workspace::SI_top()->get_parent();
+                   if (caller && caller == si)
+                      {
+                        const Prefix & cp = caller->get_prefix();
+                        const Token_string & body =
+                                             caller->get_executable()->get_body();
+                        // the prefix has already read the token left of
+                        // ⍎ (the lookahead): the END of the statement if
+                        // ⍎ is leftmost. An assignment Z←⍎'→N' is not a
+                        // primitive and is OK (the old behaviour).
+                        //
+                        // Only for ⍎ (body[pc - 2]), not for ⎕EA, ⎕EC, ...
+                        //
+                        const Prefix_PC pc = cp.get_PC();
+                        const TokenClass left = pc > Prefix_PC_0
+                                              ? body[pc - 1].get_Class()
+                                              : TC_END;
+                        const bool is_execute = pc > Prefix_PC_0 + 1 &&
+                              body[pc - 2].get_tag() == TOK_F1_EXECUTE;
+                        const bool leftmost = cp.ssize() == 1 &&
+                                              (left == TC_END ||
+                                               left == TC_ASSIGN);
+                        if (is_execute && !leftmost)
+                           {
+                             Workspace::pop_SI(LOC);   // the ⍎ context
+                             MORE_ERROR() << "⍎ of a branch is not the"
+                                             " leftmost primitive";
+                             SYNTAX_ERROR;
+                           }
+                      }
+                 }
+
+              // pop contexts above defined function
+              //
+              while (si != Workspace::SI_top())   Workspace::pop_SI(LOC);
+
+              si->goon(line, LOC);
+              continue;
+            }
+
+         if (token.get_tag() == TOK_ESCAPE)
+            {
+              // remove all SI entries up to (including) the next immediate
+              // execution context. If the → came from ⍎ (⍎'→') then the
+              // statement containing that ⍎ does not count: ⍎'→' in
+              // immediate execution is → (LRM p.121, Bugs35 #52).
+              //
+              const StateIndicator * execute_caller = 0;
+              if (Workspace::SI_top() &&
+                  Workspace::SI_top()->get_parse_mode() == PM_EXECUTE)
+                 execute_caller = Workspace::SI_top()->get_parent();
+
+              for (bool goon = true; goon;)
+                  {
+                    StateIndicator * si = Workspace::SI_top();
+                    if (si == 0)   break;   // SI empty
+
+                    goon = si->get_parse_mode() != PM_STATEMENT_LIST ||
+                           si == execute_caller;
+                    si->escape();   // pop local vars of user defined functions
+                    Workspace::pop_SI(LOC);
+                  }
+              return;
+            }
+
+         if (token.get_tag() == TOK_ERROR)
+            {
+              if (token.get_int_val() == E_COMMAND_PUSHED)
+                 {
+                   Workspace::pop_SI(LOC);
+                   UCS_string pushed_command = Workspace::get_pushed_Command();
+                   process_line(pushed_command, 0);
+                   pushed_command.clear();
+                   Workspace::push_Command(pushed_command);   // clear in
+                   return;
+                 }
+
+              expression_failed = true;
+
+              // clear attention and interrupt flags
+              //
+              InterruptContext::clear_attention_raised(LOC);
+              InterruptContext::clear_interrupt_raised(LOC);
+
+              // check for safe execution mode. Unroll all SI entries that
+              // have the same safe_execution_depth, except the last
+              // unroll the SI stack.
+              //
+              if (Workspace::SI_top()->get_safe_execution_depth())
+                 {
+                   // SI_top() is in save execution mode. Pop it and all
+                   // callers with the same get_safe_execution_depth().
+                   //
+                   // after pop'ing the SI entries only the original SI
+                   // (which has set the save execution mode) shall remain
+                   // the SI stack.
+                   //
+                   // Capture the innermost (about-to-be-popped) frame's
+                   // error and restore it onto the surviving frame once
+                   // unwound, the same way the nonsuspendable-unwind case
+                   // below already does -- without this, Quad_EC::eoc()
+                   // (called via check_EOC right after) read whatever
+                   // stale error happened to already be sitting on the
+                   // surviving frame instead of the one that was actually
+                   // just thrown, showing the wrong ⎕EM[1;] text and/or
+                   // losing ⎕EM[2;]/[3;] whenever evaluating ⎕EC's B
+                   // pushed one or more intermediate SI frames (e.g. any
+                   // real statement execution, or a called function).
+                   // See Bugs27 #57.
+                   //
+                   StateIndicator * si = Workspace::SI_top();
+                   const int sex_level = si->get_safe_execution_depth();
+                   Error err = StateIndicator::get_error(si);
+                   while (si->get_parent() && sex_level ==
+                          si->get_parent()->get_safe_execution_depth())
+                      {
+                        si = si->get_parent();
+                        Workspace::pop_SI(LOC);
+                      }
+                   StateIndicator::get_error(Workspace::SI_top()) = err;
+
+                    goto check_EOC;
+                  }
+
+              // if suspend is not allowed then pop all SI entries that
+              // don't allow suspend. Property 1 (nonsuspendable) is
+              // inherited from every calling )SI entry too (apl2lrm.txt
+              // p.360-361 "or-ing"), not just each entry's own -- so a
+              // whole chain of callers under a nonsuspendable one must
+              // unwind together, not just the innermost frame.
+              //
+              if (Workspace::SI_top()->get_inherited_exec_property(1))
+                 {
+                    Error err = StateIndicator::get_error(Workspace::SI_top());
+                    while (Workspace::SI_top()->get_inherited_exec_property(1))
+                       {
+                         Workspace::pop_SI(LOC);
+                       }
+
+                   if (Workspace::SI_top())
+                      {
+                        StateIndicator::get_error(Workspace::SI_top()) = err;
+                      }
+                 }
+
+              if (Workspace::get_error()->get_print_loc() == 0)   // not printed
+                 {
+                   Workspace::get_error()->print(CERR, LOC);
+                 }
+              else
+                 {
+                    // CERR << "ERROR printed twice" << endl;
+                 }
+
+              if (Workspace::SI_top()->get_level() == 0)
+                 {
+                   // IndexExpr::erase_stale() is gone: it used to delete
+                   // every IndexExpr in the ring unconditionally, live or
+                   // not, which is what caused Bugs8 #1 (Blake McBride).
+                   // IndexExpr freeing stays where it already correctly
+                   // happens (Prefix::clean_up(), the reduce_*() sites).
+                   //
+                   Value::erase_stale(LOC);
+
+                   // Bugs28 #96 investigated, NOT fixed here -- see
+                   // project_blake_bugs28.md: popping this level-0 frame
+                   // right after reporting (which does stop )SI from
+                   // growing without bound across repeated top-level
+                   // errors) was tried and reverted -- ⎕ET/⎕EM (Quad_ET.cc/
+                   // SystemVariable.cc's Quad_EM) read the failed
+                   // statement's Error directly off this same
+                   // StateIndicator object, walking up from Workspace::
+                   // SI_top(); popping it away loses that Error entirely,
+                   // so ⎕ET/⎕EM after ANY top-level error (not just the
+                   // repeated-error growth case) silently went back to
+                   // "0 0"/empty instead of the real error info -- a much
+                   // bigger regression than the growth bug itself
+                   // (confirmed live: 6 testcase files regressed,
+                   // Quad_ET/Quad_ES/Lambda/Reshape/SaveLoad/Quad_FX.tc).
+                   // A real fix needs the last-error info to survive
+                   // independently of the full StateIndicator (FIFO,
+                   // local variables, Prefix, ...) that )SI growth is
+                   // actually about -- e.g. a small separate "last
+                   // immediate-execution error" record ⎕ET/⎕EM can read
+                   // after the heavyweight frame is gone -- which is a
+                   // real design decision, not a one-line fix.
+                   //
+                 }
+              return;
+            }
+
+         // we should not come here.
+         //
+         Q1(token)  Q1(token.get_Class())  Q1(token.get_tag())  FIXME;
+       }
+
+   // pop the context for the statements
+   //
+   Workspace::pop_SI(LOC);
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Command::is_lib_ref(const UCS_string & lib)
+{
+   if (lib.size() == 1)   // single char: lib number
+      {
+        if (Avec::is_digit(lib.front()))   return true;
+      }
+
+   if (lib.front() == UNI_FULLSTOP)   return true;
+
+   loop(l, lib.size())
+      {
+        const Unicode uni = lib[l];
+        if (uni == UNI_SLASH)       return true;
+        if (uni == UNI_BACKSLASH)   return true;
+      }
+
+   return false;
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Command::parse_from_to(UCS_string & from, UCS_string & to,
+                       const UCS_string & user_arg)
+{
+   // parse user_arg which is one of the following:
+   //
+   // 1.   (empty)
+   // 2.   FROMTO
+   // 3a.  FROM -
+   // 3b.       - TO
+   // 3c.  FROM - TO
+   //
+   from.clear();
+   to.clear();
+
+int s = 0;
+bool got_minus = false;
+
+   // skip spaces before from
+   //
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
+
+   if (s == user_arg.ssize())   return false;   // case 1.: OK
+
+   // copy left of '-' to from
+   //
+   while (s < user_arg.ssize()  &&
+              user_arg[s] > ' ' &&
+              user_arg[s] != '-')  from << user_arg[s++];
+
+   // skip spaces after from
+   //
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
+
+   if (s < user_arg.ssize() && user_arg[s] == '-')
+      {
+        ++s;
+        got_minus = true;
+      }
+
+   // skip spaces before to
+   //
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
+
+   // copy right of '-' to from
+   //
+   while (s < user_arg.ssize() && user_arg[s] > ' ')  to << user_arg[s++];
+
+   // skip spaces after to
+   //
+   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
+
+   if (s < user_arg.ssize())   return true;   // error: non-blank after to
+
+   if (!got_minus)   to = from;   // case 2.
+
+   if (!(from.size() || to.size()))   return true;   // error: single '-'
+
+   return false;   // OK
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Command::process_line(UCS_string & line, ostream * out)
+{
+   line.remove_leading_whitespaces();
+   if (line.size() == 0)           return;   // empty input line
+
+   /* at this point, line is not empty and starts with a non-blank.
+      The first character line[0] determines the nature of the line:
+
+      ')':       regular APL command
+      ']':       debug command (a GNU APL extension of IBM APL2)
+      '∇':       invocaton of the Nabla function editor
+      '⍝':       full line APL comment
+      '#':       full line APL comment (a GNU APL extension of IBM APL2)
+      otherwise: APL expression in immediate execution mode
+    */
+
+   switch(line[0])
+      {
+         case UNI_R_PARENT:      // regular command, e.g. )SI
+              if (out == 0)   out = &COUT;
+              do_APL_command(*out, line);
+              if (line.size())   break;
+              return;
+
+         case UNI_R_BRACK:       // debug command, e.g. ]LOG
+              if (out == 0)   out = &CERR;
+              do_APL_command(*out, line);
+              if (line.size())   break;
+              return;
+
+         case UNI_NABLA:         // Nabla editor, e.g. ∇FUN
+              Nabla::edit_function(line);
+              return;
+
+         case UNI_NUMBER_SIGN:         // e.g. # comment
+         case UNI_COMMENT:             // e.g. ⍝ comment
+              return;
+
+        default: break;
+      }
+
+   do_APL_expression(line, Value_P());
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Command::process_lines()
+{
+UCS_string line;
+Multi_line_SM sm;
+ShapeItem multi_pos;
+UCS_string_vector content;   // for new-style multiline strings
+
+   {
+     bool eof = false;
+     InputMux::get_line(LIM_ImmediateExecution, Workspace::get_prompt(),
+                              line, eof, LineInput::get_history());
+     // InputMux::get_line() has removed the trailing \n.
+
+     if (eof)   CERR << "EOF at " << LOC << endl;
+
+     multi_pos = line.multi_pos();
+     if (multi_pos == -1)   // OUTSIDE
+        {
+          process_line(line, 0);
+          return;
+        }
+     content.push_back(UCS_string(line, 0, multi_pos));
+     sm.next(line[multi_pos]);
+   }
+
+   multiline_status = MLS_Start_of_multi;
+
+const bool multi_literal = sm.in_literal();
+
+const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
+
+   for (bool subsequent = false; ; subsequent = true)
+       {
+         if (subsequent)   // otherwise we use the line received above
+            {
+              line.clear();
+
+              bool eof = false;
+              InputMux::get_line(LIM_ImmediateExecution, prompt,
+                                 line, eof, LineInput::get_history());
+                // InputMux::get_line() has removed the trailing \n.
+
+              if (eof) CERR << "EOF at " << LOC << endl;
+
+              multi_pos = line.multi_pos();
+              if (multi_pos != -1)   // some triple
+                 {
+                    sm.next(line[multi_pos]);
+                 }
+              content.push_back(multi_literal ? line : line.do_escape(true));
+            }
+
+         if (!sm.inside_multi())   break;
+       }
+
+   multiline_status = MLS_APL_text;
+
+const UCS_string suffix(line, multi_pos + 3);
+
+    multiline_start = 0;   // inform IO_Files.cc
+
+   if (multi_literal)   // literal (not string)
+      {
+        // top-level multiline literals are recursive and therefore more
+        // complicated tnan multiline strings
+        //
+        content[0] << "<<<";
+
+        Lit_DB literals;
+
+        if (Parser::replace_multi_line_strings(content, literals, false))
+           SYNTAX_ERROR;
+        if (Parser::replace_multi_line_literals(content, literals, false))
+           SYNTAX_ERROR;
+
+        // remove trailing empty lines (which would mess up the shape
+        // computation)
+        while (content.size() && !content.back().size())   content.pop_back();
+
+        if (literals.size() != 1)
+           {
+             MORE_ERROR() << "Multiline literal has more than one ("
+                          << literals.size() << "items";
+             SYNTAX_ERROR;
+           }
+
+        Value_P literal = literals.pull_last();
+        do_APL_expression(content[0], literal);
+      }
+   else                 // string (not literal)
+      {
+        // top-level multiline strings are flat and therefore much simpler
+        // tnan multiline literals, In particular there is no need for
+        // Parser::replace_multi_line_strings().
+        //
+        if (content.size() == 2)        // special case:  ««« »»»
+           {
+             const UTF8_string empty(" (0⍴⊂\"\")");   // 0⍴⊂""
+             content[0] << UCS_string(empty);
+           }
+        else if (content.size() == 3)   // special case: ««« string »»»
+          {
+            const UTF8_string encl("(,⊂\"");  // enclose content...
+            content[0] << UCS_string(encl) << content[1] << "\")";
+          }
+        else                            // general case: ««« string ... »»»
+          {
+            content[0] << "(";
+            for (size_t a = 1; a < content.size() - 1; ++a)
+                {
+                  if (a > 1)   content[0] << " ";
+                  content[0] << "\"" << content[a] << "\"";
+                }
+            content[0] << ")";
+          }
+
+        content[0] << " " << suffix;
+        process_line(content[0], 0);
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 Command::check_params(ostream & out, const char * command, int argc,
                       const char * args)
@@ -370,326 +986,7 @@ UCS_string args_ucs(args_utf);
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
-void
-Command::do_APL_expression(UCS_string & line, Value_P literal)
-{
-   ++APL_expression_count;
-
-   COUT << left << dec << nouppercase << setfill(' ');
-   Workspace::more_error().clear();
-
-Executable * statements = 0;
-   try
-      {
-        statements = StatementList::fix(line, literal, LOC);
-      }
-   catch (Error err)
-      {
-        bool plus = Workspace::more_error().size();   // assume + needed
-        const char * error_name = Error::error_name(err.get_error_code());
-        if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
-        if (Workspace::more_error().size() &&
-               Workspace::more_error().back() == UNI_PLUS)
-           plus = false; // dito.
-
-        UERR << error_name;
-        if (plus)   UERR << UNI_PLUS;
-        UERR << endl;
-        if (err.get_error_line_2().size())
-           {
-             COUT << "      " << err.get_error_line_2() << endl
-                  << "      " << err.get_error_line_3() << endl;
-           }
-
-        err.print(UERR, LOC);
-        delete statements;
-        return;
-      }
-   catch (...)
-      {
-        CERR << "*** Command::process_line() caught other exception ***"
-             << endl;
-        delete statements;
-        cmd_OFF(0);
-      }
-
-   if (statements == 0)   // StatementList::fix() failed
-      {
-        COUT << "main: Parse error";
-        if (Workspace::more_error().size())   COUT << "+";
-        else                                  COUT << ".";
-        COUT << endl;
-        return;
-      }
-
-   // At this point, the user command was parsed correctly.
-   // check for Escape (→)
-   //
-   {
-     const Token_string & body = statements->get_body();
-     if (body.size() == 3                &&
-         body[0].get_tag() == TOK_ESCAPE &&
-         body[1].get_Class() == TC_END   &&
-         body[2].get_tag() == TOK_RETURN_STATS)
-        {
-          // remove all SI entries up to (including) the next immediate
-          // execution context
-          //
-          for (bool goon = true; goon;)
-              {
-                StateIndicator * si = Workspace::SI_top();
-                if (si == 0)   break;   // SI empty
-
-                goon = si->get_parse_mode() != PM_STATEMENT_LIST;
-                si->escape();   // pop local vars of user defined functions
-                Workspace::pop_SI(LOC);
-              }
-
-          delete statements;
-          return;
-        }
-   }
-
-// statements->print(CERR);
-
-   // push a new context for the statements.
-   //
-   Workspace::push_SI(statements, LOC);
-   finish_context();
-}
-//----------------------------------------------------------------------------
-void
-Command::finish_context()
-{
-   for (;;)
-       {
-         //
-         // NOTE that the entire SI may change while executing this loop.
-         // We should therefore avoid references to SI entries.
-         //
-         Token token = Workspace::SI_top()->get_executable()->execute_body();
-
-// Q1(token)
-
-         // start over if execution has pushed a new SI entry
-         //
-         if (token.get_tag() == TOK_SI_PUSHED)   continue;
-
-check_EOC:
-         if (Quad_FIO::benchmark_cycles_from)   // a benchmark is ongoing
-            {
-              if (StateIndicator * si = Workspace::SI_top()->get_parent())
-                 {
-                   if (si->is_safe_execution_start())
-                      {
-                        // at this point token is the result of a defined
-                        // function which is being benchmarked. Replace the
-                        // result by the number of CPU cycles executed since
-                        // the start of the benchmark.
-                        //
-                        const uint64_t to = cycle_counter();
-                        const uint64_t from = Quad_FIO::benchmark_cycles_from;
-                        const uint64_t diff = to - from;
-                        Value_P val = IntScalar(diff, LOC);
-                        token.~Token();   // free the value (if any)
-                        new (&token) Token(TOK_APL_VALUE1, val);
-                        si->clear_safe_execution();
-                      }
-                 }
-            }
-         else if (Workspace::SI_top()->is_safe_execution_start())
-            {
-              if (Quad_FIO::benchmark_cycles_from)
-                 {
-                   // ⎕FIO[-1] has started a cycle measurement. Read the CPU
-                   // cycle counter, compute the cycle difference, stop the
-                   // measurement, and return the the cycle difference as int
-                   // scalar...
-                   //
-                   const uint64_t to = cycle_counter();
-                   const uint64_t diff = to - Quad_FIO::benchmark_cycles_from;
-                   token = Token(TOK_APL_VALUE1, IntScalar(diff, LOC));
-                   Quad_FIO::benchmark_cycles_from = 0;
-                 }
-              else
-                 {
-                   Quad_EC::eoc(token);
-                 }
-            }
-
-         // the far most frequent cases are TC_VALUE and TOK_VOID
-         // so we handle them first.
-         //
-         if (token.get_Class() == TC_VALUE || token.get_tag() == TOK_VOID )
-            {
-              if (Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST)
-                 {
-                   if (InterruptContext::attention_is_raised())
-                      {
-                        InterruptContext::clear_attention_raised(LOC);
-                        InterruptContext::clear_interrupt_raised(LOC);
-                        ATTENTION;
-                      }
-
-                   break;   // will return to calling context
-                 }
-
-              Workspace::pop_SI(LOC);
-
-              // we are back in the calling SI. There should be a TOK_SI_PUSHED
-              // token at the top of stack. Replace it with the result from
-              //  the called (just poped) SI.
-              //
-              {
-                Prefix & prefix = Workspace::SI_top()->get_prefix();
-                Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
-
-                new (&prefix.tos().get_token()) Token(token);
-              }
-              if (InterruptContext::attention_is_raised())
-                 {
-                   InterruptContext::clear_attention_raised(LOC);
-                   InterruptContext::clear_interrupt_raised(LOC);
-                   ATTENTION;
-                 }
-
-              continue;
-            }
-
-         if (token.get_tag() == TOK_BRANCH)
-            {
-              const Function_Line line = Function_Line(token.get_int_val());
-              if (line == Function_Retry                                     &&
-                  Workspace::SI_top()->get_parse_mode() == PM_STATEMENT_LIST &&
-                  Workspace::SI_top()->get_parent())
-                 {
-                   Workspace::pop_SI(LOC);
-                   Workspace::SI_top()->retry(LOC);
-                   continue;
-                 }
-
-              StateIndicator * si = Workspace::SI_top_fun();
-
-              if (si == 0)
-                 {
-                    MORE_ERROR() <<
-                    "branch back into function (→N) without suspended function";
-                    SYNTAX_ERROR;   // →N without function,
-                 }
-
-              // pop contexts above defined function
-              //
-              while (si != Workspace::SI_top())   Workspace::pop_SI(LOC);
-
-              si->goon(line, LOC);
-              continue;
-            }
-
-         if (token.get_tag() == TOK_ESCAPE)
-            {
-              // remove all SI entries up to (including) the next immediate
-              // execution context
-              //
-              for (bool goon = true; goon;)
-                  {
-                    StateIndicator * si = Workspace::SI_top();
-                    if (si == 0)   break;   // SI empty
-
-                    goon = si->get_parse_mode() != PM_STATEMENT_LIST;
-                    si->escape();   // pop local vars of user defined functions
-                    Workspace::pop_SI(LOC);
-                  }
-              return;
-            }
-
-         if (token.get_tag() == TOK_ERROR)
-            {
-              if (token.get_int_val() == E_COMMAND_PUSHED)
-                 {
-                   Workspace::pop_SI(LOC);
-                   UCS_string pushed_command = Workspace::get_pushed_Command();
-                   process_line(pushed_command, 0);
-                   pushed_command.clear();
-                   Workspace::push_Command(pushed_command);   // clear in
-                   return;
-                 }
-
-              // clear attention and interrupt flags
-              //
-              InterruptContext::clear_attention_raised(LOC);
-              InterruptContext::clear_interrupt_raised(LOC);
-
-              // check for safe execution mode. Unroll all SI entries that
-              // have the same safe_execution_depth, except the last
-              // unroll the SI stack.
-              //
-              if (Workspace::SI_top()->get_safe_execution_depth())
-                 {
-                   // SI_top() is in save execution mode. Pop it and all
-                   // callers with the same get_safe_execution_depth().
-                   //
-                   // after pop'ing the SI entries only the original SI
-                   // (which has set the save execution mode) shall remain
-                   // the SI stack.
-                   //
-                   StateIndicator * si = Workspace::SI_top();
-                   const int sex_level = si->get_safe_execution_depth();
-                   while (si->get_parent() && sex_level ==
-                          si->get_parent()->get_safe_execution_depth())
-                      {
-                        si = si->get_parent();
-                        Workspace::pop_SI(LOC);
-                      }
-
-                    goto check_EOC;
-                  }
-
-              // if suspend is not allowed then pop all SI entries that
-              // don't allow suspend
-              //
-              if (Workspace::SI_top()->get_executable()->cannot_suspend())
-                 {
-                    Error err = StateIndicator::get_error(Workspace::SI_top());
-                    while (Workspace::SI_top()->get_executable()
-                                              ->cannot_suspend())
-                       {
-                         Workspace::pop_SI(LOC);
-                       }
-
-                   if (Workspace::SI_top())
-                      {
-                        StateIndicator::get_error(Workspace::SI_top()) = err;
-                      }
-                 }
-
-              if (Workspace::get_error()->get_print_loc() == 0)   // not printed
-                 {
-                   Workspace::get_error()->print(CERR, LOC);
-                 }
-              else
-                 {
-                    // CERR << "ERROR printed twice" << endl;
-                 }
-
-              if (Workspace::SI_top()->get_level() == 0)
-                 {
-                   Value::erase_stale(LOC);
-                   IndexExpr::erase_stale(LOC);
-                 }
-              return;
-            }
-
-         // we should not come here.
-         //
-         Q1(token)  Q1(token.get_Class())  Q1(token.get_tag())  FIXME;
-       }
-
-   // pop the context for the statements
-   //
-   Workspace::pop_SI(LOC);
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
@@ -705,1613 +1002,4 @@ UCS_string_vector result;
         result.push_back(token_ucs);
       }
 }
-//----------------------------------------------------------------------------
-void
-Command::cmd_BOXING(ostream & out, const UCS_string & arg)
-{
-int format = arg.atoi();
-
-   if (arg.size() == 0)
-      {
-        out << "]BOXING ";
-        if (boxing_format == 0) out << "OFF";
-        else out << boxing_format;
-        out << endl;
-        return;
-      }
-
-   if (arg.starts_iwith("OFF"))   format = 0;
-   switch (format)
-      {
-        case -29:
-        case -25: case -24: case -23:
-        case -22: case -21: case -20:
-        case -9: case  -8: case  -7:
-        case -4: case  -3: case  -2:
-        case  0:
-        case  2: case   3: case   4:
-        case  7: case   8: case   9:
-        case 20: case  21: case  22:
-        case 23: case  24: case  25:
-        case 29:
-                 boxing_format = format;
-                 return;
-      }
-
-   out << "BAD ]BOXING PARAMETER+" << endl;
-   MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
-      "  Valid parameters are OFF, N, and -N with\n"
-      "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_CHECK(ostream & out, const UCS_string & arg)
-{
-bool show_OK = true;   // assume more verbose output
-   if (arg.size())   // check with argument (supposedly BRIEF).
-      {
-        UCS_string arg0(arg);
-        arg0.remove_leading_and_trailing_whitespaces();
-        const UCS_string brief(U"BRIEF");
-        show_OK = arg0.compare(brief) != COMP_EQ;   // not BRIEF
-        if (show_OK)   // still show_OK
-           {
-             out << arg << "? Expecting BRIEF." << endl;
-             return;
-
-           }
-      }
-   // 1. erase stale functions from failed ⎕EX
-   //
-   {
-     bool erased = false;
-     if (const int stale = Workspace::cleanup_expunged(CERR, erased))
-        {
-          out << "WARNING - " << stale << " stale functions ("
-               << (erased ? "" : "not ") << "erased)" << endl;
-        }
-     else if (show_OK)
-        {
-          out << "OK      - no stale functions" << endl;
-        }
-   }
-
-   // 2. print stale values (if any)
-   //
-   {
-     if (const int stale = Value::print_stale(CERR))
-        {
-          out << "ERROR   - " << stale << " stale values" << endl;
-          IO_Files::apl_error(LOC);
-        }
-     else if (show_OK)
-        {
-          out << "OK      - no stale values" << endl;
-        }
-   }
-
-   // 3. print stale index expressions (if any)
-   {
-     if (const int stale = IndexExpr::print_stale(CERR))
-        {
-          out << "ERROR   - " << stale << " stale indices" << endl;
-          IO_Files::apl_error(LOC);
-        }
-     else if (show_OK)
-        {
-          out << "OK      - no stale indices" << endl;
-        }
-   }
-
-   // 4. discover duplicate parents. In the old clone() scheme every nested
-   //    value has (at most) one parent. In the new clone() scheme, however,
-   //    a nested value can be reused and have multiple parents.
-   {
-#ifndef NEW_CLONE   // old clone
-     // 4a. create a { parent = 0, value } vector<val_val> of all values
-     //
-     std::vector<val_val> val_vals;
-     ShapeItem duplicate_parents = 0;
-     for (const DynamicObject * obj =
-                DynamicObject::get_all_values()->get_next();
-          obj != DynamicObject::get_all_values(); obj = obj->get_next())
-         {
-           const Value * val = static_cast<const Value *>(obj);
-
-           val_val vv = { 0, val };   // no parent
-           val_vals.push_back(vv);
-         }
-
-     // 4b. sort vector<val_val> val_vals by address so that we can search it.
-     //
-     Heapsort<val_val>::sort(&val_vals.front(), val_vals.size(), 0,
-                             &val_val::greater);
-     loop(v, (val_vals.size() - 1))
-         Assert(&val_vals[v].child < &val_vals[v + 1].child);
-
-      // 4c. set parents of pointer cells
-      //
-      loop(v, val_vals.size())   // for every .child (acting as parent here)
-          {
-            const Value * val = val_vals[v].child;
-            const ShapeItem ec = val->nz_element_count();
-            loop(e, ec)   // for every ravel cell of the (parent-) value
-                {
-                  const Cell & cP = val->get_cravel(e);
-                  if (!cP.is_pointer_cell())   continue;   // not a parent
-
-                  const Value * sub = cP.get_pointer_value().get();
-                  Assert1(sub);
-
-                  val_val * vvp = reinterpret_cast<val_val *>
-                       Heapsort<val_val>::
-                        search(sub, val_vals, val_val::compare, 0);
-                  Assert(vvp);
-                  if (vvp->parent == 0)   // child has no parent (OK)
-                     {
-                       vvp->parent = val;
-                       continue;
-                     }
-
-                  // the child already has a parent (which is bad).
-                  // print its history to help figuring why.
-                  //
-                  ++duplicate_parents;
-                  out << "Value * vvp=" << voidP(vvp) << " already has parent "
-                      << voidP(vvp->parent) << " when checking Value * val="
-                      << voidP(vvp) << endl;
-
-                  out << "History of the child:" << endl;
-                  VH_entry::print_history(out, *vvp->child, LOC);
-                  out << "History of the first parent:" << endl;
-                  VH_entry::print_history(out, *vvp->parent, LOC);
-                  out << "History of the second parent:" << endl;
-                  VH_entry::print_history(out, *val, LOC);
-                  out << endl;
-               }
-          }
-
-     if (duplicate_parents)
-          {
-            out << "ERROR   - " << duplicate_parents
-                << " duplicate parents" << endl;
-            IO_Files::apl_error(LOC);
-          }
-#endif
-          {
-            if (show_OK)
-               out << "OK      - no duplicate parents" << endl;
-          }
-   }
-
-   // 5. discover strange Cells and counters.
-   //
-   Value::check_all_Cells(out);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_CLEAR(ostream & out)
-{
-   Workspace::clear_WS(out, false);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_CONTINUE(ostream & out)
-{
-const UCS_string wsname(U"CONTINUE");
-   Workspace::wsid(out, wsname, LIB_NONE, false);     // )WSID CONTINUE
-const LibRef_name lib_name(wsname, false);
-   Workspace::save_WS(out, lib_name, true);           // )SAVE
-   cmd_OFF(0);                                        // )OFF
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
-{
-LibRef libref = LIB0;   // default library reference num to copy from
-
-   if (args.size() == 0)   // at least workspace name is required
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "missing workspace name in command )COPY or )PCOPY";
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-      }
-
-   // process and skip the optional library number
-   {
-     const Unicode lib = args.front()[0];
-     if (args.size() > 1 && Avec::is_digit(lib) && args.front().size() == 1)
-        {
-          libref = LibRef(lib - '0');
-          args.erase(0);
-        }
-   }
-
-UCS_string wsname = args.front();
-   args.erase(0);
-   LibRef_name lib_name(libref, wsname);
-   Workspace::copy_WS(out, CERR, lib_name, args, protection);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
-{
-   if (args.size() > 2)   // too many arguments
-      {
-        MORE_ERROR() << "too many parameters in command ]COPY_ONCE";
-        return;
-      }
-
-LibRef libref = LIB_NONE;   // default library reference number to copy from
-   if (args.size() == 0)   // no argument means: display current table
-      {
-        if (copy_once_table.size() == 0)
-           {
-             out << "There were no )COPY_ONCE workspaces copied." << endl;
-             return;
-           }
-
-        out << "There were " << copy_once_table.size()
-            << " )COPY_ONCE workspaces copied:" << endl;
-        UCS_string_vector usv;
-        loop(row, copy_once_table.size())
-            {
-              const UCS_string & src = copy_once_table[row];
-              UCS_string ws(UNI_SPACE);
-              ws << src.front();      // wsname
-              ws << UNI_SPACE;
-              ws << UCS_string(src, 2, src.size() - 2);
-              ws << UNI_SPACE;
-              usv.push_back(ws);
-            }
-        usv.print_table(out, 1);
-        return;
-      }
-
-   // process and skip the optional library number
-   //
-   if (args.size() == 2)
-      {
-        const UCS_string & arg0 = args.front();   // first argument
-        const Unicode lib = arg0.front();         // first character
-        if (args.size() > 1 && Avec::is_digit(lib) && args.front().size() == 1)
-           {
-             libref = LibRef(lib - '0');
-             args.erase(0);
-           }
-      }
-
-   Assert(args.size() == 1);   // only wsname left
-const UCS_string wsname(args.front());
-   args.erase(0);
-
-   // lib_wsname is the name in the copy_once_table
-   //
-UCS_string lib_wsname(Unicode(libref + UNI_0));
-   lib_wsname << UNI_UNDERSCORE;
-   lib_wsname << wsname;
-
-   // silently return if wsname is already contained in the copy_once_table
-   //
-   if (copy_once_table.contains(lib_wsname))   return;
-
-   // add it to the table;
-   //
-   out << "NEW )COPY_ONCE workspace: ";
-   if (libref)   out << libref << " ";
-   out << wsname << endl;
-
-   copy_once_table.push_back(lib_wsname);
-   LibRef_name lib_name(libref, wsname);
-   Workspace::copy_WS(out, CERR, lib_name, args, false);
-}
-//----------------------------------------------------------------------------
-void
-Command::clear_copy_once_table()
-{
-   if (const size_t count = copy_once_table.size())
-      {
-        copy_once_table.clear();
-        CERR << ")COPY_ONCE table cleared (" << count << " entries)" << endl;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_DOXY(ostream & out, const UCS_string_vector & args)
-{
-UTF8_string root("/tmp");
-   if (args.size())   root = UTF8_string(args.front());
-
-   try
-     {
-       Doxy doxy(out, root);
-       doxy.gen();
-
-       if (doxy.get_errors())
-          out << "Command ]DOXY failed (" << doxy.get_errors() << " errors)"
-              << endl;
-      else
-         out << "Command ]DOXY finished successfully." << endl
-             << "    The generated documentation was stored in directory "
-             << doxy.get_root_dir() << endl
-             << "    You may now browse it from file://"
-             << doxy.get_root_dir()
-             << "/index.html" << endl;
-     }
-   catch (...) {}
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
-{
-   // Command is:
-   //
-   // )DROP wsname
-   // )DROP libnum wsname
-
-const LibRef_name lib_name(out, lib_ws, false);
-   if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
-
-const UTF8_string filename = LibPaths::get_filename(lib_name, true,
-                                                    ".xml", ".apl");
-
-const int result = unlink(filename.c_str());
-   if (result)
-      {
-        out << lib_name.get_name() << " NOT DROPPED: "
-            << strerror(errno) << "+" << endl;
-        MORE_ERROR() << "could not unlink file " << filename;
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-      }
-   else
-      {
-        Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
-                  bool html, bool silent)
-{
-   CHECK_SECURITY(disable_SAVE_command);
-
-   // Command is:
-   //
-   // )DUMP
-   // )DUMP workspace
-   // )DUMP lib workspace
-
-   if (args.size() > 0)   // workspace or lib workspace
-      {
-        const LibRef_name lib_name(out, args, false);
-        if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
-        Workspace::dump_WS(out, lib_name, html, silent);
-        return;
-      }
-
-   // )DUMP: use )WSID unless it is CLEAR WS
-   //
-   if (Workspace::is_CLEAR_WS())
-      { 
-        // don't dump CLEAR WS
-        //
-        COUT << "NOT DUMPED: THIS WS IS CLEAR WS+" << endl;
-        MORE_ERROR() <<
-        "the workspace was not dumped because 'CLEAR WS' is a special\n"
-        "workspace name that cannot be dumped. "
-        "First create WS name with )WSID <name>."; 
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-      }
-
-LibRef_name wsid  = Workspace::get_WSID();
-   if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
-   Workspace::dump_WS(out, wsid, html, silent);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
-{
-   Workspace::erase_symbols(out, args);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
-{
-#ifndef cfg_PERFORMANCE_COUNTERS_WANTED
-   out << "\n"
-<< "Command ]PSTAT is not available, since performance counters were not\n"
-"configured for this APL interpreter. To enable performance counters (which\n"
-"will slightly decrease performance), recompile the interpreter as follows:"
-
-<< "\n\n"
-"   ./configure PERFORMANCE_COUNTERS_WANTED=yes (... "
-<< "other configure options"
-<< ")\n"
-"   make\n"
-"   make install (or try: src/apl to test without installing)\n"
-"\n"
-
-<< "above the src directory."
-<< "\n";
-
-   return;
-#endif
-
-   if (arg.starts_iwith("CLEAR"))
-      {
-        out << "Performance counters cleared" << endl;
-        Performance::reset_all();
-        return;
-      }
-
-   if (arg.starts_iwith("SAVE"))
-      {
-        const char * filename = "./PerformanceData.def";
-        ofstream outf(filename, ofstream::out);
-        if (!outf.is_open())
-           {
-             out << "opening " << filename
-                 << " failed: " << strerror(errno) << endl;
-             return;
-           }
-
-        out << "Writing performance data to file " << filename << endl;
-        Performance::save_data(out, outf);
-        return;
-      }
-
-Pfstat_ID iarg = PFS_ALL;
-   if (arg.size() > 0)   iarg = Pfstat_ID(arg.atoi());
-
-   Performance::print(iarg, out);
-}
-//----------------------------------------------------------------------------
-void
-Command::primitive_help(ostream & out, const char * arg, int arity,
-                        const char * prim,  const char * name,
-                        const char * brief, const char * descr)
-{
-   if (strcmp(arg, prim))   return;
-
-   if (arity == -6)
-      {
-        out << "   " << name << ":   " << brief << endl
-            << "    " << descr << endl;
-        return;
-      }
-
-   out << "   " << name << " is a ";
-   switch(arity)
-      {
-        case -5: out << "quasi-dyadic operator:\n"
-                        "   Z ← A (∘ . G) B";               break;
-        case -4: out << "dyadic primitive operator:\n"
-                        "   Z ← A (F . G) B";               break;
-        case -3: out << "dyadic primitive operator:\n"
-                        "   Z ← (F " << prim << " G) B";    break;
-        case -2: out << "monadic primitive operator:\n"
-                        "   Z ← A (F " << prim << ") B";     break;
-        case -1: out << "monadic primitive operator:\n"
-                        "   Z ← (F " << prim << ") B";       break;
-        case  0: out << "niladic primitive function:\n"
-                        "   Z ← " << prim;                    break;
-        case  1: out << "monadic primitive function:\n"
-                        "   Z ← " << prim << " B";            break;
-        case  2: out << "dyadic primitive function:\n"
-                        "   Z ← A " << prim << " B";         break;
-        case  3: out << "monadic primitive function (with axis):\n"
-                        "   Z ← " << prim << "[X] B";      break;
-        case  4: out << "dyadic primitive function (with axis):\n"
-                        "   Z ← A " << prim << "[X] B";      break;
-
-        default: FIXME;   // error in Help.def
-      }
-
-   if (*name)   out << "  ("  << name  <<  ")";
-   out << endl;
-   if (*brief)  out << "    " << brief << endl;
-
-   if (descr)   out << descr << endl;
-}
-//----------------------------------------------------------------------------
-
-/// return the length differece between a UCS_string and its UTF8 encoding
-static inline int
-len_diff(const char * txt)
-{
-int ret = 0;
-   while (const char cc = *txt++)   if ((cc & 0xC0) == 0x80)   ++ret;
-   return ret;
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_EXPECT(ostream & out, const UCS_string & arg)
-{
-   IO_Files::expect_apl_errors(arg);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_FNS(ostream & out, const UCS_string & arg)
-{
-   Workspace::list(out, LIST_FUNS, arg);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_HELP(ostream & out, const UCS_string & _arg)
-{
-   // map alternate APL characters to standard ones
-   //
-UCS_string arg;
-   loop(a, _arg.size())   arg << Avec::make_standard(_arg[a]);
-
-   if (arg.size() > 0 && Avec::is_first_symbol_char(arg.front()))
-      {
-        // help for a user defined name
-        //
-        CERR << "symbol '" << arg << "' ";
-        Symbol * sym = Workspace::lookup_existing_symbol(arg);
-        if (sym == 0)
-           {
-             CERR << "does not exist in the current workspace" << endl;
-             return;
-           }
-
-        if (sym->is_erased())
-           {
-             CERR << "is erased." << endl;
-             return;
-           }
-
-        ValueStackItem * vs = sym->top_of_stack();
-        if (vs == 0)
-           {
-             CERR << " has no stack." << endl;
-             return;
-           }
-
-        switch(vs->get_NC())
-           {
-             case NC_INVALID:
-                  CERR << "has no valid name class" << endl;
-                  return;
-
-             case NC_UNUSED_USER_NAME:
-                  CERR << "is an unused name" << endl;
-                  return;
-
-             case NC_LABEL:
-                  CERR << "is a label (line " << vs->get_label()
-                       << ")" << endl;
-                  return;
-
-             case NC_VARIABLE:
-                  {
-                    CERR << "is a variable:" << endl;
-                    Value_P val = sym->get_apl_value();
-                    if (+val)   val->print_properties(CERR, 4, true);
-                  }
-                  CERR << endl;
-                  return;
-
-             case NC_FUNCTION:
-                  {
-                    cFunction_P fun = sym->get_function();
-                    Assert(fun);
-                    if (fun->is_native())
-                       {
-                         const NativeFunction *nf =
-                               reinterpret_cast<const NativeFunction *>(fun);
-                         CERR << "is a native function implemented in "
-                              << nf->get_so_path() << endl
-                              << "    load state: " << (nf->is_valid() ?
-                                 "OK (loaded)" : "error") << endl;
-                         return;
-                       }
-
-                    CERR << "is a ";
-                    if      (fun->get_fun_valence() == 2)   CERR << "dyadic";
-                    else if (fun->get_fun_valence() == 1)   CERR << "monadic";
-                    else                                    CERR << "niladic";
-                    CERR << " defined function:" << endl;
-
-                    const UserFunction * ufun = fun->get_func_ufun();
-                    Assert(ufun);
-                    ufun->help(CERR);
-                  }
-                  return;
-
-             case NC_OPERATOR:
-                  {
-                    cFunction_P fun = sym->get_function();
-                    Assert(fun);
-                    CERR << "is a ";
-                    if (fun->get_oper_valence() == 2)   CERR << "dyadic";
-                    else                                CERR << "monadic";
-                    CERR << " defined operator:" << endl;
-
-                    const UserFunction * ufun = fun->get_func_ufun();
-                    Assert(ufun);
-                    ufun->help(CERR);
-                  }
-                  return;
-
-             case NC_SYSTEM_VAR:
-                  CERR << "is a shared variable" << endl;
-                  return;
-
-             default:
-                  FIXME;
-           }
-
-        return;
-      }
-
-   {
-     bool prim = arg.size() == 1;   // standard (1-character) APL primitive
-     if (arg.size() == 2)
-        prim = arg.front() == UNI_DOWN_TACK ||
-              (arg.front() == UNI_COMMENT && arg[1] == UNI_COMMENT);
-
-     if (prim)
-        {
-          UTF8_string arg_utf(arg);
-          const char * arg_cp = arg_utf.c_str();
-
-#define help_def(ar, prim, name, title, descr)              \
-   primitive_help(out, arg_cp, ar, prim, name, title, descr);
-#include "Help.def"
-
-         return;
-        }
-   }
-
-   enum { COL2 = 40 };   ///< where the second column starts
-
-UCS_string_vector commands;
-   commands.reserve(60);
-
-   out << left << "APL Commands:" << endl;
-#define cmd_def(cmd_str, _code, arg, _hint) \
-   { UCS_string c(UTF8_string(cmd_str " " arg));   commands.push_back(c); }
-#include "Command.def"
-
-bool left_col = true;
-   loop(c, commands.size())
-      {
-        const UCS_string & cmd = commands[c];
-        if (left_col)
-           {
-              out << "      " << setw(COL2 - 2) << cmd;
-              left_col = false;
-           }
-        else
-           {
-              out << cmd << endl;
-              left_col = true;
-           }
-      }
-
-  if (Workspace::get_user_commands().size())
-     {
-       out << endl << endl << "User defined commands:" << endl;
-       for (size_t u = Workspace::get_user_commands().size(); u; )
-           {
-             const user_command & ucmd = Workspace::get_user_commands()[--u];
-             out << "      " << ucmd.prefix << " [args]  calls:  ";
-             if (ucmd.mode)   out << "tokenized-args ";
- 
-             out << ucmd.apl_function << " (quoted-args)" << endl;
-           }
-     }
-
-   out << endl << "System variables:" << endl
-       << "      " << setw(COL2)
-       << "⍞       Character Input/Output"
-       << "⎕       Evaluated Input/Output" << endl;
-   left_col = true;
-
-#define ro_sv_def(x, _str, txt)                                            \
-   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
-     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << endl;                 \
-        left_col = !left_col; }
-#define rw_sv_def(x, _str, txt)                                            \
-   { const UCS_string & ucs = Workspace::get_v_ ## x().get_name();         \
-     if (left_col)   out << "      " << setw(8) << ucs << setw(30) << txt; \
-     else            out << setw(8) << ucs << txt << endl;                 \
-        left_col = !left_col; }
-#include "SystemVariable.def"
-
-   out << endl << "System functions:" << endl;
-   left_col = true;
-#define ro_sv_def(x, _str, _txt)
-#define rw_sv_def(x, _str, _txt)
-#define sf_def(_q, str, txt)                                              \
-   if (left_col)   out << "      ⎕" << setw(7) << str << setw(30 +        \
-                                        len_diff(txt)) << txt;            \
-   else            out << "⎕" << setw(7) << str << txt << endl;           \
-   left_col = !left_col;
-#include "SystemVariable.def"
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
-{
-   if (arg.size())   // )HISTORY  CLEAR (or else line filter)
-      {
-        if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
-        else                             LineInput::print_history(out, arg);
-      }
-   else              // )HISTORY (with no argument/filter)
-      {
-        UCS_string no_filter;
-        LineInput::print_history(out, no_filter);
-      }
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_HOST(ostream & out, const UCS_string & arg)
-{
-   if (UserPreferences::uprefs.safe_mode)
-      {
-        out << 
-"This interpreter was started in \"safe mode\" (command line option --safe,\n"
-"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << endl;
-        return;
-      }
-
-UTF8_string host_cmd(arg);
-FILE * pipe = popen(host_cmd.c_str(), "r");
-   if (pipe == 0)   // popen() failed
-      {
-        out << ")HOST command failed: " << strerror(errno) << endl;
-        return;
-      }
-
-   // reset SIGCHLD to its default so that pclose() works as expected
-   //
-   signal(SIGCHLD, SIG_DFL);
-   for (;;)
-       {
-         const int cc = fgetc(pipe);
-         if (cc == EOF)   break;
-         out << char(cc);
-       }
-
-   errno = 0;
-const int result = pclose(pipe);
-   Log(LOG_verbose_error)
-      {
-        if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
-                           << errno << " (" << strerror(errno) << ")" << endl;
-      }
-
-   out << endl << result << ' ' << endl;
-   signal(SIGCHLD, SIG_IGN);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
-                  UCS_string & quad_lx, bool silent)
-{
-   // Command is:
-   //
-   // LOAD wsname
-   // LOAD libnum wsname
-
-const LibRef_name lib_name(out, args, false);
-   if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
-
-   Workspace::load_WS(out, CERR, lib_name, quad_lx, silent);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_LOG(ostream & out, const UCS_string & arg)
-{
-#ifdef cfg_DYNAMIC_LOG_WANTED
-
-   log_control(arg);
-
-#else
-
-   out <<
-"\n"
-"The debug command ]LOG is not available, because dynamic logging was not\n"
-"./configure'd for this APL interpreter. To configure dynamic logging (which\n"
-"will slightly decrease performance), recompile the interpreter as follows:\n"
-"\n"
-"   $ ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)\n"
-"   $ make\n"
-"   $ sudo make install (or: src/apl to run the recopmpiled interpreter\n"
-"                        without installing it)\n"
-"\n"
-"in the top-level GNU APL directory (i.e. above the src directory)."
-"\n";
-
-#endif
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
-{
-   if (args.size() > 0)   // optional AUTO ?
-      {
-        if (!args.front().starts_iwith("AUTO"))   // no
-           {
-             CERR << "BAD COMMAND+" << endl;
-             MORE_ERROR() << "Bad )MORE argument: " << args.front()
-                          << ". Use none or AUTO.";
-             if (auto_MORE)   CERR << Workspace::more_error() << endl;
-             return;
-           }
-
-        // )MORE AUTO...
-        //
-        if (args.size() > 1)   // optional ON/OFF ?
-           {
-             if      (args[1].starts_iwith("ON"))    auto_MORE = true;
-             else if (args[1].starts_iwith("OFF"))   auto_MORE = false;
-             else
-                {
-                  CERR << "BAD COMMAND+" << endl;
-                  MORE_ERROR() << "Bad )MORE AUTO argument: " << args[1]
-                               << ". Use none, ON, or OFF.";
-                  if (auto_MORE)   CERR << Workspace::more_error() << endl;
-                  return;
-                }
-           }
-        else                   // no ON or OFF:
-           {
-             auto_MORE = ! auto_MORE;   // toggle
-           }
-        out << "Automatic )MORE is now: "
-            << (auto_MORE ? "ON" : "OFF") << endl;
-        return;
-      }
-
-   if (Workspace::more_error().size() == 0)
-      {
-        out << "NO )MORE ERROR INFO" << endl;
-        return;
-      }
-
-   out << Workspace::more_error() << endl;
-   return;
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
-{
-   loop(a, args.size())
-       {
-         const UCS_string & arg = args[a];
-
-         // figure HAVE- or NO- prefix and capability
-         //
-         if (arg.starts_iwith("HAVE-"))
-            {
-              if (! have_capability(arg.drop(5)))   return;
-            }
-         else if (arg.starts_iwith("NO-"))
-            {
-              if (have_capability(arg.drop(3)))   return;
-            }
-         else
-            {
-              CERR << "]NEXTFILE: unknown capability '" << arg
-                   << "' (ignored).\n"
-                      "Capabilities start with HAVE- or with NO- "
-                      "(try TAB expansion)."
-                   << endl;
-              continue;   // next arg
-            }
-       }
-
-   IO_Files::next_file();
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_OFF(int exit_val)
-{
-   COUT << endl;
-   if (UserPreferences::uprefs.silence < NO_BANNER)
-      {
-        timeval end;
-        gettimeofday(&end, 0);
-        end.tv_sec -= UserPreferences::uprefs.session_start.tv_sec;
-        end.tv_usec -= UserPreferences::uprefs.session_start.tv_usec;
-        if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
-        COUT << "Goodbye." << endl
-             << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
-             << " seconds " << endl;
-      }
-
-   cleanup(true);
-
-   // restore the initial memory rlimit
-   //
-#ifndef RLIMIT_AS // BSD does not define RLIMIT_AS
-# define RLIMIT_AS RLIMIT_DATA
-#endif
-
-rlimit rl;
-   getrlimit(RLIMIT_AS, &rl);
-   rl.rlim_cur = Quad_WA::initial_rlimit;
-   setrlimit(RLIMIT_AS, &rl);
-
-   exit(exit_val);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_NMS(ostream & out, const UCS_string & arg)
-{
-   Workspace::list(out, LIST_NAMES, arg);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_OPS(ostream & out, const UCS_string & arg)
-{
-   Workspace::list(out, LIST_OPERS, arg);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
-{
-   if (arg.starts_iwith("CLEAR"))
-      {
-        out << "Optimization counters cleared" << endl;
-        OptmizationStatistics::reset_all();
-        return;
-      }
-
-int ulen;
-#define optim(ena, opt, text) ulen = 40 + UTF8_string::bytes_chars(text);   \
-   out << left << setw(ulen) << text << right << " : ";                     \
-   if (ena) out << setw(6) << OptmizationStatistics::get(OPTI_ ## opt);     \
-   else     out << "disabled";                                              \
-   out << endl;
-#include "Performance.def"
-}
-//----------------------------------------------------------------------------
-bool
-Command::have_capability(const UCS_string & capa)
-{
-const int len = capa.size();
-   if (capa.front() == UNI_Quad_Quad)   // ⎕xx
-      {
-        const UCS_string capa1 = capa.drop(1);
-        if (len == 4 && capa1.starts_iwith("FFT"))       return apl_FFT;
-        if (len == 4 && capa1.starts_iwith("PNG"))       return apl_PNG;
-        if (len == 3 && capa1.starts_iwith("RE"))        return apl_PCRE;
-      }
-   else
-      {
-        if (len == 3 && capa.starts_iwith("GTK"))        return apl_GTK3;
-        if (len == 3 && capa.starts_iwith("GUI"))        return apl_GUI;
-        if (len == 8 && capa.starts_iwith("POSTGRES"))   return apl_POSTGRES;
-        if (len == 7 && capa.starts_iwith("SQLITE3"))    return apl_SQLITE3;
-        if (len == 3 && capa.starts_iwith("X11"))        return apl_X11;
-      }
-
-   CERR << "]NEXTFILE: Unknown capability '" << capa << "'" << endl;
-   return false;
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_OUT(ostream & out, UCS_string_vector & args)
-{
-   // )OUT filename
-   // )OUT filename object...
-   //
-UCS_string fname = args.front();
-   args.erase(0);
-
-const LibRef_name lib_name(LIB0, fname);
-const UTF8_string filename = LibPaths::get_filename(lib_name, false, ".atf", 0);
-
-FILE * atf = fopen(filename.c_str(), "w");
-   if (atf == 0)
-      {
-        const char * why = strerror(errno);
-        out << ")OUT " << fname << " failed: " << why << endl;
-        MORE_ERROR() << "command )OUT: could not open file " << fname
-                     << " for writing: " << why;
-        return;
-      }
-
-uint64_t seq = 1;   // sequence number for records written
-   Workspace::write_OUT(atf, seq, args);
-
-   fclose(atf);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_OWNERS(ostream & out)
-{
-   Value::list_all(out, true);
-}
-//----------------------------------------------------------------------------
-bool
-Command::check_name_conflict(ostream & out, const UCS_string & cnew,
-                             const UCS_string cold)
-{
-int len = cnew.size();
-        if (len > cold.ssize())   len = cold.size();
-
-   loop(l, len)
-      {
-        int c1 = cnew[l];
-        int c2 = cold[l];
-        if (c1 >= 'a' && c1 <= 'z')   c1 -= 0x20;   // uppercase
-        if (c2 >= 'a' && c2 <= 'z')   c2 -= 0x20;   // uppercase
-        if (l && (c1 != c2))   return false;   // OK: different
-     }
-
-   out << "BAD COMMAND+" << endl;
-   MORE_ERROR() << "conflict with existing command name in command ]USERCMD";
-   if (auto_MORE)   CERR << Workspace::more_error() << endl;
-
-   return true;
-}
-//----------------------------------------------------------------------------
-bool
-Command::check_redefinition(ostream & out, const UCS_string & cnew,
-                            const UCS_string fnew, const int mnew)
-{
-   loop(u, Workspace::get_user_commands().size())
-     {
-       const UCS_string cold = Workspace::get_user_commands()[u].prefix;
-       const UCS_string fold = Workspace::get_user_commands()[u].apl_function;
-       const int mold = Workspace::get_user_commands()[u].mode;
-
-       if (cnew != cold)   continue;
-
-       // user command name matches; so must mode and function
-       if (mnew != mold || fnew != fold)
-         {
-           out << "BAD COMMAND+" << endl;
-           MORE_ERROR() <<
-           "conflict with existing user command definition in command ]USERCMD";
-           if (auto_MORE)   CERR << Workspace::more_error() << endl;
-         }
-       return true;
-     }
-
-   return false;
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_PUSHFILE()
-{
-   CERR <<
-"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
-        << endl;
-
-   if (InputFile::files_todo.size())
-      InputFile::files_todo.front().set_pushed_pending(true);
-
-InputFile fam("stdin", stdin, false, true, true, no_LX);
-   fam.set_pushed_IE();
-   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
-{
-   CHECK_SECURITY(disable_SAVE_command);
-
-   // )SAVE
-   // )SAVE workspace
-   // )SAVE lib workspace
-
-   if (args.size() > 0)   // wsname or lib wsname
-      {
-        const LibRef_name lib_name(out, args, false);
-        if (lib_name.get_name().size() == 0)   return;   // error, )MORE set
-        Workspace::save_WS(out, lib_name, false);
-        return;
-      }
-
-   // )SAVE without arguments: use )WSID unless CLEAR WS...
-
-   if (Workspace::is_CLEAR_WS())
-      {
-        // don't save CLEAR WS
-        COUT << "NOT SAVED: THIS WS IS CLEAR WS+" << endl;
-        MORE_ERROR() <<
-        "the workspace was not saved because 'CLEAR WS' is a special\n"
-        "workspace name that cannot be saved. "
-        "First create WS name with )WSID <name>."; 
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-      }
-
-LibRef_name wsid =  Workspace::get_WSID();
-   if (wsid.get_libref() == LIB_NONE)   wsid.set_libref(LIB0);
-   Workspace::save_WS(out, wsid, true);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SI(ostream & out, bool dbg)
-{
-   if (dbg)   Workspace::list_SI(out, SIM_SI_dbg);
-   else       Workspace::list_SI(out, SIM_SI);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SIC(ostream & out)
-{
-   Workspace::clear_SI(out);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SINL(ostream & out)
-{
-   Workspace::list_SI(out, SIM_SINL);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SIS(ostream & out, bool dbg)
-{
-   if (dbg)   Workspace::list_SI(out, SIM_SIS_dbg);
-   else       Workspace::list_SI(out, SIM_SIS);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SVARS(ostream & out)
-{
-   Svar_DB::print(out);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SYMBOL(ostream & out, const UCS_string & arg)
-{
-   Workspace::get_symbol_table().list_symbol(out, arg);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_SYMBOLS(ostream & out, const UCS_string & arg)
-{
-   Workspace::list(out, LIST_NONE, arg);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
-                     UCS_string_vector & args)
-{
-   // case 1:    ]USERCMD
-   // case 2a:   ]USERCMD REMOVE-ALL
-   // case 2b:   ]USERCMD REMOVE        ]existing-command
-   // case 3a:   ]USERCMD ]new-command  APL-fun
-   // case 3b:   ]USERCMD ]new-command  APL-fun  mode
-   // case 3c:   ]USERCMD ]new-command  { ... }
-   //
-   if (args.size() == 0)   // case 1: list all commands
-      {
-        if (Workspace::get_user_commands().size())
-           {
-             for (size_t u = Workspace::get_user_commands().size(); u;)
-                {
-                  const user_command & ucmd =
-                                       Workspace::get_user_commands()[--u];
-                  out << setw(12) << ucmd.prefix << " → ";
-                  if (ucmd.mode)   out << "A ";   // if dyadic
-                  out << ucmd.apl_function << " B"
-                      << " (mode " << ucmd.mode << ")" << endl;
-                }
-           }
-        return;
-      }
-
-  if (args.size() == 1 && args.front().starts_iwith("REMOVE-ALL"))   // case 2a.
-     {
-       Workspace::get_user_commands().clear();
-       out << "    All user-defined commands removed." << endl;
-       return;
-     }
-
-  if (args.size() == 2 && args.front().starts_iwith("REMOVE"))   // case 2b.
-     {
-       loop(u, Workspace::get_user_commands().size())
-           {
-             if (Workspace::get_user_commands()[u].prefix
-                                                  .starts_iwith(args[1]) &&
-                 args[1].starts_iwith(Workspace::get_user_commands()[u]
-                                                          .prefix))   // same
-                {
-                  // print first and remove then!
-                  //
-                  out << "    User-defined command "
-                      << Workspace::get_user_commands()[u].prefix
-                      << " removed." << endl;
-                  Workspace::get_user_commands().
-                     erase(Workspace::get_user_commands().begin() + u);
-                  return;
-                }
-           }
-
-       out << "BAD COMMAND+" << endl;
-       MORE_ERROR() << "user command in command"
-                       " ]USERCMD REMOVE does not exist";
-       if (auto_MORE)   CERR << Workspace::more_error() << endl;
-       return;
-     }
-
-  // cases 3a, 2b, and 3c...
-  //
-
-  // check that the user command is not followed by the string
-  if (args.size() == 1)
-     {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "The user command syntax is: ]USERCMD "
-                        " ]new-command  APL-function [mode]";
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-     }
-
-UCS_string command_name = args.front();
-UCS_string apl_fun = args[1];
-int mode = 0;
-
-   // check if lambda
-   bool is_lambda = false;
-   if (apl_fun.front() == '{')
-      {
-         // looks like the user command is a lambda function.
-         UCS_string result;
-         // lambdas could contain spaces, collect all arguments in one string
-         for (ShapeItem i = 1; i < args.ssize(); ++i)
-            {
-               result << args[i];
-            }
-         // check if lamda-function closed properly
-         if (result.back() == '}')
-            {
-               is_lambda = true;
-               apl_fun = result;
-               // determine the mode: if both alpha and omega present then
-               // assume dyadic, otherwise monadic usage
-               mode = (apl_fun.contains(UNI_OMEGA) &&
-                       apl_fun.contains(UNI_ALPHA)) ? 1 : 0;
-            }
-         else
-            {
-               out << "BAD COMMAND+" << endl;
-               MORE_ERROR() << "closing } in lambda function not found";
-               if (auto_MORE)   CERR << Workspace::more_error() << endl;
-               return;
-            }
-      }
-
-   if (args.size() > 3 && !is_lambda)
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many parameters in command ]USERCMD";
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-      }
-
-   // check mode
-   //
-   if (!is_lambda && args.size() == 3)   mode = args[2].atoi();
-   if (mode < 0 || mode > 1)
-      {
-        out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "unsupported mode " << mode
-                     << " in command ]USERCMD (0 or 1 expected)";
-        if (auto_MORE)   CERR << Workspace::more_error() << endl;
-        return;
-      }
-
-   // check command name
-   //
-   loop(c, command_name.size())
-      {
-        bool error = false;
-        if (c == 0)   // command must start with ] or )
-           {
-             if (command_name[c] != ']' && command_name[c] != ')')
-                error = true;
-           }
-        else // and continue with symbol characters
-           {
-             error = error || !Avec::is_symbol_char(command_name[c]);
-           }
-
-        if (error)
-           {
-             out << "BAD COMMAND+" << endl;
-             MORE_ERROR() << " bad user command name in command ]USERCMD";
-             if (auto_MORE)   CERR << Workspace::more_error() << endl;
-             return;
-           }
-      }
-
-   // check conflicts with existing commands
-   //
-#define cmd_def(cmd_str, _cmd, _arg, _hint) \
-   if (check_name_conflict(out, UTF8_string(cmd_str), command_name))   return;
-#include "Command.def"
-   if (check_redefinition(out, command_name, apl_fun, mode))
-     {
-       out << "    User-defined command "
-           << command_name << " installed." << endl;
-       return;
-     }
-
-   // check APL function name
-   // Only needed when not a lambda function
-   if (!is_lambda)
-      {
-         loop(c, apl_fun.size())
-            {
-               if (!Avec::is_symbol_char(apl_fun[c]))
-                  {
-                     out << "BAD COMMAND+" << endl;
-                     MORE_ERROR() <<
-                          "bad APL function name in command ]USERCMD";
-                     if (auto_MORE)   CERR << Workspace::more_error() << endl;
-                     return;
-                  }
-            }
-      }
-
-const user_command new_user_command = { command_name, apl_fun, mode };
-
-   // keep user commands sorted by command_name
-   //
-vector<user_command> & user_commands = Workspace::get_user_commands();
-bool inserted = false;
-   loop(u, user_commands.size())
-       {
-         const Comp_result comp = user_commands[u].prefix.compare(command_name);
-         if (comp == COMP_LT)
-            {
-              user_commands.insert(user_commands.begin() + u, new_user_command);
-              inserted = true;
-              break;
-            }
-      }
-
-   if (!inserted)   user_commands.push_back(new_user_command);
-
-   out << "    User-defined command "
-       << new_user_command.prefix << " installed." << endl;
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_VALUES(ostream & out)
-{
-   Value::list_all(out, false);
-}
-//---------------------------------------------------------------------------
-void
-Command::cmd_VARS(ostream & out, const UCS_string & arg)
-{
-   Workspace::list(out, LIST_VARS, arg);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_WSID(ostream & out, const UCS_string_vector & args)
-{
-   // )WSID
-   // )WSID wsname
-   // )WSID lib wsname
-   //
-LibRef lib = LIB_NONE;
-UCS_string arg;   // ""
-   if (args.size() == 0)        // )WSID
-      {
-        lib = LIB_NONE;
-      }
-   else if (args.size() == 1)   // )WSID wsname
-      {
-        arg = args.front();
-      }
-   else                        // )WSID lib wsname
-      {
-        lib = LibRef(args.front()[0] - '0');
-        arg = args[1];   // ""
-      }
-   Workspace::wsid(out, arg, lib, false);
-}
-//----------------------------------------------------------------------------
-void
-Command::cmd_XTERM(ostream & out, const UCS_string & arg)
-{
-const char * term = getenv("TERM");
-   if (!strncmp(term, "dumb", 4) && arg.starts_iwith("ON"))
-      {
-        out << "impossible on dumb terminal" << endl;
-      }
-   else if (arg.starts_iwith("OFF") || arg.starts_iwith("ON"))
-      {
-        Output::toggle_color(arg);
-      }
-   else if (arg.size() == 0)
-      {
-        out << "]COLOR/XTERM ";
-        if (Output::color_enabled()) out << "ON"; else out << "OFF";
-        out << endl;
-      }
-   else
-      {
-        out << "BAD COMMAND" << endl;
-        return;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
-                    const UCS_string & line, const UCS_string & cmd,
-                    UCS_string_vector & args, int uidx)
-{
-   /*
-      apl_cmd   is '' (due to line.clear() in Command::do_APL_command().
-      line      is the user input from (including) the command
-                                  to the end of the line.
-      cmd       is the command (first token in line)
-      args is the tokenized line
-    */
-
-  if (Workspace::get_user_commands()[uidx].mode > 0)   // dyadic
-     {
-        // construct the left argument of the (dyadic) 'apl_function'
-        apl_cmd.append_single_quoted(cmd);
-        apl_cmd << UNI_SPACE;
-        loop(a, args.size())
-           {
-             apl_cmd.append_single_quoted(args[a]);
-             apl_cmd << UNI_SPACE;
-           }
-     }
-
-   apl_cmd << Workspace::get_user_commands()[uidx].apl_function << UNI_SPACE;
-   apl_cmd.append_single_quoted(line);
-}
-//----------------------------------------------------------------------------
-#ifdef cfg_DYNAMIC_LOG_WANTED
-void
-Command::log_control(const UCS_string & arg)
-{
-UCS_string_vector args = split_arg(arg);
-
-   if (args.size() == 0 || arg.front() == UNI_QUESTION)  // no arg or '?'
-      {
-        for (LogId l = LID_MIN; l < LID_MAX; l = LogId(l + 1))
-            {
-              const char * info = Log_info(l);
-              Assert(info);
-
-              const bool val = Log_status(l);
-              CERR << "    " << setw(2) << right << l << ": " 
-                   << (val ? "(ON)  " : "(OFF) ") << left << info << endl;
-            }
-
-        return;
-      }
-
-   // at this point args is a sequence of numbers (LIDs) and actions (ON or
-   // OFF). We parse args back to front. to acreate a vector of actions
-   // which is then executed from front to back.
-   //
-vector<struct lid_OOT> lid_OOTs;
-OOT action = Toggle;
-   loop(a, args.size())
-       {
-         const UCS_string & ucs = args[args.size() - a - 1];
-         if      (ucs.starts_iwith("ON"))    action = On;
-         else if (ucs.starts_iwith("OFF"))   action = Off;
-         else   // remember the LogId and its action and
-            {
-              const LogId lid = LogId(ucs.atoi());
-              const lid_OOT lo = { lid, action };
-              if (lid >= LID_MIN && lid <= LID_MAX)
-                 lid_OOTs.push_back(lo);
-              else
-                 CERR << "    Invalid logging facility " << lid
-                      << " ignored. Valid logging facilities are: "
-                      << LID_MIN << ".." << (LID_MAX - 1) << endl;
-            }
-       }
-
-   loop(a, lid_OOTs.size())
-       {
-         const lid_OOT lo = lid_OOTs[lid_OOTs.size() - a - 1];
-         const LogId lid = lo.lid;
-         const char * info = Log_info(lid);
-         bool new_status = !Log_status(lid);   // assume toggle
-         if      (lo.on_off_toggle == On)   new_status = true;
-         else if (lo.on_off_toggle == Off)  new_status = false;
-         Log_control(lid, new_status);
-
-         CERR << "    Logging facility " << lid << ": " << info
-              << " is now " << (new_status ? "ON " : "OFF") << endl;
-       }
-}
-#endif
-//----------------------------------------------------------------------------
-bool
-Command::parse_from_to(UCS_string & from, UCS_string & to,
-                       const UCS_string & user_arg)
-{
-   // parse user_arg which is one of the following:
-   //
-   // 1.   (empty)
-   // 2.   FROMTO
-   // 3a.  FROM -
-   // 3b.       - TO
-   // 3c.  FROM - TO
-   //
-   from.clear();
-   to.clear();
-
-int s = 0;
-bool got_minus = false;
-
-   // skip spaces before from
-   //
-   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
-
-   if (s == user_arg.ssize())   return false;   // case 1.: OK
-
-   // copy left of '-' to from
-   //
-   while (s < user_arg.ssize()  &&
-              user_arg[s] > ' ' &&
-              user_arg[s] != '-')  from << user_arg[s++];
-
-   // skip spaces after from
-   //
-   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
-
-   if (s < user_arg.ssize() && user_arg[s] == '-')
-      {
-        ++s;
-        got_minus = true;
-      }
-
-   // skip spaces before to
-   //
-   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
-
-   // copy right of '-' to from
-   //
-   while (s < user_arg.ssize() && user_arg[s] > ' ')  to << user_arg[s++];
-
-   // skip spaces after to
-   //
-   while (s < user_arg.ssize() && user_arg[s] <= ' ') ++s;
-
-   if (s < user_arg.ssize())   return true;   // error: non-blank after to
-
-   if (!got_minus)   to = from;   // case 2.
-
-   if (!(from.size() || to.size()))   return true;   // error: single '-'
-
-   return false;   // OK
-}
-//----------------------------------------------------------------------------
-bool
-Command::is_lib_ref(const UCS_string & lib)
-{
-   if (lib.size() == 1)   // single char: lib number
-      {
-        if (Avec::is_digit(lib.front()))   return true;
-      }
-
-   if (lib.front() == UNI_FULLSTOP)   return true;
-
-   loop(l, lib.size())
-      {
-        const Unicode uni = lib[l];
-        if (uni == UNI_SLASH)       return true;
-        if (uni == UNI_BACKSLASH)   return true;
-      }
-
-   return false;
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

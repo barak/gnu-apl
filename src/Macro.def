@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2016  Dr. Jürgen Sauermann
+    Copyright © 2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,243 +23,791 @@
 /// monadic EACH without result
 //
 mac_def(LO_EACH_B,
- "(LO LO_EACH_B) B;N;N_max\n"
- "N←⎕IO ◊ N_max←N+⍴B←,B\n"
- "LO N⊃B ◊ 0 → N_max>N←N+1\n")
+ "(μ3 LO_EACH_B) μ6;μ1;μ7\n"
+ "⍝ called as Bif_OPER1_EACH::eval_LB(_LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  N  │ loop index (⎕IO-based)                                 ║\n"
+ "⍝ ║μ3 │  LO │ the operand function applied to each element of B      ║\n"
+ "⍝ ║μ6 │  B  │ ravelled in place                                      ║\n"
+ "⍝ ║μ7 │N_max│ loop limit                                             ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←⎕IO ◊ μ7←μ1+⍴μ6←,μ6\n"
+ "μ3 μ1⊃μ6 ◊ 0 → μ7>μ1←μ1+1\n")
 
 /// dyadic EACH without result, scalar A, scalar B
 //
 mac_def(sA_LO_EACH_sB,
- "A (LO sa_LO_EACH_sB) B\n"
- "A LO B\n")
+ "μ2 (μ3 sA_LO_EACH_sB) μ6\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│C++│ Description                                            ║\n"
+ "⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ2 │ A │                                                        ║\n"
+ "⍝ ║μ3 │ LO│                                                        ║\n"
+ "⍝ ║μ6 │ B │                                                        ║\n"
+ "⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ2 μ3 μ6\n")
 
 /// dyadic EACH without result, scalar A, vector B
 //
 mac_def(sA_LO_EACH_vB,
- "A (LO sa_LO_EACH_vB) B;N;N_max\n"
- "N←⎕IO ◊ N_max←N+⍴B←,B\n"
- "(⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n")
+ "μ2 (μ3 sA_LO_EACH_vB) μ6;μ1;μ7\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  N  │ loop index (over B)                                    ║\n"
+ "⍝ ║μ2 │  A  │ (scalar), disclosed each iteration                     ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ7 │N_max│ loop limit                                             ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←⎕IO ◊ μ7←μ1+⍴μ6←,μ6\n"
+ "(⊃μ2) μ3 μ1⊃μ6 ◊ 0 → μ7>μ1←μ1+1\n")
 
 /// dyadic EACH without result, vector A, scalar B
 //
 mac_def(vA_LO_EACH_sB,
- "A (LO vA_LO_EACH_sB) B;N;N_max\n"
- "N←⎕IO ◊ N_max←N+⍴A←,A\n"
- "(N⊃A) LO ⊃B ◊ 0 → N_max>N←N+1\n")
+ "μ2 (μ3 vA_LO_EACH_sB) μ6;μ1;μ7\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  N  │ loop index (over A)                                    ║\n"
+ "⍝ ║μ2 │  A  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (scalar), disclosed each iteration                     ║\n"
+ "⍝ ║μ7 │N_max│ loop limit                                             ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←⎕IO ◊ μ7←μ1+⍴μ2←,μ2\n"
+ "(μ1⊃μ2) μ3 ⊃μ6 ◊ 0 → μ7>μ1←μ1+1\n")
 
 /// dyadic EACH without result, vector A, vector B
 //
 mac_def(vA_LO_EACH_vB,
- "A (LO vA_LO_EACH_vB) B;N;N_max\n"
- "N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B\n"
- "(N⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n")
+ "μ2 (μ3 vA_LO_EACH_vB) μ6;μ1;μ7\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  N  │ loop index (over A and B in parallel)                  ║\n"
+ "⍝ ║μ2 │  A  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ7 │N_max│ loop limit                                             ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←⎕IO ◊ μ2←,μ2 ◊ μ7←μ1+⍴μ6←,μ6\n"
+ "(μ1⊃μ2) μ3 μ1⊃μ6 ◊ 0 → μ7>μ1←μ1+1\n")
 
 /// monadic EACH with result
 //
-mac_def(Z__LO_EACH_B, 
- "Z←(LO Z__LO_EACH_B) B;rho_Z;N;N_max\n"
- "rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "(N⊃Z)←LO N⊃B ◊ 0 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+mac_def(Z__LO_EACH_B,
+ "μ1←(μ3 Z__LO_EACH_B) μ6;μ7;μ8;μ9;μ10\n"
+ "⍝ called as Bif_OPER1_EACH::eval_LB(_LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ ravelled in place                                      ║\n"
+ "⍝ ║μ7 │rho_Z│ B's original shape (⍴B, saved before ravel)            ║\n"
+ "⍝ ║μ8 │  N  │ loop index                                             ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│ ⎕IO0│ ⎕IO as it was on entry (Bugs27 #56 residual, see below) ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "⍝ μ8/μ9 are plain arithmetic counters, immune to ⎕IO -- but every ⊃\n"
+ "⍝ pick/assign below used to index μ6/μ1 with the raw counter μ8\n"
+ "⍝ directly, which is only correct as long as ⎕IO stays exactly what\n"
+ "⍝ it was when μ8 was seeded. LO is user-supplied and may itself\n"
+ "⍝ change ⎕IO (e.g. (LO←{⎕IO←0 ⋄ ...})¨B) -- ⎕IO is a normal global\n"
+ "⍝ system variable, not auto-localized in a lambda, so that change\n"
+ "⍝ persists (correctly) past LO's own call and broke every subsequent\n"
+ "⍝ iteration's indexing, INDEX_ERROR-ing or reading/writing the wrong\n"
+ "⍝ slot. Fixed by never using μ8 as an index directly: (⎕IO+μ8-μ10)\n"
+ "⍝ recomputes the CURRENT-⎕IO-relative position fresh at each use\n"
+ "⍝ (read and write) from the fixed, ⎕IO-independent 0-based offset\n"
+ "⍝ (μ8-μ10), so it stays correct under whatever ⎕IO happens to be at\n"
+ "⍝ that exact moment -- self-correcting like the analogous fix for\n"
+ "⍝ Z__A_LO_INNER_RO_B above, and (unlike that fix) requires no\n"
+ "⍝ ⎕IO reset anywhere, so a real ⎕IO change from LO's last call\n"
+ "⍝ still correctly persists once the loop completes.\n"
+ "⍝\n"
+ "μ7←⍴μ6 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ9←μ10+⍴μ6←,μ6 ◊ μ1←μ9⍴0\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "μ1←μ7⍴μ1\n")
 
 /// dyadic EACH with result, scalar A, scalar B
 //
 mac_def(Z__sA_LO_EACH_sB,
- "Z←A (LO Z__sA_LO_EACH_sB) B\n"
- "Z←⊂A LO B\n")
+ "μ1←μ2 (μ3 Z__sA_LO_EACH_sB) μ6\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│C++│ Description                                            ║\n"
+ "⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │ Z │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │ A │                                                        ║\n"
+ "⍝ ║μ3 │ LO│                                                        ║\n"
+ "⍝ ║μ6 │ B │                                                        ║\n"
+ "⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←⊂μ2 μ3 μ6\n")
 
 /// dyadic EACH with result, scalar A, vector B
 //
-mac_def(  Z__sA_LO_EACH_vB, 
- "Z←A (LO Z__sA_LO_EACH_vB) B;rho_Z;N;N_max\n"
- "rho_Z←⍴B ◊ N←⎕IO ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "(N⊃Z)←⊂(⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+mac_def(  Z__sA_LO_EACH_vB,
+ "μ1←μ2 (μ3 Z__sA_LO_EACH_vB) μ6;μ7;μ8;μ9;μ10\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │  A  │ (scalar), disclosed each iteration                     ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ7 │rho_Z│ B's shape (⍴B)                                         ║\n"
+ "⍝ ║μ8 │  N  │ loop index                                             ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment)      ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ7←⍴μ6 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ9←μ10+⍴μ6←,μ6 ◊ μ1←μ9⍴0\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←⊂(⊃μ2) μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "μ1←μ7⍴μ1\n")
 
 /// dyadic EACH with result, vector A, scalar B
 //
-mac_def(  Z__vA_LO_EACH_sB, 
- "Z←A (LO Z__vA_LO_EACH_sB) B;rho_Z;N;N_max\n"
- "rho_Z←⍴A ◊ N←⎕IO ◊ N_max←N+⍴A←,A ◊ Z←N_max⍴0\n"
- "(N⊃Z)←⊂(N⊃A) LO ⊃B ◊ 0 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+mac_def(  Z__vA_LO_EACH_sB,
+ "μ1←μ2 (μ3 Z__vA_LO_EACH_sB) μ6;μ7;μ8;μ9;μ10\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │  A  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (scalar), disclosed each iteration                     ║\n"
+ "⍝ ║μ7 │rho_Z│ A's shape (⍴A)                                         ║\n"
+ "⍝ ║μ8 │  N  │ loop index                                             ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment)      ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ7←⍴μ2 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ9←μ10+⍴μ2←,μ2 ◊ μ1←μ9⍴0\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←⊂((⎕IO+μ8-μ10)⊃μ2) μ3 ⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "μ1←μ7⍴μ1\n")
 
 /// dyadic EACH with result, vector A, vector B
 //
 mac_def(  Z__vA_LO_EACH_vB,
- "Z←A (LO Z__vA_LO_EACH_vB) B;rho_Z;N;N_max\n"
- "→((⍴A)≡⍴B)⍴SHAPES_MATCH ◊ ⎕ES 5,2+(⍴⍴A)=⍴⍴B\n"
- "SHAPES_MATCH: rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
- "(N⊃Z)←(N⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+ "μ1←μ2 (μ3 Z__vA_LO_EACH_vB) μ6;μ7;μ8;μ9;μ10\n"
+ "⍝ called as Bif_OPER1_EACH::eval_ALB(A, _LO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │  A  │ (vector); shapes of A and B are checked to match first ║\n"
+ "⍝ ║μ3 │  LO │                                                        ║\n"
+ "⍝ ║μ6 │  B  │ (vector), ravelled in place                            ║\n"
+ "⍝ ║μ7 │rho_Z│ B's shape (⍴B)                                         ║\n"
+ "⍝ ║μ8 │  N  │ loop index                                             ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment)      ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "1 → (⍴μ2)≡⍴μ6 ◊ ⎕ES 5,2+(⍴⍴μ2)=⍴⍴μ6\n"
+ "μ7←⍴μ6 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ2←,μ2 ◊ μ9←μ10+⍴μ6←,μ6 ◊ μ1←μ9⍴0\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←((⎕IO+μ8-μ10)⊃μ2) μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "μ1←μ7⍴μ1\n")
 
 /// outer product
 //
 mac_def(  Z__A_LO_OUTER_B,
- "Z←A (LO Z__A_LO_OUTER_B) B;rho_Z;N;N_max;I;IA;IB\n"
- "rho_Z←(⍴A),⍴B ◊ N←⎕IO ◊ A←,A ◊ B←,B ◊ I←,⍳(⍴A),⍴B ◊ N_max←N+⍴I ◊ Z←N_max⍴0\n"
- "(IA IB)←⊃I[N] ◊ Z[N]←⊂(⊃A[IA]) LO ⊃B[IB] ◊ 0 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+ "μ1←μ2 (μ3 Z__A_LO_OUTER_B) μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13\n"
+ "⍝ called as Bif_OPER2_OUTER::eval_ALB(A, _RO, B) -- note: for ∘.f,\n"
+ "⍝ C++'s RO (f) fills this macro's LO slot (∘.f's own left operand ∘\n"
+ "⍝ is fixed and never passed in)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │  A  │ ravelled in place                                      ║\n"
+ "⍝ ║μ3 │  LO │ (i.e. f in ∘.f)                                        ║\n"
+ "⍝ ║μ6 │  B  │ ravelled in place                                      ║\n"
+ "⍝ ║μ7 │rho_Z│ the result's shape ((⍴A),⍴B)                           ║\n"
+ "⍝ ║μ8 │  N  │ loop index                                             ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│  I  │ cartesian-product index list ,⍳(⍴A),⍴B                 ║\n"
+ "⍝ ║μ11│  IA │ current A-index (disclosed from I[N])                  ║\n"
+ "⍝ ║μ12│  IB │ current B-index (disclosed from I[N])                  ║\n"
+ "⍝ ║μ13│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment). I's ║\n"
+ "⍝ ║   │     │ own contents (IA/IB) are fixed values computed once,   ║\n"
+ "⍝ ║   │     │ under the ORIGINAL ⎕IO, by ⍳ above -- if LO changes    ║\n"
+ "⍝ ║   │     │ ⎕IO, they must ALSO be re-based (⎕IO+IA-μ13, not just  ║\n"
+ "⍝ ║   │     │ N itself) before being used to bracket-index μ2/μ6.    ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ7←(⍴μ2),⍴μ6 ◊ μ13←⎕IO ◊ μ8←μ13 ◊ μ2←,μ2 ◊ μ6←,μ6 ◊ μ10←,⍳(⍴μ2),⍴μ6 ◊ μ9←μ13+⍴μ10 ◊ μ1←μ9⍴0\n"
+ "(μ11 μ12)←⊃μ10[⎕IO+μ8-μ13] ◊ μ1[⎕IO+μ8-μ13]←⊂(⊃μ2[⎕IO+μ11-μ13]) μ3 ⊃μ6[⎕IO+μ12-μ13] ◊ 0 → μ9>μ8←μ8+1\n"
+ "μ1←μ7⍴μ1\n")
 
 /// inner product. caller has checked that the shapes of A and B fit
 //
 mac_def(  Z__A_LO_INNER_RO_B,
- "Z←A (LO INNER RO) B;⎕IO\n"
- "    ⎕IO←1 ◊ → (⍴⍴A) ↓ sA ◊ → (⍴⍴B) ↓ vA_sB\n"
- "vA_vB: Z←LO/¨ (⊂[ρρA]A) ∘.RO ⊂[1]B ◊ →0\n"
- "vA_sB: Z←LO/¨ (⊂[ρρA]A) ∘.RO ⊂B    ◊ →0\n"
- "sA: → (⍴⍴B) ↓ sA_sB\n"
- "sA_vB: Z←LO/¨ (⊂A)      ∘.RO ⊂[1]B ◊ →0\n"
- "sA_sB: Z←LO/¨ (⊂A)      ∘.RO ⊂B    ◊ →0\n")
+ "μ1←μ2 (μ3 Z__A_LO_INNER_RO_B μ4) μ6\n"
+ "⍝ called as Bif_OPER2_INNER::eval_ALRB(A, _LO, _RO, B)\n"
+ "⍝\n"
+ "⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│C++│ Description                                            ║\n"
+ "⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │ Z │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │ A │                                                        ║\n"
+ "⍝ ║μ3 │ LO│ the reduce function of A LO.RO B (the '+' in +.×)      ║\n"
+ "⍝ ║μ4 │ RO│ the elementwise function (the '×' in +.×)              ║\n"
+ "⍝ ║μ6 │ B │                                                        ║\n"
+ "⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+ "⍝ ⎕IO used to be localized to 1 here, on the (wrong) assumption that\n"
+ "⍝ doing so was harmless: LO/RO are user-supplied and may be called\n"
+ "⍝ from within this macro (below), so a localized ⎕IO leaked into\n"
+ "⍝ them too -- confirmed live: A +.F B with F referencing ⎕IO\n"
+ "⍝ internally saw 1 instead of the caller's real ⎕IO←0 (Bugs27 #56).\n"
+ "⍝ Fixed by never touching ⎕IO at all: A's last axis is\n"
+ "⍝ ⎕IO+(⍴⍴μ2)-1 and B's first axis is ⎕IO, under any ⎕IO -- instead\n"
+ "⍝ of forcing ⎕IO←1 so that those reduce to the simpler ρρμ2 / 1.\n"
+ "⍝ The C++ caller has already checked that A's and B's shapes fit.\n"
+ "⍝\n"
+ "    3 → (⍴⍴μ2)=0 ◊ 2 → (⍴⍴μ6)=0\n"
+ " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂[⎕IO]μ6 ◊ →0\n"
+ " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂μ6      ◊ →0\n"
+ " 2 → (⍴⍴μ6)=0\n"
+ " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂[⎕IO]μ6 ◊ →0\n"
+ " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂μ6      ◊ →0\n")
 
 /// monadic power with repeat count and no result
 //
 mac_def(  LO_POWER_N_B,
-  " A (LO LO_POWER_N_B N) Z\n"
-"LO Z ◊ 0 → 0<N←N-1\n")
+  " μ2 (μ3 LO_POWER_N_B μ5) μ6\n"
+"⍝ called as Bif_OPER2_POWER::eval_LRB(_LO, N, B) -- LO⍣N B, no result\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ2 │ A │ unused (only reached for the monadic LO⍣N B form)      ║\n"
+"⍝ ║μ3 │ LO│ applied N times                                        ║\n"
+"⍝ ║μ5 │ N │ (the repeat count), decremented once per iteration     ║\n"
+"⍝ ║μ6 │ B │ (C++ B; originally named Z in the source, fed through  ║\n"
+"⍝ ║   │   │ LO in place); no separate result -- the macro has no Z←║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"μ3 μ6 ◊ 0 → 0<μ5←μ5-1\n")
 
 /// dyadic power with repeat count and no result
 //
 mac_def(  A_LO_POWER_N_B,
-  " A (LO A_LO_POWER_N_B N) Z\n"
-"A LO Z ◊ 0 → 0<N←N-1\n")
+  " μ2 (μ3 A_LO_POWER_N_B μ5) μ6\n"
+"⍝ called as Bif_OPER2_POWER::eval_ALRB(A, _LO, N, B) -- A LO⍣N B, no result\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ2 │ A │ the fixed left argument of LO on every iteration       ║\n"
+"⍝ ║μ3 │ LO│ applied N times                                        ║\n"
+"⍝ ║μ5 │ N │ (the repeat count), decremented once per iteration     ║\n"
+"⍝ ║μ6 │ B │ (C++ B; originally named Z in the source, updated in   ║\n"
+"⍝ ║   │   │ place each iteration); no separate result -- the macro ║\n"
+"⍝ ║   │   │ has no Z←                                              ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"μ2 μ3 μ6 ◊ 0 → 0<μ5←μ5-1\n")
 
 /// monadic power with repeat count and result
 //
 mac_def(  Z__LO_POWER_N_B,
-" Z←A (LO Z__LO_POWER_N_B N) Z\n"
-" Z←LO Z ◊ 0 → 0<N←N-1\n")
+" μ6←μ2 (μ3 Z__LO_POWER_N_B μ5) μ6\n"
+"⍝ called as Bif_OPER2_POWER::eval_LRB(_LO, N, B) -- Z←LO⍣N B\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ2 │ A │ unused (only reached for the monadic Z←LO⍣N B form)    ║\n"
+"⍝ ║μ3 │ LO│ applied N times                                        ║\n"
+"⍝ ║μ5 │ N │ (the repeat count), decremented once per iteration     ║\n"
+"⍝ ║μ6 │ B │ (C++ B; originally named Z on both sides of the header,║\n"
+"⍝ ║   │   │ so input and result share one slot, updated in place)  ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+" μ6←μ3 μ6 ◊ 0 → 0<μ5←μ5-1\n")
 
 /// dyadic power with repeat count and result
 //
 mac_def(  Z__A_LO_POWER_N_B,
-" Z←A (LO Z__A_LO_POWER_N_B N) Z\n"
-"Z←A LO Z ◊ 0 → 0<N←N-1\n")
+" μ6←μ2 (μ3 Z__A_LO_POWER_N_B μ5) μ6\n"
+"⍝ called as Bif_OPER2_POWER::eval_ALRB(A, _LO, N, B) -- Z←A LO⍣N B\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ2 │ A │ the fixed left argument of LO on every iteration       ║\n"
+"⍝ ║μ3 │ LO│ applied N times                                        ║\n"
+"⍝ ║μ5 │ N │ (the repeat count), decremented once per iteration     ║\n"
+"⍝ ║μ6 │ B │ (C++ B; originally named Z on both sides of the header,║\n"
+"⍝ ║   │   │ so accumulator and result share one slot)              ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"μ6←μ2 μ3 μ6 ◊ 0 → 0<μ5←μ5-1\n")
 
 /// monadic power with condition function RO and no result
 //
 mac_def(  Z__LO_POWER_RO_B,
-  " Z←(LO Z__LO_POWER_RO_B RO) B;T\n"
-"Z←LO B ◊ T←Z RO B ◊ B←Z ◊ 0 →(,T)≢,1\n")
+  " μ1←(μ3 Z__LO_POWER_RO_B μ4) μ6;μ7\n"
+"⍝ called as Bif_OPER2_POWER::eval_LRB(_LO, _RO, B) -- Z←LO⍣RO B\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │ Z │ the new value (LO B); also the eventual result returned║\n"
+"⍝ ║   │   │ to the C++ caller                                      ║\n"
+"⍝ ║μ3 │ LO│ produces the next value                                ║\n"
+"⍝ ║μ4 │ RO│ the stop-condition function; iteration stops once it   ║\n"
+"⍝ ║   │   │ returns 1                                              ║\n"
+"⍝ ║μ6 │ B │ the previous value; overwritten with the new value at  ║\n"
+"⍝ ║   │   │ the end of each iteration                              ║\n"
+"⍝ ║μ7 │ T │ the condition result (Z RO B)                          ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"⍝ RO's result must be all-Boolean (⎕ES 5,4 aka DOMAIN ERROR if not --\n"
+"⍝ ∧ silently computes LCM for non-Boolean numeric args, so validating\n"
+"⍝ with ∊0 1 first, rather than trusting a bare ∧/,μ7, is required, not\n"
+"⍝ just belt-and-braces) before ∧/ can safely decide whether every item\n"
+"⍝ is 1 (stop). Unvalidated, a condition that is never exactly (,1) (a\n"
+"⍝ non-scalar RO result, e.g.) used to loop forever. It must also have\n"
+"⍝ exactly one item: 0 1 looped forever, and 1 1 or ⍬ stopped (Bugs34\n"
+"⍝ #19).\n"
+"μ1←μ3 μ6 ◊ μ7←μ1 μ4 μ6 ◊ μ6←μ1 ◊ 1 →(1=≢,μ7)∧∧/(,μ7)∊0 1 ◊ ⎕ES 5,4\n"
+"¯1 →~∧/,μ7\n")
 
 /// monadic power with condition function RO and result
 //
 mac_def(  Z__A_LO_POWER_RO_B,
-" Z←A (LO Z__A_LO_POWER_RO_B RO) B;T\n"
-"Z←A LO B ◊ T←Z RO B ◊ B←Z ◊ 0 → (,T)≢,1\n")
+" μ1←μ2 (μ3 Z__A_LO_POWER_RO_B μ4) μ6;μ7\n"
+"⍝ called as Bif_OPER2_POWER::eval_ALRB(A, _LO, _RO, B) -- Z←A LO⍣RO B\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │ Z │ the new value (A LO B); also the eventual result       ║\n"
+"⍝ ║   │   │ returned to the C++ caller                             ║\n"
+"⍝ ║μ2 │ A │ the fixed left argument of LO on every iteration       ║\n"
+"⍝ ║μ3 │ LO│ produces the next value                                ║\n"
+"⍝ ║μ4 │ RO│ the stop-condition function; iteration stops once it   ║\n"
+"⍝ ║   │   │ returns 1                                              ║\n"
+"⍝ ║μ6 │ B │ the previous value; overwritten with the new value at  ║\n"
+"⍝ ║   │   │ the end of each iteration                              ║\n"
+"⍝ ║μ7 │ T │ the condition result (Z RO B)                          ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"⍝ see Z__LO_POWER_RO_B's comment (same file) for why the validation +\n"
+"⍝ ∧/ two-step, rather than a bare ∧/,μ7, is required here.\n"
+"μ1←μ2 μ3 μ6 ◊ μ7←μ1 μ4 μ6 ◊ μ6←μ1 ◊ 1 →(1=≢,μ7)∧∧/(,μ7)∊0 1 ◊ ⎕ES 5,4\n"
+"¯1 →~∧/,μ7\n")
 
 /// reduce: Z←LO/[X] B
 //
 mac_def(Z__LO_REDUCE_X4_B,
-" Z←(LO Z__LO_REDUCE_X4_B) [X4] B;B3;T;H;M;M_max;L;N;I;I_max\n"
-" (X4 H M_max L)←X4 ◊ B3←(H M_max L)⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(H, L)⍴0 ◊ N←⎕IO\n"
-" (H L)←⊃I[N] ◊ M←M_max-2 ◊ T←B3[H;⎕IO+M_max-1;L]\n"
-" T← ⊂(⊃B3[H;⎕IO+M;L]) LO ⊃T ◊  0 → 0≤M←M-1\n"
-" Z[H;L]←T                   ◊ ¯2 → I_max>N←N+1\n"
-" Z←((X4≠⍳⍴⍴B)/⍴B)⍴Z\n")
+" μ1←(μ3 Z__LO_REDUCE_X4_B) [μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16\n"
+" ⍝ called as Bif_REDUCE::eval_LXB(tok_LO, X4, B); C++ builds\n"
+" ⍝ X4 as (axis+⎕IO, B3.h(), B3.m(), B3.l()) -- precomputed there for speed\n"
+" ⍝\n"
+"⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│ C++ │ Description                                            ║\n"
+"⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+"⍝ ║μ3 │  LO │ the reduce function                                    ║\n"
+"⍝ ║μ5 │  X4 │ destructured below into just the axis number; H/M_max/L║\n"
+"⍝ ║   │     │ (X4's other 3 fields) get their own slots, see below   ║\n"
+"⍝ ║μ6 │  B  │                                                        ║\n"
+"⍝ ║μ7 │  B3 │ B reshaped to (H,M_max,L) -- before/reduce-axis/after  ║\n"
+"⍝ ║   │     │ sizes                                                  ║\n"
+"⍝ ║μ8 │  T  │ the running reduced value                              ║\n"
+"⍝ ║μ9 │  H  │ (from X4), size of the dimensions before the reduce-   ║\n"
+"⍝ ║   │     │ axis                                                   ║\n"
+"⍝ ║μ10│  M  │ position within the reduce-axis (counts down)          ║\n"
+"⍝ ║μ11│M_max│ (from X4), size of the reduce-axis                     ║\n"
+"⍝ ║μ12│  L  │ (from X4), size of the dimensions after the reduce-axis║\n"
+"⍝ ║μ13│  N  │ loop index over Z's (H,L) positions                    ║\n"
+"⍝ ║μ14│  I  │ index list ,⍳(H,L) (cartesian product of Z positions)  ║\n"
+"⍝ ║μ15│I_max│ loop limit                                             ║\n"
+"⍝ ║μ16│ ⎕IO0│ ⎕IO as it was on entry (Bugs35 #40). μ13-μ15 are based ║\n"
+"⍝ ║   │     │ on it, H and L (μ9, μ12) are 0-based, and every index  ║\n"
+"⍝ ║   │     │ is ⎕IO+..., so that LO may change ⎕IO                  ║\n"
+"⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+" ⍝\n"
+" (μ5 μ9 μ11 μ12)←μ5 ◊ μ7←(μ9 μ11 μ12)⍴μ6 ◊ μ16←⎕IO ◊ μ15←μ16+⍴μ14←,⍳⍴μ1←(μ9, μ12)⍴0 ◊ μ13←μ16\n"
+" (μ9 μ12)←(⊃μ14[⎕IO+μ13-μ16])-μ16 ◊ μ10←μ11-2 ◊ μ8←μ7[⎕IO+μ9;⎕IO+μ11-1;⎕IO+μ12]\n"
+" μ8← ⊂(⊃μ7[⎕IO+μ9;⎕IO+μ10;⎕IO+μ12]) μ3 ⊃μ8 ◊  0 → 0≤μ10←μ10-1\n"
+" μ1[⎕IO+μ9;⎕IO+μ12]←μ8                   ◊ ¯2 → μ15>μ13←μ13+1\n"
+" μ1←(((μ5-μ16)≠(⍳⍴⍴μ6)-⎕IO)/⍴μ6)⍴μ1\n")
 
 /// reduce N-wise: Z←A LO/[X] B with positive A
 //
 mac_def(   Z__pA_LO_REDUCE_X4_B,
-" Z←A1 (LO Z__pA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
-" (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
-" (H a L)←⊃I[N] ◊ M←A1+1 ◊ T←B3[H;a-A1;L]\n"
-" T← ⊂(⊃B3[H;a-M;L]) LO ⊃T ◊  0 → 0≥M←M+1\n"
-" Z[H;a;L]←T               ◊ ¯2 →I_max>N←N+1\n"
-" Z←rho_Z⍴Z\n")
+" μ1←μ2 (μ3 Z__pA_LO_REDUCE_X4_B) [μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16;μ17;μ18;μ19\n"
+" ⍝ called as Bif_REDUCE::eval_ALXB(A1, tok_LO, X4, B) --\n"
+" ⍝ A LO/[axis] B, N-wise, A1>0. X4 built by C++ as (axis+⎕IO, ⍴Z,\n"
+" ⍝ ⍴Z3, ⍴B3) -- precomputed there for speed\n"
+" ⍝\n"
+"⍝ ╔═══╤══════╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│ C++  │ Description                                            ║\n"
+"⍝ ╟───┼──────┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │  Z   │ the result returned to the C++ caller                  ║\n"
+"⍝ ║μ2 │  A1  │ the (positive) N-wise window size                      ║\n"
+"⍝ ║μ3 │  LO  │ the reduce function                                    ║\n"
+"⍝ ║μ5 │  X4  │ destructured below into just the axis number;          ║\n"
+"⍝ ║   │      │ ⍴Z/⍴Z3/⍴B3 (X4's other 3 fields) get their own slots,  ║\n"
+"⍝ ║   │      │ see below                                              ║\n"
+"⍝ ║μ6 │  B   │                                                        ║\n"
+"⍝ ║μ7 │rho_B3│ (from X4), shape to reshape B into                     ║\n"
+"⍝ ║μ8 │  B3  │ B reshaped per rho_B3                                  ║\n"
+"⍝ ║μ9 │rho_Z │ (from X4), the result's final shape (trailing reshape) ║\n"
+"⍝ ║μ10│rho_Z3│ (from X4), intermediate 3-part shape used to allocate Z║\n"
+"⍝ ║μ11│  T   │ running reduced value across one window                ║\n"
+"⍝ ║μ12│  H   │ 'before' index component of the current Z position     ║\n"
+"⍝ ║μ13│  M   │ position counter walking one window (from A1+1 down)   ║\n"
+"⍝ ║μ14│  L   │ 'after' index component of the current Z position      ║\n"
+"⍝ ║μ15│  a   │ index component along the reduce-axis                  ║\n"
+"⍝ ║μ16│  N   │ loop index over Z's flattened positions                ║\n"
+"⍝ ║μ17│  I   │ index list ,⍳rho_Z3 (one 3-tuple (H,a,L) per Z pos)    ║\n"
+"⍝ ║μ18│I_max │ loop limit                                             ║\n"
+"⍝ ╚═══╧══════╧════════════════════════════════════════════════════════╝\n"
+" ⍝\n"
+" ⍝ μ19 is ⎕IO on entry: μ16-μ18 are based on it, H, a, L (μ12, μ15,\n"
+" ⍝ μ14) are 0-based, every index is ⎕IO+... (LO may change ⎕IO, Bugs35 #40)\n"
+" (μ5 μ9 μ10 μ7)←μ5 ◊ μ8←μ7⍴μ6 ◊ μ19←⎕IO ◊ μ18←μ19+⍴μ17←,⍳⍴μ1←(μ10)⍴0 ◊ μ16←μ19\n"
+" (μ12 μ15 μ14)←(⊃μ17[⎕IO+μ16-μ19])-μ19 ◊ μ13←μ2+1 ◊ μ11←μ8[⎕IO+μ12;⎕IO+μ15-μ2;⎕IO+μ14]\n"
+" μ11← ⊂(⊃μ8[⎕IO+μ12;⎕IO+μ15-μ13;⎕IO+μ14]) μ3 ⊃μ11 ◊  0 → 0≥μ13←μ13+1\n"
+" μ1[⎕IO+μ12;⎕IO+μ15;⎕IO+μ14]←μ11               ◊ ¯2 →μ18>μ16←μ16+1\n"
+" μ1←μ9⍴μ1\n")
 
 /// reduce N-wise: Z←A LO/[X] B with negative A
 //
 mac_def(   Z__nA_LO_REDUCE_X4_B,
-" Z←A1 (LO Z__nA_LO_REDUCE_X4_B) [X4] B;rho_B3;B3;rho_Z;rho_Z3;T;H;M;L;a;N;I;I_max\n"
-" (X4 rho_Z rho_Z3 rho_B3)←X4 ◊ B3←rho_B3⍴B ◊ I_max←⎕IO+⍴I←,⍳⍴Z←(rho_Z3)⍴0 ◊ N←⎕IO\n"
-" (H a L)←⊃I[N] ◊ M←¯1 ◊ T←B3[H;a;L]\n"
-" T← ⊂((⊃B3[H;a-M;L]) LO ⊃T) ◊  0 → A1≤M←M-1\n"
-" Z[H;a;L]←T                 ◊ ¯2 →I_max>N←N+1\n"
-" Z←rho_Z⍴Z\n")
+" μ1←μ2 (μ3 Z__nA_LO_REDUCE_X4_B) [μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16;μ17;μ18;μ19\n"
+" ⍝ called as Bif_REDUCE::eval_ALXB(A1, tok_LO, X4, B) --\n"
+" ⍝ A LO/[axis] B, N-wise, A1<0. X4 built by C++ as (axis+⎕IO, ⍴Z,\n"
+" ⍝ ⍴Z3, ⍴B3) -- precomputed there for speed\n"
+" ⍝\n"
+"⍝ ╔═══╤══════╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│ C++  │ Description                                            ║\n"
+"⍝ ╟───┼──────┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │  Z   │ the result returned to the C++ caller                  ║\n"
+"⍝ ║μ2 │  A1  │ the (negative) N-wise window size                      ║\n"
+"⍝ ║μ3 │  LO  │ the reduce function                                    ║\n"
+"⍝ ║μ5 │  X4  │ destructured below into just the axis number;          ║\n"
+"⍝ ║   │      │ ⍴Z/⍴Z3/⍴B3 (X4's other 3 fields) get their own slots,  ║\n"
+"⍝ ║   │      │ see below                                              ║\n"
+"⍝ ║μ6 │  B   │                                                        ║\n"
+"⍝ ║μ7 │rho_B3│ (from X4), shape to reshape B into                     ║\n"
+"⍝ ║μ8 │  B3  │ B reshaped per rho_B3                                  ║\n"
+"⍝ ║μ9 │rho_Z │ (from X4), the result's final shape (trailing reshape) ║\n"
+"⍝ ║μ10│rho_Z3│ (from X4), intermediate 3-part shape used to allocate Z║\n"
+"⍝ ║μ11│  T   │ running reduced value across one window                ║\n"
+"⍝ ║μ12│  H   │ 'before' index component of the current Z position     ║\n"
+"⍝ ║μ13│  M   │ position counter walking one window (from ¯1 down to   ║\n"
+"⍝ ║   │      │ A1)                                                    ║\n"
+"⍝ ║μ14│  L   │ 'after' index component of the current Z position      ║\n"
+"⍝ ║μ15│  a   │ index component along the reduce-axis                  ║\n"
+"⍝ ║μ16│  N   │ loop index over Z's flattened positions                ║\n"
+"⍝ ║μ17│  I   │ index list ,⍳rho_Z3 (one 3-tuple (H,a,L) per Z pos)    ║\n"
+"⍝ ║μ18│I_max │ loop limit                                             ║\n"
+"⍝ ╚═══╧══════╧════════════════════════════════════════════════════════╝\n"
+" ⍝\n"
+" ⍝ μ19 is ⎕IO on entry, see Z__pA_LO_REDUCE_X4_B (Bugs35 #40)\n"
+" (μ5 μ9 μ10 μ7)←μ5 ◊ μ8←μ7⍴μ6 ◊ μ19←⎕IO ◊ μ18←μ19+⍴μ17←,⍳⍴μ1←(μ10)⍴0 ◊ μ16←μ19\n"
+" (μ12 μ15 μ14)←(⊃μ17[⎕IO+μ16-μ19])-μ19 ◊ μ13←¯1 ◊ μ11←μ8[⎕IO+μ12;⎕IO+μ15;⎕IO+μ14]\n"
+" μ11← ⊂((⊃μ8[⎕IO+μ12;⎕IO+μ15-μ13;⎕IO+μ14]) μ3 ⊃μ11) ◊  0 → μ2≤μ13←μ13-1\n"
+" μ1[⎕IO+μ12;⎕IO+μ15;⎕IO+μ14]←μ11                 ◊ ¯2 →μ18>μ16←μ16+1\n"
+" μ1←μ9⍴μ1\n")
 
 /// scan: Z←LO/[X] B
 //
 mac_def(  Z__LO_SCAN_X4_B,
-  " Z←(LO Z__LO_SCAN_X4_B) [X4] B;B3;T;H;M;M_max;L;a;N;I;I_max\n"
-" (X4 H M_max L)←X4 ◊ I_max←⎕IO+⍴I←,⍳⍴Z←B3←(H M_max L)⍴B ◊ N←⎕IO - 1\n"
-" (H a L)←⊃I[N←N+1]          ◊  0 → a=⎕IO ◊ M←1 ◊ T←B3[H;a;L]\n"
-" T← ⊂((⊃B3[H;a-M;L]) LO ⊃T) ◊  0 → a>M←M+1\n"
-" Z[H;a;L]←T                 ◊ ¯2 → I_max>N+1\n"
-" Z←(⍴B)⍴Z\n")
+  " μ1←(μ3 Z__LO_SCAN_X4_B) [μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16;μ17\n"
+"⍝ called as Bif_SCAN::eval_LXB(tok_LO, X4, B); C++ builds\n"
+"⍝ X4 as (axis+⎕IO, Z3.h(), Z3.m(), Z3.l()) -- precomputed there for speed\n"
+"⍝\n"
+"⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│ C++ │ Description                                            ║\n"
+"⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │  Z  │ the result (also B3's initial value, being B reshaped) ║\n"
+"⍝ ║μ3 │  LO │ the scan function                                      ║\n"
+"⍝ ║μ5 │  X4 │ destructured below into just the axis number; H/M_max/L║\n"
+"⍝ ║   │     │ (X4's other 3 fields) get their own slots, see below   ║\n"
+"⍝ ║μ6 │  B  │                                                        ║\n"
+"⍝ ║μ7 │  B3 │ (from X4's H/M_max/L), B and Z reshaped to (H,M_max,L) ║\n"
+"⍝ ║μ8 │  T  │ running scanned value                                  ║\n"
+"⍝ ║μ9 │  H  │ (from X4), size of the dimensions before the scan-axis ║\n"
+"⍝ ║μ10│  M  │ position within the scan-axis walked so far            ║\n"
+"⍝ ║μ11│M_max│ (from X4), size of the scan-axis                       ║\n"
+"⍝ ║μ12│  L  │ (from X4), size of the dimensions after the scan-axis  ║\n"
+"⍝ ║μ13│  a  │ current position along the scan-axis                   ║\n"
+"⍝ ║μ14│  N  │ loop index over Z's (H,M_max,L) positions              ║\n"
+"⍝ ║μ15│  I  │ index list ,⍳(H,M_max,L)                               ║\n"
+"⍝ ║μ16│I_max│ loop limit                                             ║\n"
+"⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"⍝ μ17 is ⎕IO on entry: μ14 and μ16 are based on it, H, a, L (μ9, μ13,\n"
+"⍝ μ12) are 0-based, and every index is ⎕IO+... (LO may change ⎕IO). The\n"
+"⍝ former test μ13>μ10 lost the last step for ⎕IO=0 (Bugs35 #40).\n"
+" (μ5 μ9 μ11 μ12)←μ5 ◊ μ17←⎕IO ◊ μ16←μ17+⍴μ15←,⍳⍴μ1←μ7←(μ9 μ11 μ12)⍴μ6 ◊ μ14←μ17-1\n"
+" (μ9 μ13 μ12)←(⊃μ15[⎕IO+(μ14←μ14+1)-μ17])-μ17 ◊  0 → μ13=0 ◊ μ10←1 ◊ μ8←μ7[⎕IO+μ9;⎕IO+μ13;⎕IO+μ12]\n"
+" μ8← ⊂((⊃μ7[⎕IO+μ9;⎕IO+μ13-μ10;⎕IO+μ12]) μ3 ⊃μ8) ◊  0 → μ13≥μ10←μ10+1\n"
+" μ1[⎕IO+μ9;⎕IO+μ13;⎕IO+μ12]←μ8                 ◊ ¯2 → μ16>μ14+1\n"
+" μ1←(⍴μ6)⍴μ1\n")
 
-/// rank: Z←  (LO⍤j) B and Z←  (LO⍤[X]j) 
+/// rank: Z←  (LO⍤j) B and Z←  (LO⍤[X]j)
 //
 mac_def(Z__LO_RANK_X5_B,
- "Z←(LO Z__LO_RANK_X5_B) [X5] B;LB;rho_B;N_max;N;LZ;rho_Z\n"
-" (X5 LB rho_B LZ rho_Z)←X5 ◊ B←(LZ,LB)⍴B ◊ N_max←LZ+N←⎕IO ◊ Z←LZ⍴0\n"
-" Z[N]←⊂LO rho_B⍴B[N;] ◊ 0 → N_max>N←N+1\n"
-"→(X5≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
-"WITH_AXES:           Z←⊃[X5]rho_Z⍴Z\n")
+ "μ1←(μ3 Z__LO_RANK_X5_B) [μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13\n"
+ "⍝ called as Bif_OPER2_RANK::eval_LXB(_LO, X5, B) -- (LO⍤j)B and\n"
+ "⍝ (LO⍤[X]j)B. X5 built by C++ as (axis-or-¯1, LB, ⍴B, LZ, ⍴Z) --\n"
+ "⍝ precomputed there for speed\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ3 │  LO │ applied to one rank-selected cell of B at a time       ║\n"
+ "⍝ ║μ5 │  X5 │ destructured below into just the axis number (¯1 = no  ║\n"
+ "⍝ ║   │     │ axis given)                                            ║\n"
+ "⍝ ║μ6 │  B  │ reshaped to (LZ,LB) below                              ║\n"
+ "⍝ ║μ7 │  LB │ (from X5), ravelled length of one cell of B            ║\n"
+ "⍝ ║μ8 │rho_B│ (from X5), shape of one cell of B, used to reshape each║\n"
+ "⍝ ║   │     │ cell before calling LO                                 ║\n"
+ "⍝ ║μ9 │N_max│ loop limit                                             ║\n"
+ "⍝ ║μ10│  N  │ loop index over B's cells                              ║\n"
+ "⍝ ║μ11│  LZ │ (from X5), number of cells (= the loop count)          ║\n"
+ "⍝ ║μ12│rho_Z│ (from X5), the result's final shape (trailing reshape) ║\n"
+ "⍝ ║μ13│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment)      ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ " (μ5 μ7 μ8 μ11 μ12)←μ5 ◊ μ6←(μ11,μ7)⍴μ6 ◊ μ13←⎕IO ◊ μ9←μ11+μ10←μ13 ◊ μ1←μ11⍴0\n"
+ " μ1[⎕IO+μ10-μ13]←⊂μ3 μ8⍴μ6[⎕IO+μ10-μ13;] ◊ 0 → μ9>μ10←μ10+1\n"
+ "1 → μ5≢¯1 ◊ μ1←30 ⎕CR μ12⍴μ1 ◊ →0\n"
+ " μ1←⊃[μ5]μ12⍴μ1\n")
 
-/// rank: Z←A (LO⍤j) B and Z←(A LO⍤[X]j) 
+/// rank: Z←A (LO⍤j) B and Z←(A LO⍤[X]j)
 //
 mac_def(  Z__A_LO_RANK_X7_B,
- "Z←A (LO Z__A_LO_RANK_X7_B)[X7] B;LA;rho_A;LB;rho_B;N_max;N;LZ;rho_Z\n"
-" (X7 LA rho_A LB rho_B LZ rho_Z)←X7 ◊ A←(LZ,LA)⍴A ◊ B←(LZ,LB)⍴B\n"
-" N_max←LZ+N←⎕IO ◊ Z←LZ⍴0\n"
-" Z[N]←⊂(rho_A⍴A[N;]) LO rho_B⍴B[N;] ◊ 0 → N_max>N←N+1\n"
-" →(X7≢¯1)⍴WITH_AXES ◊ Z←30 ⎕CR rho_Z⍴Z ◊ →0\n"
-"WITH_AXES:           Z←⊃[X7]rho_Z⍴Z\n")
+ " μ1←μ2 (μ3 Z__A_LO_RANK_X7_B)[μ5] μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15\n"
+ "⍝ called as Bif_OPER2_RANK::eval_ALXB(A, _LO, X7, B) -- A(LO⍤j)B\n"
+ "⍝ and A(LO⍤[X]j)B. X7 built by C++ as (axis-or-¯1, LA, ⍴A, LB, ⍴B,\n"
+ "⍝ LZ, ⍴Z) -- precomputed there for speed\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ2 │  A  │ reshaped to (LZ,LA) below                              ║\n"
+ "⍝ ║μ3 │  LO │ applied to one rank-selected cell of A and B           ║\n"
+ "⍝ ║μ5 │  X7 │ destructured below into just the axis number (¯1 = no  ║\n"
+ "⍝ ║   │     │ axis given)                                            ║\n"
+ "⍝ ║μ6 │  B  │ reshaped to (LZ,LB) below                              ║\n"
+ "⍝ ║μ7 │  LA │ (from X7), ravelled length of one cell of A            ║\n"
+ "⍝ ║μ8 │rho_A│ (from X7), shape of one cell of A, reshaped before LO  ║\n"
+ "⍝ ║μ9 │  LB │ (from X7), ravelled length of one cell of B            ║\n"
+ "⍝ ║μ10│rho_B│ (from X7), shape of one cell of B, reshaped before LO  ║\n"
+ "⍝ ║μ11│N_max│ loop limit                                             ║\n"
+ "⍝ ║μ12│  N  │ loop index over A's/B's cells                          ║\n"
+ "⍝ ║μ13│  LZ │ (from X7), number of cells (= the loop count)          ║\n"
+ "⍝ ║μ14│rho_Z│ (from X7), the result's final shape (trailing reshape) ║\n"
+ "⍝ ║μ15│ ⎕IO0│ ⎕IO as it was on entry (Bugs28 #57, Bugs27 #56 residual║\n"
+ "⍝ ║   │     │ -- see Z__LO_EACH_B's own, more detailed comment)      ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝\n"
+ " (μ5 μ7 μ8 μ9 μ10 μ13 μ14)←μ5 ◊ μ2←(μ13,μ7)⍴μ2 ◊ μ6←(μ13,μ9)⍴μ6\n"
+ " μ15←⎕IO ◊ μ11←μ13+μ12←μ15 ◊ μ1←μ13⍴0\n"
+ " μ1[⎕IO+μ12-μ15]←⊂(μ8⍴μ2[⎕IO+μ12-μ15;]) μ3 μ10⍴μ6[⎕IO+μ12-μ15;] ◊ 0 → μ11>μ12←μ12+1\n"
+ "1 → μ5≢¯1 ◊ μ1←30 ⎕CR μ14⍴μ1 ◊ →0\n"
+ " μ1←⊃[μ5]μ14⍴μ1\n")
 
 /// ⎕INP helper
 //
 mac_def(Z__Quad_INP_B,
-    " B←Z__Quad_INP_B B;C;C_max;N;N_max;ROW\n"
-" N←⎕IO ◊ N_max←N+↑(⍴B),1\n"
-" ROW←⊃B[N] ◊ C←¯1+⎕IO ◊ C_max←C+⎕IO+⍴ROW ◊ →CX\n"
-" ROW[C]←⊂⍕⍎⊃ROW[C]\n"
-"CX: ¯1 → C_max>C←C+2 ◊ B[N]←31 ⎕CR ⊂ROW ◊ ¯2 → N_max>N←N+1\n")
+    " μ6←Z__Quad_INP_B μ6;μ1;μ7;μ8;μ9;μ10\n"
+"⍝ called as Quad_INP::eval_AB(A, B): eval_B(BB), where BB is the\n"
+"⍝ per-line text array (each element a 3-part row) assembled by ⎕INP\n"
+"⍝ in C++\n"
+"⍝\n"
+"⍝ ╔═══╤═════╤═══════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│ C++ │ Description                                           ║\n"
+"⍝ ╟───┼─────┼───────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │  C  │ column index while scanning one row for a leading dot ║\n"
+"⍝ ║   │     │ (⎕IO-based, offset by ¯1)                             ║\n"
+"⍝ ║μ6 │  B  │ (C++ BB; originally named B on both sides of the      ║\n"
+"⍝ ║   │     │ header, so input and result share one slot, one row   ║\n"
+"⍝ ║   │     │ rewritten in place at a time)                         ║\n"
+"⍝ ║μ7 │C_max│ column-scan limit for the current row                 ║\n"
+"⍝ ║μ8 │  N  │ loop index over B's rows                              ║\n"
+"⍝ ║μ9 │N_max│ loop limit                                            ║\n"
+"⍝ ║μ10│ ROW │ current row of B being rewritten                      ║\n"
+"⍝ ╚═══╧═════╧═══════════════════════════════════════════════════════╝\n"
+"⍝\n"
+" μ8←⎕IO ◊ μ9←μ8+↑(⍴μ6),1\n"
+" μ10←⊃μ6[μ8] ◊ μ1←¯1+⎕IO ◊ μ7←μ1+⎕IO+⍴μ10 ◊ 2 → 1\n"
+" μ10[μ1]←⊂⍕⍎⊃μ10[μ1]\n"
+" ¯1 → μ7>μ1←μ1+2 ◊ μ6[μ8]←31 ⎕CR ⊂μ10 ◊ ¯2 → μ9>μ8←μ8+1\n")
 
 /// ⎕EA (Execute Alternate) helper
 //
 mac_def(Z__A_Quad_EA_B,
-  " Z←A Z__A_Quad_EA_B B;RC;ET;RES\n"
-"     (RC ET RES)←⎕EC B ◊ →(RC=0 1 2 3 4 5)/ERR VAL COM 0 BRA ESC\n"
-"ERR: ⎕ES 100 $FFFF,  (⊂,A),  ET     ⍝ error\n"
-"VAL: Z←RES      ◊ →0                ⍝ non-committed value\n"
-"COM: ⎕ES 100 $FFFE   RES            ⍝ committed value\n"
-"BRA: ⎕ES 100 $FFFD   RES            ⍝ →N\n"
-"ESC: ⎕ES 100 $FFFC                  ⍝ →\n")
+  " μ1←μ2 Z__A_Quad_EA_B μ6;μ7;μ8;μ9\n"
+"⍝ called as Quad_EA::eval_AB(A, B)\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                            ║\n"
+"⍝ ╟───┼───┼────────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │ Z │ the result returned to the C++ caller                  ║\n"
+"⍝ ║μ2 │ A │ ⎕EA's alternate-branch payload, forwarded to ⎕ES       ║\n"
+"⍝ ║   │   │ on the →N/error/escape paths                           ║\n"
+"⍝ ║μ6 │ B │ the APL expression text to execute                     ║\n"
+"⍝ ║μ7 │ RC│ ⎕EC's return code (0=error,1/2=value,3=no value/→N out ║\n"
+"⍝ ║   │   │ of range,4/5=syntax error)                             ║\n"
+"⍝ ║μ8 │ ET│ ⎕EC's error token (meaningful only when RC=0)          ║\n"
+"⍝ ║μ9 │RES│ ⎕EC's result value (meaningful only when RC=1 or 2)    ║\n"
+"⍝ ╚═══╧═══╧════════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"     (μ7 μ8 μ9)←⎕EC μ6 ◊ 1→μ7=0 ◊ 2→μ7=1 ◊ 3→μ7=2 ◊ →(μ7=3)/0 ◊ 4→μ7=4 ◊ 5→μ7=5\n"
+  // μ9 (RES) is meaningful (per the doc table above) only when RC=1
+  // or 2, but Quad_EC::eoc() (QuadFunction.cc) ALSO populates it on
+  // the RC=0 (error) branch with the same 3-line, ⎕EM-shaped
+  // character matrix ⎕EM itself would show for B's real error --
+  // forward it here (⊂μ9, a 6th payload element) so that
+  // Prefix::handle_QUAD_ES_ERR() can recover that text/caret detail
+  // instead of only the bare (major,minor) code carried by μ8 (Z2).
+  // See Bugs28 #56 (Bugs27 #36 residual).
+" ⎕ES 100 $FFFF,  (⊂,μ2),  μ8,  (⊂μ9)     ⍝ error\n"
+" μ1←μ9      ◊ →0                ⍝ non-committed value\n"
+" ⎕ES 100 $FFFE   μ9            ⍝ committed value\n"
+  // A is added to BRA's payload (unlike the original, RES-only form)
+  // so that handle_QUAD_ES_BRA() (Prefix.cc) can fall back to
+  // executing A itself when the →N in B turns out to be out of range
+  // for ⎕EA's caller too (lrm p.349 Figure 38: "0 or any other line
+  // number not within the function... flow of execution returns to
+  // the invoking expression" -- i.e. B "failed" from ⎕EA's own point
+  // of view, same as if it had errored; a →N that IS within the
+  // caller's own range is simply taken directly, A never enters into
+  // it -- see Blake McBride, LanguageVariances.md #27).
+" ⎕ES 100 $FFFD,  (⊂,μ2),  μ9    ⍝ →N\n"
+" ⎕ES 100 $FFFC                  ⍝ →\n")
 
 /// ⎕EB (Execute Both) helper
 //
 mac_def(Z__A_Quad_EB_B,
-  " Z←A Z__A_Quad_EB_B B;RC;ET;RES\n"
-"     (RC ET RES)←⎕EC B ◊ ⍎A\n"
-"     →(RC=0 1 2 3 4 5)/ERR VAL COM 0 BRA ESC\n"
-"ERR: ⎕ES ET     ◊ →0                ⍝ error\n"
-"VAL: Z←RES      ◊ →0                ⍝ non-committed value\n"
-"COM: ⎕ES 100 $FFFE   RES            ⍝ committed value\n"
-"BRA: ⎕ES 100 $FFFD   RES            ⍝ →N\n"
-"ESC: ⎕ES 100 $FFFC                  ⍝ →\n")
+  " μ1←μ2 Z__A_Quad_EB_B μ6;μ7;μ8;μ9\n"
+"⍝ called as Quad_EB::eval_AB(A, B)\n"
+"⍝\n"
+"⍝ ╔═══╤═══╤══════════════════════════════════════════════════════╗\n"
+"⍝ ║APL│C++│ Description                                          ║\n"
+"⍝ ╟───┼───┼──────────────────────────────────────────────────────╢\n"
+"⍝ ║μ1 │ Z │ the result returned to the C++ caller                ║\n"
+"⍝ ║μ2 │ A │ the cleanup expression text, ⍎'d AFTER B, always     ║\n"
+"⍝ ║   │   │ (whether B succeeded or failed: try/finally)         ║\n"
+"⍝ ║μ6 │ B │ the protected expression text, run FIRST via ⎕EC     ║\n"
+"⍝ ║μ7 │ RC│ ⎕EC's return code                                    ║\n"
+"⍝ ║μ8 │ ET│ ⎕EC's error token (meaningful only when RC=0)        ║\n"
+"⍝ ║μ9 │RES│ ⎕EC's result value (meaningful only when RC=1 or 2)  ║\n"
+"⍝ ╚═══╧═══╧══════════════════════════════════════════════════════╝\n"
+"⍝\n"
+"     (μ7 μ8 μ9)←⎕EC μ6 ◊ ⍎μ2\n"
+"     1→μ7=0 ◊ 2→μ7=1 ◊ 3→μ7=2 ◊ →(μ7=3)/0 ◊ 4→μ7=4 ◊ 5→μ7=5\n"
+  // μ9 is B's ⎕EM-like matrix (see Quad_ES::eval_AB())
+" μ9 ⎕ES μ8  ◊ →0                ⍝ error\n"
+" μ1←μ9      ◊ →0                ⍝ non-committed value\n"
+" ⎕ES 100 $FFFE   μ9            ⍝ committed value\n"
+" ⎕ES 100 $FFFD   μ9            ⍝ →N\n"
+" ⎕ES 100 $FFFC                  ⍝ →\n")
 
 /// inner product with A and B of rank ≤ 1
 //
 mac_def(  Z__vA_LO_INNER_RO_vB,
- "Z←A (LO Z__A_LO_INNER_RO_B RO) B\n"
- "Z←LO/(,A) RO ,B\n")
+ "μ1←μ2 (μ3 Z__vA_LO_INNER_RO_vB μ4) μ6\n"
+ "⍝ called as Bif_OPER2_INNER::eval_ALRB(A, _LO, _RO, B) -- A and B\n"
+ "⍝ both rank ≤ 1\n"
+ "⍝\n"
+ "⍝ ╔═══╤═══╤═══════════════════════════════════════╗\n"
+ "⍝ ║APL│C++│ Description                           ║\n"
+ "⍝ ╟───┼───┼───────────────────────────────────────╢\n"
+ "⍝ ║μ1 │ Z │ the result returned to the C++ caller ║\n"
+ "⍝ ║μ2 │ A │                                       ║\n"
+ "⍝ ║μ3 │ LO│ the reduce function                   ║\n"
+ "⍝ ║μ4 │ RO│ the elementwise function              ║\n"
+ "⍝ ║μ6 │ B │                                       ║\n"
+ "⍝ ╚═══╧═══╧═══════════════════════════════════════╝\n"
+ "⍝\n"
+ "μ1←μ3/(,μ2) μ4 ,μ6\n")
 
 /// monadic EACH with ⍎
 //
 mac_def(Z__EXEC_EACH_B,
- "Z← Z__EXEC_EACH_B B;T;rho_Z;RC;ET;ZZ;J;N;N3;V3;N_max\n"
- " N←⎕IO ◊ rho_Z←⍴B ◊ N_max←N+⍴B←,B ◊ T←(⍴B)⍴0 ◊ V3←N3←⎕IO\n"
- " J←RC0, RC12, RC12, RC3, RC4, RC5\n"
- "LOOP:  (RC ET ZZ)←⎕EC ⊃B[N] ◊ →J[⎕IO+RC]\n"
- " RC0:  ((⊃ZZ)[⎕IO;], ' in macro ⍎¨') ⎕ES ⊃ET\n"
- " RC12: T[N]←⊂ZZ ◊ N3←N3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
- " RC3:             V3←V3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
- " RC4: 'SYNTAX ERROR: →N in macro ⍎¨' ⎕ES 2 2\n"
- " RC5: 'SYNTAX ERROR: → in macro ⍎¨'  ⎕ES 2 2\n"
- " DONE: →(V3=N_max)⍴0                      ⍝ NO RESULT\n"
- " →(N3≠N_max)/MISMATCH ◊ Z←rho_Z⍴T ◊ →0\n  ⍝ RESULT\n"
- "MISMATCH: 'VALUE ERROR in macro ⍎¨' ⎕ES 3 1\n")
+ "μ1← Z__EXEC_EACH_B μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16\n"
+ "⍝ called as Bif_OPER1_EACH::eval_B(B) -- ⍎¨B, i.e. LO is ⍎ itself\n"
+ "⍝\n"
+ "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
+ "⍝ ║APL│ C++ │ Description                                            ║\n"
+ "⍝ ╟───┼─────┼────────────────────────────────────────────────────────╢\n"
+ "⍝ ║μ1 │  Z  │ the result returned to the C++ caller                  ║\n"
+ "⍝ ║μ6 │  B  │ a vector of APL expression texts, ravelled in place    ║\n"
+ "⍝ ║μ7 │  T  │ per-element results collected so far (same shape as B) ║\n"
+ "⍝ ║μ8 │rho_Z│ B's original shape, used for the trailing reshape      ║\n"
+ "⍝ ║μ9 │  RC │ ⎕EC's return code for the current element              ║\n"
+ "⍝ ║μ10│  ET │ ⎕EC's error token for the current element (meaningful  ║\n"
+ "⍝ ║   │     │ only when RC=0)                                        ║\n"
+ "⍝ ║μ11│  ZZ │ ⎕EC's result value for the current element (meaningful ║\n"
+ "⍝ ║   │     │ only when RC=1 or 2)                                   ║\n"
+ "⍝ ║μ12│  J  │ relative-offset branch-distance table indexed by RC,   ║\n"
+ "⍝ ║   │     │ replacing the former RC0/RC12/RC3/RC4/RC5 labels       ║\n"
+ "⍝ ║μ13│  N  │ loop index over B's elements                           ║\n"
+ "⍝ ║μ14│  N3 │ count of elements that returned a value (RC 1 or 2)    ║\n"
+ "⍝ ║μ15│  V3 │ count of elements that returned no value (RC 3)        ║\n"
+ "⍝ ║μ16│N_max│ loop limit                                             ║\n"
+ "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
+ "⍝ a branch (RC 4, 5) is a DOMAIN ERROR: ⍎ applied with an operator\n"
+ "⍝ (LRM p.121, Bugs35 #52)\n"
+ "⍝\n"
+ " μ13←⎕IO ◊ μ8←⍴μ6 ◊ μ16←μ13+⍴μ6←,μ6 ◊ μ7←(⍴μ6)⍴0 ◊ μ15←μ14←⎕IO\n"
+ " μ12←1,2,2,3,4,5\n"
+ " (μ9 μ10 μ11)←⎕EC ⊃μ6[μ13] ◊ μ12[⎕IO+μ9] → 1\n"
+ " ((⊃μ11)[⎕IO;], ' in macro ⍎¨') ⎕ES ⊃μ10\n"
+ " μ7[μ13]←⊂μ11 ◊ μ14←μ14+1 ◊ ¯2 → μ16>μ13←μ13+1 ◊ 4 → 1\n"
+ " μ15←μ15+1 ◊ ¯3 → μ16>μ13←μ13+1 ◊ 3 → 1\n"
+ " 'DOMAIN ERROR: →N in macro ⍎¨' ⎕ES 5 4\n"
+ " 'DOMAIN ERROR: → in macro ⍎¨'  ⎕ES 5 4\n"
+ " →(μ15=μ16)⍴0                      ⍝ NO RESULT\n"
+ " 2 → μ14≠μ16 ◊ μ1←μ8⍴μ7 ◊ →0\n  ⍝ RESULT\n"
+ "'VALUE ERROR in macro ⍎¨' ⎕ES 3 1\n")
 
 #undef mac_def
 

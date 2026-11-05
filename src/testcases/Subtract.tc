@@ -1,6 +1,8 @@
 ⍝ Subtract.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       5-3
 2
 
@@ -18,5 +20,47 @@
       2J8 - 3.0
 ¯1J8
 
-⍝ ==================================
+      ⍝ Integer overflow → float promotion (Cell::diff_overflow(),
+      ⍝ IntCell::bif_subtract_ii()). ⎕PP←17 so the promoted (float)
+      ⍝ results print with enough digits to be unambiguous.
+      ⍝
+      ⎕PP←17
+
+      ⍝ boundary: difference is exactly the largest int64 value, stays integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9223372036854775806-¯1
+9223372036854775807
+      ]FILE_CTL SKIP_APL2   ⍝ 26⎕CR is a GNU-only type-introspection extension
+      26⎕CR 9223372036854775806-¯1
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ one more: difference overflows int64, promoted to float
+      9223372036854775807-¯1
+9.2233720368547758E18
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 9223372036854775807-¯1
+32
+      ]FILE_CTL NO_SKIP
+
+      ⍝ boundary: difference is exactly the smallest int64 value, stays integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      ¯9223372036854775807-1
+¯9223372036854775808
+      ]FILE_CTL SKIP_APL2
+      26⎕CR ¯9223372036854775807-1
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ one more negative: difference overflows int64, promoted to float
+      ¯9223372036854775808-1
+¯9.2233720368547758E18
+      ]FILE_CTL SKIP_APL2
+      26⎕CR ¯9223372036854775808-1
+32
+      ]FILE_CTL NO_SKIP
+
+      ⎕PP←10
+
+      ⍝ ==================================
 

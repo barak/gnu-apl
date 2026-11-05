@@ -36,16 +36,17 @@
 // exist on the platform
 
 #ifdef HAVE_UNISTD_H
-# include <unistd.h>
+#  include <unistd.h>
 #endif
 
 #ifdef HAVE_DIRENT_H
-# include <dirent.h>   // typedefs DIR as struct __dirstream
+#  include <dirent.h>   // typedefs DIR as struct __dirstream
 #else
   typedef struct __dirstream DIR;
 #endif
 
 #include <string.h>
+#include <csignal>   // for sig_atomic_t (InterruptContext's ^C flags)
 
 #include <stdint.h>
 #include <stdio.h>
@@ -53,17 +54,21 @@
 #include <sys/time.h>   // for gettimeofday()
 
 #ifndef RLIM_INFINITY   // Raspberry
-#define RLIM_INFINITY (~rlim_t(0))
+#  define RLIM_INFINITY (~rlim_t(0))
 #endif
 
 #ifndef cfg_MAX_RANK_WANTED
-# define cfg_MAX_RANK_WANTED 8
+#  define cfg_MAX_RANK_WANTED 8
+#endif
+
+#ifndef cfg_MAX_DEPTH_WANTED
+#  define cfg_MAX_DEPTH_WANTED 254
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
 #ifdef erase
-#undef erase
+#  undef erase
 #endif
 
 #include <complex>
@@ -92,8 +97,8 @@ extern const int libapl_version;
 extern int64_t get_main();
 
 /// interpreter capabilities (for ]NEXTFILE)
-#define  apl_CAPABILITIES  "⎕FFT", "GTK",  "GUI", "⎕PNG", "POSTGRES", "⎕PLOT", \
- "⎕RE", "⎕SQL", "SQLITE3", "X11",  "XCB",
+#define  apl_CAPABILITIES  "⎕FFT", "GSL",  "GTK",  "GUI", "⎕PNG", "POSTGRES", \
+ "⎕PLOT", "⎕RE", "⎕SQL", "SQLITE3", "SVARS", "X11",  "XCB",
 
 /// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
 extern bool gtk_init_done;
@@ -102,28 +107,49 @@ extern bool gtk_init_done;
 /// that depend on the command line arguments. Note that different
 /// build targets (main.cc, libapl.cc, and python_apl.cc) provide their own
 /// \b init_modules() function.
+/// @param argv0        path to the interpreter executable (argv[0])
+/// @param log_startup  true to log startup progress to CERR
 extern void init_modules(const char * argv0, bool log_startup);
 
 /// initialize those modules (Output, Svar_DB, LineInput, and Parallel)
 /// that are independent of the command line arguments.
+/// @param log_startup  true to log startup progress to CERR
 extern void init_modules2(bool log_startup);
 
 /// clean up
+/// @param soft  true for a soft (non-fatal) cleanup, false for hard exit
 extern void cleanup(bool soft);
 
+/// the default ostream format state (flags, precision, fill, ...) that
+/// every ostream in GNU APL (COUT, CERR, or a caller-owned ostream & out)
+/// shall be reset to via reset_format(); shared by all of them so there is
+/// exactly one definition of "default" and no per-stream drift. A function-
+/// local static (rather than an extern global defined in Common.cc) so
+/// that reset_format() stays header-only: some binaries (e.g. the AP1xx
+/// auxiliary processors) link a stand-alone Backtrace.o without linking
+/// Common.o, which would otherwise leave default_format_state undefined.
+inline const ios &
+default_format_state()
+   { static const ios state(0);   return state; }
+
+/// reset \b out (typically COUT, CERR, or a caller-owned ostream) to
+/// default_format_state(), i.e. undo any setfill()/left/hex/... left
+/// behind by earlier output. Use as: out << reset_format;
+inline ostream &
+reset_format(ostream & out)
+   { out.copyfmt(default_format_state());   return out; }
+
+//════════════════════════════════════════════════════════════════════════════
 class InterruptContext
 {
 public:
   InterruptContext()
-  : attention_raised(false),
+  : attention_count(0),
+    attention_raised(false),
+    interrupt_count(0),
     interrupt_raised(false),
-    interrupt_when(0),
-    attention_count(0),
-    interrupt_count(0)
+    interrupt_when(0)
   {}
-
-  // ^C handler
-  static void control_C(int);
 
   /// true if Control-C was hit (once)
   static bool attention_is_raised()
@@ -131,71 +157,108 @@ public:
        return interrupt_context.attention_raised;
      }
 
+  /// @param loc  caller location for diagnostics
+  static void clear_attention_raised(const char * loc)
+     {
+       interrupt_context.attention_raised = false;
+     }
+
+   /// @param loc  caller location for diagnostics
+   static void clear_interrupt_raised(const char * loc)
+      {
+        interrupt_context.interrupt_raised = false;
+      }
+
+  /// return the range in the prefix parser when ^C was hit (once)
+  static const Function_PC2 & get_attention_range()
+     { return interrupt_context.attention_range; };
+
+   /// return the number of interrupts
+   static uint64_t get_interrupt_count()
+      { return interrupt_context.interrupt_count; }
+
+  /// return the range in the prefix parser when ^C was hit (twice)
+  static const Function_PC2 & get_interrupt_range()
+     { return interrupt_context.interrupt_range; }
+
+  /// return the position (in body) of the statement when ^C was hit (once)
+  static Prefix_PC get_attention_stat_PC()
+     { return interrupt_context.attention_stat_PC; }
+
+  /// return the position (in body) of the statement when ^C was hit (twice)
+  static Prefix_PC get_interrupt_stat_PC()
+     { return interrupt_context.interrupt_stat_PC; }
+
+  /// return the executable to which the attention and interrupt ranges
+  /// belong (0 if none)
+  static const void * get_range_executable()
+     { return interrupt_context.range_executable; }
+
   /// true if Control-C was hit twice within 500 ms
   static bool interrupt_is_raised()
      {
        return interrupt_context.interrupt_raised;
      }
 
+  /// @param loc  caller location for diagnostics
   static void set_attention_raised(const char * loc)
      {
        interrupt_context.attention_raised = true;
      }
 
-  static void clear_attention_raised(const char * loc)
-     {
-       interrupt_context.attention_raised = false;
-     }
-
+   /// @param loc  caller location for diagnostics
    static void set_interrupt_raised(const char * loc)
       {
         interrupt_context.interrupt_raised = true;
       }
 
-   static void clear_interrupt_raised(const char * loc)
-      {
-        interrupt_context.interrupt_raised = false;
-      }
-
-   /// return the number of interrupts
-   static uint64_t get_interrupt_count()
-      { return interrupt_context.interrupt_count; }
-
-  /// return the range in the prefix parser when ^C was hit (once)
-  static const Function_PC2 & get_attention_range()
-     { return interrupt_context.attention_range; };
-
-  /// return the range in the prefix parser when ^C was hit (twice)
-  static const Function_PC2 & get_interrupt_range()
-     { return interrupt_context.interrupt_range; }
+  // ^C handler
+  static void control_C(int);
 
 protected:
-  /// true if ^C was hit (once)
-  bool attention_raised;
-
-  /// true if ^C was hit (twice)
-  bool interrupt_raised;
-
-  APL_time_us interrupt_when = 0;   // to detect double ^C
-
   /// the number of attentions
   uint64_t attention_count;
 
-  /// the number of interrupts
-  uint64_t interrupt_count;
+  /// true if ^C was hit (once). volatile sig_atomic_t, not plain bool:
+  /// this is written from control_C(), a real SIGINT handler, and read
+  /// from ordinary code -- a plain bool has no guaranteed atomicity or
+  /// visibility across a signal, sig_atomic_t is the standard's own
+  /// type for exactly this (C++11 [support.signal], C11 7.14.1.1).
+  volatile sig_atomic_t attention_raised;
 
   /// The range in the prefix parser when ^C was hit (once)
   Function_PC2 attention_range;
 
+  /// the position (in body) of the statement when ^C was hit (once)
+  Prefix_PC attention_stat_PC = Prefix_PC_invalid;
+
+  /// the position (in body) of the statement when ^C was hit (twice)
+  Prefix_PC interrupt_stat_PC = Prefix_PC_invalid;
+
+  /// the number of interrupts
+  uint64_t interrupt_count;
+
+  /// true if ^C was hit (twice) -- see attention_raised for why this
+  /// is volatile sig_atomic_t rather than plain bool.
+  volatile sig_atomic_t interrupt_raised;
+
   /// The range in the prefix parser when ^C was hit (twice)
   Function_PC2 interrupt_range;
+
+  /// the executable (SI top) in which the ranges above were recorded:
+  /// the error may be reported for another one (e.g. a macro's ^C for the
+  /// statement that called it), where the ranges are meaningless
+  const void * range_executable = 0;
+
+  APL_time_us interrupt_when = 0;   // to detect double ^C
 
   /// the context for Attention and Interrupt.
   static InterruptContext interrupt_context;
 };
 
 /// signal handler for ^C
-extern void control_C(int);
+/// @param sig  signal number (SIGINT)
+extern void control_C(int sig);
 
 /// normal APL output (to stdout)
 extern ostream COUT;
@@ -241,19 +304,19 @@ timeval tv;
    return tv.tv_sec * 1000000ULL + tv.tv_usec;
 }
 #else // neither HAVE_RDTSC nor HAVE_GETTIMEOFDAY
-#define cycle_counter() 0
+#  define cycle_counter() 0
 #endif // HAVE_RDTSC
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if HAVE_SEM_INIT
 
-# define __sem_destroy(sem) sem_destroy(sem)
-# define __sem_init(sem, pshared, value) sem_init(sem, pshared, value)
+#  define __sem_destroy(sem) sem_destroy(sem)
+#  define __sem_init(sem, pshared, value) sem_init(sem, pshared, value)
 
 #else // not HAVE_SEM_INIT
 
-# define __sem_destroy(sem) { if (sem) sem_close(sem); }
-# define __sem_init(sem, _pshared, value)                   \
+#  define __sem_destroy(sem) { if (sem) sem_close(sem); }
+#  define __sem_init(sem, _pshared, value)                   \
 {                                                          \
 char sname[100];                                           \
    { /* create a unique name */                            \
@@ -266,7 +329,7 @@ char sname[100];                                           \
    sem = sem_open(sname, O_CREAT, mode, value);            \
 }
 #endif // HAVE_SEM_INIT
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
@@ -275,14 +338,38 @@ char sname[100];                                           \
 class Probe
 {
 public:
+   /// constructor
+   Probe()
+      { init(); }
+
    /// some Proble related parameters
    enum { PROBE_COUNT = 100,   ///< the number of probes
           PROBE_LEN   = 20     ///< the number of measurements in each probe
         };
 
-   /// constructor
-   Probe()
-      { init(); }
+   /// get the m'th start time of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_start(int m) const
+      { if (m >= idx)   return -1;
+        return measurements[m].cycles_from;
+      }
+
+   /// get the m'th stop time of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_stop(int m) const
+      { if (m >= idx)   return -1;
+        return measurements[m].cycles_to;
+      }
+
+   /// get the m'th time (from P1 to P2) of this probe
+   /// @param m  measurement index within this probe
+   int64_t get_time(int m) const
+      { if (m >= idx)   return -1;
+        const int64_t diff = measurements[m].cycles_to
+                           - measurements[m].cycles_from;
+        if (diff < 0)   return -2;
+        return diff;
+      }
 
    /// initialize this probe
    void init()
@@ -291,17 +378,6 @@ public:
         start_p = &dummy;
         stop_p  = &dummy;
       }
-
-   /// init the p'th probe
-   static int init(int p)
-      { if (p >= PROBE_COUNT)   return -3;
-        probes[p].init();
-        return 0;
-      }
-
-   /// initialize all probes
-   static void init_all()
-      { loop(p, PROBE_COUNT)   init(p); }
 
    /// start time measurement
    void start()
@@ -337,50 +413,48 @@ public:
         ++idx;
       }
 
-   /// get the m'th time (from P1 to P2) of this probe
-   int64_t get_time(int m) const
-      { if (m >= idx)   return -1;
-        const int64_t diff = measurements[m].cycles_to
-                           - measurements[m].cycles_from;
-        if (diff < 0)   return -2;
-        return diff;
-      }
-
-   /// get the m'th time of the p'th probe
-   static int get_time(int p, int m)
+   /// get the number of times int the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   static int get_length(int p)
       { if (p >= PROBE_COUNT)   return -3;
-        return probes[p].get_time(m);
-      }
-
-   /// get the m'th start time of this probe
-   int64_t get_start(int m) const
-      { if (m >= idx)   return -1;
-        return measurements[m].cycles_from;
+        return probes[p].idx;
       }
 
    /// get the m'th start time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
    static int get_start(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].get_start(m);
       }
 
-   /// get the m'th stop time of this probe
-   int64_t get_stop(int m) const
-      { if (m >= idx)   return -1;
-        return measurements[m].cycles_to;
-      }
-
    /// get the m'th stop time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
    static int get_stop(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
         return probes[p].get_stop(m);
       }
 
-   /// get the number of times int the p'th probe
-   static int get_length(int p)
+   /// get the m'th time of the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   /// @param m  measurement index within the probe
+   static int get_time(int p, int m)
       { if (p >= PROBE_COUNT)   return -3;
-        return probes[p].idx;
+        return probes[p].get_time(m);
       }
+
+   /// init the p'th probe
+   /// @param p  probe index (0 .. PROBE_COUNT-1)
+   static int init(int p)
+      { if (p >= PROBE_COUNT)   return -3;
+        probes[p].init();
+        return 0;
+      }
+
+   /// initialize all probes
+   static void init_all()
+      { loop(p, PROBE_COUNT)   init(p); }
 
    static Probe & P0;    ///< start of vector probes
    static Probe & P_1;   ///< individual probe 1
@@ -398,11 +472,11 @@ protected:
         int64_t cycles_to;     ///< the cycle counter at point 2
       };
 
-   /// all measurements
-   measurement measurements[PROBE_LEN];
-
    /// index into \b probes
    int idx;
+
+   /// all measurements
+   measurement measurements[PROBE_LEN];
 
    /// start time
    int64_t * start_p;
@@ -416,34 +490,37 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// Year, Month, Day, hour, minute, second, μsecond
 struct YMDhmsu
 {
    /// construct YMDhmsu from usec since Jan. 1. 1970 00:00:00
+   /// @param t  microseconds since Unix epoch (Jan. 1, 1970 00:00:00)
    YMDhmsu(APL_time_us t);
 
    /// return usec since Jan. 1. 1970 00:00:00
    APL_time_us get() const;
 
-   int year;     ///< year, e.g. 2013
-   int month;    ///< month 1-12
    int day;      ///< day 1-31
    int hour;     ///< hour 0-23
-   int minute;   ///< minute 0-59
-   int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
+   int minute;   ///< minute 0-59
+   int month;    ///< month 1-12
+   int second;   ///< second 0-59
+   int year;     ///< year, e.g. 2013
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #ifdef TROUBLESHOOT_NEW_DELETE
-inline void * operator new(size_t size)   { return common_new(size); }
-inline void   operator delete(void * p)   { common_delete(p); }
+inline void * operator new(size_t size)    { return common_new(size); }
+inline void   operator delete(void * p)    { common_delete(p); }
+inline void * operator new[](size_t size)  { return common_new(size); }
+inline void   operator delete[](void * p)  { common_delete(p); }
 #endif
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// a function to be used if CERR might not (yet) be initialized. Returns cerr
 /// in that case.
@@ -469,12 +546,19 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 #define ALLOCA(typ, count) \
         reinterpret_cast<typ *>(alloca((count) * sizeof(typ)))
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+
+class cValue;   // forward declaration (defined in Value.hh)
 
 #ifdef cfg_VALUE_HISTORY_WANTED
 
+class cValue;   // forward declaration (defined in Value.hh)
    enum { VALUEHISTORY_SIZE = 100000 };
-   extern void add_event(const Value * val, VH_event ev, int ia,
+   /// @param val  the APL value the event applies to
+   /// @param ev   the value-history event type
+   /// @param ia   auxiliary integer parameter for the event
+   /// @param loc  caller location for diagnostics
+   extern void add_event(const cValue * val, VH_event ev, int ia,
                         const char * loc);
 #  define ADD_EVENT(val, ev, ia, loc)   add_event(val, ev, ia, loc);
 
@@ -485,91 +569,171 @@ extern std::ostream & get_CERR();   // defined in: Output.cc
 
 #endif
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+/// @param p  pointer into a C string, advanced past any leading whitespace
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 inline const char * yes_no(bool yes)   { return yes ? "yes" : "no"; }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+/// @param pc     function program counter
+/// @param offset byte offset to add
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// @param pc     function program counter
+/// @param offset byte offset to subtract
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) - offset);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC ++ (post increment)
+/// @param pc  function program counter to increment
+/// @param     unused post-increment distinguisher
 inline Function_PC
 operator ++(Function_PC & pc, int)
 {
-const Function_PC before_increment = pc; 
+const Function_PC before_increment = pc;
    pc = pc + 1;
    return before_increment;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC ++ (pre increment)
+/// @param pc  function program counter to increment
 inline Function_PC &
 operator ++(Function_PC & pc)
 {
    pc = pc + 1;
    return pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Function_PC -- (pre decrement)
+/// @param pc  function program counter to decrement
 inline Function_PC &
 operator --(Function_PC & pc)
 {
    pc = pc - 1;
    return pc;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// @param pc     Prefix_PC
+/// @param offset offset to add
+inline Prefix_PC
+operator +(Prefix_PC pc, int offset)
+{
+   return Prefix_PC(int(pc) + offset);
+}
+//────────────────────────────────────────────────────────────────────────────
+/// @param pc     Prefix_PC
+/// @param offset offset to subtract
+inline Prefix_PC
+operator -(Prefix_PC pc, int offset)
+{
+   return Prefix_PC(int(pc) - offset);
+}
+//────────────────────────────────────────────────────────────────────────────
+/// the distance between two Prefix_PCs
+inline int
+operator -(Prefix_PC pc1, Prefix_PC pc2)
+{
+   return int(pc1) - int(pc2);
+}
+//────────────────────────────────────────────────────────────────────────────
+/// Prefix_PC ++ (post increment)
+inline Prefix_PC
+operator ++(Prefix_PC & pc, int)
+{
+const Prefix_PC before_increment = pc;
+   pc = pc + 1;
+   return before_increment;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// Prefix_PC ++ (pre increment)
+inline Prefix_PC &
+operator ++(Prefix_PC & pc)
+{
+   pc = pc + 1;
+   return pc;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// Prefix_PC -- (post decrement)
+inline Prefix_PC
+operator --(Prefix_PC & pc, int)
+{
+const Prefix_PC before_decrement = pc;
+   pc = pc - 1;
+   return before_decrement;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// Prefix_PC -- (pre decrement)
+inline Prefix_PC &
+operator --(Prefix_PC & pc)
+{
+   pc = pc - 1;
+   return pc;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// print a Prefix_PC
+inline ostream &
+operator <<(ostream & out, Prefix_PC pc)
+{
+   return out << int(pc);
+}
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to const char *
+/// @param utf  UTF-8 byte pointer to reinterpret as char *
 inline const char *
 charP(const UTF8 * utf)
 {
    return reinterpret_cast<const char *>(utf);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to const char *
+/// @param vp  void pointer to reinterpret as char *
 inline const char *
 charP(const void * vp)
 {
    return reinterpret_cast<const char *>(vp);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// frequently used cast to a const void *
+/// @param addr  address to return as const void *
 inline const void *
 voidP(const void * addr)
 {
    return addr;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #define uhex  std::hex << uppercase << setfill('0')
 #define uhexs  std::hex << uppercase
 #define lhex  std::hex << nouppercase << setfill('0')
-#define nohex std::dec << nouppercase << setfill(' ')
 
-/// formatting for hex (and similar) values
-#define HEX(x)     "0x" << uhex <<             int64_t(x) << nohex
+/// formatting for hex (and similar) values. Each ends with reset_format
+/// (not a hand-written "undo", see reset_format() in Common.hh above) so
+/// the stream is fully back to normal afterwards -- earlier versions
+/// ended with "<< std::left << nohex", which reset dec/case/fill but
+/// left the stream *left*-justified, i.e. the same class of bug as the
+/// Command.cc/UCS_string.cc left/right leaks found elsewhere.
+#define HEX(x)     "0x" << uhex <<             int64_t(x) << reset_format
 #define HEX2(x)    "0x" << uhex << std::right << \
-                           setw(2) << int(x) << std::left << nohex
+                           setw(2) << int(x) << reset_format
 #define HEX4(x)    "0x" << uhex << std::right << \
-                           setw(4) << int(x) << std::left << nohex
+                           setw(4) << int(x) << reset_format
 #define HEX8(x)    "0x" << uhex << std::right << \
-                           setw(8) << int32_t(x) << std::left << nohex
+                           setw(8) << int32_t(x) << reset_format
 #define HEX16(x)   "0x" << uhex << std::right << \
-                           setw(16) << int64_t(x) << std::left << nohex
+                           setw(16) << int64_t(x) << reset_format
 #define HEX16s(x)          uhexs << std::right << \
-                           setw(16) << int64_t(x) << std::left << nohex
-#define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
+                           setw(16) << int64_t(x) << reset_format
+#define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << reset_format
 
 /// set the last byte in buffer to 0 (so that string functions won't fail
 /// even if the  buffer was not 0-terminated for some reason.

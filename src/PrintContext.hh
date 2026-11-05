@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,11 +27,13 @@
 #include "Common.hh"
 #include "SystemLimits.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// Attributes that control how APL values are being printed.
 class PrintContext
 {
 public:
    /// constructor from another style
+   /// @param st  print style to use
    PrintContext(PrintStyle st)
    : style(st),
      precision(DEFAULT_Quad_PP),
@@ -39,29 +41,33 @@ public:
    {}
 
    /// constructor for given values
+   /// @param st   print style to use
+   /// @param qpp  print precision (⎕PP)
+   /// @param qpw  print width (⎕PW)
    PrintContext(PrintStyle st, int qpp, int qpw)
    : style(st),
      precision(qpp),
      width(qpw)
    {}
 
-   /// return the print style to be used
-   PrintStyle get_style() const { return style; }
-
-   /// set the print style to be used
-   void set_style(PrintStyle ps) { style = ps; }
-
-   /// return true iff exponential format shall be used
-   bool get_scaled() const   { return (style & PST_SCALED) != 0; }
-
-   /// request scaled (exponential) format
-   void set_scaled()   { style = PrintStyle(style | PST_SCALED); }
-
    /// return the print precision to be used
    int get_PP() const { return precision; }
 
    /// return the print width to be used
    int get_PW() const { return width; }
+
+   /// return true iff exponential format shall be used
+   bool get_scaled() const   { return (style & PST_SCALED) != 0; }
+
+   /// return the print style to be used
+   PrintStyle get_style() const { return style; }
+
+   /// request scaled (exponential) format
+   void set_scaled()   { style = PrintStyle(style | PST_SCALED); }
+
+   /// set the print style to be used
+   /// @param ps  new print style
+   void set_style(PrintStyle ps) { style = ps; }
 
 protected:
    /// the print style to be used
@@ -73,5 +79,6 @@ protected:
    /// the print width to be used
    int width;          // aka. ⎕PW
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PRINT_CONTEXT_HH_DEFINED__

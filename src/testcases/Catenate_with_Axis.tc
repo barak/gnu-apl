@@ -1,6 +1,8 @@
 ⍝ Catenate_with_Axis.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       M1←2 2⍴⍳4
       M2←2 2⍴'ABCD'
       M2,[1]M1
@@ -9,7 +11,7 @@ C D
 1 2
 3 4
 
-⍝ One Arguments is a Scalar ----------------------------------
+      ⍝ One Arguments is a Scalar ----------------------------------
 
       A←3 4ρ'BATHBEATBIND'
       A
@@ -26,7 +28,7 @@ XXXX
 1 2 3 4  5
 6 7 8 9 10
 
-⍝ Arguments same Rank ----------------------------------
+      ⍝ Arguments same Rank ----------------------------------
 
       A
 BATH
@@ -57,7 +59,7 @@ ZERO
 ¯13 ¯14 ¯15
 ¯16 ¯17 ¯18
 
-⍝ Arguments differ in Rank by 1 ----------------------------------
+      ⍝ Arguments differ in Rank by 1 ----------------------------------
 
       H←'words'
       H

@@ -1,6 +1,8 @@
 ⍝ ZZZ7_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ segfault in ⎕EA with error in right argument
       ⍝ 
 

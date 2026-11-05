@@ -25,6 +25,7 @@
 #define __USER_PREFERENCES_HH_DEFINED__
 
 #include <sys/time.h>
+#include <map>
 #include <string>
 
 #include "Parallel.hh"
@@ -32,15 +33,19 @@
 
 class Function;
 
+//════════════════════════════════════════════════════════════════════════════
 /** a structure that contains user preferences from different sources
     (command line arguments, config files, environment variables ...)
  */
 /// Various preferences of the user (sorted alphabetically)
 class UserPreferences
 {
+   friend class CrashDump;   // for show_version() et al. in crash dumps
+
 public:
   /// collect all user preferences (from command line arguments and from
   /// preferences file). Return \b true iff start-up logging was requested.
+  /// @param args command-line argument vector passed to main()
   bool collect_preferences(const std::vector<const char *> & args);
 
    /// append test results to summary.log rather than overriding it
@@ -51,6 +56,15 @@ public:
 
    /// backup on )SAVE
    bool backup_before_save;
+
+   /// format APL values exactly like IBM APL2 does, even where that differs
+   /// from GNU APL's traditional output (preference STRICT_IBM_APL2_FORMATTING,
+   /// see apl.texi, "Output Formatting")
+   bool strict_IBM_APL2_formatting;
+
+   /// display nested items like IBM APL2, but with (multi-line) parentheses
+   /// instead of blanks (STRICT_IBM_APL2_FORMATTING parentheses)
+   bool nested_parentheses;
 
    /// screen rows for ⎕PLOT ASCII driver
    int plot_ASCII_rows;
@@ -96,6 +110,7 @@ public:
    bool emacs_mode;
 
    /// expand lumped arguments
+   /// @param args raw command-line argument vector to expand
    void expand_args(const std::vector<const char *> & args);
 
    /// --eval expressions
@@ -161,6 +176,9 @@ public:
    /// true if --safe command line option was given
    bool safe_mode;
 
+   /// true if --status was given: print ]STATUS and exit
+   bool show_status;
+
    /// the argument number of the APL script name (if run from a script)
    /// in expanded_args, or 0 if apl is started directly.
    size_t script_argc;
@@ -187,6 +205,10 @@ public:
    /// the profile to be used (in the preferences file)
    int user_profile;
 
+   /// true if no preferences or parallel_thresholds files shall be read
+   /// (--noPrefs, e.g. for testcases that must not depend on an installation)
+   bool no_prefs;
+
    /// wait at start-up
    int wait_ms;
 
@@ -197,11 +219,53 @@ public:
    /// \b preferences files) for the APL interpreter instance
    static UserPreferences uprefs;
 
+   /// why a feature is switched off (see ]STATUS): a source code like the
+   /// ones of )LIBS (PSYS, PUSER, ARGV, RUN) and a detail (e.g. the line
+   /// of a preferences file or the command line option)
+   struct Off_reason
+      {
+        std::string source;   ///< PSYS, PUSER, ARGV, or RUN
+        std::string detail;   ///< e.g. "line 251: SharedVars Disabled"
+      };
+
+   /// the run-time switchable features (see ]STATUS) and their current state
+   std::map<std::string, bool> feature_states() const;
+
+   /// record that \b feature was switched off. Only the first reason is kept
+   /// until the feature is switched on again (see feature_on()).
+   void feature_off(const std::string & feature, const char * source,
+                    const std::string & detail)
+      {
+        if (off_reasons.count(feature) == 0)
+           off_reasons[feature] = Off_reason{ source, detail };
+      }
+
+   /// record that \b feature was switched on (its reason is void)
+   void feature_on(const std::string & feature)
+      { off_reasons.erase(feature); }
+
+   /// record the features that were switched on or off since \b before
+   /// (a result of feature_states()) by \b source and \b detail
+   void note_feature_changes(const std::map<std::string, bool> & before,
+                             const char * source, const std::string & detail);
+
+   /// the reason why a feature is switched off (or 0 if none was recorded)
+   const Off_reason * get_off_reason(const std::string & feature) const
+      {
+        auto it = off_reasons.find(feature);
+        return it == off_reasons.end() ? 0 : &it->second;
+      }
+
+   /// the reasons why (run-time switchable) features are switched off
+   std::map<std::string, Off_reason> off_reasons;
+
    /// args after expand_args(). The strings in \b expanded_args are
    /// allocated with strdup() and are never free()'d (since used by ⎕ARG).
    std::vector<const char *> expanded_args;
 
    /// read a \b preference file and update parameters set there
+   /// @param sys true to read the system-wide preferences file
+   /// @param log_startup true to log preference file activity at start-up
    void read_config_file(bool sys, bool log_startup);
 
 protected:
@@ -210,23 +274,29 @@ protected:
    UserPreferences();
 
    /// read a \b parallel_thresholds file and update parameters set there
+   /// @param sys true to read the system-wide thresholds file
+   /// @param log_startup true to log threshold file activity at start-up
    void read_threshold_file(bool sys, bool log_startup);
 
    /// print possible command line options and exit
+   /// @param prog name of the interpreter executable (argv[0])
    static void usage(const char * prog);
 
    /// print how the interpreter was configured (via ./configure) and exit
    static void show_configure_options();
 
    /// print the GPL
+   /// @param out stream to write the GPL text to
    static void show_GPL(ostream & out);
 
    /// show version information
+   /// @param out stream to write version text to
    static void show_version(ostream & out);
 
    /// parse the original command line arguments to figure if start-up logging
    /// is desired (BEFORE any expansions). Parses (only) the -l option.
    /// Return true iff startup-logging (aka. -l 37) was requested.
+   /// @param args original (unexpanded) command-line argument vector
    bool parse_args_0(const std::vector<const char *> & args);
 
    /// parse \b expanded_args (BEFORE reading preference
@@ -237,32 +307,46 @@ protected:
    /// parse \b expanded_args (AFTER reading preference files)
    /// Parses all valid options (and overwrite any corresponding settings in
    /// the preference files).
+   /// @param logit true to emit diagnostic output while parsing
    void parse_args_2(bool logit);
 
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
    /// itself), or a 2-character hex value
-   /// 
-   static int decode_ASCII(const char * strg);
+   /// @param strg string token from preferences file to decode
+   static int decode_ASCII(const char * strg, const char * filename = 0,
+                            int line = 0);
 
    /// return true if file \b filename is an APL script (has execute permission
    /// and starts with #!
+   /// @param filename path of the file to test
    static bool is_APL_script(const char * filename);
 
    /// open a user-supplied config file (in $HOME or gnu-apl.d)
+   /// @param fname base name of the config file to open
+   /// @param opened_filename buffer receiving the full path of the opened file
+   /// @param sys true to search the system-wide directory
+   /// @param log_startup true to log file-open activity at start-up
    FILE * open_user_file(const char * fname, char * opened_filename,
                          bool sys, bool log_startup);
 
    /// set the parallel threshold of function \b fun to \b threshold
+   /// @param fun primitive function whose threshold is updated
+   /// @param padic index selecting the monadic/dyadic variant
+   /// @param macn machine-architecture index for the threshold table
+   /// @param threshold minimum element count to enable parallel execution
    static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
 
   /// print \b args
+  /// @param args argument vector to display
   static void show_args(const std::vector<const char *> & args);
 
    /// return " (default)" if yes is true
+   /// @param yes true if the corresponding option is the default
    static const char * is_default(bool yes)
       { return yes ? " (default)" : ""; }
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

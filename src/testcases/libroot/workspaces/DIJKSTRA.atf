@@ -1,0 +1,39 @@
+XNêPP 0 10                                                                     ¯
+XNêIO 0 1                                                                      ¯
+XNêCT 0 1E˝13                                                                  ¯
+XCêFC 1 6 .,*0_˝                                                               ¯
+XNêRL 0 1919931645                                                             ¯
+XCêPR 1 1                                                                      ¯
+XCêLX 1 0                                                                      ¯
+*(2001 2 2 20 7 56 432)                                                        ¯
+XFNEW êFX 'NEW' 'TΩ20 RANDOM_TOPO 16' '2 3 SHORTEST T'                         ¯
+*(2001 2 2 19 37 50 524)                                                       ¯
+ FRANDOM_TOPO êFX 'ZΩP RANDOM_TOPO N'                                          ¯
+  '‰ RETURN A QUADRATIC, SYMMETRIC RANDOM 0/1 MATRIX.'                         ¯
+  '‰ P IS THE PROBABILITY (IN PERCENT) THAT Z[X;Y] IS 1'                       ¯
+  '‰ N IS THE NUMBER OF NODES IN Z' '‰' 'ZΩPÚ?(N,N)Ê100'                       ¯
+X 'ZΩZ^(ÏN)¯.ÚÏN' 'ZΩZÎÌZ'                                                     ¯
+*(2001 2 3 23 9 7 260)                                                         ¯
+ FSHORTEST êFX 'ZΩFT SHORTEST T;F;L;P;P1;P2;Q;X;êIO' '‰'                       ¯
+  '‰ T IS A TOPOLOGY (A SYMMETRIC ADJACENCY MATRIX)'                           ¯
+  '‰ FT (FROM/TO) IS TWO NODES OF T'                                           ¯
+  '‰ Z IS A PATH FROM FT[1] TO FT[2] IN T, OR EMPTY IF NO SUCH PATH EXIS       ¯
+ TS' '‰' '‰ FIRST WE INITIALIZE SOME VARIABLES:'                               ¯
+  '‰ P: POWERS OF T, THAT IS, THE N-HOP ADJACENCIES OF T'                      ¯
+  '‰ F: THE FIRST NODE' '‰ X: THE LAST NODE, MOVING TOWARDS F' '‰'             ¯
+  'êIOΩ1 ÿ P1ΩT ÿ (1 1ÌP1)Ω1 ÿ PΩ(1,ÊT)ÊP1 ÿ ZΩ(F=X)«(F X)ΩFT ÿ ∏(T[F;X]       ¯
+ ÎF=X)/0' '‰' '‰ COMPUTE POWERS OF T AS LONG AS REACHABILITY INCREASES'        ¯
+  '‰' 'PL:P2ΩP1 ÿ P1ΩTÎ.^P1 ÿ PΩP,[1]P1 ÿ ∏(,P1ÙP2)/PL' '‰'                    ¯
+  '‰ COMPUTE THE LENGTH L OF THE PATH AND HANDLE THE NO PATH CASE' '‰'         ¯
+  'ZΩÏ0 ÿ ∏((∆ÊP)=LΩ+/~P[;F;X])/0 ÿ ZΩX ÿ LΩL+1' '‰'                           ¯
+  '‰ CONTRUCT THE PATH' '‰'                                                    ¯
+  'XL:QΩ((P[LΩL-1;F;]^T[;X])/Ï∆ÊT)~X ÿ XΩ∆Q ÿ ZΩX,Z ÿ ∏T[F;X]«XL ÿ ZΩF,Z       ¯
+X'                                                                             ¯
+ NT 2 16 16 0 0 0 0 1 1 0 0 1 0 0 0 0 1 1 0 0 0 0 1 1 0 0 0 0 0 0 0 0 1        ¯
+ 1 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 1 0 1 0 0 0 0 1 0 1 0 1 0 0 0 0 1 1 1       ¯
+  0 0 1 0 0 0 0 1 0 0 0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0        ¯
+ 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 1 1 1 0 0 1 0 0 0 0 0       ¯
+  0 0 0 0 0 0 0 0 0 0 0 1 0 0 1 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 1 1        ¯
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0       ¯
+  1 1 1 0 0 0 1 0 0 0 0 0 0 0 0 0 1 1 1 0 1 1 0 1 0 1 0 0 0 0 0 0 0 0 1        ¯
+X1 1 0 0 1 0 0 0 0 0 0 0 0                                                     ¯

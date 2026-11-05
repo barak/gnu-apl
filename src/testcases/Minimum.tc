@@ -1,6 +1,8 @@
 ⍝ Minimum.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       3⌊4
 3
 
@@ -28,5 +30,26 @@
       ⌊⌿0.123 0.456 0.789
 0.123
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #78): complex ⌊ used to route its selected
+      ⍝ operand through ComplexCell::zV(), which snaps a value within
+      ⍝ ⎕CT-tolerance of an integer to an IntCell -- so a near-real
+      ⍝ result that was not itself an integer got rounded to one, unlike
+      ⍝ the real ⌊ path (FloatCell::bif_minimum_ff), which deliberately
+      ⍝ returns the selected operand verbatim.
+      ⍝
+      OldPP←⎕PP
+      ⎕PP←17
+
+      ¯1E¯11J0⌊0
+¯9.9999999999999994E¯12
+
+      1.99999999995J0⌊2
+1.99999999995
+
+      (1.99999999995J0⌊2) = 2
+0
+
+      ⎕PP←OldPP
+
+      ⍝ ==================================
 

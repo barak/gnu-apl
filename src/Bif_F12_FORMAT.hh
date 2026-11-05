@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "PrimitiveFunction.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /** A helper struct for Bif_F12_FORMAT
  It represents a sub-field (int part, fract part, or exponent)
  of the format field
@@ -36,26 +37,19 @@ struct Format_sub
    Format_sub()
    : out_len(0),
      flt_mask(0),
-     min_len(0)
+     min_len(0),
+     digit_count(0)
    {}
 
-   UCS_string      format;         ///< the format ('0'...'9' and comma)
-   int             out_len;        ///< the length in the output
-   uint32_t        flt_mask;       ///< decorator floating mode
-   int             min_len;        ///< the minimum length in the output
+   /// return true if the decorator is floating floating
+   /// @param value_is_negative true if the formatted number is negative
+   bool do_float(bool value_is_negative) const
+      { if (flt_mask & BIT_1)   return  value_is_negative;
+        if (flt_mask & BIT_2)   return !value_is_negative;
+        return true;
+      }
 
-   /// return the number of characters in \b format
-   size_t size() const
-      { return format.size(); }
-
-   /// set flt_mask according to the digits in member \b format
-   /// return the number of digits from '1' to '4' (including)
-   int map_field(int type);
-
-   /// a debug function for printing \b this Format_sub
-   ostream & print(ostream & out) const;
-
-   /// return true iff format contains a '4' (i.e. counteract the effect of 
+   /// return true iff format contains a '4' (i.e. counteract the effect of
    /// 1, 2, or 3) or none of 1 (float if negative), 2 (float if positive),
    /// or 3 (always float) was given
    bool no_float() const
@@ -63,25 +57,53 @@ struct Format_sub
           return ! (flt_mask & (BIT_1 | BIT_2 | BIT_3));   // no 1, 2, or 3
         }
 
-   /// return true if the decorator is floating floating 
-   bool do_float(bool value_is_negative) const
-      { if (flt_mask & BIT_1)   return  value_is_negative;
-        if (flt_mask & BIT_2)   return !value_is_negative;
-        return true;
-      }
-
    /// return the pad character (default: space, otherwise controlled by ⎕FC)
+   /// @param qfc current ⎕FC fill character
    Unicode pad_char(Unicode qfc) const
       { return flt_mask & BIT_8 ? qfc : UNI_SPACE; }
 
+   /// return true iff \b format (a decorator) has a non-blank character,
+   /// i.e. if it can show a sign (a blank decorator shows nothing)
+   bool is_visible() const
+      { loop(f, format.ssize())   if (format[f] != UNI_SPACE)   return true;
+        return false; }
+
+   /// return the number of characters in \b format
+   size_t size() const
+      { return format.size(); }
+
    /// Fill buf at position x,y with data according to fmt
+   /// return true if all digits in \b ucs are 0 (ignoring separators)
+   /// @param ucs the formatted digits (with separators)
+   static bool zero_digits(const UCS_string & ucs);
+
+   /// @param data digit string for the fractional part
+   UCS_string insert_fract_commas(const UCS_string & data) const;
+
+   /// Fill buf at position x,y with data according to fmt
+   /// @param data digit string for the integer part
+   /// @param overflow output flag set if the field is too narrow
    UCS_string insert_int_commas(const UCS_string & data,
                                 bool & overflow) const;
 
-   /// Fill buf at position x,y with data according to fmt
-   UCS_string insert_fract_commas(const UCS_string & data) const;
+   /// set flt_mask according to the digits in member \b format
+   /// return the number of digits from '1' to '4' (including)
+   /// @param type sub-field type code (integer, fraction, or exponent)
+   int map_field(int type);
+
+   /// a debug function for printing \b this Format_sub
+   /// @param out output stream to write to
+   ostream & print(ostream & out) const;
+
+   UCS_string      format;         ///< the format ('0'...'9' and comma)
+   int             out_len;        ///< the length in the output
+   uint32_t        flt_mask;       ///< decorator floating mode
+   int             min_len;        ///< the minimum length in the output
+   int             digit_count;    ///< the number of digit positions
+                                    ///< (unlike out_len, excludes commas
+                                    ///< and other non-digit decorations)
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** System function format
  */
 /// The class implementing ⍕
@@ -93,21 +115,14 @@ public:
    : NonscalarFunction(TOK_F12_FORMAT)
    {}
 
-   /// A character array with B formatted by specification
-   static Value_P format_by_specification(Value_P A, Value_P B);
-
-   static Bif_F12_FORMAT  fun;   ///< Built-in function
-
-   /// Return true iff uni is '0' .. '9', comma, or full-stop
-   static bool is_control_char(Unicode uni);
-
    /// An entire format field (LIFER = Left-Int-Fract-Expo-Right
    struct Format_LIFER
       {
         /// empty constructor
-        Format_LIFER() {}
+        Format_LIFER() : negative_representable(true) {}
 
         /// constructor
+        /// @param fmt format string to parse into sub-fields
         Format_LIFER(UCS_string fmt);
 
         /// return the size of the format
@@ -120,67 +135,130 @@ public:
            { return left_deco.out_len + int_part.out_len + fract_part.out_len
                   + expo_deco.out_len + exponent.out_len + right_deco.out_len; }
 
-        /// format \b value by example
-        UCS_string format_example(APL_Float value);
+        /// format \b cell (an integer or a real number) by example
+        /// @param cell the number to format
+        UCS_string format_example(const Cell & cell);
+
+        /// fill data fields from the absolute value of \b cell
+        /// @param cell the number to decompose (exactly if it is an integer)
+        /// @param data_int output string for the integer digits
+        /// @param data_fract output string for the fractional digits
+        /// @param data_expo output string for the exponent digits
+        /// @param overflow output flag set if the value exceeds field width
+        void fill_data_fields(const Cell & cell, UCS_string & data_int,
+                              UCS_string & data_fract, UCS_string & data_expo,
+                              bool & overflow);
 
         /// format the left decorator and integer part (everything left of the
         /// decimal dot)
+        /// @param data_int digit string for the integer part
+        /// @param negative true if the value is negative
+        /// @param overflow output flag set if the field is too narrow
         UCS_string format_left_side(const UCS_string data_int, bool negative,
                                     bool & overflow);
 
         /// format the fract part, exponent, and right decorator (everything
-        /// left of the decimal dot)
+        /// right of the decimal dot)
+        /// @param data_fract digit string for the fractional part
+        /// @param negative true if the value is negative
+        /// @param data_expo digit string for the exponent part
         UCS_string format_right_side(const UCS_string data_fract, bool negative,
                                      const UCS_string data_expo);
-
-        /// Print \b value into int, fract, and expo fields
-        void fill_data_fields(APL_Float value, UCS_string & data_int,
-                              UCS_string & data_fract, UCS_string & data_expo,
-                              bool & overflow);
 
         Format_sub left_deco;    ///< the left decorator
         Format_sub int_part;     ///< the integer part
         Format_sub fract_part;   ///< the fractional part
         Format_sub expo_deco;    ///< the exponent decorator
         Format_sub exponent;     ///< the exponent
-        Format_sub right_deco;   ///< the left decorator
+        Format_sub right_deco;   ///< the right decorator
 
         /// the exponent char to be used
         Unicode exponent_char;
 
         /// true if the exponent is negative
         bool expo_negative;
+
+        /// true if this picture has some way (a conditional decorator
+        /// on either side) to signal a negative B; if false, formatting
+        /// a genuinely negative B is a DOMAIN ERROR (Bugs28 #46)
+        bool negative_representable;
       };
 
+   /// A character array with B formatted by specification
+   /// @param A format specification APL value (numeric width and precision)
+   /// @param B APL value to format
+   static Value_P format_by_specification(cValue_R A, cValue_R B);
+
+   /// Return true iff uni is '0' .. '9', comma, or full-stop
+   /// @param uni Unicode character to test
+   static bool is_control_char(Unicode uni);
+
+   /// Like is_control_char(), but also recognizes ⎕FC[5] (print-as-
+   /// blank); for parsing a format-by-example picture string only, NOT
+   /// for validating a proposed ⎕FC[5] value (see the .cc definition).
+   /// @param uni Unicode character to test
+   static bool is_picture_char(Unicode uni);
+
    /// A character array with the display of B
-   static Value_P monadic_format(Value_P B);
+   /// @param B APL value to format
+   static Value_P monadic_format(cValue_R B);
+
+   static Bif_F12_FORMAT  fun;   ///< Built-in function
 
 protected:
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value (format specification or example)
+   /// @param B right argument APL value to format
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// A character array with B formatted by example
-   static Value_P format_by_example(Value_P A, Value_P B);
+   /// @param A format example APL value (character string with picture)
+   /// @param B APL value to format
+   static Value_P format_by_example(cValue_R A, cValue_R B);
 
    /// split entire format string string into \b column format strings
+   /// @param format overall format picture string to split
+   /// @param col_formats output vector receiving one format string per column
    static void split_example_into_columns(const UCS_string & format,
                                    UCS_string_vector & col_formats);
 
    /// A character array with one column of B formatted by specification
-   static PrintBuffer format_one_col_by_spec(int width, int precision,
-                                             const Cell * cB, ShapeItem cols,
-                                             ShapeItem rows);
+   /// @param width_A total output field width in characters
+   /// @param precision_A number of digits after the decimal point
+   /// @param cB pointer to the first cell of the column
+   /// @param cols total number of columns in the value
+   /// @param rows total number of rows in the value
+   static PrintBuffer format_one_col_by_spec(APL_Integer width_A,
+                                             APL_Integer precision_A,
+                                             cValue_R B, ShapeItem base,
+                                             ShapeItem cols, ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
+   /// @param ret PrintBuffer to append the row to
+   /// @param row zero-based index of the row being added
+   /// @param has_char true if any cell in the row is a character cell
+   /// @param has_num true if any cell in the row is a numeric cell
+   /// @param align_char alignment character for mixed char/num columns
+   /// @param data formatted string content for this row
    static void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
 
    /// format value with \b precision mantissa digits (floating format)
+   /// @param value floating-point number to format
+   /// @param precision number of significant mantissa digits
    static UCS_string format_float_by_spec(APL_Float value, int precision);
+
+   /// remove the LRM-style leading 0 (0.xxx → .xxx, ¯0.x → ¯.x, ¯0 → 0)
+   /// from a fixed-point (by-specification) formatted \b ret in place
+   /// @param ret formatted string to strip in place
+   /// @param precision number of digits after the decimal point (0 for
+   ///        integer format)
+   static void strip_leading_zero_by_spec(UCS_string & ret, int precision);
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __BIF_F12_FORMAT_HH_DEFINED__

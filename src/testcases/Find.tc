@@ -1,7 +1,9 @@
 ⍝ Find.tc
 ⍝ ----------------------------------
 
-   ⍝ character compatibility
+⍝@ test3.
+
+      ⍝ character compatibility
 
       1 ⋸ 1 2 3
 1 0 0

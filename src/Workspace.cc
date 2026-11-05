@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,6 +30,8 @@
 using namespace std;
 
 #include "Archive.hh"
+#include "Bif_F1_EXECUTE.hh"
+#include "CRC32.hh"
 #include "Command.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"
@@ -54,24 +56,34 @@ using namespace std;
 #include "Workspace.hh"
 
 // first of all: inline functions...
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Error *
 Workspace::get_error()
 {
    return &StateIndicator::get_error(SI_top());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Workspace::SI_entry_count()
 {
    return SI_top() ? (SI_top()->get_level() + 1) : 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Workspace::Workspace()
-   : WS_id(U"CLEAR WS", true),
-//   prompt(U"-----> "),
-     prompt(U"      "),
-     top_SI(0)
+// : prompt(U"-----> "),
+#if 0 && MINGW_SRC
+   // U+2207 (∇) must be in the same render pass as APL Functional Symbols
+   // (U+2360–U+237F, e.g. ⍴=U+2374) for them to display.  For WriteConsoleW
+   // (CIN echo) the render pass covers one screen row; for cout/cerr it covers
+   // one flush batch.  std::endl (flush+newline) starts a new render pass and
+   // resets the effect.  The prompt places ∇ on the same row as user input so
+   // every keystroke's render pass includes ∇, making ⍴ and friends visible.
+   : prompt(U"  ∇   "),
+#else
+   : prompt(U"      "),
+#endif
+     top_SI(0),
+     WS_id(U"CLEAR WS", true)
 {
 /// Read-Only System Variable
 #define ro_sv_def(x, str, _txt)                         \
@@ -97,14 +109,14 @@ Workspace::Workspace()
    new (&Quad_EC::fun)   Quad_EC;
    new (&Quad_ES::fun)   Quad_ES;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Workspace::is_CLEAR_WS()
 {
    return get_WSID().get_name()
                     .compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::push_SI(const Executable * fun, const char * loc)
 {
@@ -121,8 +133,20 @@ Workspace::push_SI(const Executable * fun, const char * loc)
 
 
         Quad_SYL::si_depth_limit = 0;
+
+        // Setting these flags alone (the old behaviour) is not enough: a
+        // single statement recursing from inside itself (the common
+        // case, e.g. ∇Z←F N ⋄ Z←F N+1 ⋄ ∇) never reaches the end-of-line
+        // check (Prefix::check_interrupt_or_attention()) that would have
+        // consulted them -- push_SI() runs on every call, deep inside
+        // that same still-unfinished statement, so throwing HERE, at the
+        // exact push that would exceed the limit, is what actually stops
+        // the recursion instead of only setting flags nothing reads
+        // until a line boundary that is never reached. See Bugs27 #17.
+        //
         InterruptContext::set_attention_raised(LOC);
         InterruptContext::set_interrupt_raised(LOC);
+        LIMIT_ERROR_SIDEPTH;
       }
 
    if (Value::check_WS_FULL(__FUNCTION__, 1000, LOC))
@@ -176,7 +200,7 @@ Workspace::push_SI(const Executable * fun, const char * loc)
              << " at " << loc << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::pop_SI(const char * loc)
 {
@@ -202,7 +226,7 @@ StateIndicator * del = SI_top();
    the_workspace.top_SI = del->get_parent();
    delete del;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint64_t
 Workspace::get_RL(uint64_t mod)
 {
@@ -219,7 +243,7 @@ uint64_t rand = the_workspace.v_Quad_RL.get_random();
 
    return rand % mod;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::clear_error(const char * loc)
 {
@@ -231,18 +255,35 @@ Workspace::clear_error(const char * loc)
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 StateIndicator *
 Workspace::SI_top_fun()
 {
    for (StateIndicator * si = SI_top(); si; si = si->get_parent())
        {
-         if (si->get_parse_mode() == PM_FUNCTION)   return si;
+         if (si->get_parse_mode() != PM_FUNCTION)   continue;
+
+         // skip an internal macro frame (Bugs30 #2): a macro's own
+         // native lines (e.g. Z__A_Quad_EB_B's →(μ7=3)/0) never reach
+         // this function at all -- jump_to_line() resolves those
+         // directly against the macro's own get_exec_ufun(), in place,
+         // without ever consulting SI_top_fun() -- so skipping macro
+         // frames here only affects a →N escaping from something
+         // *underneath* the macro (a nested ⍎, as ⎕EA/⎕EB's macros run
+         // their A/B operands), which must resolve against the nearest
+         // REAL (non-macro) enclosing function instead, exactly as if
+         // the macro were not on the )SI at all -- otherwise e.g.
+         // '→1' ⎕EB '2+2' resolves →1 to the macro's own line 1 (the
+         // very statement that runs A), looping forever.
+         //
+         if (si->get_executable()->get_exec_ufun()->is_macro())   continue;
+
+         return si;
        }
 
    return 0;   // no context wirh parse mode PM_FUNCTION
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 StateIndicator *
 Workspace::SI_top_error(bool quad_LRX)
 {
@@ -257,7 +298,7 @@ Workspace::SI_top_error(bool quad_LRX)
 
    return 0;   // no context with an error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Workspace::immediate_execution(bool exit_on_error)
 {
@@ -266,6 +307,7 @@ Workspace::immediate_execution(bool exit_on_error)
          try
             {
               Command::process_lines();
+              flush_expunged();
             }
          catch (Error & err)
             {
@@ -273,7 +315,7 @@ Workspace::immediate_execution(bool exit_on_error)
                  {
                    if (err.get_error_code() != E_DEFN_ERROR)
                       {
-                        err.print_em(UERR, LOC);
+                        err.print_EM(UERR, LOC);
                         if (err.get_error_code() == E_SYNTAX_ERROR)   {}
                         else
                            {
@@ -296,21 +338,18 @@ Workspace::immediate_execution(bool exit_on_error)
                  CERR << ")SI depth is " << the_workspace.SI_entry_count()
                       <<  "; )SIC is strongly recommended !!!"
                       << endl;
-              try { WS_FULL } catch (...) {}
+              try { WS_FULL } catch (Error &) {}
+                              catch (...) { FIXME; }
               if (exit_on_error)   return Token(TOK_OFF);
             }
+
          catch (...)
-            {
-              CERR << "*** " << __FUNCTION__
-                   << "() caught other exception ***" << endl;
-              IO_Files::apl_error(LOC);
-              if (exit_on_error)   return Token(TOK_OFF);
-            }
+            { FIXME; }
       }
 
    return Token(TOK_ESCAPE);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const NamedObject *
 Workspace::lookup_existing_name(const UCS_string & name)
 {
@@ -344,7 +383,7 @@ Symbol * sym = the_workspace.symbol_table.lookup_existing_symbol(name);
         default:          return 0;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Symbol *
 Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
 {
@@ -362,7 +401,7 @@ Workspace::lookup_existing_symbol(const UCS_string & symbol_name)
 
    return the_workspace.symbol_table.lookup_existing_symbol(symbol_name);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
 Workspace::get_quad(const UCS_string & ucs, int & len)
 {
@@ -372,11 +411,12 @@ Workspace::get_quad(const UCS_string & ucs, int & len)
        return Token();
      }
 
+   // a distinguished name is ⎕ followed by ALL name characters (as ABX is
+   // one name and not AB X). Only an exact match is a system name; the
+   // longest known prefix was taken before, e.g. ⎕PPX←7 was ⎕PP X←7 and
+   // assigned the user variable X (Bugs34 #21).
+   //
 UCS_string name(UNI_Quad_Quad);
-   len = 1;
-
-SystemName * longest = 0;
-
    for (ShapeItem u = 1; u < ucs.ssize(); ++u)
       {
         Unicode uni = ucs[u];
@@ -384,22 +424,21 @@ SystemName * longest = 0;
 
         if (uni >= 'a' && uni <= 'z')   uni = Unicode(uni - 0x20);
         name << uni;
-        SystemName * dn =
-               the_workspace.distinguished_names.lookup_existing_symbol(name);
-
-        if (dn)   // ss is a valid distinguished name
-           {
-             longest = dn;
-             len = name.size();
-           }
       }
 
-   if (longest == 0)   return Token(TOK_Quad_Quad, &the_workspace.v_Quad_Quad);
+SystemName * dn = name.size() == 1 ? 0
+                : the_workspace.distinguished_names.lookup_existing_symbol(name);
+   if (dn == 0)   // ⎕ alone, or an unknown name ⎕xxx (then len < ⍴⎕xxx)
+      {
+        len = 1;
+        return Token(TOK_Quad_Quad, &the_workspace.v_Quad_Quad);
+      }
 
-   if (longest->get_variable())   return longest->get_variable()->get_token();
-   else                           return longest->get_function()->get_token();
+   len = name.size();
+   if (dn->get_variable())   return dn->get_variable()->get_token();
+   else                      return dn->get_function()->get_token();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 StateIndicator *
 Workspace::oldest_exec(const Executable * exec)
 {
@@ -410,7 +449,34 @@ StateIndicator * ret = 0;
 
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+bool
+Workspace::is_bound_as_operand(const UserFunction * ufun)
+{
+   for (const StateIndicator * si = SI_top(); si; si = si->get_parent())
+       {
+         const Executable * exec = si->get_executable();
+         if (exec == 0)                          continue;
+
+         const UserFunction * frame_ufun = exec->get_exec_ufun();
+         if (frame_ufun == 0)                    continue;   // not a ∇ call
+         if (frame_ufun == ufun)                 continue;   // covered by
+                                                          // oldest_exec()
+
+         const UserFunction_header & header = frame_ufun->get_header();
+         const Symbol * cands[] = { header.LO(), header.RO(), header.FUN() };
+         loop(c, sizeof(cands)/sizeof(*cands))
+             {
+               const Symbol * sym = cands[c];
+               if (sym == 0)                             continue;
+               if (!(sym->get_NC() & NC_FUN_OPER))        continue;
+               if (sym->get_function()->get_func_ufun() == ufun)   return true;
+             }
+       }
+
+   return false;
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 Workspace::is_called(const UCS_string & funname)
 {
@@ -437,11 +503,12 @@ const UserFunction * ufun = fun->get_func_ufun();
 
    return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-Workspace::write_OUT(FILE * out, uint64_t & seq,
-                     const UCS_string_vector & objects)
+Workspace::write_OUT(FILE * out, const UCS_string_vector & objects)
 {
+uint64_t seq = 1;   // sequence number for records written
+
    // if objects is empty then write all user defined objects and some system
    // variables
    //
@@ -490,7 +557,7 @@ Workspace::write_OUT(FILE * out, uint64_t & seq,
             }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::unmark_all_values()
 {
@@ -518,7 +585,7 @@ Workspace::unmark_all_values()
    loop(f, the_workspace.expunged_functions.size())
       the_workspace.expunged_functions[f]->unmark_all_values();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Workspace::show_owners(ostream & out, const Value & value)
 {
@@ -552,7 +619,7 @@ int count = 0;
 
    return count;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 Workspace::cleanup_expunged(ostream & out, bool & erased)
 {
@@ -578,7 +645,21 @@ const int ret = the_workspace.expunged_functions.size();
    erased = true;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Workspace::flush_expunged()
+{
+   if (the_workspace.expunged_functions.size() == 0)   return;
+   if (SI_entry_count() > 0)                            return;
+
+   while (the_workspace.expunged_functions.size())
+       {
+         const UserFunction * ufun = the_workspace.expunged_functions.back();
+         the_workspace.expunged_functions.pop_back();
+         delete ufun;
+       }
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::clear_WS(ostream & out, bool silent)
 {
@@ -642,7 +723,7 @@ const LibRef_name lib_name(UCS_ASCII_string("CLEAR WS"), true);
    set_WSID(lib_name);
    if (!silent)   out << "CLEAR WS" << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::clear_SI(ostream & out)
 {
@@ -653,7 +734,7 @@ Workspace::clear_SI(ostream & out)
         pop_SI(LOC);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::list_SI(ostream & out, SI_mode mode)
 {
@@ -662,7 +743,7 @@ Workspace::list_SI(ostream & out, SI_mode mode)
 
    if (mode & SIM_debug)   out << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::save_WS(ostream & out, const LibRef_name & lib_name,
                    bool name_from_WSID)
@@ -676,25 +757,49 @@ const UTF8_string filename =
      const bool file_exists = access(filename.c_str(), W_OK) == 0;
      if (file_exists)
         {
-          if (lib_name.get_name()
+          // the WSID includes the library (LRM p. 460), so the libraries
+          // must be the same as well (Bugs37 #24). LIB_NONE is library 0.
+          //
+          const LibRef lib_cmd  = lib_name.get_libref() == LIB_NONE
+                                ? LIB0 : lib_name.get_libref();
+          const LibRef lib_wsid = the_workspace.WS_id.get_libref() == LIB_NONE
+                                ? LIB0 : the_workspace.WS_id.get_libref();
+          if (lib_cmd != lib_wsid ||
+              lib_name.get_name()
                       .compare(the_workspace.WS_id.get_name()) != COMP_EQ)
              {
                // names differ. Complain.
                //
-               const UCS_string & wsid = the_workspace.WS_id.get_name();
-               out << "NOT SAVED: THIS WS IS " << wsid << endl;
+               UCS_string wsid;
+               if (lib_wsid != LIB0)   wsid << int(lib_wsid) << " ";
+               wsid << the_workspace.WS_id.get_name();
+               out << "NOT SAVED, THIS WS IS " << wsid << endl;
     
-               MORE_ERROR() <<
+               UCS_string & more = MORE_ERROR() <<
                   "the workspace was not saved because"
                   " the workspace name '" << wsid << "' according\n"
                   "   to )WSID does not match the name '" << lib_name.get_name()
                << "' in the )SAVE command, AND the\n"
                   "   workspace file " << filename << " already exists.\n"
-                  "   Use )WSID " << lib_name.get_name() << " first."; 
+                  "   Use )WSID ";
+               if (lib_cmd != LIB0)   more << int(lib_cmd) << " ";
+               more << lib_name.get_name() << " first.";
                return;
              }
         }
    }
+
+   // Warn if the )SI stack is not clean.  Suppress when the only entry is
+   // the immediate ⍎ context that invoked )SAVE (workspace was effectively
+   // clean before ⍎ was typed).
+   //
+   if (the_workspace.SI_entry_count() > 1 ||
+       (the_workspace.SI_entry_count() == 1 &&
+        the_workspace.SI_top()->get_executable()->get_exec_ufun()))
+      {
+        CERR << "WARNING: )SAVEing a workspace whose )SI stack is not clear."
+             << endl;
+      }
 
    if (UserPreferences::uprefs.backup_before_save &&
        backup_existing_file(filename.c_str()))
@@ -706,19 +811,41 @@ const UTF8_string filename =
 
    // at this point it is OK to rename and save the workspace...
    //
-   the_workspace.WS_id = LibRef_name(the_workspace.WS_id.get_libref(),
-                                     lib_name.get_name());
+   // the active workspace assumes the library AND name given in the
+   // )SAVE command (LRM p.451). Set it BEFORE the archive is written, so
+   // that the file records the new )WSID, and restore it if the )SAVE
+   // fails (Bugs35 #61, #62).
+   //
+const LibRef_name old_WS_id = the_workspace.WS_id;
+   if (!name_from_WSID)   // otherwise lib_name IS the )WSID
+      the_workspace.WS_id = LibRef_name(lib_name.get_libref(),
+                                        lib_name.get_name());
 
    Log(LOG_archive)   CERR << "constructing XML_Saving_Archive." << endl;
 XML_Saving_Archive ar(out, CERR, filename.c_str());
 
    // print time and date to COUT
    //
-   get_v_Quad_TZ().print_timestamp(out, now());
-   if (name_from_WSID)   out << " " << the_workspace.WS_id.get_name();
-   out << endl;
+   if (!ar.saved_OK())   the_workspace.WS_id = old_WS_id;
+
+   if (ar.saved_OK())
+      {
+        get_v_Quad_TZ().print_timestamp(out, now());
+        if (name_from_WSID)   out << " " << the_workspace.WS_id.get_name();
+        out << endl;
+      }
+   else
+      {
+        COUT << "NOT SAVED";   // no endl: the . follows (Bugs37 #80)
+        if ((!name_from_WSID) &&
+            (lib_name.get_name() != the_workspace.WS_id.get_name()))
+           {
+             COUT << " ( and WSID not changed)";
+           }
+        COUT << "." << endl;
+      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Workspace::backup_existing_file(const char * filename)
 {
@@ -768,14 +895,159 @@ const int err = rename(filename, backup_filename.c_str());
 
    return false; // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// the trailing comment written by write_DUMP_checksum() / looked for by
+/// verify_DUMP_checksum()
+static const char * const DUMP_checksum_marker = "\n⍝ checksum: crc32=";
+
+/// normalize )DUMP'ed (.apl) file content for checksumming: unlike the XML
+/// case (Archive.cc, XML_Archive::normalize_for_checksum()), a )DUMP file
+/// is APL source, so the normalization is narrower and specific to APL
+/// source text: strip a leading 6-blank command-prompt prefix (present if
+/// the file was pasted back from an interactive session -- APL ignores
+/// leading blanks on an input line, so this makes no difference), and
+/// trailing blanks/tabs (likewise invisible to APL). Anything else,
+/// including other leading whitespace (e.g. function body indentation),
+/// is kept as-is.
+static string
+normalize_for_DUMP_checksum(const char * data, size_t len)
+{
+string result;
+   result.reserve(len);
+
+size_t line_start = 0;
+   for (;;)
+       {
+         size_t line_end = line_start;
+         while (line_end < len && data[line_end] != '\n'
+                                && data[line_end] != '\r')   ++line_end;
+
+         size_t s = line_start;
+         size_t e = line_end;
+         if ((e - s) >= 6 && !memcmp(data + s, "      ", 6))   s += 6;
+         while (e > s && (data[e-1] == ' ' || data[e-1] == '\t'))   --e;
+
+         result.append(data + s, e - s);
+
+         if (line_end >= len)   break;
+
+         line_start = line_end + 1;
+         if (data[line_end] == '\r' && line_start < len
+                                     && data[line_start] == '\n')
+            ++line_start;
+       }
+
+   return result;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// append a trailing "⍝ checksum: crc32=XXXXXXXX" comment to a freshly
+/// written )DUMP file \b filename (already flushed/closed content in
+/// \b outf, more to be written to \b outf after this call returns).
+static void
+write_DUMP_checksum(ofstream & outf, const char * filename)
+{
+   outf.flush();
+ifstream in(filename, ifstream::binary);
+   if (!in.is_open())   return;
+const string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+const string normalized = normalize_for_DUMP_checksum(content.data(),
+                                                       content.size());
+const uint32_t crc = apl_crc::crc32(normalized.data(), normalized.size());
+char cc[10];
+   SPRINTF(cc, "%8.8X", crc);
+   outf << "⍝ checksum: crc32=" << cc << endl;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// outcome of get_DUMP_checksum_status()
+enum DUMP_ChecksumStatus
+   {
+     DCS_NO_FILE,       ///< file could not be opened
+     DCS_NO_CHECKSUM,   ///< no checksum comment (e.g. an older file)
+     DCS_OK,            ///< checksum present and matching
+     DCS_MISMATCH,      ///< checksum present but not matching
+   };
+
+/// compute the checksum status of a )DUMP file \b filename; \b stored_crc
+/// and \b computed_crc are only set for DCS_OK and DCS_MISMATCH.
+static DUMP_ChecksumStatus
+get_DUMP_checksum_status(const UTF8_string & filename, uint32_t & stored_crc,
+                         uint32_t & computed_crc)
+{
+ifstream in(filename.c_str(), ifstream::binary);
+   if (!in.is_open())   return DCS_NO_FILE;
+const string content((istreambuf_iterator<char>(in)), istreambuf_iterator<char>());
+
+const size_t marker_pos = content.rfind(DUMP_checksum_marker);
+   if (marker_pos == string::npos)   return DCS_NO_CHECKSUM;
+
+const size_t crc_pos = marker_pos + strlen(DUMP_checksum_marker);
+   if (sscanf(content.c_str() + crc_pos, "%8X", &stored_crc) != 1)
+      return DCS_NO_CHECKSUM;
+
+const string normalized = normalize_for_DUMP_checksum(content.data(),
+                                                       marker_pos + 1);
+   computed_crc = apl_crc::crc32(normalized.data(), normalized.size());
+
+   return (computed_crc == stored_crc) ? DCS_OK : DCS_MISMATCH;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// verify the trailing checksum comment (if any) of a )DUMP file \b
+/// filename read via )LOAD or )COPY; print a WARNING (but do not prevent
+/// loading) on mismatch. Silently do nothing if there is no checksum
+/// comment (e.g. a file written before this feature existed, or one not
+/// written by GNU APL at all).
+static void
+verify_DUMP_checksum(const UTF8_string & filename)
+{
+uint32_t stored_crc = 0;
+uint32_t computed_crc = 0;
+   if (get_DUMP_checksum_status(filename, stored_crc, computed_crc)
+       != DCS_MISMATCH)   return;
+
+   CERR << "WARNING: checksum mismatch in workspace file " << filename
+        << endl
+        << "         (stored crc32=" << HEX8(stored_crc)
+        << ", computed crc32=" << HEX8(computed_crc) << ")." << endl
+        << "         The file may have been edited outside of GNU APL. "
+           "Loading it anyway." << endl;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Workspace::check_DUMP_checksum(ostream & out, const UTF8_string & filename)
+{
+uint32_t stored_crc = 0;
+uint32_t computed_crc = 0;
+   switch (get_DUMP_checksum_status(filename, stored_crc, computed_crc))
+      {
+        case DCS_NO_FILE:   // caller is expected to check existence first
+             break;
+
+        case DCS_NO_CHECKSUM:
+             out << "WARNING - " << filename
+                 << ": no checksum (old workspace)" << endl;
+             break;
+
+        case DCS_OK:
+             out << "OK      - " << filename << ": checksum OK" << endl;
+             break;
+
+        case DCS_MISMATCH:
+             out << "WARNING - " << filename
+                 << ": checksum mismatch (stored crc32=" << HEX8(stored_crc)
+                 << ", computed crc32=" << HEX8(computed_crc) << ")" << endl;
+             break;
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
                      LX_mode with_LX, bool silent,
-                     UCS_string_vector * object_filter)
+                     UCS_string_vector * object_filter, bool protection)
 {
    Log(LOG_command_IN)
       CERR << "loading )DUMP file " << filename << "..." << endl;
+
+   verify_DUMP_checksum(filename);
 
    {
      struct stat st;
@@ -784,8 +1056,6 @@ Workspace::load_DUMP(ostream & out, const UTF8_string & filename, int fd,
      Workspace::get_v_Quad_TZ().print_timestamp(out << "DUMPED ", when) << endl;
    }
 
-FILE * file = fdopen(fd, "r");
-
    // make sure that filename is not already open (which would indicate
    // )COPY recursion
    //
@@ -793,23 +1063,27 @@ FILE * file = fdopen(fd, "r");
       {
         if (filename == InputFile::files_todo[f].filename)   // same filename
            {
-             CERR << "*** )COPY " << filename
-                  << " would cause recursion (NOT COPIED)" << endl;
+             CERR << "*** NOT COPIED. )COPY " << filename
+                  << " would cause an infinite recursion." << endl;
              return;
            }
       }
 
+FILE * file = fdopen(fd, "r");
+
 InputFile fam(filename, file, false, false, true, with_LX);
-   if (object_filter)   // therefore )COPY, not )LOAD
+   if (object_filter)   // therefore )COPY or )PCOPY, not )LOAD
       {
         loop(o, object_filter->size())
             fam.copy_filter.add_filter_object((*object_filter)[o]);
+        fam.copy_filter.set_protection(protection);
+        fam.copy_filter.set_copying();
         fam.set_COPY();
         ++Bif_F1_EXECUTE::copy_pending;
       }
    InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a streambuf that escapes certain HTML characters
 class HTML_streambuf : public streambuf
 {
@@ -848,7 +1122,7 @@ public:
    : ostream(html_out)
    {}
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Workspace::dump_WS(ostream & out, const LibRef_name & lib_name,
                    bool html, bool silent)
@@ -971,6 +1245,7 @@ int variable_count = 0;
 #include "SystemVariable.def"
 
    if (html)   outf << endl << "⍝ EOF </pre></body></html>" << endl;
+   else        write_DUMP_checksum(outf, filename.c_str());
 
    if (silent)
       {
@@ -984,11 +1259,11 @@ int variable_count = 0;
             << " VARIABLES)" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::dump_commands(ostream & out)
 {
-vector<Command::user_command> & cmds = get_user_commands();
+const vector<Command::user_command> & cmds = get_user_commands();
 
    loop(c, cmds.size())
        {
@@ -998,7 +1273,7 @@ vector<Command::user_command> & cmds = get_user_commands();
 
    if (cmds.size())   out << endl;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // )LOAD WS, set ⎕LX of loaded WS on success
 void
 Workspace::load_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
@@ -1043,12 +1318,12 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
            ++wsid_start;
         const char * wsid_end = filename.c_str() + filename.size();
 
-        // skip the .apl extension (if any)
+        // ignore the .apl extension (if any)
         //
-        if (wsid_end > (wsid_start - 4) &&   // long enough
+        if ((wsid_end  - wsid_start) > 4 &&   // long enough
            !strcmp(wsid_end - 4, ".apl"))  wsid_end -= 4;
 
-        const UTF8_string wsid_utf8(utf8P(wsid_start), wsid_end - wsid_start);
+        const UTF8_string wsid_utf8(wsid_start, wsid_end - wsid_start);
         const UCS_string wsid_ucs(wsid_utf8);
         wsid(out, wsid_ucs, lib_name.get_libref(), true);
 
@@ -1063,6 +1338,9 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
                  << ") failed: " << strerror(errno) << endl;
              return;
            }
+
+        if (!in.is_valid_format())   // wrong format; diagnostic already
+           return;                   // printed by the constructor
 
         Log(LOG_command_IN)   out << "LOADING " << lib_name.get_name()
                                   << " from file '" << filename << "' ..."
@@ -1079,12 +1357,58 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
         the_workspace.clear_WS(out, !LOG_archive);
 #endif
 
-        in.read_Workspace(silent);
+        // Bugs28 #99: a corrupt <SI-entry> (e.g. a level="..." that
+        // disagrees with its position in the )SI stack -- a
+        // hand-edited or otherwise corrupt file) throws out of
+        // read_Workspace() rather than silently reconstructing a
+        // partial )SI (see the matching Archive.cc comment). Refuse
+        // the whole workspace on that: clear back out whatever was
+        // already read (symbols/functions are read before the
+        // trailing <StateIndicator>, so some may already be in place)
+        // instead of leaving an inconsistent, partially-loaded
+        // workspace active as if the )LOAD had succeeded.
+        //
+        try
+           {
+             in.read_Workspace(silent);
+           }
+        catch (Error & err)
+           {
+             // the specific reason (e.g. a bad )SI stack, or a negative
+             // shape item (Bugs32 #26)), if the reader gave one
+             const UCS_string reason = Workspace::more_error();
+             the_workspace.clear_WS(out, true);
+             out << ")LOAD " << lib_name.get_name() << " failed: "
+                 << Error::error_name(err.get_error_code()) << endl;
+             UCS_string & more = MORE_ERROR();
+             more.clear();
+             // not necessarily corrupt: e.g. an )SI entry of a derived
+             // function or lambda that cannot be restored (Bugs35 #43).
+             // The reason (if any) follows.
+             more << "workspace file " << filename
+                  << " could not be loaded; the workspace is CLEAR WS";
+             if (reason.size())   more << UNI_LF << reason;
+             return;
+           }
+        catch (...)
+           {
+             // any other exception (e.g. std::bad_alloc) mid-read must
+             // leave a CLEAR WS too, not the half-loaded remains; rethrow
+             // so Cmd_WS::cmd_LOAD's own catch(std::bad_alloc&)/catch(...)
+             // still run their usual reporting on top of this.
+             //
+             the_workspace.clear_WS(out, true);
+             out << ")LOAD " << lib_name.get_name() << " failed" << endl;
+             MORE_ERROR() << "workspace file " << filename
+                          << " could not be loaded and was not fully"
+                             " read; the workspace is CLEAR WS";
+             throw;
+           }
       }
 
    if (Workspace::get_LX().size())  quad_lx = Workspace::get_LX();
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::copy_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
@@ -1106,7 +1430,8 @@ int dump_fd = -1;
 XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
    if (dump_fd != -1)   // case 1: )DUMPed .apl file
       {
-        load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects);
+        load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects,
+                  protection);
         // load_DUMP closes dump_fd
         return;
       }
@@ -1118,16 +1443,47 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
         return;
       }
 
+   if (!in.is_valid_format())   // wrong format; diagnostic already
+      return;                  // printed by the constructor
+
    // case 2: )SAVEd .xml file
    //
    Log(LOG_command_IN)   CERR << "LOADING " << lib_name.get_name()
                               << " from file '" << filename << "' ..." << endl;
 
    in.set_protection(protection, lib_ws_objects);
-   in.read_vids();
-   in.read_Workspace(false);
+
+   // Unlike )LOAD, )COPY updates the *live* workspace's Symbols directly
+   // (see Archive.cc read_Symbol()), one <Symbol> at a time, and there is
+   // no CLEAR WS to fall back to if a later, corrupt <Symbol> throws --
+   // the user's own, possibly unsaved workspace is what's at stake. Undo
+   // every Symbol already overwritten by this )COPY rather than leaving
+   // a half-old/half-new mix with no diagnostic. read_vids() (an earlier,
+   // read-only pass over the same file) can throw on the same corruption
+   // too, so it is covered by the same try as read_Workspace() below.
+   //
+   try
+      {
+        in.read_vids();
+        in.read_Workspace(false);
+      }
+   catch (Error & err)
+      {
+        // the specific reason, if the reader gave one (e.g. Bugs32 #26)
+        const UCS_string reason = Workspace::more_error();
+        in.copy_restore_snapshots();
+        CERR << ")COPY " << lib_name.get_name() << " failed: "
+             << Error::error_name(err.get_error_code()) << endl;
+        UCS_string & more = MORE_ERROR();
+        more.clear();
+        more << "workspace file " << filename
+             << " could not be copied; )COPY was aborted and every symbol"
+                " already copied from it was restored to its"
+                " pre-)COPY state";
+        if (reason.size())   more << UNI_LF << reason;
+      }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
 {
@@ -1178,7 +1534,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
         the_workspace.WS_id = LibRef_name(lib, arg);
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// start a new )MORE error info (overriding the previous one).
 UCS_string &
 MORE_ERROR()
@@ -1186,5 +1542,5 @@ MORE_ERROR()
    Workspace::more_error().clear();
    return Workspace::more_error();
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

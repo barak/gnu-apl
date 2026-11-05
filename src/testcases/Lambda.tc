@@ -1,6 +1,8 @@
 ⍝ Lambda.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝
       )CLEAR
 CLEAR WS
@@ -65,7 +67,7 @@ CLEAR WS
       )CLEAR
 CLEAR WS
 
-SUM ← { ⍺ + ⍵⊣C←0 ;C;⎕io}
+      SUM ← { ⍺ + ⍵⊣C←0 ;C;⎕io}
       ⎕CR 'SUM'
 λ←⍺ λ1 ⍵;C;⎕io
 λ← ⍺ + ⍵⊣C←0  
@@ -74,3 +76,140 @@ SUM ← { ⍺ + ⍵⊣C←0 ;C;⎕io}
 14
 
       )ERASE SUM
+
+      ⍝ Bugs28 #50 regression: the result of V←λ (a named-lambda
+      ⍝ assignment) used to be a fabricated character-vector VALUE
+      ⍝ holding V's own name, which then leaked into any further
+      ⍝ reduction as ordinary data -- e.g. (f←{⍵}) 5 became the 2-item
+      ⍝ STRAND 'f' 5 instead of applying the lambda to 5. Fixed in
+      ⍝ Prefix.cc's reduce_V_ASS_F_(): if an argument is already
+      ⍝ waiting on the stack (right-to-left parsing: ssize() >
+      ⍝ prefix_len detects it), the result is the function itself, so
+      ⍝ a further reduction sees exactly what "F B" would see for any
+      ⍝ other named function; otherwise (a bare V←λ statement, by far
+      ⍝ the most common case, e.g. defining a helper lambda for later
+      ⍝ use) the traditional printable/silent-assignment value result
+      ⍝ is kept, so it behaves exactly like an ordinary value
+      ⍝ assignment (no "missing mandatory right argument" error).
+      ⍝
+      (ZZ50F1←{⍵}) 5
+5
+
+      ⍝ control: with no argument waiting, a further reduction still
+      ⍝ correctly rejects the leaked value (any error is acceptable;
+      ⍝ this happens to be a SYNTAX ERROR since arithmetic requires a
+      ⍝ numeric operand, not the function's committed name value)
+      ⍝
+      1+(ZZ50F2←{⍵})
+SYNTAX ERROR+
+      1+(ZZ50F2←{⍵})
+      ^ ^
+
+      )SIC
+
+      ⍝ control: ⎕← of a bare V←λ statement still prints V's name,
+      ⍝ exactly as before
+      ⍝
+      ⎕←ZZ50F3←{⍵}
+ZZ50F3
+
+      ⍝ the single most common real-world pattern: a bare V←λ
+      ⍝ statement (nothing follows), used only later -- must NOT error
+      ⍝
+      ZZ50UT←{ (⍳⍺) ∘.> (⍳⍵)}
+      ⎕NC 'ZZ50UT'
+3
+
+      2 ZZ50UT 2
+0 0
+1 0
+
+      ⍝ regression (Bugs28 #100(aa)): reduce_V_ASS_F_() (the same "named
+      ⍝ lambda: V←{...}" phrase the #50 fix above touches) accepted ⎕
+      ⍝ and the other distinguished symbols ⍺ ⍶ χ ⍹ ⍵ as V without
+      ⍝ checking they were ordinary, user-assignable names -- unlike ⍞
+      ⍝ and ⎕IO (which carry their own dedicated token tags and never
+      ⍝ reach this generic phrase at all), ⎕/⍺/⍶/χ/⍹/⍵ carry the same
+      ⍝ generic TC_SYMBOL class an ordinary name does, so ⎕←{⍵} silently
+      ⍝ gave the lambda literal "⎕" as its new name instead of running
+      ⍝ Quad_Quad::assign() (the code that implements ⎕←B) -- a no-op
+      ⍝ with neither the SYNTAX ERROR nor the display every other
+      ⍝ ⎕←function form (⎕←+/, ⎕←F) already correctly gives.
+      ⍝
+      ⎕←{⍵}
+SYNTAX ERROR
+      ⎕←{⍵}
+      ^ ^
+
+      )SIC
+
+      ⍵←{⍺}
+SYNTAX ERROR
+      ⍵←{⍺}
+      ^ ^
+
+      )SIC
+
+      ⍺←{⍵}
+SYNTAX ERROR
+      ⍺←{⍵}
+      ^ ^
+
+      )SIC
+
+      χ←{⍵}
+SYNTAX ERROR
+      χ←{⍵}
+      ^ ^
+
+      )SIC
+
+      ⍝ control: ⎕←F for an ordinary (non-lambda) function was already
+      ⍝ correctly rejected, and is unaffected by this fix
+      ⍝
+      )ERASE ZZ100AA
+      ⎕FX 'Z←ZZ100AA B' 'Z←B'
+ZZ100AA
+
+      ⎕←ZZ100AA
+SYNTAX ERROR
+      ⎕←ZZ100AA
+      ^ ^
+
+      )SIC
+      )ERASE ZZ100AA
+
+      ⍝ regression (Bugs28 #94, Bugs27 #49 residual): a lambda rejected
+      ⍝ at fix time by compute_lambda_body() (e.g. {⍶}1 -- a niladic
+      ⍝ lambda referencing an operand) used to throw the raw DEFN_ERROR
+      ⍝ macro, which calls update_error_info() -- at this point (before
+      ⍝ the lambda's own statement has an SI entry) that rebuilds line
+      ⍝ 2/3 from whatever the *previous* statement's frame was, and
+      ⍝ also prints immediately, so the error was shown twice: once
+      ⍝ (wrongly) under the previous statement, and once more from
+      ⍝ Command::do_APL_expression()'s own catch block. Thrown directly
+      ⍝ now, without calling update_error_info(): printed once, and
+      ⍝ ⎕ET/⎕EM no longer leak the previous statement's info (⎕EM's
+      ⍝ line 2/3 are simply empty, the same as on a fresh interpreter
+      ⍝ with no previous statement to leak from).
+      ⍝
+      1÷0
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      {⍶}1
+DEFN ERROR+
+
+      )MORE
+niladic lambda with axis. left argument, or function argument(s)
+
+      ⎕ET
+0 2817
+
+      ⎕EM
+DEFN ERROR+
+           
+           
+
+      )ERASE ZZ50F1 ZZ50F2 ZZ50F3 ZZ50UT

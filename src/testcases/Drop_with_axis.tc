@@ -1,7 +1,9 @@
 ⍝ Drop_with_axis.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
+⍝@ test3.
+
+      ⍝ ----------------------------------
 
       A←3 4ρ'FOLDBEATRODE'
       A
@@ -23,7 +25,7 @@ OLD
 EAT
 ODE
 
-⍝ Permitted axes ----------------------------------
+      ⍝ Permitted axes ----------------------------------
 
       Q←3 2 4ρ'ABCDEFGH',(ι8),'abcdefgh'
       Q
@@ -49,7 +51,7 @@ B C D
 
 b c d
 
-⍝ Effect on Depth ----------------------------------
+      ⍝ Effect on Depth ----------------------------------
 
       T←'W' 'WE'('WEE' 'WEED')'B' 'BE'('BEE' 'BEEP')
 
@@ -84,7 +86,7 @@ B
       ρN
 2 1
 
-⍝ Selective specification ----------------------------------
+      ⍝ Selective specification ----------------------------------
 
       V←3 4ρ'ABCDEFGHIJKL'
       V

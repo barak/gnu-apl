@@ -27,6 +27,7 @@
 #include "apl-sqlite.hh"
 #include "Connection.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// An abstract provider for a database service
 class Provider
 {
@@ -41,7 +42,7 @@ public:
    virtual const char * get_provider_type() const = 0;
 
    /// connect to the database
-   virtual Connection * open_database(const Value & B) = 0;
+   virtual Connection * open_database(const cValue & B) = 0;
 
    /// library version_string
    virtual const char * version_string() const = 0;
@@ -49,5 +50,6 @@ public:
    /// library version_number
    virtual int version_number() const   = 0;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

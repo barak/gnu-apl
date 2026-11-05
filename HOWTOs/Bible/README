@@ -1,0 +1,35 @@
+The GNU APL Bible -- Preview
+============================
+
+Bible-Preview.pdf is a free preview of "The GNU APL Bible: Implementing
+APL in C++" by Dr. Jürgen Sauermann: front cover, table of contents,
+preface, and the first three chapters.
+
+About the book
+--------------
+
+The GNU APL Bible is a 324-page, 29-chapter guided tour of the GNU APL
+interpreter's ~175,000-line C++ implementation, written by its
+long-time maintainer. Across eight parts it works from the core data
+model (Value, Shape, Cell types) through tokenization, parsing, and
+execution, into the built-in functions and operators, workspace and
+symbol management, and the optional/advanced features -- the libapl
+embedding API, native functions and auxiliary processors, parallel
+execution, the WebSocket/GUI interfaces, and the Windows port -- before
+closing with a practical guide to navigating, maintaining, and
+contributing to the source tree.
+
+Written in the spirit of Knuth's "The Art of Computer Programming":
+precise, heavily annotated code listings, historical notes tracing
+APL's lineage back to Iverson's 1962 notation, and end-of-chapter
+exercises. It is aimed at anyone who wants to understand GNU APL from
+the inside -- current and prospective maintainers, C++ developers
+studying a substantial real-world interpreter, students of language
+implementation, and APL users simply curious how their interpreter
+works.
+
+How to order
+------------
+
+Ordering information for the book can be found at the end of the preview.
+

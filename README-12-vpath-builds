@@ -44,7 +44,7 @@ However, the following considerations are required:
 
 A. the build directory chosen for the VPATH build needs to be located below
    the top-level APL directory and (currently) not deeper than four directory
-   levels. A commom choice is a directory named 'obj' in the top-level
+   levels. A common choice is a directory named 'obj' in the top-level
    directory.
 
 B. The top-level APL directory and its sub-directory 'src' must be "fresh",

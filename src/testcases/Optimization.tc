@@ -1,10 +1,13 @@
 ⍝ Optimization.tc
 ⍝ ════════════════
 
+⍝@ test3.
+
       ]log 38 ON
 
       )ERASE FOO
 
+      ]FILE_CTL SKIP_APL2   ⍝ double-quoted strings are a GNU APL extension
 ∇FOO B
  →(B=1 2 3) / L1 L2 L3 ◊ →0
 
@@ -22,7 +25,7 @@ L3
 
       ]log 38 OFF
 
-)ERASE FOO
+      )ERASE FOO
 
-)CHECK BRIEF
+      )CHECK BRIEF
 

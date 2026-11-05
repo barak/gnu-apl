@@ -1,10 +1,12 @@
 ⍝ Index.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       (ι0)⌷42
 42
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       ⎕IO←1
       V←2 2.3 ¯5 999 .01
@@ -18,7 +20,7 @@
   2 2.3 2
 999 2   2.3
 
-⍝ Indexing a matrix ----------------------------------
+      ⍝ Indexing a matrix ----------------------------------
 
       ⎕IO←1
       M←3 4ρι12
@@ -52,4 +54,68 @@
 
       ⍴(2 2⍴⍳4)[1;⍬]
 0
+
+      ⍝ regression (Bugs28 #100(f)): indexed ASSIGNMENT through an empty
+      ⍝ index used to silently no-op regardless of B, instead of
+      ⍝ requiring B to conform (0 elements) just like a non-empty index
+      ⍝ already does (Z[1;1 2]←1 2 3, below, was already correctly
+      ⍝ LENGTH ERROR).
+      ⍝
+      Z←2 2⍴1
+      Z[1;⍬]←1 2
+LENGTH ERROR+
+      Z[1;⍬]←1 2
+      ^     ^
+
+      )MORE
+A[B]←C: an index is empty, so the selected area is empty, but C has 2 element(s) (expecting 0)
+      )SIC
+
+      ⍝ control: a conforming (empty) B through an empty index is a
+      ⍝ genuine no-op
+      ⍝
+      Z[1;⍬]←⍬
+      Z
+1 1
+1 1
+
+      ⍝ control: this was already correctly rejected before the fix
+      ⍝
+      Z[1;1 2]←1 2 3
+LENGTH ERROR+
+      Z[1;1 2]←1 2 3
+      ^       ^
+
+      )SIC
+      )ERASE Z
+
+      ⍝ regression (Bugs28 #100(s)): the single-axis form of indexed
+      ⍝ assignment (A[B]←C, no semicolons) only checked C's ELEMENT
+      ⍝ COUNT against the index's, never that C was actually a vector,
+      ⍝ so a wrongly-shaped C whose element count happened to match
+      ⍝ (e.g. a 2 1 matrix for a 2-element index) silently succeeded
+      ⍝ instead of RANK ERROR.
+      ⍝
+      W←10 20 30 40
+      W[1 2]←2 1⍴1 2
+RANK ERROR+
+      W[1 2]←2 1⍴1 2
+      ^     ^
+
+      )MORE
+A[B]←C: expecting ⍴C to be ⍴B (2); ⍴C is 2 1
+      )SIC
+
+      ⍝ control: a proper vector and a 1-element (scalar-extended) C
+      ⍝ are unaffected
+      ⍝
+      W[1 2]←5 6
+      W
+5 6 30 40
+
+      W[1 2]←,99
+      W
+99 99 30 40
+
+      )ERASE W
 

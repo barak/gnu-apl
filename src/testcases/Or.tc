@@ -1,10 +1,17 @@
 ⍝ Or.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ ISO p. 94
       0 1 ∘.∨ 0 1
 0 1
 1 1
+
+      ⍝ real APL2 restricts ∧/∨ to booleans; SKIP...NOSKIP below brackets
+      ⍝ the GNU/ISO-13751-only LCM/GCD numeric extension (to EOF here) --
+      ⍝ see project_apl2_and_or_boolean_only.md
+      ]FILE_CTL SKIP_APL2
 
       30 ∨ 36
 6
@@ -29,4 +36,37 @@
       ¯1J0 ∨ ¯1J0
 1
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #100(l)): FloatCell::gcd()'s m==0/n==0
+      ⍝ shortcuts used to return the OTHER operand with whatever sign
+      ⍝ it happened to have, instead of its absolute value like every
+      ⍝ other GCD result here already gets.
+      ⍝
+      0 ∨ ¯5
+5
+
+      ¯5 ∨ 0
+5
+
+      0.0 ∨ ¯5
+5
+
+      0 ∨ 0
+0
+
+      ⍝ regression (Bugs28 #100(n)): int_gcd() used to reject INT64_MIN
+      ⍝ outright with DOMAIN ERROR (FloatCell::gcd()'s abs() cannot
+      ⍝ negate it without overflow), unlike N∧0/N|3/N⌈3 which handle
+      ⍝ the same N fine via unrelated code paths.
+      ⍝
+      N←¯9223372036854775807-1
+      N ∨ 3
+1
+
+      ⍝ Bugs35 #25: the GCD 2⋆63 of N and N is returned as a float (like |N)
+      ⍝
+      N ∨ N
+9.223372037E18
+
+      )ERASE N
+
+      ⍝ ==================================

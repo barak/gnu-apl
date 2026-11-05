@@ -1,17 +1,27 @@
 ⍝ Quad_EB.tc
 ⍝ ----------------------------------
 
-      '"CLEAN-UP"' ⎕EB '⍳4.5'
+⍝@ test3.
+
+      ⍝ A ⎕EB B is try/finally: B's result (or error) is the result;
+      ⍝ A is the cleanup, always executed after B, its value (if any)
+      ⍝ discarded (not displayed). Hence ⎕← to make A's execution
+      ⍝ visible. If B fails, )MORE names B's failure.
+      ⍝
+      '⎕←"CLEAN-UP"' ⎕EB '⍳4.5'
 CLEAN-UP
-DOMAIN ERROR
-      "CLEAN-UP" μ-Z__A_Quad_EB_B '⍳4.5'
-      ^                                ^
+DOMAIN ERROR+
+      '⎕←"CLEAN-UP"' ⎕EB '⍳4.5'
+      ^
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: ⍳4.5
 
       )SIC
       )ERASE FOO
 
 ∇FOO
-   '"CLEAN-UP"' ⎕EB '→L3'
+   '⎕←"CLEAN-UP"' ⎕EB '→L3'
    NOT REACHED
 L3: 'GOON'
 ∇
@@ -24,7 +34,7 @@ GOON
       )ERASE FOO
 
 ∇FOO
-   '"CLEAN-UP"' ⎕EB '→'
+   '⎕←"CLEAN-UP"' ⎕EB '→'
    NOT REACHED
 ∇
 
@@ -39,6 +49,155 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+      ⍝ Bugs30 #2 (Blake McBride): A containing a →N with no enclosing
+      ⍝ defined function used to hang the interpreter forever (→N was
+      ⍝ misresolved as a jump to the ⎕EB macro's own line 1, i.e. the
+      ⍝ very statement that runs A, looping). Fixed: no enclosing
+      ⍝ function means SYNTAX ERROR (like a bare ⍎'→1'), not a hang.
 
-⍝ ==================================
+      '→1' ⎕EB '2+2'
+SYNTAX ERROR+
+      →1
+      ^
+
+      )SIC
+
+      '→0' ⎕EB '2+2'
+SYNTAX ERROR+
+      →0
+      ^
+
+      )SIC
+
+      '→¯1' ⎕EB '2+2'
+SYNTAX ERROR+
+      →¯1
+      ^
+
+      )SIC
+
+      ⍝ →N with a real enclosing function must still branch for real.
+
+      )ERASE FOO
+
+∇Z←FOO
+      A←'→3' ⎕EB '2+2'
+      Z←100
+      Z←999
+∇
+
+      FOO
+999
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE FOO
+
+      ⍝ result rules (try/finally):
+      ⍝
+      ⍝   B       A       result of A ⎕EB B
+      ⍝   value   value   B's value (A's value discarded, not displayed)
+      ⍝   error   value   B's error  ()MORE: B's failure)
+      ⍝   value   error   A's error
+      ⍝   error   error   A's error  ()MORE: B's failure)
+      ⍝
+      ⍝ A may have no value at all (e.g. a cleanup function without
+      ⍝ result, or an empty A).
+      ⍝
+      )ERASE CLEANUP
+∇CLEANUP
+ '... CLEANUP ran'
+∇
+
+      Z←'5' ⎕EB '2+2'
+      Z
+4
+
+      '5' ⎕EB '2+2'
+4
+
+      'CLEANUP' ⎕EB '2+2'
+... CLEANUP ran
+4
+
+      '' ⎕EB '2+2'
+4
+
+      ')WSID' ⎕EB '2+2'
+4
+
+      '5' ⎕EB '3÷0'
+DOMAIN ERROR+
+      '5' ⎕EB '3÷0'
+      ^
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: 3÷0
+
+      )SIC
+      '1÷0' ⎕EB '2+2'
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      )SIC
+      '1÷0' ⎕EB '3÷0'
+DOMAIN ERROR+
+      1÷0
+      ^^
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: 3÷0
+
+      )SIC
+
+      ⍝ a ⎕EC inside B is not ⎕EB's own ⎕EC: no )MORE for it.
+      ⍝
+      '' ⎕EB '↑⎕EC ''3÷0'''
+0
+
+      )MORE
+NO )MORE ERROR INFO
+
+      )ERASE CLEANUP
+
+      ⍝ regression (Blake McBride, Bugs31 #7) -- CLOSED AS NOT A BUG
+      ⍝ (2026-10-02, after discussion with the user): an SI-modifying
+      ⍝ command as the A operand, e.g. ')OFF' ⎕EB '2+2', really executes
+      ⍝ (and ends the session), whereas the same command as B gives the
+      ⍝ ⎕EC guard's DOMAIN ERROR. That asymmetry is intended: ⎕EB is
+      ⍝ try/finally -- B is the protected expression, run under ⎕EC
+      ⍝ (which must return a result for B, hence the guard), and A is
+      ⍝ the cleanup expression, ⍎'d unguarded AFTER B whether B
+      ⍝ succeeded or not, so that A is guaranteed to be at least
+      ⍝ attempted. ')OFF' ⎕EB B ("whatever happens in B, end the session
+      ⍝ afterwards") is a legitimate request; vetoing it would break the
+      ⍝ very guarantee ⎕EB exists for. Same reasoning as ⎕EA's A operand
+      ⍝ (see Quad_EA.tc, Bugs31 #7). As with a C++ finally block that
+      ⍝ calls exit(), B's own outcome (result or error) is then lost.
+      ⍝
+      ⍝ Blake's )SAVE claim (a "*" )SI frame saved into the workspace)
+      ⍝ reproduces, but identically for a plain ⍎')SAVE ...' without
+      ⍝ ⎕EB -- see Quad_EA.tc; it is )SAVE's own frame handling.
+      ⍝
+      ⍝ )OFF/)CLEAR/)SAVE can't be run for real in this shared-process
+      ⍝ suite; )SIC takes the identical E_COMMAND_PUSHED path and is
+      ⍝ safe here. It must reach Command.cc silently (no DOMAIN ERROR);
+      ⍝ the whole ⎕EB statement never completes, so B's result (4) is
+      ⍝ not displayed either -- same as a plain ⍎')SIC' would.
+      ⍝
+      ')SIC' ⎕EB '2+2'
+      )SI
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ ==================================
 

@@ -47,7 +47,18 @@
 //
 phrase(BS_ANY+3      , LPAR , B    , RPAR ,      , DITO )
 phrase(BS_ANY+3      , LPAR , F    , RPAR ,      , "LPAR_B_RPAR_")
-phrase(BS_ANY+4      , LPAR , F    , C    , RPAR , ""    )
+
+// a parenthesized function bound to its own axis, e.g. (⌽[1]), collapsed
+// to a single (derived) function so it can be used the same way as a
+// bare F elsewhere, e.g. as the LO of an operator: (⌽[1])⌿B. Without
+// this phrase, "F C" alone (nothing after C, i.e. no further, trailing
+// M or B to complete a longer phrase) never reduces to anything by
+// itself, so the shift-reduce engine ran off the end of the statement
+// with "( F C )" still unreduced on the stack and no matching phrase --
+// SYNTAX ERROR, even for the plain call (⌽[1])B with no operator at
+// all involved. Found investigating Blake McBride's Bugs26 #5.
+//
+phrase(BS_ANY+4      , LPAR , F    , C    , RPAR , DITO )
 
 // niladic function call
 phrase(BS_ANY+ 1,      N    ,      ,      ,      , DITO )
@@ -68,10 +79,10 @@ phrase(BS_A_F+4      , A    , M    , C    , B    , DITO )   // A /[X] B
 //
 phrase(BS_LO_OP+2    , F    , M    ,      ,      , DITO )   // +/
 phrase(BS_LO_OP+2    , M    , M    ,      ,      , DITO )   // /¨
+phrase(BS_LO_OP+2    , A    , M    ,      ,      , DITO )   // (5 OP1)
 phrase(BS_LO_OP+3    , F    , M    , C    ,      , DITO )   // +/[2]
 phrase(BS_LO_OP+3    , F    , C    , M    ,      , DITO )   // ,[2]/
 phrase(BS_LO_OP+4    , F    , C    , M    , C    , DITO )   // ,[2]/[2]
-phrase(BS_LO_OP+2    , A    , M    ,      ,      , DITO )   // A/
 
 // dyadic operator
 //

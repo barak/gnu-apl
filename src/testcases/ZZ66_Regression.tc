@@ -1,0 +1,116 @@
+⍝ ZZ66_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ bug-apl@gnu.org, Bugs9 (Blake McBride): regression coverage for the
+      ⍝ critical/high severity findings below. See SVN log for details.
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ #1: Archive.cc next_ravel_Value() vs next_ravel_Pointer() -- )SAVE/
+      ⍝ )LOAD used to silently collapse every nesting depth >=3 down to 2.
+      X←⊂⊂1 2
+      Y←⊂1 2
+      Z←⊂⊂⊂1 2
+      ≡X
+3
+      ≡Y
+2
+      ≡Z
+4
+      )SAVE /tmp/ZZ66_save_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+      )CLEAR
+CLEAR WS
+      )LOAD /tmp/ZZ66_save_test
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+      ≡X
+3
+      ≡Y
+2
+      ≡Z
+4
+
+      ⍝ #2: A⍸B integer overflow -> heap overflow, SIGSEGV. Must now be a
+      ⍝ clean WS FULL instead of writing past the (wrongly-sized) result.
+      ]FILE_CTL SKIP_APL2   ⍝ characters beyond ⎕AV are a GNU APL extension; ⍤ ⍣ ⍸ ≢ are not in IBM APL2
+      ⍸ 4 ⍴ 4611686018427387904
+WS FULL
+      ⍸4⍴4611686018427387904
+      ^
+
+      ⍝ #3: 1 ⎕TF inverse rank/shape parsing had no overflow bound --
+      ⍝ a claimed rank/shape item could wrap and silently misparse.
+      1 ⎕TF 'CX 65536 a'
+DOMAIN ERROR+
+      1 ⎕TF 'CX 65536 a'
+      ^ ^
+      )SIC
+
+      ⍝ #4: CDR CHAR8 decode sign-extended bytes 128-255.
+      ⎕UCS 12 ⎕CR 11 ⎕CR 'AéB'
+65 233 66
+
+      ⍝ #5: CDR nested CHAR32 scalar read big-endian, written little-endian.
+      ⎕UCS ⊃12 ⎕CR 11 ⎕CR ((⎕UCS 300) 1)
+300 
+
+      ⍝ #6: 1 ⎕TF of an empty numeric array emitted a record its own
+      ⍝ inverse rejected (missing the shape/data separator).
+      ]FILE_CTL NO_SKIP
+      A←⍳0
+      T←1 ⎕TF 'A'
+      ⎕EX 'A'
+1
+      1 ⎕TF T
+A
+      ⍴A
+0
+
+      ⍝ #7 / #11: empty value built by a loop that never runs kept the
+      ⍝ default numeric prototype instead of the intended one.
+      B←''
+      T←1 ⎕TF 'B'
+      ⎕EX 'B'
+1
+      1 ⎕TF T
+B
+      B≡''
+1
+      (⎕JSON '""')≡''
+1
+
+      ⍝ #8: 2 ⎕TF of an empty char array dropped both shape and enclosure;
+      ⍝ separately, a length-1 nested vector lost one enclosure level
+      ⍝ (relied on strand notation to re-create it, which needs >=2 items).
+      C←2 0⍴'a'
+      2 ⎕TF 'C'
+C←2 0⍴' '
+      NN←,⊂⊂''
+      ≡NN
+3
+      T←2 ⎕TF 'NN'
+      ⎕EX 'NN'
+1
+      ⍎T
+      ≡NN
+3
+
+      ⍝ #9: A⍒B (collating grade down) broke ties in descending index
+      ⍝ order instead of ascending.
+      N←4 1⍴'abab'
+      'ab'⍒N
+2 4 1 3
+
+      ⍝ #10: empty JSON object serialised to '}' -- invalid JSON, and its
+      ⍝ own output no longer parsed.
+      2 ⎕JSON ⎕JSON '{}'
+{}
+
+      )ERASE X Y Z A B C N NN T
+      )DROP /tmp/ZZ66_save_test
+³
+
+      ]NEXTFILE

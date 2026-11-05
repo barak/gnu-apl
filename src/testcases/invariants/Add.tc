@@ -1,0 +1,36 @@
+⍝ Add.tc
+⍝ ═══════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A and B numeric
+      ⍝ inv: A+B ←→ B+A   (+ is commutative, even when the sum
+      ⍝ overflows int64 and is promoted to float)
+      A ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      (A+B) ≡ B+A
+1
+      A ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      B ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      (A+B) ≡ B+A
+1
+
+      ⍝ Precond: Big sits at the int64 boundary so that Big+Small
+      ⍝ always overflows and is promoted to float
+      ⍝ (Cell::sum_overflow(), IntCell::bif_add_ii()); Small is small
+      ⍝ enough to be exactly double-representable, so subtracting it
+      ⍝ back out of the float sum is exact
+      ⍝ inv: Big ←→ (Big+Small)-Small
+      ⍝ (the reverse recovery, Small ←→ (Big+Small)-Big, is NOT exact:
+      ⍝ converting the huge Big to a double already loses precision on
+      ⍝ its own, independently of the addition - so it is not tested)
+      Small ← 1+999∣|⎕RVAL 0
+      Big ← 9223372036854775807
+      Big ≡ (Big+Small)-Small
+1
+      Small ← ¯1-999∣|⎕RVAL 0
+      Big ← ¯9223372036854775808
+      Big ≡ (Big+Small)-Small
+1

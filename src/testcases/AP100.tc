@@ -1,6 +1,13 @@
 ⍝ AP100.tc
 ⍝ ----------------------------------
 
+      ⍝ this testcase requires shared variables, which --noSV or
+      ⍝ SharedVars Disabled (or a failed connection to APserver) turn off
+      ⍝
+      ]NEXTFILE NO-SVARS
+
+
+
       ⍝ share variable OS with AP100 and allow ⎕SVO to complete
       100 ⎕SVO 'OS' ◊ 0⍴⎕DL 1
 ⁰
@@ -39,5 +46,5 @@
       ⎕SVO 'OS'
 0
 
-⍝ ==================================
+      ⍝ ==================================
 

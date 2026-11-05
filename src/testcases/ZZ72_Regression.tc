@@ -1,0 +1,465 @@
+⍝ ZZ72_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ Blake McBride's Bugs33 report (9 items): the ∇-editor (Nabla.cc).
+      ⍝ #8 ([∆n1 n2 ...]) is a documented gap, see apl2lrm.tc #45/#46.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+
+
+      ⍝ #1 an existing function that is only displayed (∇F[⎕]∇) is not fixed
+      ⍝ again, so its creation time stays the same
+      ⍝
+      ⊣⎕FX 'FOO' 'A←1' 'B←2'
+
+
+
+
+
+      T1←2 ⎕AT 'FOO'
+
+
+
+
+
+      ⊣⎕DL 1.1
+
+
+
+
+
+      ∇FOO[⎕1]∇
+    ∇
+[0]   FOO
+[1]   A←1
+
+
+
+
+
+      T1≡2 ⎕AT 'FOO'
+1
+
+
+
+
+
+      )ERASE FOO T1
+
+
+
+
+
+
+
+      ⍝ #2 [→] ends editing without establishing anything (LRM p. 392): ⎕STOP
+      ⍝ and the creation time of an existing function stay, and a new
+      ⍝ function is not created
+      ⍝
+      ∇FOO
+      A←1
+      B←2
+      ∇
+
+
+
+
+
+      2 ⎕STOP 'FOO'
+
+
+
+
+
+      T1←2 ⎕AT 'FOO'
+
+
+
+
+
+      ⊣⎕DL 1.1
+
+
+
+
+
+      ∇FOO
+      [1] X←99
+      [→]
+
+
+
+
+
+      ⎕STOP 'FOO'
+2
+
+
+
+
+
+      T1≡2 ⎕AT 'FOO'
+1
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO      
+      A←1
+      B←2
+
+
+
+
+
+      ∇NEWFN
+      A←1
+      [→]
+
+
+
+
+
+      ⎕NC 'NEWFN'
+0
+
+
+
+
+
+      )ERASE FOO T1
+
+
+
+
+
+
+
+      ⍝ #3 [N] without text only positions the editor at line N (LRM p. 386)
+      ⍝
+      ∇FOO
+      A←1
+      B←2
+      C←3
+      ∇
+
+
+
+
+
+      ∇FOO
+      [2]
+      ∇
+
+
+
+
+
+      ∇FOO[2]
+      X←9
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO      
+      A←1
+      X←9
+      C←3
+
+
+
+
+
+      )ERASE FOO
+
+
+
+
+
+
+
+      ⍝ #4 a ∇ in a comment neither truncates the line nor closes the editor;
+      ⍝ a line with a comment is never closed by ∇ (LRM p. 388)
+      ⍝
+      ∇FOO
+      A←1
+      B←2
+      ∇
+
+
+
+
+
+      ∇FOO
+      [1] A←1 ⍝ needs ∇ here
+      C←3 ⍝ comment∇
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO                 
+A←1 ⍝ needs ∇ here  
+      C←3 ⍝ comment∇
+
+
+
+
+
+      )ERASE FOO
+
+
+
+
+
+
+
+      ⍝ #5 a bad header line [0] gives DEFN ERROR when not interactive (as a
+      ⍝ bad body line does); the function stays unchanged
+      ⍝
+      ∇FOO
+      A←1
+      ∇
+
+
+
+
+
+      ∇FOO
+      [0] 1BADHDR
+DEFN ERROR+
+      ∇FOO
+         ^
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO      
+      A←1
+
+
+
+
+
+      )ERASE FOO
+
+
+
+
+
+
+
+      ⍝ #6 the line after [2147483647] is [2147483647.1] (no overflow)
+      ⍝
+      ∇FOO
+      [2147483647] A←1
+      B←2
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO      
+A←1      
+      B←2
+
+
+
+
+
+      )ERASE FOO
+
+
+
+
+
+
+
+      ⍝ #7 ∇F[⎕]⍫ displays, closes, and locks
+      ⍝
+      ∇LCK
+      A←1
+      B←2
+      ∇
+
+
+
+
+
+      ∇LCK[⎕1]⍫
+    ∇
+[0]   LCK
+[1]         A←1
+
+
+
+
+
+      3 ⎕AT 'LCK'
+1 1 1 1
+
+
+
+
+
+      )ERASE LCK
+
+
+
+
+
+
+
+      ⍝ #8 (implemented 2026-10-08): the list forms [⎕n1 n2 ...] and [∆n1 n2
+      ⍝ ...] and the open-ended ranges [⎕n-] and [∆n-] (LRM pp. 389-391).
+      ⍝ Unlike the LRM, line numbers out of order (also repeated ones) are
+      ⍝ rejected.
+      ⍝
+      ∇LST
+      A←1
+      B←2
+      C←3
+      D←4
+      E←5
+      ∇
+
+
+
+
+
+      ∇LST[⎕2 4 9]∇
+[2]         B←2
+[4]         D←4
+
+
+
+
+
+      ∇LST[∆0 1 4]∇
+
+
+
+
+
+      ⎕CR 'LST'
+LST      
+      B←2
+      C←3
+      E←5
+
+
+
+
+
+      ∇LST[∆3 1]∇
+DEFN ERROR+
+      ∇LST[∆3 1]∇
+                ^
+
+
+
+
+
+      ∇LST[∆2 2]∇
+DEFN ERROR+
+      ∇LST[∆2 2]∇
+                ^
+
+
+
+
+
+      ∇LST[⎕3-1]∇
+DEFN ERROR+
+      ∇LST[⎕3-1]∇
+                ^
+
+
+
+
+
+      ∇LST[∆2 7]∇
+DEFN ERROR+
+      ∇LST[∆2 7]∇
+                ^
+
+
+
+
+
+      ∇LST[2⎕3 4]∇
+DEFN ERROR+
+      ∇LST[2⎕3 4]∇
+                 ^
+
+
+
+
+
+      ∇LST[∆3-]∇
+
+
+
+
+
+      ⎕CR 'LST'
+LST      
+      B←2
+      C←3
+
+
+
+
+
+      )ERASE LST
+
+
+
+
+
+
+
+      ⍝ #9 a line number is a number: [1.0] is line [1], [2.10] is [2.1]
+      ⍝
+      ∇FOO
+      F1←1
+      F2←2
+      [1.0] REPL←99
+      [2.10] I←1
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO'
+FOO       
+REPL←99   
+      F2←2
+I←1       
+
+
+
+
+
+      )ERASE FOO
+
+
+
+
+

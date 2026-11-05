@@ -1,10 +1,12 @@
 ⍝ Quad_ET.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       (A←1)←2
 SYNTAX ERROR
       (A←1)←2
-         ^ ^
+         ^  ^
 
       ⎕ET
 2 4
@@ -12,7 +14,7 @@ SYNTAX ERROR
       →
 
       (⍳68)⍴15
-SYSTEM LIMIT (rank)
+SYSTEM LIMIT (rank)+
       (⍳68)⍴15
       ^    ^
 
@@ -27,5 +29,32 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #93): a fix-time-only error (one that never
+      ⍝ gets to execute at all, e.g. "1)" -- unbalanced parenthesis)
+      ⍝ used to leave ⎕ET/⎕EM reporting whatever the *previous*
+      ⍝ statement's run-time error had been, since neither
+      ⍝ Token_string::all_brackets_closed() nor
+      ⍝ Error::throw_parse_error() ever stored the new error where
+      ⍝ ⎕ET/⎕EM look for it (StateIndicator::get_error()) -- only
+      ⍝ run-time errors (via throw_apl_error()) did that.
+      ⍝
+      1÷0
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      ⎕ET
+5 4
+
+      1)
+Unbalanced right parenthesis+
+      1)
+       ^
+
+      ⎕ET
+2 6658
+
+      )SIC
+
+      ⍝ ==================================
 

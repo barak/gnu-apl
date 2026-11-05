@@ -1,11 +1,32 @@
 ⍝ Quad_UCS.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕UCS '⍴A B'
 9076 65 32 66
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕UCS with mixed arguments is a GNU APL extension
       ⎕UCS 'Hello',72 101 108 108 111
 72 101 108 108 111 Hello
 
-⍝ ==================================
+      ⍝ Regression (2026-08-10): ISO-IEC/JTC1/SC22 N3067 "APL Character
+      ⍝ Repertoire" (devel_doc/n3067.pdf) lists 6 APL functional symbols
+      ⍝ GNU APL previously had no UNI_xxx name for at all: ⊆ ⊇ ∅ ⍌ ⍓ ⍔.
+      ⍝ None of them are assigned a function by any known APL dialect
+      ⍝ (same category as e.g. ⍚/DIAMOND_UNDERBAR), so they are not ⎕AV
+      ⍝ members and cannot be used as bare tokens in source -- but as
+      ⍝ character DATA they must round-trip correctly, which is what
+      ⍝ n3067 (in the context of ⎕TF/⎕IN/⎕OUT interchange) actually cares
+      ⍝ about.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      V←⎕UCS 8838 8839 8709 9036 9043 9044
+      V
+⊆⊇∅⍌⍓⍔
+
+      (⎕UCS V)≡8838 8839 8709 9036 9043 9044
+1
+
+      ⍝ ==================================
 

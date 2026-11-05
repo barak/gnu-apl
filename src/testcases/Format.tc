@@ -1,6 +1,8 @@
 ⍝ Format.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       R←2 3ρ'ONE' 1 1 'TWO' 2 22
       R
  ONE 1  1 
@@ -14,7 +16,7 @@
       ρZ
 2 10
 
-⍝ printing width ----------------------------------
+      ⍝ printing width ----------------------------------
 
       ⎕PW←30
       T←34559898 449449449 13981 93891293
@@ -29,7 +31,7 @@
 
       ⎕PW←80
 
-⍝ simple char arrays ----------------------------------
+      ⍝ simple char arrays ----------------------------------
 
       M←'3  5  SIX'
       M
@@ -57,7 +59,7 @@
       ρY
 9
 
-⍝ nested arrays ----------------------------------
+      ⍝ nested arrays ----------------------------------
 
       B←(2 3 4) 5 (⊂7 8 (9 10 11))
       ρB
@@ -72,7 +74,7 @@
       C
  2 3 4  5   7 8  9 10 11   
 
-⍝2^3^4^^5^^^7^8^^9^10^11^^^
+      ⍝2^3^4^^5^^^7^8^^9^10^11^^^
 
 
       D←(1 2) (3 4 5) 6 (2 2 3ρ6+ι12)
@@ -102,7 +104,7 @@
 ^^^^^^^^^^^^^^^^^^13^14^15^
 ^^^^^^^^^^^^^^^^^^16^17^18^
 
-⍝ effect of printing precision ----------------------------------
+      ⍝ effect of printing precision ----------------------------------
 
       ⎕PP←5
       H←÷3 6
@@ -186,4 +188,24 @@
 
       ⍴⍕R
 3 4 48
+
+      ⍝ regression (Bugs28 #80, Bugs27 #42 residual): a complex number's
+      ⍝ imaginary part used to inherit the real part's (or an already
+      ⍝ dropped part's) scaled/E-format decision verbatim instead of
+      ⍝ getting its own need_scaling() decision -- so a real part small
+      ⍝ enough to need E-format forced the imaginary part into E-format
+      ⍝ too, even when the imaginary part's own magnitude did not need
+      ⍝ it (and the mirror case, via ⍕'s "drop the negligible part"
+      ⍝ shortcut for 1E¯17J0.5, below).
+      ⍝
+      OldPP←⎕PP
+      ⎕PP←10
+
+      1E¯7J0.5
+1E¯7J0.5
+
+      ⍕1E¯17J0.5
+0J0.5
+
+      ⎕PP←OldPP
 

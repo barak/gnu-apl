@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,11 +28,26 @@
 #include "ErrorCode.hh"
 
 /// throw an Error with \b code only (typically a standard APL error)
+/// @param code APL error code to throw
+/// @param loc caller location for diagnostics
 void throw_apl_error(ErrorCode code, const char * loc)
 #ifdef __GNUC__
     __attribute__ ((noreturn))
 #endif
 ;
+
+/// called by FIXME (see below) just before it exit()s: if a testcase file
+/// is currently being read, writes its summary.log entry and prints
+/// "Failed testcase is ..." (IO_Files::report_abnormal_exit()) since
+/// exit() bypasses end_of_current_file(), which would otherwise be the
+/// only place that happens -- without this, the file goes silently
+/// missing from summary.log instead of showing up as failed. Returns the
+/// exit() code FIXME should use: 0 (unchanged default/interactive
+/// behaviour) unless --TM 3 is active, in which case it is non-zero so
+/// that test tooling (e.g. src/Automated_Test_Report.sh) can tell an
+/// internal-consistency failure apart from a clean pass -- exit(0) would
+/// otherwise report false success. See IO_Files.cc.
+int fixme_exit_code();
 
 #define ATTENTION         { throw_apl_error(E_ATTENTION,           LOC); }
 #define AXIS_ERROR          throw_apl_error(E_AXIS_ERROR,          LOC)
@@ -46,12 +61,15 @@ void throw_apl_error(ErrorCode code, const char * loc)
 #define LIMIT_ERROR_SVAR    throw_apl_error(E_SYS_LIMIT_SVAR,      LOC)
 #define LIMIT_ERROR_FUNOPER throw_apl_error(E_SYS_LIMIT_FUNOPER,   LOC)
 #define LIMIT_ERROR_PREFIX  throw_apl_error(E_SYS_LIMIT_PREFIX,    LOC)
+#define LIMIT_ERROR_NESTING throw_apl_error(E_SYS_LIMIT_NESTING,   LOC)
+#define LIMIT_ERROR_SIDEPTH throw_apl_error(E_SYS_LIMIT_SIDEPTH,   LOC)
 #define RANK_ERROR          throw_apl_error(E_RANK_ERROR,          LOC)
 #define SYNTAX_ERROR        throw_apl_error(E_SYNTAX_ERROR,        LOC)
 #define LEFT_SYNTAX_ERROR   throw_apl_error(E_LEFT_SYNTAX_ERROR,   LOC)
 #define SYSTEM_ERROR        throw_apl_error(E_SYSTEM_ERROR,        LOC)
 #define TODO                throw_apl_error(E_NOT_YET_IMPLEMENTED, LOC)
-#define FIXME               {  BACKTRACE; cleanup(false); exit(0);        \
+#define FIXME               {  BACKTRACE; cleanup(false);                \
+                               exit(fixme_exit_code());                  \
                                throw_apl_error(E_THIS_IS_A_BUG,    LOC); }
 #define VALUE_ERROR         throw_apl_error(E_VALUE_ERROR,         LOC)
 #define VALENCE_ERROR       throw_apl_error(E_VALENCE_ERROR,       LOC)

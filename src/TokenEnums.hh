@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ enum TokenClass
    TC_SYMBOL        = 0x0E,   ///< user defined name
    TC_VALUE         = 0x0F,   ///< APL value
 
-   TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
+   TC_MAX_PERM,               ///< permanent tokens are < TC_MAX_PERM
 
    // token class aliases. We sometimes want to use TC_FUN1 or TC_FUN2
    // for clarification, but both are TC_FUN12.
@@ -114,6 +114,7 @@ enum TokenClass
 };
 
    /// return true if \b tcl is a niladic, monadic or dyadic function
+   /// @param tcl token class to test
    inline bool is_function_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN0 | 1 << TC_FUN1 | 1 << TC_FUN2 };
@@ -121,12 +122,14 @@ enum TokenClass
       }
 
    /// return true if \b tcl is a monadic or dyadic operator
+   /// @param tcl token class to test
    inline bool is_operator_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_OPER1 | 1 << TC_OPER2 };
         return BITS & 1 << tcl;
       }
 
+   /// @param tcl token class to test
    inline bool is_function_or_operator_class(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN0  | 1 << TC_FUN1 | 1 << TC_FUN2
@@ -135,6 +138,7 @@ enum TokenClass
       }
 
    /// return if tcl is a token class that needs a right argument
+   /// @param tcl token class to test
    inline bool needs_B(TokenClass tcl)
       {
         enum { BITS = 1 << TC_FUN1  | 1 << TC_FUN2
@@ -215,7 +219,7 @@ enum TokenValueType
 enum TokenTag
 {
 
-#define TD(tok, tc, tv, id) tok = tc | tv | (id << 16),
+#define TD(tok, tc, tv, id) tok = int(tc) | int(tv) | int(id << 16),
 #include "Token.def"
 
    TOK_FUN1 = TOK_FUN2,
@@ -223,6 +227,8 @@ enum TokenTag
 };
 
 /// exchange TokenTags \b t1 and \b t2
+/// @param tag1 first tag to swap
+/// @param tag2 second tag to swap
 inline void
 swap(TokenTag & tag1, TokenTag & tag2)
 { const TokenTag tmp = tag1;

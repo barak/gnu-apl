@@ -1,0 +1,19 @@
+⍝ TransposeReversed.tc
+⍝ ════════════════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: monadic ⍉ reverses all axes
+      ⍝ inv: ⍴Z ←→ ⌽⍴B
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 3 (2 3 4) (,0 1 0 0 0)
+      Z ← ⍉B
+      (⍴Z) ≡ ⌽⍴B
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ Applying twice returns original
+      B ≡ ⍉⍉B
+1

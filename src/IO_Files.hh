@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -65,6 +65,7 @@ using namespace std;
  
  */
 
+//════════════════════════════════════════════════════════════════════════════
 /** handling of Input files. IO_Files reads lines from files until they
     are all executed. The output of the APL interpreter is compared against
     the testcase files and mismatches are recorded.
@@ -93,22 +94,54 @@ public:
    static bool exit_on_error()
       { return test_mode == TM_EXIT_AFTER_FILE_ERROR; }
 
+   /// return \b true iff --TM 3 (stop testing after the first file error,
+   /// but stay in the interpreter rather than exit()ing) is active.
+   static bool is_stop_after_file_error()
+      { return test_mode == TM_STOP_AFTER_FILE_ERROR; }
+
    /// count and report a parse error
    static void syntax_error();
 
-   /// reset APL errors, expecting cnt
-   static void expect_apl_errors(const UCS_string & arg);
+   /// reset APL errors, expecting at most max_cnt errors
+   /// @param max_cnt the expected error count
+   static void expect_apl_errors(int max_cnt);
 
    /// count an APL error
+   /// @param loc caller location for diagnostics
    static void apl_error(const char * loc);
 
    /// count a failed assertion
    static void assert_error();
 
+   /// write a summary.log entry (and print "Failed testcase is ...") for
+   /// the testcase file that is executing right now, if any -- for a
+   /// crash (CrashDump::crash_handler()) or an internal-consistency
+   /// failure (the FIXME macro, via fixme_exit_code()), both of which
+   /// exit() directly without ever reaching end_of_current_file(). Without
+   /// this, such a file is silently missing from summary.log entirely
+   /// (not even a "0 errors" line), making it invisible to tooling that
+   /// parses summary.log for the first failure (src/Automated_Test_Report.sh).
+   /// Also persists a raw backtrace to disk under get_crash_backtrace_path()
+   /// (see there) so it survives independent of whatever, if anything,
+   /// later captures CERR. No-op if no testcase file is currently being
+   /// read.
+   static void report_abnormal_exit();
+
+   /// the file path used by report_abnormal_exit() to persist a raw
+   /// backtrace for the testcase file that is executing right now (the
+   /// same testcase named in its summary.log entry), so that a crash's
+   /// or FIXME's backtrace is available on disk even though CERR itself
+   /// is not normally captured anywhere durable. Returns an empty string
+   /// if no testcase file is currently being read (mirrors
+   /// report_abnormal_exit()'s own no-op condition).
+   static UTF8_string get_crash_backtrace_path();
+
    /// count a output diff error
    static void diff_error();
 
    /// get one line from the current file, open the next file if necceessary
+   /// @param line output buffer for the line read
+   /// @param eof set to true when no more input is available
    static void get_file_line(UTF8_string & line, bool & eof);
 
    /// open the next test file 
@@ -122,12 +155,37 @@ public:
       { return current_testreport; }
 
    /// read one line from the current input file with CR and LF removed
+   /// @param file_line output buffer for the line read
+   /// @param eof set to true when end of file is reached
    static void read_file_line(UTF8_string & file_line, bool & eof);
 
-protected:
-   /// dito (close files, print errors, summary etc).
-   static bool end_of_current_file();
+   /// modes for ]FILE_CTL (see Cmd_HOST::cmd_FILE_CTL()): lines between
+   /// a ]FILE_CTL command and the next one (or end of file, or )CLEAR)
+   /// are discarded by read_file_line() -- without ever reaching the
+   /// tokenizer/executor -- when SKIP_mode says so for the interpreter
+   /// currently reading them. Real APL2 has no such command; the
+   /// MEGA-workspace-based cross-check harness emulates the SKIP_APL2
+   /// effect itself (this enum/flag has no meaning there).
+   static enum Skip_mode
+      {
+        /// don't skip anything (default; also the state after )CLEAR)
+        SKIP_NONE  = 0,
 
+        /// skip while GNU APL is the interpreter reading this file
+        SKIP_GNU   = 1,
+
+        /// skip while (emulated) real APL2 is reading this file --
+        /// meaningless to GNU APL's own read_file_line(), which never
+        /// skips for this value; only the APL2-side MEGA-workspace
+        /// emulation acts on it
+        SKIP_APL2  = 2,
+
+        /// skip unconditionally (start of what amounts to a multi-line
+        /// comment, regardless of which interpreter is reading it)
+        SKIP_ALL   = 3,
+      } skip_mode;
+
+protected:
    /// how to handle test results
    static enum TestMode
       {
@@ -159,6 +217,9 @@ protected:
         TM_DONE_AFTER_LINE_ERROR = TM_STOP_AFTER_LINE_ERROR
                                  | TM_EXIT_AFTER_LINE_ERROR,
       } test_mode;   ///< the desired test mode as per --TM n
+
+   /// dito (close files, print errors, summary etc).
+   static bool end_of_current_file();
 
    /// write testcases summary file
    static void print_summary();
@@ -202,5 +263,6 @@ protected:
    /// when a .tc file was started
    static APL_time_us start_usecs;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __IO_FILES_HH_DEFINED__

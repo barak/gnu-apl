@@ -1,6 +1,8 @@
 ⍝ OuterProduct.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       (ι4)∘.+ι5
 2 3 4 5 6
 3 4 5 6 7
@@ -28,9 +30,62 @@
       3 0 2 ∘./ 5 1 7   ⍝ do not follow Dyalog, IBM APL2 gives a SYNTAX ERROR
 SYNTAX ERROR+
       3 0 2∘./5 1 7
-      ^      ^
+      ^       ^
 
       )SIC
 
-⍝ ==================================
+      ⍝ Bugs28 #37 regression: A∘.f B with an empty result kept only
+      ⍝ the first *cell* of RO's fill result as Z's prototype (dropping
+      ⍝ everything but that one cell/level for a non-scalar or nested
+      ⍝ fill result), and never converted a wrong-VALUE fill result
+      ⍝ (e.g. RO's own identity element) to a type-correct default.
+      ⍝ Fixed in Bif_OPER2_OUTER.cc: set_ravel_Value() (copies the cell
+      ⍝ for a simple scalar, else wraps in a fresh PointerCell, mirror-
+      ⍝ ing EACH's own empty-fill logic) followed by to_type(false) --
+      ⍝ NOT to_type(true) as EACH uses, since a user-defined RO's fill
+      ⍝ result can legitimately be a character cell that must stay
+      ⍝ character (a space), not get force-converted to numeric 0.
+      ⍝
+      X←0⍴⊂1 2
+      Z←3∘.,X ⋄ 2 ⎕TF 'Z'
+Z←0⍴(⊂3⍴0 0 0)
+
+      ⍝ control: A f¨B on the same arguments was already correct
+      Z←3,¨X ⋄ 2 ⎕TF 'Z'
+Z←0⍴(⊂3⍴0 0 0)
+
+      Z←⍬∘.{⍺+⍵}1 2 3 ⋄ 2 ⎕TF 'Z'
+Z←0 3⍴0
+
+      (⍬∘.{⍺+⍵}1 2 3)≡0 3⍴0
+1
+
+      Z←⍬∘.{⍺+⍵}'ab' ⋄ 2 ⎕TF 'Z'
+Z←0 2⍴' '
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension; ∪ ∩ ⍬ are GNU APL extensions
+      Z←⍬∘.,1 2 3 ⋄ 2 ⎕TF 'Z'
+Z←0 3⍴(⊂2⍴0 0)
+
+      ⍝ Bugs28 #57 regression (Bugs27 #56 residual): ∘.f (like ¨,
+      ⍝ f⍤y, and f.g) still broke when the operand changed ⎕IO --
+      ⍝ Z__A_LO_OUTER_B (Macro.def) indexed μ1/μ2/μ6, and even its own
+      ⍝ cartesian-product index list μ10 (itself built by ⍳ under the
+      ⍝ ORIGINAL ⎕IO), with the raw loop counter/disclosed indices,
+      ⍝ seeded from ⎕IO ONCE at the start; if LO's own ⎕IO←0 (global,
+      ⍝ not auto-localized in a lambda) persisted past its first call,
+      ⍝ every later iteration misindexed instead of INDEX-ERROR-ing
+      ⍝ outright. Fixed the same self-correcting way as the already-
+      ⍝ fixed monadic ¨ (Z__LO_EACH_B): recompute ⎕IO+(offset-savedIO)
+      ⍝ fresh at each use, for every index derived from that saved IO.
+      ⍝
+      1 2 3∘.{⎕IO←0 ⋄ ⍺+⍳⍵}1 2
+ 1  1 2 
+ 2  2 3 
+ 3  3 4 
+
+      ]FILE_CTL NO_SKIP
+      ⎕IO←1
+
+      ⍝ ==================================
 

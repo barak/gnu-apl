@@ -1,7 +1,9 @@
 ⍝ Enclose.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
+⍝@ test3.
+
+      ⍝ ----------------------------------
 
       A←2 3 4ρι24
       A
@@ -34,7 +36,7 @@
       ≡Z
 2
 
-⍝ compared to vector notation ----------------------------------
+      ⍝ compared to vector notation ----------------------------------
 
       D←'ON' 'UP' 'BY'
       ρD
@@ -78,4 +80,31 @@
 0
       ≡Y
 2
+
+      ⍝ regression (Bugs28 #100(s)): (⊂NAME)←C, the standard idiom for
+      ⍝ nesting a whole array C into a single (possibly indexed) target
+      ⍝ as one atomic item, gave a bare SYNTAX ERROR whenever C was not
+      ⍝ itself a scalar. Source: Bif_F12_PARTITION::do_eval_B() treats
+      ⍝ any scalar B whose one cell is an LvalCell as "not simple" (an
+      ⍝ LvalCell genuinely isn't a plain data cell) and took the
+      ⍝ "nested: clone and copy" branch -- but that branch clones the
+      ⍝ pointed-to VALUE, discarding the live reference, so the ⊂
+      ⍝ result's own cell became a plain PointerCell instead of an
+      ⍝ LvalCell, and the later selective-assignment code (which
+      ⍝ requires the target cell to itself be an lvalue) had nothing to
+      ⍝ write through. Enclosing a scalar is a no-op regardless of
+      ⍝ whether it happens to be a live lvalue reference, so the cell
+      ⍝ is now copied directly (preserving its lvalue-ness) instead.
+      ⍝
+      B←5
+      (⊂B)←1 2 3
+      B
+ 1 2 3 
+
+      V←1 2 3 4
+      (⊂V[2])←10 20 30
+      V
+ 1  10 20 30  3 4 
+
+      )ERASE B V
 

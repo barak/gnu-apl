@@ -1,6 +1,8 @@
 ⍝ NaturalLogarithm.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍟1
 0
 
@@ -14,5 +16,19 @@
       ⍟0J1
 0J1.570796327
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #77): ⍟ of a complex number with both parts
+      ⍝ individually smaller than ⎕CT's absolute floor used to be
+      ⍝ rejected as "near zero", even when the value is not
+      ⍝ mathematically zero and has a perfectly finite logarithm (only
+      ⍝ exact 0J0 -- log(0) -- is now rejected).
+      ⍝
+      ⍟0J1E¯11
+¯25.32843602J1.570796327
+
+      ⍟0J0
+DOMAIN ERROR
+      ⍟0J0
+      ^
+
+      ⍝ ==================================
 

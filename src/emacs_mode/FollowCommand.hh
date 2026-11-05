@@ -28,14 +28,24 @@
 #include "../Symbol.hh"
 #include "TraceData.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "follow" network command: subscribe to future assignment events of
+/// a variable and push each new value to the client over \b conn
 class FollowCommand : public NetworkCommand {
 public:
+    /// constructor
     FollowCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
+/// maps a followed Symbol to the TraceData tracking its subscribers
 typedef map<const Symbol *, TraceData *> SymbolTraceMap;
 
+/// Symbol event callback: on an assignment event, push the symbol's new
+/// value to every client following it (looked up in \b trace_data)
 void symbol_assignment( const Symbol &symbol, Symbol_Event ev );
 
 #endif

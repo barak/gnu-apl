@@ -1,0 +1,695 @@
+// rval.def — ⎕RVAL parameters for invariant testcase generation
+//
+// Each non-comment, non-blank line is a prim_def() macro call with 5
+// quoted C-string arguments (all five, not just arity/Z_constraint --
+// the middle three used to be bare, preprocessor-tokenized macro args,
+// but every APL glyph except ¯ fails to compile that way on GCC, and
+// even ¯ fails on clang, so they are now plain string literals like the
+// rest; see Quad_RVAL.cc's prim_def macro, which just passes them
+// through instead of stringifying them (Paul Rockwell, macOS/clang)).
+// An empty A_stim or X_stim argument stands for ⍬ (prim_table_value()
+// substitutes "" back to "⍬").
+//
+//   prim_def("arity", "B_stim", "A_stim", "X_stim", "Z_constraint")
+//
+//   arity        APL expression, e.g. "Z←A⍴B"
+//   B_stim       ⎕RVAL argument that generates the right (or only) argument B
+//   A_stim       ⎕RVAL argument that generates the left argument A  (empty = ⍬)
+//   X_stim       ⎕RVAL argument that generates the axis X            (empty = ⍬)
+//   Z_constraint APL boolean expression (in terms of A B X Z) that must be 1
+//
+// ⎕RVAL B layout:  rank  shape  (types)  depth  ecount
+//   rank   ¯N          random 0..N
+//          (w0 w1 …)   weighted distribution over ranks 0,1,2,…
+//   shape  ¯N          each axis random 0..N (scalar-extended to MAX_RANK)
+//   types  (char int float complex nested)   boolean mask; 0 = type excluded
+//   depth  max nesting depth (0 = simple arrays only)
+//   ecount RE = run-time ravel-element limit (replaced by caller); 0 = unlimited
+//
+// Type masks use 0/1 only, so an external distribution DIST can be applied as
+//   DIST × (1 1 1 1 0)
+// to select both the per-type weights and the primitive's type constraints.
+// depth=3 is kept even when nested=0; it only limits recursion when
+// nested>0 is actually set.
+//
+// RE is a placeholder for the maximum ⍴∈ limit; the APL test runner
+// substitutes a concrete value (e.g. 10000) before calling ⎕RVAL.
+//
+// One blank line separates different primitives.
+//
+// 6 ⎕RVAL ⍬  returns this table as a 5-column nested character matrix.
+
+// ── + Conjugate / Plus ────────────────────────────────────────────────
+prim_def("Z←+B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A+B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── - Negate / Minus ──────────────────────────────────────────────────
+prim_def("Z←-B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A-B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── × Signum / Times ──────────────────────────────────────────────────
+prim_def("Z←×B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A×B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ÷ Reciprocal / Divide ─────────────────────────────────────────────
+prim_def("Z←÷B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A÷B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ⌈ Ceiling / Maximum ───────────────────────────────────────────────
+// complex not accepted
+prim_def("Z←⌈B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A⌈B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ⌊ Floor / Minimum ─────────────────────────────────────────────────
+prim_def("Z←⌊B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A⌊B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── | Magnitude / Residue ─────────────────────────────────────────────
+// monadic accepts complex; dyadic A|B requires real
+prim_def("Z←|B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←A|B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── * Exponential / Power ─────────────────────────────────────────────
+prim_def("Z←*B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+// A*B DOMAIN-ERRORs for A=0 with B<0 (1/0) -- with A spanning a huge
+// random range across thousands of elements, hitting A=0 exactly on
+// at least one element is all but guaranteed. It also DOMAIN-ERRORs
+// for |B| beyond roughly 1e9 (confirmed directly: 2*1E9 is fine,
+// 2*2E9 is not -- looks like an internal 32-bit exponent limit), which
+// unbounded ⎕RVAL floats/ints hit constantly. 1000000|B fixes both
+// (residue against a positive modulus is always non-negative and well
+// within the safe exponent range) for INTEGER B -- but B's type mask
+// also allowed float/complex, and both cause further, deeper problems:
+// (a) 1000000|(complex B) stays complex (e.g. 268288J0) even with a
+// zero imaginary part, and a negative-real A raised to a nominally-
+// real-but-complex-typed exponent DOMAIN-ERRORs (confirmed directly:
+// ¯5*268288J0 fails, ¯5*268288 doesn't); (b) more fundamentally, a
+// huge-magnitude FLOAT (e.g. 6.19E18) has no exact low-order digits
+// left at all (a double's precision runs out around 1E15-1E17), so
+// "1000000|hugeFloat" doesn't reliably return a clean, exact integer
+// residue -- the tiny (genuinely real, non-integer) error left over is
+// then enough for A⋆(that residue) to hit the real domain restriction
+// on non-integer powers of a negative base (confirmed directly: the
+// exact same residue computation that looks like a clean integer when
+// printed still DOMAIN-ERRORs, while retyping the printed digits as a
+// fresh, exact integer literal does not). Restricting B to INT only
+// sidesteps both: integer residue is always exact.
+prim_def("Z←A*1000000|B", "¯3 ¯100 (0 1 0 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ⍟ Natural Log / Logarithm ─────────────────────────────────────────
+prim_def("Z←⍟B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+// A⍟B DOMAIN-ERRORs whenever A is a negative real value that happens to
+// be COMPLEX-typed (e.g. ¯5J0, imaginary part exactly 0) -- confirmed
+// directly: ¯5⍟3 auto-promotes to complex and succeeds, but ¯5J0⍟3
+// (same value, complex cell type) does not; GNU APL's log seemingly
+// needs a genuinely real-typed operand to take the auto-promoting
+// path for a negative base, same as A⋆B above. Unlike A⋆B there is no
+// cheap value-preserving way to re-cast a complex-with-zero-imaginary
+// cell back to real here (⌊/⌈ demote the type but round the value,
+// losing any fractional part), so B's type mask drops complex
+// entirely -- A conforms to B's types (excludes complex too), so this
+// sidesteps the bug rather than working around it in-expression.
+prim_def("Z←A⍟B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ! Factorial / Binomial ────────────────────────────────────────────
+// integer only, bounded to 0..170 by the arity itself: unbounded ⎕RVAL
+// ints span the full 64-bit range, and !B DOMAIN-ERRORs both for
+// negative B and (due to double-precision overflow) for B > 170. B is
+// usually an array of many elements (shape axes up to 100), and !
+// applied to an array fails as soon as ANY single element is invalid,
+// so even a bound that left a small per-element failure chance (e.g.
+// 200|B, ~15% per element in the failing 171..199 range) still failed
+// almost every draw once multiplied across dozens of elements -- 171|B
+// keeps every element within the always-safe 0..170 range instead.
+prim_def("Z←!171|B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "", "", "(⍴Z)≡⍴B")
+prim_def("Z←(200|A)!200|B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ○ Pi-Times / Circular Functions ───────────────────────────────────
+prim_def("Z←○B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "(⍴Z)≡⍴B")
+// A selects which circular function (sin/cos/tan/...); valid range is
+// ¯12..12 (confirmed directly: 12○B and ¯12○B both work, 13○B and
+// ¯13○B both DOMAIN ERROR) but A_stim generates an unbounded 64-bit
+// int, so almost every draw picked an out-of-range selector. (25|A)-12
+// maps any int onto ¯12..12.
+prim_def("Z←((25|A)-12)○B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "0 0 (0 1 0 0 0) 0 RE", "", "(⍴Z)≡⍴B")
+
+// ── < Less Than ───────────────────────────────────────────────────────
+// no complex (ordering undefined there)
+prim_def("Z←A<B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ≤ Less or Equal ───────────────────────────────────────────────────
+prim_def("Z←A≤B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── = Equal ───────────────────────────────────────────────────────────
+// accepts any simple type; depth=0 to keep both A and B comparable
+prim_def("Z←A=B", "¯3 ¯100 (1 1 1 1 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ≥ Greater or Equal ────────────────────────────────────────────────
+prim_def("Z←A≥B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── > Greater Than ────────────────────────────────────────────────────
+prim_def("Z←A>B", "¯3 ¯100 (0 1 1 0 0) 3 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ≠ Not Equal ───────────────────────────────────────────────────────
+prim_def("Z←A≠B", "¯3 ¯100 (1 1 1 1 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ~ Logical Not / Without ───────────────────────────────────────────
+// ~B: B must be strictly Boolean (0/1) -- DOMAIN ERROR on any other int
+// (confirmed directly: ~5 fails). The comment here used to promise "tc
+// applies 2∣ after generating", but no such step ever existed in
+// AllPrimitives.tc/ONE_PRIMITIVE -- B was merely restricted to int type,
+// not to {0,1}, so most generated B values made ~B fail before ever
+// reaching the postcondition (confirmed empirically: ~20% success rate
+// over 200 real trials). Fixed by baking the coercion directly into the
+// arity expression instead: 2∣B is always exactly 0 or 1.
+prim_def("Z←~2∣B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "", "", "(⍴Z)≡⍴B")
+// A~B (Without): A and B simple, any type
+// A~B (Without) requires rank ≤1 for both A and B (RANK ERROR
+// otherwise, confirmed directly) -- old B_stim allowed rank up to 3.
+prim_def("Z←A~B", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "¯1 ¯100 (1 1 1 1 0) 0 RE", "", "(⍴⍴Z)≡,1")
+
+// ── ∧ And ─────────────────────────────────────────────────────────────
+// No coercion needed, unlike ~B/⍲/⍱ below: GNU APL generalizes dyadic
+// ∧ to LCM for any non-negative integers, not just strict Boolean AND
+// (confirmed directly: 5∧7 gives 35, not a DOMAIN ERROR) -- the old
+// comment here claiming "Boolean (0/1); tc applies 2∣ after generating"
+// was simply wrong (no such tc-side step ever existed, see ~B above),
+// and this row already succeeds on ~100% of real trials without it.
+prim_def("Z←A∧B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ∨ Or ──────────────────────────────────────────────────────────────
+// Same GCD generalization as ∧ above (5∨7 gives 1, not an error); no
+// coercion needed.
+prim_def("Z←A∨B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ⍲ Nand ────────────────────────────────────────────────────────────
+// Unlike ∧/∨, GNU APL's ⍲ has no GCD/LCM-style generalization -- both
+// operands must be strictly Boolean (confirmed directly), so this row
+// needs the same 2∣ coercion as ~B, on both A and B (empirically ~20%
+// success rate without it).
+prim_def("Z←(2∣A)⍲2∣B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ⍱ Nor ─────────────────────────────────────────────────────────────
+// Same as ⍲ above.
+prim_def("Z←(2∣A)⍱2∣B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "~B", "", "(⍴Z)≡⍴B")
+
+// ── ? Roll / Deal ─────────────────────────────────────────────────────
+// ?B: every element of B must be a strictly positive integer -- ?0 is a
+// DOMAIN ERROR (confirmed directly), not just "≥0" as the old comment
+// claimed. That comment also promised "tc takes |B to ensure ≥ 0", but
+// no such step ever existed in AllPrimitives.tc (same stale-promise
+// pattern as ~B above) -- B's int type mask alone doesn't bound sign or
+// magnitude, so almost every random B failed (confirmed empirically:
+// ~28% success over 200 real trials, and that's generous since large B
+// values make Roll's own cost scale up too). Fixed inline: 1+1000|B is
+// always in 1..1000, elementwise, preserving B's shape/rank.
+prim_def("Z←?1+1000|B", "¯3 ¯100 (0 1 0 0 0) 0 RE", "", "", "(⍴Z)≡⍴B")
+// A?B: A and B must be scalars, with 0≤A≤B (DOMAIN ERROR otherwise,
+// confirmed directly: 5?3 fails since A>B) -- the old comment noted
+// this requirement but nothing enforced it; A and B were generated as
+// two fully independent scalars, so this row always failed (confirmed
+// empirically: 0% success over 200 real trials, every single one A>B
+// or B<1). Fixed inline: bound B to 1..1000 the same way as ?B above,
+// then clamp A into 0..B via ⌊ so 0≤A≤B always holds. The constraint
+// must repeat that same (|A)⌊(1+1000|B) expression rather than testing
+// against the raw, uncoerced A -- Z_constraint sees the same original
+// A/B that ONE_PRIMITIVE generated, not whatever OPER computed A into
+// internally, so checking against raw A here would fail on every trial
+// where coercion actually changed A's value.
+prim_def("Z←((|A)⌊(1+1000|B))?1+1000|B", "0 0 (0 1 0 0 0) 0 RE", "0 0 (0 1 0 0 0) 0 RE", "", "((⍴Z)≡,(|A)⌊1+1000|B)∧(⍴⍴Z)≡,1")
+
+// ── ⍴ Shape / Reshape ─────────────────────────────────────────────────
+// monadic: any argument including nested
+prim_def("Z←⍴B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍴⍴B)∧(⍴⍴Z)≡,1")
+// dyadic A⍴B: B is the data source; any type/shape
+prim_def("Z←A⍴B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~SC", "", "((⍴Z)≡,A)∧(⍴⍴Z)≡⍴,A")
+
+// ── , Ravel / Catenate ────────────────────────────────────────────────
+prim_def("Z←,B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡,×/⍴B)∧(⍴⍴Z)≡,1")
+// A_stim: A,B requires SAME rank (no auto-promotion) with all axes but
+// the last matching B, or either side a scalar (extension). B is
+// generated first, so A_stim computes a matching shape from B directly
+// via a positional ⎕RVAL override: 50%-ish scalar, else same rank as B
+// with the last axis replaced by a fresh random length.
+// A_stim=~BL: A_stim is a preprocessor-tokenized (unquoted) field,so it
+// can't hold an arbitrary APL expression (glyphs like ⊃/⍴/↓ aren't
+// valid raw tokens there, see ONE_PRIMITIVE's ~B handling) -- ~BL is a
+// bare ASCII marker, like ~B, that ONE_PRIMITIVE recognizes specially:
+// same rank as B with all axes but the Last one matching B, or scalar.
+prim_def("Z←A,B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~BL", "", "(⍴⍴Z)≡,⌈/(⍴⍴A),(⍴⍴B),1")
+// monadic ,[X]B with integer X is the identity (only ,[X.5]B, the
+// laminate case below,actually changes anything); X_stim is integer
+// only here, so Z must equal B exactly, for every valid X
+prim_def("Z←,[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "0 0 (0 1 0 0 0) 0 RE", "Z≡B")
+// A_stim=~B (exact ⍴B or scalar): the actual X used is derived from B's
+// rank *after* A is generated (see ONE_PRIMITIVE), so A can't target the
+// specific axis X in advance -- matching B's shape on every axis (not
+// just the eventual catenate axis) is stricter than required but always
+// structurally valid regardless of which axis X turns out to be.
+// old constraint "(⍴A)[X]+(⍴B)[X]" threw INDEX ERROR whenever A was
+// scalar-extended (⍴A empty) -- found via a real fuzzer VIOLATION.
+// Fixed: pad ⍴A with 1s out to ⍴⍴B before indexing, so a scalar A's
+// contribution to every axis (including X) correctly reads as 1
+// without ever indexing past ⍴A's actual (possibly zero) length.
+prim_def("Z←A,[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~B", "0 0 (0 1 0 0 0) 0 RE", "((⍴⍴Z)≡(⍴⍴A)⌈⍴⍴B)∧(⍴Z)[X]≡(⍴B)[X]+((⍴A),(⍴⍴B)⍴1)[X]")
+// Laminate: A and B same SHAPE (not just rank); K is fractional axis
+// X_stim was missing the shape placeholder (4 elements, not 5) --
+// same class of bug as the ~20 rows fixed globally in Phase 1, missed
+// there because this row's type mask (float-only, for the fractional
+// X.5 axis value) differs from the (0 1 0 0 0) pattern that grep
+// caught. DOMAIN ERROR on every generation attempt before this fix.
+// A_stim was independently random (same rank as B but not the same
+// shape) -- laminate needs identical shapes. Fixed via ~B (conform A
+// to B). But "[X.5]" in the OPER text itself is NOT "X plus a
+// fractional part" -- APL's tokenizer reads "X" as a complete
+// identifier (stopping at the dot) and ".5" as a separate numeric
+// literal, so juxtaposing them strands into the 2-element vector
+// (X,0.5), an invalid multi-value axis (100% AXIS ERROR, confirmed
+// directly: X←1 ⋄ X.5 gives 1 0.5, not 1.5). Fixed by writing the
+// axis as an actual arithmetic expression, "[X+0.5]".
+prim_def("Z←A,[X+0.5]B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~B", "0 0 (0 0 1 0 0) 0 RE", "(⍴⍴Z)≡1+(⍴⍴A)⌈⍴⍴B")
+
+// ── ⍪ Table / Catenate First ──────────────────────────────────────────
+// monadic ⍪B (Table) always yields rank exactly 2: the first axis is
+// kept, all remaining axes are flattened into one column axis --
+// confirmed directly for rank 0/1/2/3 B. Old constraint (2⌈⍴⍴B) was
+// wrong for rank≥3 B, which never actually happens with GNU APL's ⍪
+// (found via a real fuzzer VIOLATION, not a hypothetical).
+prim_def("Z←⍪B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "(⍴⍴Z)≡,2")
+// A_stim=~BF: same rank as B, all axes but the First matching B (⍪
+// joins along the first/row axis), or scalar.
+prim_def("Z←A⍪B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~BF", "", "(⍴⍴Z)≡(⍴⍴A)⌈⍴⍴B")
+
+// ── ⌽ Reverse / Rotate ────────────────────────────────────────────────
+prim_def("Z←⌽B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// A_stim=~BD: A must be scalar, or have rank ⍴⍴B-1 with shape = B's
+// leading axes (dropping the last entirely) -- see CONFORM_A.
+prim_def("Z←A⌽B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~BD", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// verified via: transpose axis X to the last position (forward perm =
+// grade-up of "other axes in order, then X"; the un-transposed "other
+// axes in order, then X" itself is the inverse perm to transpose back),
+// reverse/rotate along that now-last axis with plain ⌽/A⌽, transpose
+// back — this reduces the axis-X case to the well-known no-axis case
+prim_def("Z←⌽[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "0 0 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉⌽(⍋((⍳⍴⍴B)~X),X)⍉B")
+prim_def("Z←A⌽[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~S", "0 0 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉A⌽(⍋((⍳⍴⍴B)~X),X)⍉B")
+
+// ── ⊖ Reverse First / Rotate First ───────────────────────────────────
+prim_def("Z←⊖B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+prim_def("Z←A⊖B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~BDF", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── ⍉ Transpose ───────────────────────────────────────────────────────
+// requires rank ≥ 1 for monadic; rank distribution skips scalars
+prim_def("Z←⍉B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⌽⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// A_stim=~BP: ≢A must equal ⍴⍴B exactly, values 1..⍴⍴B (repeats legal
+// -- generalized/diagonal transpose); RANK ERROR otherwise.
+prim_def("Z←A⍉B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~BP", "", "(⍴⍴Z)≡⍴⍴B")
+
+// ── ↑ First / Take ────────────────────────────────────────────────────
+// monadic ↑B is First (IBM APL2 lrm p. 131, see Bif_F12_TAKE::first()),
+// NOT Mix: for simple B it always returns a scalar (the first cell of
+// B's ravel); for nested B whose first item is itself enclosed, Z is
+// that enclosed sub-value verbatim (Z≡⊃(,B)[1]) -- which can have any
+// shape/rank, so no rank inequality holds in general. B←⍬ is a
+// separate prototype-only special case, excluded via (0=≢,B).
+prim_def("Z←↑B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "(0=≢,B)∨Z≡⊃((,B),⊂0)[1]")
+// dyadic A↑B: B is the array to take from; any type/shape.
+// A_stim is ~SCR, not ~SC: unlike A⍴B, A↑B requires (≢,A)≡⍴⍴B, so A's
+// length must track B's rank rather than being generated independently
+// (Bugs8 #6, Blake McBride).
+prim_def("Z←A↑B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~SCR", "", "((⍴Z)≡|,A)∧(⍴⍴Z)≡⍴,A")
+// verified: transpose axis X to last (same forward/inverse perm pair as
+// ⌽[X]B above), take A along that now-last axis via a vector left arg
+// that leaves every other (transposed) axis at its current full size
+// (no padding/truncation there), transpose back
+prim_def("Z←A↑[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "~S", "¯1 ¯3 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉⊃A↑¨⊂[⍴⍴B](⍋((⍳⍴⍴B)~X),X)⍉B")
+
+// ── ↓ Split / Drop ────────────────────────────────────────────────────
+// monadic ↓B (Split) is NOT implemented in GNU APL -- ↓B always raises
+// VALENCE ERROR regardless of B, confirmed directly (Z←↓B on any B).
+// Removed rather than "fixed": there is no argument shape that could
+// make this succeed, so there is nothing for a conforming stim to fix.
+// A_stim=~BR: ≢A must equal ⍴⍴B exactly (LENGTH ERROR otherwise);
+// magnitude of each drop-count doesn't matter (drop clamps).
+// The constraint's shape formula has two cases (confirmed against
+// Bif_F12_DROP.cc's eval_AB directly): for non-scalar B it's the
+// obvious 0⌈(⍴B)-|A per axis, but for *scalar* B (⍴B is truly ⍬,
+// rank 0) GNU APL instead treats B as if reshaped to ((⍴⍴B)⍴1)⍴B --
+// conceptually all-1s, one 1 per axis of A -- giving shape_Z[r] = 1 if
+// A[r]=0 else 0, i.e. simply (A=0). Naively using ⍬ (B's real,
+// unreshaped shape) in the general formula collapses via scalar-
+// extension to ⍬ regardless of A's length (confirmed directly: A↓B
+// with a 1-element A and scalar B gives a real shape (0), but the old
+// formula predicted shape ⍬ -- a rank mismatch that's really a
+// wrong-postcondition bug, not an interpreter bug). (⊂⍴B),⊂(⍴,A)⍴1
+// packages both possible "effective ⍴B"s (real, or the all-1s
+// stand-in) as enclosed scalars so picking between them by B's
+// scalarity never hits a shape mismatch.
+prim_def("Z←A↓B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~BR", "", "((⍴Z)≡0⌈((1+0=⍴⍴B)⊃(⊂⍴B),⊂(⍴,A)⍴1)-|A)∧(⍴⍴Z)≡(⍴,A)⌈⍴⍴B")
+// same transpose trick as A↑[X]B above, but drop (0 = drop nothing) on
+// every other (transposed) axis instead of take-full
+prim_def("Z←A↓[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "0 0 (0 1 0 0 0) 0 RE", "¯1 ¯3 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉((0×¯1↓⍴(⍋((⍳⍴⍴B)~X),X)⍉B),A)↓(⍋((⍳⍴⍴B)~X),X)⍉B")
+
+// ── ⍳ Interval Index / Index Of ──────────────────────────────────────
+// monadic ⍳B: B a single non-negative integer here (B_stim's shape is
+// fixed to a 1-element vector) -- negative B is a DOMAIN ERROR
+// (confirmed directly: ⍳¯5 fails). The old comment promised "tc takes
+// |B to ensure ≥ 0", but no such step ever existed in AllPrimitives.tc
+// (same stale-promise pattern as ~B/?B above), so this row failed on
+// every single trial whenever the random int happened to be negative
+// (confirmed empirically: 0% success over 200 real trials -- roughly
+// half of int64 space is negative, and unbounded-magnitude B on the
+// positive side made ⍳B expensive even when it didn't error outright).
+// Fixed inline with the same 1000| idiom already used elsewhere in this
+// file for magnitude capping (see CONFORM_A's DROPVARY): 1000|B is
+// always in 0..999. The constraint must use that same coerced
+// expression, not raw B, for the same reason as A?B above.
+prim_def("Z←⍳1000|B", "¯1 1 (0 1 0 0 0) 0 RE", "", "", "((⍴Z)≡,1000|B)∧(⍴⍴Z)≡,1")
+// dyadic A⍳B: A simple array; B same type as A
+prim_def("Z←A⍳B", "¯3 ¯100 (1 1 1 1 0) 0 RE", "1 ¯100 (1 1 1 1 0) 0 RE", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── ∊ Enlist / Member ─────────────────────────────────────────────────
+// monadic ∊B: any (especially useful nested); result always simple vector
+prim_def("Z←∊B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "(⍴⍴Z)≡,1")
+// dyadic A∊B: both simple; membership test
+prim_def("Z←A∊B", "¯3 ¯100 (1 1 1 1 0) 0 RE", "¯3 ¯100 (1 1 1 1 0) 0 RE", "", "((⍴Z)≡⍴A)∧(⍴⍴Z)≡⍴⍴A")
+
+// ── ⍷ Find ────────────────────────────────────────────────────────────
+// A⍷B: both same type, simple; B is the searched array
+prim_def("Z←A⍷B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "(0 3 2 1) ¯10 (1 1 1 1 0) 0 RE", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── ⊂ Enclose / Partitioned Enclose ──────────────────────────────────
+prim_def("Z←⊂B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍳0)∧(⍴⍴Z)≡,0")
+// dyadic A⊂B (APL2 Partitioned Enclose): A is Boolean/integer vector, B simple nonscalar
+// A_stim=~BC: A's length must exactly equal B's last axis (LENGTH
+// ERROR otherwise); see CONFORM_A.
+prim_def("Z←A⊂B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BC", "", "(⍴⍴Z)≡⍴⍴B")
+prim_def("Z←⊂[X]B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "", "¯1 ¯3 (0 1 0 0 0) 0 RE", "(⍴⍴Z)≡,(⍴⍴B)-⍴,X")
+// A⊂B (no axis) partitions along the LAST axis and, unlike ⊂[X] alone,
+// preserves rank (the partitioned axis's length becomes the group
+// count); same transpose trick as above, no rank adjustment needed
+// ~BC conforms A to B's LAST axis; X is derived afterwards from B's
+// rank (see ONE_PRIMITIVE) so this is only right when X happens to
+// land on the last axis -- an approximation, same caveat as ~B on
+// A,[X]B above.
+prim_def("Z←A⊂[X]B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BC", "0 0 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉A⊂(⍋((⍳⍴⍴B)~X),X)⍉B")
+
+// ── ⊃ First / Disclose / Pick ─────────────────────────────────────────
+// monadic ⊃B: benefits from nested input
+prim_def("Z←⊃B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "1")
+// dyadic A⊃B (Pick): B is a nested array
+// A_stim=~BPICK: B rank 0 needs A=⍬, rank 1 needs a scalar index, rank≥2
+// needs A=⊂ of an (⍴⍴B)-element index path (RANK ERROR otherwise,
+// confirmed directly -- a flat multi-element A into a matrix B fails).
+// Z_constraint: pick always discloses, so a simple (non-nested) B must
+// yield a scalar Z; (1≥|≡B)≤(0=⍴⍴Z) is that implication via ≤ on
+// booleans (vacuously true whenever B is nested, since no simple
+// generic check applies there).
+prim_def("Z←A⊃B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~BPICK", "", "(1≥|≡B)≤(0=⍴⍴Z)")
+// per Bif_F12_PARTITION_PICK.cc's disclose_with_axis(): Z←⊃[X]B is
+// defined as cB←⊃B (plain disclose, no axis) then cB transposed by the
+// permutation "cB's axes not in X, in order, followed by X" — verified
+// against that source both algebraically and empirically (all 3 axis
+// positions on a rank1-of-rank2 nested B)
+prim_def("Z←⊃[X]B", "(0 3 2 1) ¯100 (1 1 1 1 1) 3 RE", "", "¯1 ¯3 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴⊃B)~X),X)⍉⊃B")
+
+// ── ≡ Depth / Match ───────────────────────────────────────────────────
+prim_def("Z←≡B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍳0)∧(⍴⍴Z)≡,0")
+prim_def("Z←A≡B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "((⍴Z)≡⍳0)∧(⍴⍴Z)≡,0")
+
+// ── ≢ Tally / Mismatch ────────────────────────────────────────────────
+prim_def("Z←≢B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "", "((⍴Z)≡⍳0)∧(⍴⍴Z)≡,0")
+prim_def("Z←A≢B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "¯3 ¯100 (1 1 1 1 1) 3 RE", "", "((⍴Z)≡⍳0)∧(⍴⍴Z)≡,0")
+
+// ── ⍋ Grade Up ────────────────────────────────────────────────────────
+// simple only (no complex, no nested); rank ≥ 1; char or real
+prim_def("Z←⍋B", "(0 3 2 1) ¯100 (10 70 15 0 0) 0 RE", "", "", "((⍴Z)≡1↑⍴B)∧(⍴⍴Z)≡,1")
+// dyadic A⍋B (collating grade): B must be char
+// A must contain every character that occurs in B (else DOMAIN ERROR,
+// confirmed directly) -- ~BGRADE builds A from B's own distinct chars.
+prim_def("Z←A⍋B", "(0 3 2 1) ¯100 (1 0 0 0 0) 0 RE", "~BGRADE", "", "((⍴Z)≡1↑⍴B)∧(⍴⍴Z)≡,1")
+
+// ── ⍒ Grade Down ──────────────────────────────────────────────────────
+prim_def("Z←⍒B", "(0 3 2 1) ¯100 (10 70 15 0 0) 0 RE", "", "", "((⍴Z)≡1↑⍴B)∧(⍴⍴Z)≡,1")
+prim_def("Z←A⍒B", "(0 3 2 1) ¯100 (1 0 0 0 0) 0 RE", "~BGRADE", "", "((⍴Z)≡1↑⍴B)∧(⍴⍴Z)≡,1")
+
+// ── ⊥ Decode ──────────────────────────────────────────────────────────
+// A⊥B: both numeric, no complex. NOTE: this constraint string had an
+// unbalanced closing paren (missing one at the very end) -- it would
+// have thrown SYNTAX ERROR on every ⍎, making EXPD always fail
+// regardless of A/B, independent of the A_stim fix below. Fixed here.
+// A_stim=~BDEC: A's last axis must equal B's first axis, or A scalar.
+prim_def("Z←A⊥B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "~BDEC", "", "((⍴Z)≡(¯1↓⍴A),1↓⍴B)∧(⍴⍴Z)≡,(0⌈¯1+⍴⍴A)+(0⌈¯1+⍴⍴B)")
+
+// ── ⊤ Encode ──────────────────────────────────────────────────────────
+prim_def("Z←A⊤B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "(0 1 1 1) ¯16 (0 1 1 0 0) 0 RE", "", "((⍴Z)≡(⍴A),⍴B)∧(⍴⍴Z)≡,(⍴⍴A)+⍴⍴B")
+
+// ── ⌹ Matrix Inverse / Divide ─────────────────────────────────────────
+// requires matrix (rank 2); real numeric only. Rank was ¯2 (random
+// 0/1/2), contradicting this very comment -- fixed to a literal 2.
+// GNU APL additionally requires rows ≥ columns ("Bad shape ... expecting
+// rows ≥ columns", confirmed directly), which a fully independent
+// per-axis random shape cannot guarantee; the arity transposes B
+// whenever rows < columns to always satisfy that, and the constraint
+// re-derives the same (possibly transposed) B rather than the original
+// (found via a real fuzzer sweep: ~14% LENGTH ERROR from exactly this).
+prim_def("Z←⌹⍉⍣(((⍴B)[1])<(⍴B)[2])⊢B", "2 ¯100 (0 1 1 0 0) 0 RE", "", "", "((⍴Z)≡⌽⍴⍉⍣(((⍴B)[1])<(⍴B)[2])⊢B)∧(⍴⍴Z)≡⍴⍴B")
+// A_stim=~BDOM: A's first axis (rows) must equal B's first axis, or
+// LENGTH ERROR. Same "rows ≥ columns" requirement on B as monadic ⌹B
+// above, same fix (transpose B in the arity when rows < columns); A
+// must conform to the post-transpose row count, see DOMINOVARY's ⌈/⍴B.
+prim_def("Z←A⌹⍉⍣(((⍴B)[1])<(⍴B)[2])⊢B", "2 ¯100 (0 1 1 0 0) 0 RE", "~BDOM", "", "((⍴Z)≡(1↓⍴⍉⍣(((⍴B)[1])<(⍴B)[2])⊢B),1↓⍴A)∧(⍴⍴Z)≡,1⌈¯2+(⍴⍴A)+⍴⍴B")
+
+// ── ⍕ Format ──────────────────────────────────────────────────────────
+// monadic: any simple type
+prim_def("Z←⍕B", "¯3 ¯100 (1 1 1 1 0) 0 RE", "", "", "(⍴⍴Z)≡,(1⌈⍴⍴B)-(0=⍴⍴B)∧(0⍴B)≡0⍴' '")
+// dyadic A⍕B: A is format spec (integer), B is numeric
+// A_stim=~FMT: A must be length 1 or 2 (LENGTH ERROR otherwise) and
+// non-negative (DOMAIN ERROR on negative width/decimals); confirmed
+// directly.
+prim_def("Z←A⍕B", "¯3 ¯100 (0 1 1 0 0) 0 RE", "~FMT", "", "(⍴⍴Z)≡,1⌈⍴⍴B")
+
+// ── ⍎ Execute ─────────────────────────────────────────────────────────
+// B must be character; note: random chars rarely make valid APL
+prim_def("Z←⍎B", "¯3 ¯100 (1 0 0 0 0) 0 RE", "", "", "1")
+
+// ── ∪ Unique / Union ──────────────────────────────────────────────────
+// simple arrays only; ∪/∩/∪ all require rank ≤1 (RANK ERROR on any
+// matrix operand, confirmed directly) -- B_stim/A_stim rank weights
+// restricted to (scalar, vector) only, no rank ≥2.
+prim_def("Z←∪B", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "", "", "(⍴⍴Z)≡⍴⍴B")
+// dyadic A∪B always yields a vector: unlike monadic ∪, A and B are
+// concatenated as item lists (scalars are scalar-extended to a single
+// item), so ⍴⍴Z is always 1 regardless of A's or B's own rank -- e.g.
+// A a scalar and B a vector gives a rank-1 Z, not a rank-0 one.
+prim_def("Z←A∪B", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "", "(⍴⍴Z)≡,1")
+
+// ── ∩ Intersection ────────────────────────────────────────────────────
+// same rank-1-always pattern as A∪B above (confirmed: scalar A with
+// vector B gives rank-1 Z, not rank-0) -- old constraint (⍴⍴Z)≡⍴⍴A was
+// wrong for that case, fixed alongside the rank-≤1 argument restriction.
+prim_def("Z←A∩B", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "(1 3) ¯100 (1 1 1 1 0) 0 RE", "", "(⍴⍴Z)≡,1")
+
+// ── ⌷ Index (Squad) ───────────────────────────────────────────────────
+// B is the array being indexed; any type including nested
+// A_stim=~BI: ≢A must equal ⍴⍴B exactly, each element a valid index
+// into the corresponding axis of B.
+prim_def("Z←A⌷B", "¯3 ¯100 (1 1 1 1 1) 3 RE", "~BI", "", "1")
+
+// ── Bracket Indexing ──────────────────────────────────────────────────
+// Renamed from "Z←A[B]" to "Z←B[A]" -- ONE_PRIMITIVE generates B first
+// (see AllPrimitives.tc), so only the *second*-generated variable (A,
+// via A_stim/CONFORM_A) can be made to conform to the first (B)'s
+// actual size; the array must be B (generated first, rank 1 required
+// -- RANK ERROR on a matrix, confirmed directly), and the index must
+// be A (~BIDX: any shape, values forced into 1..≢B).
+prim_def("Z←B[A]", "1 ¯100 (1 1 1 1 1) 3 RE", "~BIDX", "", "(⍴Z)≡⍴A")
+// A[I], A[I;J], A[I;J;K] originally referenced I/J/K, but
+// ONE_PRIMITIVE only ever generates A/B/X -- I/J/K were undefined
+// names, always VALUE ERROR regardless of stim. A[I] duplicated B[A]
+// above (single-axis bracket index) once renamed/fixed. The
+// two/three-axis semicolon forms below avoid needing ONE_PRIMITIVE
+// extended with more generated variables: A itself is generated as a
+// nested vector of per-axis index vectors (~BIJ, see CONFORM_A), and
+// the arity string decomposes it inline via ⊃A[1]/⊃A[2]/... instead
+// of separate I/J/K names.
+prim_def("Z←B[⊃A[1];⊃A[2]]", "2 ¯100 (1 1 1 1 1) 3 RE", "~BIJ", "", "(⍴Z)≡(≢⊃A[1]),≢⊃A[2]")
+prim_def("Z←B[⊃A[1];⊃A[2];⊃A[3]]", "3 ¯100 (1 1 1 1 1) 3 RE", "~BIJ", "", "(⍴Z)≡(≢⊃A[1]),(≢⊃A[2]),≢⊃A[3]")
+
+// ── / Compress / Replicate (used as function) ─────────────────────────
+// B nonscalar; A Boolean for Compress, integer for Replicate
+prim_def("Z←A/B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BC", "", "((¯1↓⍴Z)≡¯1↓⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// same transpose trick as ⌽[X]B above: A/B (no axis) already operates
+// along the last axis,so move axis X there, apply plain /, move back
+prim_def("Z←A/[X]B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BC", "0 0 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉A/(⍋((⍳⍴⍴B)~X),X)⍉B")
+prim_def("Z←A⌿B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BCF", "", "((1↓⍴Z)≡1↓⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── \ Expand (used as function) ───────────────────────────────────────
+// A_stim=~BE: unlike compress (~BC), expand requires a strictly
+// boolean A whose *count* of 1s (not its length) equals B's last axis.
+prim_def("Z←A\\B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BE", "", "((¯1↓⍴Z)≡¯1↓⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// same transpose trick as A/[X]B above
+prim_def("Z←A\\[X]B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BE", "0 0 (0 1 0 0 0) 0 RE", "Z≡(((⍳⍴⍴B)~X),X)⍉A\\(⍋((⍳⍴⍴B)~X),X)⍉B")
+prim_def("Z←A⍀B", "(0 3 2 1) ¯100 (1 1 1 1 0) 0 RE", "~BEF", "", "((1↓⍴Z)≡1↓⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── f/ Reduce ─────────────────────────────────────────────────────────
+// B nonscalar; f is an arbitrary scalar function -- but always one of
+// CONTEXT.FPOOL='+-×⌈⌊' (see ONE_PRIMITIVE), none of which accept char
+// operands (monadically or dyadically), so char is excluded from B's
+// type mask on every f/f¨/f.g row below (confirmed directly: -/B
+// DOMAIN-ERRORs whenever any element of B is a character).
+// 100|B additionally bounds B's magnitude: unlike A⋆B, GNU APL's ×
+// genuinely DOMAIN-ERRORs on float overflow rather than returning ∞
+// (confirmed directly: 1E200×1E200 fails), and f/B chains up to ~100
+// unbounded-magnitude multiplications when f=× (1/5 of CONTEXT.FPOOL),
+// making overflow near-certain; 100 keeps even a 100-element product
+// (100^100=1E200) safely under DBL_MAX.
+prim_def("Z←f/100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "", "((⍴Z)≡¯1↓⍴B)∧(⍴⍴Z)≡,0⌈¯1+⍴⍴B")
+// NOTE: 'f' is substituted (to a concrete function from CONTEXT.FPOOL)
+// only in OPER, never in this constraint (ONE_PRIMITIVE in
+// AllPrimitives.tc), so the constraint cannot invoke f itself and the
+// full value-checking transpose trick used for e.g. ⌽[X]B/A/[X]B above
+// does not apply here. This is the strongest f-independent check
+// possible: unlike the old rank-only check, it confirms axis X
+// specifically (not just some axis) was the one removed, with every
+// other axis's length preserved in its original relative order
+prim_def("Z←f/[X]100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "0 0 (0 1 0 0 0) 0 RE", "(⍴Z)≡(⍴B)[(⍳⍴⍴B)~X]")
+prim_def("Z←f⌿100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "", "((⍴Z)≡1↓⍴B)∧(⍴⍴Z)≡,0⌈¯1+⍴⍴B")
+// N-Wise Reduce: A is window size (scalar integer), B is the array.
+// Valid range is |A|≤(¯1↑⍴B) (confirmed directly: for a 3-element B,
+// A=3 and A=¯3 both work,A=4 DOMAIN-ERRORs) but A_stim generates an
+// unbounded 64-bit int with no idea of B's eventual last-axis length
+// (A is independent of B here, unlike the "~B"-conforming rows), so
+// essentially every draw was out of range. The arity now bounds A
+// itself via residue against (1+2×lastaxis), re-centered on 0 -- this
+// needs B's actual shape, only known once B is generated, hence done
+// in the arity expression rather than at generation time. The
+// constraint mirrors the same bounding formula so it checks against
+// the window size actually used, not the raw (unbounded) A.
+// complex also excluded (same reason as f/B etc. above: f can be ⌈/⌊,
+// which have no total order on complex numbers). 100|B on just the
+// final (operand) B bounds magnitude against × overflow, same as
+// plain f/B above -- every other "B" here is inside ⍴B (a shape
+// reference, unaffected by bounding B's values).
+prim_def("Z←(((1+2×¯1↑⍴B)|A+¯1↑⍴B)-¯1↑⍴B)f/100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "0 0 (0 1 0 0 0) 0 RE", "", "((⍴Z)≡(¯1↓⍴B),(1+(¯1↑⍴B)-|((1+2×¯1↑⍴B)|A+¯1↑⍴B)-¯1↑⍴B))∧(⍴⍴Z)≡⍴⍴B")
+
+// ── f\ Scan ───────────────────────────────────────────────────────────
+// 100|B: same × overflow reasoning as f/B above -- scan chains the
+// same number of operations as reduce, just keeping every prefix.
+prim_def("Z←f\\100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// NOTE: same f-not-available-in-constraints limitation as f/[X]B above.
+// Unlike reduce, scan never changes any axis's length (only values), so
+// there is no axis-specific shape fact left to add here beyond full
+// shape equality — already the strongest check possible without f.
+prim_def("Z←f\\[X]100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "0 0 (0 1 0 0 0) 0 RE", "(⍴Z)≡⍴B")
+prim_def("Z←f⍀100|B", "(0 3 2 1) ¯100 (0 1 1 0 0) 0 RE", "", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+
+// ── f¨ Each ───────────────────────────────────────────────────────────
+// char AND nested both excluded: f¨B applies f (from CONTEXT.FPOOL)
+// monadically to each element, and none of +-×⌈⌊ accept char or a
+// nested (PointerCell) argument directly.
+prim_def("Z←f¨B", "¯3 ¯100 (0 1 1 1 0) 3 RE", "", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡⍴⍴B")
+// nested excluded (unlike f¨B): A_stim=~B only guarantees A's TOP-LEVEL
+// shape matches B's, generated independently -- when a position in both
+// A and B happens to be nested (5% of cells, per CONTEXT.TD), their
+// nested sub-values have no relationship to each other, and dyadic f¨
+// applying a scalar function to two independently-shaped nested items
+// throws RANK ERROR (found via a real fuzzer sweep: ~1/300, rare
+// because it needs BOTH sides nested at the same position, but real).
+// Excluding nested here isn't a loss of coverage for what this row
+// actually tests (scalar-extension/EACH shape semantics), and matches
+// the same trade-off already made for e.g. f/B, f⌿B above.
+prim_def("Z←Af¨B", "¯3 ¯100 (0 1 1 0 0) 0 RE", "~B", "", "((⍴Z)≡⍴B)∧(⍴⍴Z)≡(⍴⍴A)⌈⍴⍴B")
+
+// ── Af.gB Inner Product ───────────────────────────────────────────────
+// A and B must be conformable; numeric only for typical f.g
+// A_stim=~BMM: A's column count (last axis) must equal B's row count
+// (first axis), or LENGTH ERROR. complex excluded: f is the *reduce*
+// step of the inner product and can be ⌈/⌊, which have no total order
+// on complex numbers (same issue as the f/B family above). Both A and
+// B are magnitude-bounded (100|...) for the same reason as f/B's
+// 100|B: g (the elementwise step) feeds f=× a chain of up to ~100
+// terms, and GNU APL's × genuinely DOMAIN-ERRORs on float overflow
+// (confirmed: 1E200×1E200 fails) rather than tolerating it like ⋆
+// does -- unbounded-magnitude A and B made this near-certain.
+prim_def("Z←(100|A)f.g100|B", "2 ¯100 (0 1 1 0 0) 0 RE", "~BMM", "", "((⍴Z)≡(¯1↓⍴A),1↓⍴B)∧(⍴⍴Z)≡,0⌈¯2+(⍴⍴A)+⍴⍴B")
+
+// ── A∘.fB Outer Product ───────────────────────────────────────────────
+// A and B can be any shape/type; result is rank(A)+rank(B)
+// outer product's result has (×/⍴A)×(×/⍴B) elements -- capping A and
+// B each at the full CONTEXT.BUDGET (as the "RE" placeholder would)
+// still allows up to BUDGET² elements, which reliably timed out the
+// fuzzer sweep well before any DOMAIN ERROR could even be observed.
+// "SB" (Sqrt Budget, substituted like "RE" -- see ONE_PRIMITIVE) caps
+// each operand at √BUDGET instead, keeping the outer product's total
+// within BUDGET.
+prim_def("Z←A∘.fB", "¯3 ¯100 (0 1 1 0 0) 0 SB", "¯3 ¯100 (0 1 1 0 0) 0 SB", "", "((⍴Z)≡(⍴A),⍴B)∧(⍴⍴Z)≡,(⍴⍴A)+⍴⍴B")
+
+// ── f⍣N Power Operator ────────────────────────────────────────────────
+// B is the starting value; N is the iteration count (non-negative integer).
+// "N" here is descriptive only -- the count is generated via this row's
+// A_stim (3rd argument), i.e. into the framework's fixed "A" variable
+// (X_stim, the 4th argument, is empty -- no axis for this row), so the
+// OPER text itself must reference A, not N or X. Using a literal "N"
+// (an undefined variable) left the executed line with a 100% VALUE
+// ERROR (found via survey); an intermediate attempt using "X" instead
+// was also wrong for the same reason -- confirmed by debug-tracing
+// ONE_PRIMITIVE: 4⊃ROW (X_stim) is the literal empty-axis marker "⍬"
+// for this row, so X is never assigned anything but ⍬.
+// A second, independent bug in the OPER text itself: "AB" (no
+// separator) tokenizes as the single, undefined 2-character identifier
+// "AB" rather than "A" followed by "B" -- confirmed directly (A←3 ⋄
+// B←5 ⋄ Z←B-⍣AB gives VALUE ERROR on "AB"; adding a space, Z←B-⍣A B,
+// works). "Bf" needs no such separator since f is substituted with an
+// actual (non-alphanumeric) operator glyph before execution, which
+// naturally terminates the identifier.
+// A_stim's magnitude was unbounded (int64), so N (the iteration count)
+// could come out enormous -- f⍣N then tries to apply f that many
+// times, hanging for minutes/effectively forever (found via a real
+// timeout: ++COUNT 300 didn't finish in 2 minutes). Bounded via
+// residue, same pattern as the f-family's window size: 20|A.
+// complex excluded (0 1 1 0 0, not 0 1 1 1 0) -- f can be ⌈/⌊, which
+// have no total order on complex (same issue as f/B and Af.gB above).
+// B's magnitude bounded via 100|B (both occurrences -- the left one is
+// re-used as the constant operand on every one of the up to 20
+// iterations, so leaving it unbounded defeats the point) for the same
+// reason as f/B's: f can be × and this chains repeatedly, and GNU
+// APL's × genuinely DOMAIN-ERRORs on float overflow rather than
+// tolerating it like ⋆. Both "100|B" occurrences need their own
+// parens: APL has no operator precedence, so an unparenthesized
+// leading "100|B×⍣N..." parses as 100|(B×⍣N...) -- the residue
+// swallows the entire rest of the expression as its right argument,
+// not just the adjacent "B" -- confirmed directly (A/B fixed at
+// ¯1745312757069981762 / ¯5127353025049257185: the unparenthesized
+// form throws DOMAIN ERROR; wrapping each "100|B" in parens fixes it).
+prim_def("Z←(100|B) f⍣(20|A) (100|B)", "¯3 ¯100 (0 1 1 0 0) 0 RE", "0 0 (0 1 0 0 0) 0 RE", "", "(⍴Z)≡⍴B")
+
+// ── f⍤[K] Rank Operator ───────────────────────────────────────────────
+// FIX: the rank operator ⍤ takes its rank as a plain value right
+// operand (f⍤K, per apl.texi's own documented examples, e.g.
+// "0 1 2(⌽⍤0 1) 'ABC'") -- NOT bracket-axis notation f⍤[K]. The old
+// arity strings ("Bf⍤[X]B" / "Af⍤[X]B") used bracket-axis syntax, which
+// is invalid for ⍤ and always raised RANK ERROR on every attempt, so
+// this row could never previously execute far enough to reach its
+// constraint at all (⎕EC OPER always failed, going straight to
+// ONE_PRIMITIVE's FAIL path). Also dropped a spurious leading "B" from
+// the monadic row's arity, which combined with the caller having no
+// left argument would itself have been wrong.
+//
+// Constraints: f is always one of CONTEXT.FPOOL's scalar functions
+// (+-×⌈⌊), and scalar functions distribute over any rank/cell
+// decomposition -- i.e. f⍤K B ≡ f B and A f⍤K B ≡ A f B for EVERY valid
+// K (verified empirically for several K per rank, including K=0). So
+// the rank actually chosen for X does not change the result at all;
+// the strongest fact checkable without invoking f (not available in
+// this constraint - see the f/[X]B note above) is the shape a plain
+// (unranked) scalar function call would have: unchanged shape for the
+// monadic case, and normal scalar-extension shape for the dyadic case
+prim_def("Z←f⍤X B", "¯3 ¯100 (0 1 1 1 0) 0 RE", "", "0 0 (0 1 0 0 0) 0 RE", "(⍴Z)≡⍴B")
+// A_stim=~B: CONTEXT.FPOOL is all scalar functions, which distribute
+// over any rank decomposition, so the usual scalar-pervasive
+// conformability rule applies regardless of the rank operand X: A
+// must be exactly ⍴B, or a scalar.
+prim_def("Z←A f⍤X B", "¯3 ¯100 (0 1 1 0 0) 0 RE", "~B", "0 0 (0 1 0 0 0) 0 RE", "((⍴Z)≡⍴A)∨(⍴Z)≡⍴B")
+
+//undef prim_def
+

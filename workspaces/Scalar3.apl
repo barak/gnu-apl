@@ -177,9 +177,9 @@ LOOP: PARAMS←SETUP GTK ◊ DOIT → 0 < ⍴PARAMS
    →0
 
 DOIT:
- ⎕SYL[26;2] ← 0         ◊ SEQ←BENCH PARAMS[5]   ⍝ sequential
- ⎕SYL[26;2] ← PARAMS[4] ◊ PAR←BENCH PARAMS[5]   ⍝ parallel
- ⎕SYL[26;2] ← 0
+ ⎕SYL[27;2] ← 0         ◊ SEQ←BENCH PARAMS[5]   ⍝ sequential
+ ⎕SYL[27;2] ← PARAMS[4] ◊ PAR←BENCH PARAMS[5]   ⍝ parallel
+ ⎕SYL[27;2] ← 0
 
  (SEQ_sup SEQ_pi  L1 L2)←PARAMS[3] PLOT_LINES SEQ
  'Seq: setup' SEQ_sup 'per item:' SEQ_pi

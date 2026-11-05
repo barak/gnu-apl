@@ -1,18 +1,22 @@
 ⍝ Quad_NC
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
-   A←1
+      A←1
 
       )ERASE OP1
+      ]FILE_CTL SKIP_APL2   ⍝ GNU APL-only function header
 ∇A (LO OP1 RO) B
 ∇
 
       )ERASE LL
 
       )ERASE FOO
+      ]FILE_CTL NO_SKIP
 ∇FOO
 LL: ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
 ∇
@@ -20,6 +24,7 @@ LL: ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
       FOO
 ¯1 ¯1 1 2 3 4
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
       ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
 ¯1 ¯1 0 2 3 4
 
@@ -34,18 +39,110 @@ LL: ⎕NC 6 3⍴' ÷ ÷  LL A  FOOOP1'
       ⎕NC '⎕X'
 5
 
+      ]FILE_CTL NO_SKIP
       ⎕NC '⎕XX'
 ¯1
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
       ⎕NC'⎕'
 5
 
       ⎕NC'⍞'
 5
 
+      ]FILE_CTL NO_SKIP
       ⎕NC'⍞_'
 ¯1
 
-⍝ ==================================
+      ⍝ Regression (Blake McBride, LanguageVariances.md #24, 2026-08-10):
+      ⍝ ⎕NC of a system FUNCTION name (⎕EA, ⎕FX, ...) gave ¯1 (invalid)
+      ⍝ instead of 6, because Workspace::get_quad() returns a function
+      ⍝ token (not a Symbol) for these, and get_NC() only ever checked
+      ⍝ the Symbol/TC_SYMBOL path. Per ISO/IEC 13751 11.5.2, 5=system
+      ⍝ variable, 6=system function.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
+      ⎕NC 3 3⍴'⎕EA⎕IO⎕KZ'
+6 5 ¯1
+
+      ⎕NC 3⍴'⎕FX'
+6
+
+      ⎕NC 4⍴'⎕FFT'
+6
+
+      ⍝ prefix-tolerance must still be rejected for functions too
+      ⍝ (same rule as the existing '⎕XX' case above, for variables)
+      ⍝
+      ⎕NC 7⍴'⎕FFTxyz'
+¯1
+
+      ⍝ Bugs28 #48 regression: ⎕NC of a NESTED vector of names (see the
+      ⍝ matching, more detailed comment in testcases/Quad_EX.tc) had
+      ⍝ the same bug as ⎕EX -- one shared root cause
+      ⍝ (QuadFunction.cc's new quad_EX_NC_names()).
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ZZ48NA←1 ⋄ ZZ48NB←2
+      ]FILE_CTL SKIP_APL2   ⍝ structured variables are a GNU APL extension; ⎕NC of GNU APL names/classes differs
+      ⎕NC 'ZZ48NA' 'ZZ48NB'
+2 2
+
+      ⎕NC 'ZZ48NA' 'ZZ48NOSUCH'
+2 0
+
+      )ERASE ZZ48NA ZZ48NB
+
+      ⍝ Bugs28 #54 regression: ⎕NC of an existing MEMBER of a
+      ⍝ structured variable (e.g. S.a) gave ¯1 ("invalid name") --
+      ⍝ get_NC() had no member (.) handling at all, looked up the
+      ⍝ WHOLE string "S.a" as one symbol name (never found, since '.'
+      ⍝ is not a valid symbol character), and fell through to the
+      ⍝ "user-defined name" path's per-char validation, which rejects
+      ⍝ the '.'. doc/apl.texi says the usual rules for normal
+      ⍝ variables apply to members: an existing member is a variable
+      ⍝ (2), a nonexistent member of an otherwise-existing structured
+      ⍝ variable is simply unused (0, same as any other undefined
+      ⍝ name). Fixed by detecting the '.' and reusing
+      ⍝ try_existing_member() (Bugs28 #53) to check without throwing.
+      ⍝
+      ZZ54S.a←1
+      ⎕NC 'ZZ54S.a'
+2
+
+      ⎕NC 'ZZ54S'
+2
+
+      ⎕NC 'ZZ54S.zz'
+0
+
+      ⍝ control: a nonexistent base variable is also just unused
+      ⍝
+      ⎕NC 'ZZ54NOSUCH.a'
+0
+
+      ⍝ control: ⎕EX already correctly treated the member as a name
+      ⍝
+      ⎕EX 'ZZ54S.a'
+1
+
+      ⎕NC 'ZZ54S.a'
+0
+
+      ⍝ regression (Bugs28 #88): ⎕NC of a character matrix B used to
+      ⍝ give a scalar Z (via "var_count > 1", false for a 1- or 0-row
+      ⍝ matrix) instead of a vector sized to B's row count (ISO 13751:
+      ⍝ ⍴Z ←→ ↑⍴B) -- a scalar Z whose single cell is then never
+      ⍝ written (the result loop runs 0 or 1 times either way) is an
+      ⍝ incomplete value.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ⍴⎕NC 1 1⍴'A'
+1
+
+      ⍴⎕NC 0 3⍴'A'
+0
+
+      ⍝ ==================================
 
 

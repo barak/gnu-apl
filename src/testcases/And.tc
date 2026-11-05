@@ -1,20 +1,31 @@
 ⍝ And.tc
       0 0 1 1∧0 1 0 1
 0 0 0 1
+⍝@ test3.
+
+
+      ⍝ real APL2 restricts ∧/∨ to booleans; SKIP...NOSKIP below brackets
+      ⍝ the GNU/ISO-13751-only LCM/GCD numeric extension -- see
+      ⍝ project_apl2_and_or_boolean_only.md
+      ]FILE_CTL SKIP_APL2
 
       ⍝ Regression (LCM overflow)
       ⍝
       2028259601 ∧ 9094863431
 1.844674407E19
 
-      2028259601 ∧ 9094863431  
+      2028259601 ∧ 9094863431
 1.844674407E19
+
+      ]FILE_CTL NO_SKIP   ⍝ boolean again below, so APL2-safe
 
       ⍝ ISO p. 93
       ⍝
       0 1 ∘.∧ 0 1
 0 0
 0 1
+
+      ]FILE_CTL SKIP_APL2   ⍝ non-boolean again from here to EOF
 
       30 ∧ 36
 180
@@ -29,5 +40,34 @@
       ⍝
       2028259601 ∧ 9094863431J0
 1.844674407E19
+
+      ⍝ Bugs28 #43 regression: float GCD/LCM (NumericCell::flt_gcd(),
+      ⍝ shared by ∨ and ∧) did plain Euclid on doubles with fmod(b,a)
+      ⍝ and an absolute is_near_zero(a) as the only stop condition --
+      ⍝ the qct parameter was never used. fmod(1E30,1E10) is the exact
+      ⍝ remainder of the two *doubles* (1024, since the double 1E30 is
+      ⍝ not an exact multiple of the double 1E10), so the iteration
+      ⍝ continued from there instead of recognizing that 1E10 already
+      ⍝ (tolerantly) divides 1E30. Fixed by checking the quotient b÷a
+      ⍝ for a near-integer RELATIVE to its own magnitude at each step
+      ⍝ (not integral_within()'s absolute-qct window, which is far too
+      ⍝ tight once the quotient itself reaches astronomical size).
+      ⍝
+      1E30 ∨ 1E10
+1E10
+
+      1E30 ∧ 1E10
+1E30
+
+      1E200 ∨ 1E100
+1E100
+
+      1E¯9 ∨ 1
+1E¯9
+
+      ⍝ control: an integer-typed pair was already correct
+      ⍝
+      1E17 ∨ 1E16
+10000000000000000
 
 

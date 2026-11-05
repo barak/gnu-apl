@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,18 +37,22 @@ enum LogId
 
 #ifdef cfg_DYNAMIC_LOG_WANTED
 
-#define log_def(val, item, txt) extern bool LOG_ ## item;
-#include "Logging.def"
+#  define log_def(val, item, txt) extern bool LOG_ ## item;
+#  include "Logging.def"
 
+/// @param lid logging category identifier
+/// @param ON true to enable, false to disable the category
 void Log_control(LogId lid, bool ON);
+/// @param lid logging category identifier
 bool Log_status(LogId lid);
+/// @param lid logging category identifier
 const char * Log_info(LogId lid);
 
 #else   // static logging
 
-#define Log_control(x, y)
-#define log_def(val, item, txt) enum { LOG_ ## item = val };
-#include "Logging.def"
+#  define Log_control(x, y)
+#  define log_def(val, item, txt) enum { LOG_ ## item = val };
+#  include "Logging.def"
 
 #endif
 

@@ -33,7 +33,11 @@ local files_cc=$(find src -name '*.cc'   -exec echo -n " {}" \;)
 local files_hh=$(find src -name '*.hh'   -exec echo -n " {}" \;)
 local files_icc=$(find src -name '*.icc' -exec echo -n " {}" \;)
 local files="$files_cc $files_hh $files_icc"
-local q=$(grep 'Q(' $files | grep -v '#define Q(x)')
+
+# match a standalone Q( macro call, not an identifier ending in "Q"
+# followed by "(" (e.g. grab_Q(), XXX_Q()): Q must be at the start of
+# the line or preceded by a non-identifier character.
+local q=$(grep -E '(^|[^A-Za-z0-9_])Q\(' $files | grep -v '#define Q(x)')
 
 if [ -n "$q" ]
 then

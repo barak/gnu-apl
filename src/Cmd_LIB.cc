@@ -23,10 +23,12 @@
 
 #include <sys/stat.h>
 
+#include "config.h"
+
 #include "Common.hh"
 #include "Command.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_LIB::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
@@ -45,8 +47,15 @@ const bool query = args.size() &&
    if (args.size() == 2)   // cases 1a. or 1b.: set or query single libdir
       {
         const UCS_string & libref_ucs = args.front();
+        if (libref_ucs.size() != 1)
+           {
+             CERR << "Invalid library reference '" << libref_ucs << "'"
+                     ". Valid library references are the digits 0..9." << endl;
+             return;
+           }
+
         const LibRef libref = LibRef(libref_ucs.front() - '0');
-        if (libref_ucs.size() != 1 || libref < 0 || libref > 9)
+        if (libref < 0 || libref > 9)
            {
              CERR << "Invalid library reference '" << libref_ucs << "'"
                      ". Valid library references are the digits 0..9." << endl;
@@ -103,13 +112,14 @@ const bool query = args.size() &&
                 case LibPaths::LibDir::CSRC_PREF_SYS:  out << "PSYS │";   break;
                 case LibPaths::LibDir::CSRC_PREF_HOME: out << "PUSER│";   break;
                 case LibPaths::LibDir::CSRC_CMD:       out << "CMD  │";   break;
+                case LibPaths::LibDir::CSRC_ARG:       out << "ARG  │";   break;
              }
 
         if (DIR * dir = opendir(path.c_str()))
            { out << " present     │ ";   closedir(dir); }
         else
            {
-             char cc[10];
+             char cc[16];   // "(%u)" of an int errno needs up to 13 bytes
              SPRINTF(cc, "(%u)", errno);
              out << " missing " << setw(4) << cc << "│ ";
            }
@@ -121,6 +131,7 @@ const bool query = args.size() &&
 "╚═══╧══╤══╧═════════════╧══════════════════════════════════════════════════════╝\n"
 "       │\n"
 "       ├── NONE:  found no method to compute the library path\n"
+"       ├── ARG:   the path came from command line option --libroot\n"
 "       ├── CMD:   the path was set with )LIBS N path\n"
 "       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
 "       ├── PSYS:  the path came from the system preferences in file\n"
@@ -130,9 +141,9 @@ const bool query = args.size() &&
 "       └── PWD:   the path is relative to current directory $PWD (last resort)"
        << endl;
 
-   out << right;   // restore the default
+   out << reset_format;   // restore the default
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 DIR *
 Cmd_LIB::open_LIB_dir(UTF8_string & path, ostream & out,
                       const UCS_string_vector & args)
@@ -164,6 +175,7 @@ UCS_string arg(UNI_0);
    // follow symbolic links, but not too often (because symbolic links are
    // subject to creating an endless loop)...
    //
+#if ! MINGW_SRC
    loop(depth, 20)
        {
          char buffer[FILENAME_MAX + 1];
@@ -181,6 +193,7 @@ UCS_string arg(UNI_0);
               path << UTF8_string(buffer);
             }
        }
+#endif // ! MINGW_SRC
 
    if (DIR * dir = opendir(path.c_str()))   return dir;   // OK
 
@@ -193,7 +206,7 @@ const char * why = strerror(errno);
                 << "Reason: " << why;
    return 0;   // error
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 Cmd_LIB::is_directory(const dirent * entry, const UTF8_string & path)
 {
@@ -210,7 +223,7 @@ DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
    return dir != 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_common(ostream & out, const UCS_string_vector & cmd_args, bool dbg)
 {
@@ -303,7 +316,6 @@ UCS_string_vector directories;
        {
          const dirent * entry = readdir(dir);
          if (entry == 0)   break;   // directory loop done
-         const size_t dlen = strlen(entry->d_name);
          if (entry->d_name[0] == '.')   continue;   // ignore hidden files
 
          const UTF8_string filename_utf8(entry->d_name);
@@ -320,7 +332,10 @@ UCS_string_vector directories;
               continue;
             }
 
-         if (filename[dlen - 1] == '~')   continue;  // editor backup file
+         // dlen (a UTF-8 byte count) would index filename (a UCS_string of
+         // codepoints) with a byte offset -- wrong, and an OOB read
+         // (unchecked operator[]) for any multibyte name. Use back().
+         if (filename.size() && filename.back() == '~')   continue;  // editor backup file
 
          if (dbg)   // ]LIB ...
             {
@@ -350,7 +365,7 @@ UCS_string_vector directories;
    if (sort)   LIB_print_sorted(out, path, directories, files, sort);
    else        LIB_print_flat(out, path, directories, files);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_print_flat(ostream & out, const UTF8_string lib_path,
                      const UCS_string_vector & directories,
@@ -408,7 +423,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::LIB_print_sorted(ostream & out, const UTF8_string lib_path,
                           const UCS_string_vector & directories,
@@ -482,7 +497,7 @@ vector<bool> appended;         // appended[f] is true if file[f] was appended
          else FIXME;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 size_t
 Cmd_LIB::sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
                        const UCS_string & wsid)
@@ -507,7 +522,7 @@ UTF8_string name(lib_path);   // e.g. /home/workspaces
 
    return 0;   // invalid
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
@@ -524,7 +539,7 @@ Cmd_LIB::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 
    LIB_common(out, args, false);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_LIB::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
@@ -544,4 +559,4 @@ Cmd_LIB::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 
    LIB_common(out, args, true);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

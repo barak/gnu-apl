@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,16 +26,13 @@
 
 #include "SystemVariable.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** System variable Quad-RL (Random Link).  */
 class Quad_RL : public SystemVariable
 {
 public:
    /// Constructor.
    Quad_RL();
-
-   /// Return a random number.
-   uint64_t get_random();
 
    enum { INITIAL_SEED = 16807 };
 
@@ -47,8 +44,14 @@ public:
    int reset_seed()
       { state = INITIAL_SEED;   return INITIAL_SEED; }
 
+   /// Return a random number.
+   uint64_t get_random();
+
 protected:
    /// overloaded Symbol::assign()
+   /// @param value new random seed value to assign
+   /// @param clone true if the value should be cloned before storing
+   /// @param loc caller location for diagnostics
    virtual void assign(Value_P value, bool clone, const char * loc);
 
    /// overloaded Symbol::pop()
@@ -60,6 +63,6 @@ protected:
    /// state of the random number generator
    static uint64_t state;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 #endif //  __QUAD_RL_HH_DEFINED__
 

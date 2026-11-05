@@ -1,10 +1,11 @@
 
-dist_doc_DATA =	
+dist_doc_DATA =	\
 		APL_CGI.apl				\
 		RUBIK.apl		        \
 		SCRIPT.apl		        \
 		SCRIPT1.apl		        \
 		ScalarBenchmark.apl	    \
+		MemoryWall.apl		    \
 		Scalar2.apl		        \
 		Scalar3.apl		        \
 		Simple_SQL.apl	        \

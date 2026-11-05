@@ -1,7 +1,9 @@
 ⍝ Quad_ES.tc
 ⍝ ----------------------------------
 
-⍝ monadic, character B ----------------------------------
+⍝@ test3.
+
+      ⍝ monadic, character B ----------------------------------
 
       )ERASE EXPO
 
@@ -16,19 +18,19 @@
       EXPO 0
 ZERO INVALID
       EXPO 0
-      ^    ^
+      ^
 
       ⎕EM
 ZERO INVALID
       EXPO 0
-      ^    ^
+      ^     
 
       ⎕ET
 0 1
 
       →
 
-⍝ monadic, integer B, B is a defined error ----------------------------------
+      ⍝ monadic, integer B, B is a defined error ----------------------------------
 
       )ERASE FACTR
 ∇Z←FACTR A
@@ -42,19 +44,19 @@ ZERO INVALID
       FACTR 0
 DOMAIN ERROR
       FACTR 0
-      ^     ^
+      ^
 
       ⎕EM
 DOMAIN ERROR 
       FACTR 0
-      ^     ^
+      ^      
 
       ⎕ET
 5 4
 
       →
 
-⍝ monadic, B is 0 0 ----------------------------------
+      ⍝ monadic, B is 0 0 ----------------------------------
 
       )ERASE FN
 ∇FN
@@ -82,7 +84,7 @@ OK      - no duplicate parents
 0 0
 
 
-⍝ monadic, B is not a defined error ----------------------------------
+      ⍝ monadic, B is not a defined error ----------------------------------
 
 ∇Z←RECIP A
  ⎕ES(0=A)/13 17
@@ -93,24 +95,23 @@ OK      - no duplicate parents
 0.3333333333
 
       RECIP 0
-Unkown error (major 13, minor 17) in ⎕ES B
       RECIP 0
-      ^     ^
+      ^
 
       ⎕EM
-Unkown error (major 13, minor 17) in ⎕ES B
-      RECIP 0                             
-      ^     ^                             
+             
+      RECIP 0
+      ^      
 
       ⍴⎕EM
-3 42
+3 13
 
       ⎕ET
 13 17
 
       →
 
-⍝ dyadic ----------------------------------
+      ⍝ dyadic ----------------------------------
 
       'ERROR SIMULATION' ⎕ES 101 9
 ERROR SIMULATION
@@ -127,7 +128,7 @@ ERROR SIMULATION
 
       →
 
-⍝ dyadic, integer B, B is a defined error ----------------------------------
+      ⍝ dyadic, integer B, B is a defined error ----------------------------------
 
       )ERASE FACTR
 ∇Z←FACTR A
@@ -142,19 +143,19 @@ ERROR SIMULATION
       FACTR 0
 ZERO INVALID
       FACTR 0
-      ^     ^
+      ^
 
       ⎕EM
 ZERO INVALID 
       FACTR 0
-      ^     ^
+      ^      
 
       ⎕ET
 5 4
 
       →
 
-⍝ dyadic, B is 0 0 ----------------------------------
+      ⍝ dyadic, B is 0 0 ----------------------------------
 
       )ERASE FN
 ∇FN
@@ -177,7 +178,104 @@ ZERO INVALID
 0 0
 DONE
 
+      ⍝ Regression (Blake McBride, LanguageVariances.md #29, 2026-08-10):
+      ⍝ ⎕ES's LRM-recommended idiom (Figure 40, p.353) for giving a
+      ⍝ defined function a VALENCE ERROR when called with the wrong
+      ⍝ number of arguments -- ⎕ES(2≠⎕NC 'Y')/5 1 -- used to fail when Y
+      ⍝ (the declared but, in a monadic call, unsupplied left argument)
+      ⍝ was still reachable from UserFunction::set_locked_error_info():
+      ⍝ it unconditionally called Symbol::get_apl_value() on Y, which
+      ⍝ throws VALUE ERROR for an unbound symbol, silently replacing the
+      ⍝ intended ⎕ES-simulated error.
+      ⍝
+      )ERASE ROUND2
+∇Z←Y ROUND2 X
+ ⎕ES(2≠⎕NC 'Y')/5 1  ⍝SIGNAL VALENCE ERROR
+ Z←(10*-Y)×⌊.5+X×10*Y
+∇
+
+      3 ROUND2 4.5677887
+4.568
+
+      ROUND2 4.5677887
+VALENCE ERROR
+      ROUND2 4.5677887
+      ^
+
+      ⎕ET
+5 1
+
+      →
+
+      )ERASE ROUND3
+∇Z←Y ROUND3 X
+ ⎕ES(2≠⎕NC 'Y')/5 4  ⍝SIGNAL DOMAIN ERROR
+ Z←X
+∇
+
+      ROUND3 4.5677887
+DOMAIN ERROR
+      ROUND3 4.5677887
+      ^
+
+      ⎕ET
+5 4
+
+      →
+
       ]EXPECT 1
 
-⍝ ==================================
+      ⍝ regression (Blake McBride, Bugs28 #71, 2026-08-11): ⎕ES accepted
+      ⍝ out-of-range major/minor codes and leaked an internal message.
+      ⍝ get_error_code() packs B[0]/B[1] into a single 32-bit ErrorCode as
+      ⍝ (major<<16)|minor with no range check, so e.g. ⎕ES 1E9 1E9 wrapped
+      ⍝ to garbage (⎕ET came out ¯1126 51712) instead of DOMAIN ERROR; and
+      ⍝ event_simulate() treated ANY B mapping to E_USER_DEFINED_ERROR's
+      ⍝ own code (major/minor 0 1) as if B itself were the character
+      ⍝ message text -- true only for the DEDICATED "⎕ES 'text'" case --
+      ⍝ so a purely numeric ⎕ES 0 1 crashed into an internal cell-type
+      ⍝ assertion whose text then leaked into )MORE.
+      ⍝
+      ⎕ES 0 1
+User defined error
+      ⎕ES 0 1
+      ^
+      )MORE
+NO )MORE ERROR INFO
+      ⎕ET
+0 1
+      )SIC
+
+      ⍝ out of the representable 0..65535 range: now DOMAIN ERROR
+      ⍝
+      ⎕ES 1E9 1E9
+DOMAIN ERROR+
+      ⎕ES 1000000000 1000000000
+      ^
+      )SIC
+
+      ⎕ES ¯5 ¯4
+DOMAIN ERROR+
+      ⎕ES ¯5 ¯4
+      ^
+      )SIC
+
+      ⍝ control: in range but with no defined ⎕ET text is still accepted
+      ⍝ with a blank message (LRM p.284), and the existing major=100
+      ⍝ (⎕EA/⎕EB internal marker range) check is unaffected
+      ⍝
+      ⎕ES 99 99
+      ⎕ES 99 99
+      ^
+      ⎕ET
+99 99
+      )SIC
+
+      ⎕ES 100 1
+DOMAIN ERROR
+      ⎕ES 100 1
+      ^
+      )SIC
+
+      ⍝ ==================================
 

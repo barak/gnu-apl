@@ -1,6 +1,8 @@
 ⍝ ZZZ6_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ SYNTAX ERROR on IDX
       ⍝
       X ← ⍳10
@@ -28,7 +30,9 @@
 1
 
 
+      ]FILE_CTL SKIP_APL2   ⍝ real APL2 SYSTEM ERROR on self-reassigning D←(R,..)⍴D
       D←1 2 3
       R←×/¯1↓⍴D
       D←(R,¯1↑⍴D)⍴D
+      ]FILE_CTL NO_SKIP
 

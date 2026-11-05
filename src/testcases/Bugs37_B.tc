@@ -1,0 +1,636 @@
+⍝ Bugs37_B.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs37 severity B items that need no files or libraries
+⍝ (#8 - #11, #13 - #17, #20 - #22, #28 - #31).
+
+⍝@ test3.
+
+
+
+
+
+      ⍝ Bugs37 #8: ⎕PS[1] and ⎕PS[2] are independent; a rejected ⎕PS[…]←
+      ⍝ changes nothing
+      ⍝
+
+
+
+
+
+      ⎕PS[1 2]←1 8
+
+
+
+
+
+      ⎕PS[2]←0
+
+
+
+
+
+      ⎕PS
+1 0
+
+
+
+
+      ⎕PS[1]←1
+
+
+
+
+
+      ⎕PS[2]←0
+
+
+
+
+
+      ⎕PS
+1 0
+
+
+
+
+      ⎕PS←0 0
+
+
+
+
+
+      ⎕PS[2 1]←8 7
+DOMAIN ERROR
+      ⎕PS[2 1]←8 7
+      ^       ^
+
+
+      ⎕PS
+0 0
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #9: format by example in E-format shows all mantissa digits and
+      ⍝ right-aligns the exponent (zero-filled), so that the E stays in place
+      ⍝
+
+
+
+
+
+      '5.75E55'⍕1E0 1E10 1.25E9 1.25E10
+1.00E001.00E101.25E091.25E10
+
+
+
+
+      ' 5.75E55'⍕1E0 1E10 1.25E9 1.25E10
+ 1.00E00 1.00E10 1.25E09 1.25E10
+
+
+
+
+      ' 5.75E555'⍕2 2⍴1 10 100 1E100
+ 1.00E000 1.00E001
+ 1.00E002 1.00E100
+
+
+
+      '5.75E55'⍕0
+0.00E00
+
+
+
+
+      ' ¯1.7000E¯01'⍕¯25.784 0.0034
+ ¯2.5784E 01  3.4000E¯03
+
+
+
+
+      ⍝ Bugs37 #10: ⌹B for a vector B is (+B)÷+/|B|⋆2 without ⎕CT
+      ⍝
+
+
+
+
+
+      ⌹,1E¯7
+10000000
+
+
+
+
+      ⌹1E¯7 2E¯7
+2000000 4000000
+
+
+
+
+      ⌹,1E155
+1E¯155
+
+
+
+
+      ⌹3 4
+0.12 0.16
+
+
+
+
+      ⌹,0
+DOMAIN ERROR+
+      ⌹,0
+      ^
+
+
+      Q←⎕CT
+
+
+
+
+
+      ⎕CT←0
+
+
+
+
+
+      ⌹,0
+DOMAIN ERROR+
+      ⌹,0
+      ^
+
+
+      ⎕CT←Q
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #11: GCD and LCM of tiny nonzero floats
+      ⍝
+
+
+
+
+
+      1E¯11=1E¯11∨1E¯11
+1
+
+
+
+
+      1E¯11=1E¯11∨0
+1
+
+
+
+
+      1E¯11∧1
+1
+
+
+
+
+      0=1E¯11∧1E¯11
+0
+
+
+
+
+      12∨18
+6
+
+
+
+
+      12∧18
+36
+
+
+
+
+      0∧5
+0
+
+
+
+
+      1.5∨2.5
+0.5
+
+
+
+
+      ⍝ Bugs37 #13: (F⍤k)B aligns cell results of different ranks on the
+      ⍝ trailing axes
+      ⍝
+
+
+
+
+
+      ∇Z←FB37 B
+[1] →(B=2)/L2
+[2] Z←B⍴B
+[3] →0
+[4] L2:Z←2 2⍴B
+[5] ∇
+
+
+
+
+
+      ⍴(FB37⍤0)1 2 3
+3 2 3
+
+
+
+
+      3 6⍴(FB37⍤0)1 2 3
+1 0 0 0 0 0
+2 2 0 2 2 0
+3 3 3 0 0 0
+
+
+      ⍴30 ⎕CR (1 2 3)(1 4⍴7)
+2 1 4
+
+
+
+
+      )ERASE FB37
+
+
+
+
+
+      ⍝ Bugs37 #14: (f⍣N) A B ←→ (f⍣N) (A B)
+      ⍝
+
+
+
+
+
+      X←2 2⍴3
+
+
+
+
+
+      (⍴⍣1)X(4 5)
+2
+
+
+
+
+      (⍴⍣1)(⍳2)(⍳3)
+2
+
+
+
+
+      (⌽⍣1)(⍳3)(4 5)
+ 4 5  1 2 3 
+
+
+
+
+      (⍴⍤1)X(4 5)
+2
+
+
+
+
+      ⍝ Bugs37 #15: (f⍤[X]y) A g B ←→ (f⍤[X]y) (A g B)
+      ⍝
+
+
+
+
+
+      (⌽⍤[1]1)2 3⍴⍳6
+3 6
+2 5
+1 4
+
+
+      X←2 3⍴⍳6
+
+
+
+
+
+      (⌽⍤[1]1)1+X
+4 7
+3 6
+2 5
+
+
+      Y←1
+
+
+
+
+
+      (⌽⍤[1]Y)2 3⍴⍳6
+3 6
+2 5
+1 4
+
+
+      ⍝ Bugs37 #16: ∇-editor: the prompt after a delete is not an existing line
+      ⍝
+
+
+
+
+
+      ∇Z←FB16 B
+[1] Z←B+1
+[2] Z←Z×2
+[3] Z←Z-3
+[4] Z←Z÷4
+[5] ∇
+
+
+
+
+
+      ∇FB16[∆2-3]
+Z←G B
+∇
+
+
+
+
+
+      ⎕CR 'FB16'
+Z←FB16 B
+Z←B+1   
+Z←G B   
+Z←Z÷4   
+
+      ∇FB16[1∆]
+Z←H B
+∇
+
+
+
+
+
+      ⎕CR 'FB16'
+Z←FB16 B
+Z←H B   
+
+
+
+      )ERASE FB16
+
+
+
+
+
+      ⍝ Bugs37 #17: a ; outside [...] is a SYNTAX ERROR before execution
+      ⍝
+
+
+
+
+
+      A←1 2 3
+
+
+
+
+
+      A←9;2
+SYNTAX ERROR+
+      A←9;2
+         ^
+
+
+      )MORE
+; outside of [...] (only an index or an axis can contain ;)
+
+
+
+
+      A
+1 2 3
+
+
+
+
+      (1;2)
+SYNTAX ERROR+
+      (1;2)
+        ^
+
+
+      ⎕FX 'Z←FB17' 'Z←1' '→3;1' 'Z←2'
+3
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+
+      M[1;2]
+2
+
+
+
+
+      {X←⍵ ;X} 5
+5
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #20: 2 ⎕JSON of a scalar character
+      ⍝
+
+
+
+
+
+      S37←38 ⎕CR 0 ⋄ S37.y.z←'t'
+
+
+
+
+
+      2 ⎕JSON S37
+{ "y":   { "z": "t" } }
+
+
+
+
+      2 ⎕JSON 'a'
+"a"
+
+
+
+
+      2 ⎕JSON 'a' 'bc' 5
+[ "a", "bc", 5 ]
+
+
+
+
+      )ERASE S37
+
+
+
+
+
+      ⍝ Bugs37 #21: inverse 1 ⎕TF / 2 ⎕TF of a function that ⎕FX refuses
+      ⍝ give '' (LRM p. 339)
+      ⍝
+
+
+
+
+
+      ⍴1 ⎕TF 'FGB37 2 2 8 Z←GB37 B))      '
+0
+
+
+
+
+      ⎕NC 'GB37'
+0
+
+
+
+
+      ⍴2 ⎕TF '⎕FX ''Z←HB37 B'' ''))'''
+0
+
+
+
+
+      ⎕NC 'HB37'
+0
+
+
+
+
+      ⍝ Bugs37 #22: )CONTINUE is refused inside ⎕EC
+      ⍝
+
+
+
+
+
+      ⎕EC ')CONTINUE'
+ 0  5 4  DOMAIN ERROR
+         the SI-modifying command ')CONTINUE' cannot be executed from within ⎕EC
+      /⎕EA
+       
+
+      ⍝ Bugs37 #28 - #31: ⎕FIO[55] (sscanf)
+      ⍝
+
+
+
+
+
+      '%3s%3s' ⎕FIO[55] 'abcdef'
+ abc def 
+
+
+
+
+      '%2s%s' ⎕FIO[55] 'abcd'
+ ab cd 
+
+
+
+
+      ⍴'%s%c' ⎕FIO[55] 'abc'
+1
+
+
+
+
+      '%d%n' ⎕FIO[55] '12'
+12 2
+
+
+
+
+      'abc%n' ⎕FIO[55] 'abc'
+3
+
+
+
+
+      '%n' ⎕FIO[55] 'abc'
+0
+
+
+
+
+      '%s%n' ⎕FIO[55] 'abc def'
+ abc 3 
+
+
+
+
+      '%f' ⎕FIO[55] '1e+5'
+100000
+
+
+
+
+      '%f' ⎕FIO[55] '+1.5'
+1.5
+
+
+
+
+      '%d' ⎕FIO[55] '+42'
+42
+
+
+
+
+      '%d%d' ⎕FIO[55] '12-3'
+12 ¯3
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

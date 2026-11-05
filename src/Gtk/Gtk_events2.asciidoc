@@ -1,0 +1,6 @@
+| +*draw*+ | (Hi Ns Es Is Cs)←Event|  +6+  +\'Canvas'+  +\'draw'+  +\'drawingarea1\'+  +\'GtkDrawingArea'+ 
+| +*destroy*+ | (Hi Ns Es Is Cs)←Event|  +6+  +\'Main-Window'+  +\'destroy'+  +\'window1\'+  +\'GtkWindow'+ 
+| +*row_selected*+ | (Hi Ns Es Xi Yi Bi Li)←Event|  +6+  +\'text_view-Mouse'+  +\'row_selected'+  ++  ++  ++  ++ 
+| +*clicked*+ | (Hi Ns Es Is Cs)←Event|  +6+  +\'OK-button'+  +\'clicked'+  +\'button1\'+  +\'GtkButton'+ 
+| +*changed*+ | (Hi Ns Es Is Cs)←Event|  +6+  +\'Select-box'+  +\'changed'+  +\'combobox1\'+  +\'GtkComboBox'+ 
+| +*activate*+ | (Hi Ns Es Is Cs)←Event|  +6+  +\'Text-entry'+  +\'activate'+  +\'entry1\'+  +\'GtkEntry'+ 

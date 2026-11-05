@@ -1,6 +1,8 @@
 ⍝ Execute.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍎'42'
 42
 
@@ -17,18 +19,18 @@
       ⍎'195÷5×13'
 3
 
-     ⍎'MATRIX←3 3⍴ι9' 
-     MATRIX 
+      ⍎'MATRIX←3 3⍴ι9' 
+      MATRIX 
 1 2 3
 4 5 6
 7 8 9
 
-     ⍎'''AGNES''' 
+      ⍎'''AGNES''' 
 AGNES
 
-⍝ TODO: valueless expression  ----------------------------------
+      ⍝ TODO: valueless expression  ----------------------------------
 
-⍝ Conditional execution ----------------------------------
+      ⍝ Conditional execution ----------------------------------
 
       V←ι0
       ⍎(0=⍴V)/'''EMPTY'''
@@ -48,6 +50,38 @@ EMPTY
 1 2 3 4
 
       ⍎¨''
+
+      ⍝ regression (Bugs28 #95): ⍎ of an SI-modifying command ()LOAD,
+      ⍝ )QLOAD, )CLEAR, )RESET, )SIC) throws Bif_F1_EXECUTE.cc's internal
+      ⍝ E_COMMAND_PUSHED so Command::do_APL_expression() can run the
+      ⍝ command itself -- but Error::update_error_info() printed it (as
+      ⍝ "Command Pushed", an error report for a successful operation)
+      ⍝ and stored it for ⎕ET/⎕EM regardless, even though nothing
+      ⍝ actually went wrong.
+      ⍝
+      ⍎')SIC'
+      ⎕ET
+0 0
+
+      ⍝ regression (Bugs28 #100(ab)): )SIS's caret line for an ⍎ frame
+      ⍝ was four columns out of line with the statement line above it.
+      ⍝ StateIndicator.cc's case PM_EXECUTE: prints a "**  " prefix
+      ⍝ before the statement (error_line_2, which already carries its
+      ⍝ own six-space prompt margin) but used to omit that same prefix
+      ⍝ before the caret line (error_line_3) that follows it.
+      ⍝
+      ⍎'1÷0'
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      )SIS
+**        1÷0
+**        ^^
+*  ⍎'1÷0'
+   ^
+
+      )SIC
 
       )CHECK BRIEF
 

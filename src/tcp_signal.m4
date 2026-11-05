@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2026  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,12 +74,29 @@ and then:
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 
-#include <string>
+#if HAVE_SYS_SELECT_H
+#include <sys/select.h>
+#endif // HAVE_SYS_SELECT_H
+
+#if HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#include <sys/types.h>
+
+#if HAVE_NETINET_IN_H
+#include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
+
+#if ! MINGW_SRC
+#define SOCKET(x) x
+#endif // ! MINGW_SRC
+
 #include <iostream>
 #include <iomanip>
 
@@ -170,6 +187,13 @@ typedef Sig_item_int < int64_t, 8> Sig_item_i64;   ///< 64-bit signed integer
 typedef Sig_item_int <uint64_t, 8> Sig_item_u64;   ///< 64-bit unsigned integer
 typedef Sig_item_xint<uint64_t, 8> Sig_item_x64;   ///< 64-bit hex integer
 
+/// the end of the buffer currently being deserialized by the Sig_item_*
+/// constructors below (set by Signal_base::recv_TCP() before it dispatches
+/// to a signal subclass constructor); used by Sig_item_string to bound its
+/// otherwise attacker-controlled 16-bit length against what was actually
+/// received, instead of trusting the length unconditionally.
+static const uint8_t * sig_buffer_end = 0;
+
 /// a string signal item of size \b bytes
 class Sig_item_string
 {
@@ -183,8 +207,16 @@ public:
    Sig_item_string(const uint8_t * & buffer)
       {
         Sig_item_u16 len (buffer);
-        value.reserve(len.get_value() + 2);
-        for (int b = 0; b < len.get_value(); ++b)   value += *buffer++;
+        int len_val = len.get_value();
+        if (sig_buffer_end && buffer + len_val > sig_buffer_end)
+           {
+             // declared length runs past the bytes actually received --
+             // clamp instead of reading adjacent heap/stack memory
+             len_val = sig_buffer_end > buffer ? int(sig_buffer_end - buffer)
+                                               : 0;
+           }
+        value.reserve(len_val + 2);
+        for (int b = 0; b < len_val; ++b)   value += *buffer++;
       }
 
    /// return the value of the item
@@ -252,6 +284,15 @@ define(`typtrans', `ifelse(`$1', `x64',    `uint64_t',
                     ifelse(`$1', `u8',      `uint8_t',
                     ifelse(`$1', `i8',       `int8_t',
                                              `string'))))))))))))))))))')
+# the "not present" return value for get__SIGNAL__field()'s bad_get()
+# fallback: 0 for every integer typtrans() result, but string() (not
+# the integer 0) when typtrans() resolves to `string` -- `return 0;`
+# for a string-returning method constructs a std::string from a null
+# const char* (0 -> null-pointer-constant -> const char*), undefined
+# behavior that glibc/libstdc++ tolerates silently but that a
+# stricter libc++/clang correctly flags (-Wnonnull). See Paul
+# Rockwell's macOS/clang report, 2026-09-04.
+define(`badret', `ifelse(typtrans($1), `string', `string()', `0')')
 define(`sig_args', `,
                 Sig_item_`'$2 _`'$3')
 define(`sig_init', `$3(`_'$3)')
@@ -263,7 +304,7 @@ define(`sig_memb', `   `Sig_item_'$2 $3;   ///< $3
 ')
 define(`sig_load', `$3(buffer)')
 define(`sig_bad', `   virtual typtrans($2) get__$1__$3() const   ///< dito
-      { bad_get("$1", "$3"); return 0; }
+      { bad_get("$1", "$3"); return badret($2); }
 ')
 define(`sig_good', `  /// return item $3 of this signal 
    virtual typtrans($2) get__$1__$3() const { return $3.get_value(); }
@@ -414,7 +455,7 @@ ssize_t siglen = 0;
        {
          fd_set readfds;
          FD_ZERO(&readfds);
-         FD_SET(tcp_sock, &readfds);
+         FD_SET(SOCKET(tcp_sock), &readfds);
 
          errno = 0;
          const int select__result = select(tcp_sock + 1, &readfds, 0, 0, 0);
@@ -426,7 +467,7 @@ ssize_t siglen = 0;
               return 0;   // most likely: connection was closed by the peer
             }
 
-         if (!FD_ISSET(tcp_sock, &readfds))
+         if (!FD_ISSET(SOCKET(tcp_sock), &readfds))
             {
               *loc = LOC;
               return 0;   // never happens
@@ -454,6 +495,24 @@ ssize_t siglen = 0;
       {
         *loc = LOC;
         return 0;   // close
+      }
+
+   // siglen is a raw 4-byte length taken directly off the (unauthenticated,
+   // local TCP) wire, with no upper bound: an oversized value would size a
+   // heap allocation up to 4 GiB below (del = new char[siglen]) -- a
+   // resource-exhaustion DoS at best, or (on a 32-bit build, where ssize_t
+   // is 32 bits) a value >= 0x80000000 turns siglen negative here, bypasses
+   // the siglen > bufsize check below, and reaches recv() as a huge size_t
+   // -- a stack-buffer write overflow. Reject anything past a sane maximum
+   // up front; no legitimate signal (fixed header + one shared-variable
+   // value) is anywhere near this large.
+   //
+   enum { MAX_TCP_SIGNAL_SIZE = 64 << 20 };   // 64 MiB
+   if (siglen < 0 || siglen > MAX_TCP_SIGNAL_SIZE)
+      {
+        cerr << "*** bad siglen " << siglen << " in recv_TCP()" << endl;
+        *loc = LOC;
+        return 0;
       }
 
 // debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;

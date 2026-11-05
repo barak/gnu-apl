@@ -1,8 +1,13 @@
 ⍝ Macro.tc
 ⍝ ----------------------------------
 
-   )CLEAR
+⍝@ test3.
+
+      )CLEAR
 CLEAR WS
+
+      )DROP test.xml
+³
 
       ⍝ define some helper functions passed to operators
       ⍝
@@ -19,30 +24,31 @@ CLEAR WS
  Z←A-B
 ∇
 
-NEG_LAMBDA ← { -⍵ }
+      NEG_LAMBDA ← { -⍵ }
 
       ⍝ EACH varieties with user defined LO
       ⍝
-   NEG ¨ 4 3⍴⍳99
+      NEG ¨ 4 3⍴⍳99
  ¯1  ¯2  ¯3
  ¯4  ¯5  ¯6
  ¯7  ¯8  ¯9
 ¯10 ¯11 ¯12
 
-   NEG_LAMBDA ¨ 4 3⍴⍳99
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      NEG_LAMBDA ¨ 4 3⍴⍳99
  ¯1  ¯2  ¯3
  ¯4  ¯5  ¯6
  ¯7  ¯8  ¯9
 ¯10 ¯11 ¯12
 
-   NEG_ERR5 ¨ 4 3⍴⍳99
+      ]FILE_CTL NO_SKIP
+      NEG_ERR5 ¨ 4 3⍴⍳99
 SYNTAX ERROR+
 NEG_ERR5[2]  ←
              ^
       )SI
 NEG_ERR5[2]
-μ-Z__LO_EACH_B[2]
-⋆
+*
 
       vB←3×vA←4 3⍴⍳sA←23+sB←40
       (sA MINUS ¨ sB) ≡ sA -¨ sB
@@ -106,16 +112,21 @@ OK      - no duplicate parents
       )load test.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
+      ⍝ )load restored the )SI as it was at )save time above (before
+      ⍝ )SIC), which included a lambda that had already gone out of
+      ⍝ scope by then -- its deferred deletion (Bugs28 #15/#17) is
+      ⍝ correctly queued but stays pending until the )SIC below clears
+      ⍝ the reloaded )SI.
+      ⍝
       )CHECK
-OK      - no stale functions
+WARNING - 1 stale functions (not erased)
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
       )SI
 NEG_ERR5[2]
-μ-Z__LO_EACH_B[2]
-⋆
+*
 
       )SIC
       )CHECK
@@ -124,5 +135,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ ==================================
 

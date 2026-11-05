@@ -66,6 +66,8 @@
 /** @file
  */
 
+#include <memory>
+
 #define LA_DEBUG     0   /* LApack.cc */
 #define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
@@ -107,7 +109,7 @@ public:
 
 #if 1
 
-#include <complex>
+#  include <complex>
   /// a complex number
   class ZZ: public std::complex<APL_Float>
      {
@@ -214,7 +216,7 @@ public:
           { return real()*real() + imag()*imag(); }
      };   // class ZZ
  
-  //----------------------------------------------------------------------------
+  //────────────────────────────────────────────────────────────────────────────
   /// A double or complex matrix. Actually a matrix view of some data (where
   /// data is similar to an APL ravel)
   template<typename T>
@@ -225,6 +227,10 @@ public:
          /// Unlike e.g. std::vector<T> (which copies \b data), \b vdata must
          /// outlive \b this, and modifying items also modifies \b vdata!
          //
+        /// @param vdata pointer to the underlying element buffer
+        /// @param M number of rows
+        /// @param N number of columns
+        /// @param _dx leading dimension (distance between adjacent columns)
         fMatrix(void * vdata, Crow M, Ccol N, ShapeItem _dx)
           : data(reinterpret_cast<T *>(vdata)),
             rows(M),
@@ -235,6 +241,8 @@ public:
      
         /// constructor: sub-matrix of \b other with \b new_col_count columns
         /// CAUTION: other must outlive \b this!
+        /// @param other source matrix to create sub-matrix from
+        /// @param new_col_count number of columns in the sub-matrix
         fMatrix(const fMatrix & other, ShapeItem new_col_count)
           : data(other.data),
             rows(other.rows),
@@ -244,6 +252,7 @@ public:
         { Assert(new_col_count <= other.cols); }
 
         /// copy from \b other
+        /// @param other source matrix to copy from
         void operator =(const fMatrix & other)
            {
              transpose = other.transpose;
@@ -254,18 +263,22 @@ public:
 
         /// return the sub-matrix starting at row and col.
         /// I.e. \b row col↓this
+        /// @param row starting row index of the sub-matrix
+        /// @param col starting column index of the sub-matrix
         fMatrix sub_matrix(Crow row, Crow col)
            {
              Assert(col <= cols && row <= rows);
              return fMatrix(&at(row, col), rows - row, cols - col, dx);
            }
 
+        /// @param new_rows new row count
         void set_rows(Ccol new_rows)
            {
              const_cast<ShapeItem &>(dx) = dx + new_rows - rows;
              const_cast<Crow &>(rows) = new_rows;
            }
 
+        /// @param new_cols new column count
         void set_columns(Ccol new_cols)
            { const_cast<Ccol &>(cols) = new_cols; }
 
@@ -275,6 +288,8 @@ public:
         /// return the sub-matrix of size new_len_y: new_len_x.
         /// I.e. \b new_rows new_rows↑this
         /// starting at row 0 and column 0
+        /// @param new_rows number of rows to take
+        /// @param new_cols number of columns to take
         fMatrix take(ShapeItem new_rows, ShapeItem new_cols)
            {
              Assert(new_rows <= rows);
@@ -300,36 +315,46 @@ public:
            { return dx; }
      
         /// return const \b this[row, col]
+        /// @param row row index
+        /// @param col column index
         const T & at(Crow row, Ccol col) const
            { Assert(row < rows);
              Assert(col < cols);
              return data[row + col*dx]; }
-     
+
         /// return \b this[row, col]
+        /// @param row row index
+        /// @param col column index
         T & at(Crow row, Ccol col)
            { Assert(row < rows);
              Assert(col < cols);
              return data[row + col*dx]; }
-     
+
         /// return \b this[row, col] or this[col, row]
+        /// @param row row index (or column index when transposed)
+        /// @param col column index (or row index when transposed)
         const T & AT(Crow row, Ccol col) const
            { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
-     
+
         /// return \b this[row, col] or this[col, row]
+        /// @param row row index (or column index when transposed)
+        /// @param col column index (or row index when transposed)
         T & AT(Crow row, Ccol col)
            { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
-     
+
         /// return \b this[i, i]
+        /// @param i diagonal index
         T & diag(ShapeItem i)
            { Assert(i < rows);
              Assert(i < cols);
              return data[i*(1 + dx)]; }
-     
+
         /// return \b this[i, i]
+        /// @param i diagonal index
         const T & diag(ShapeItem i) const
            { Assert(i < rows);
              Assert(i < cols);
@@ -380,15 +405,15 @@ public:
        
         ~TempMatrix()
            {
-             delete[] fMatrix<T>::data;
+             std::allocator<T>{}.deallocate(fMatrix<T>::data,
+                                            fMatrix<T>::get_item_count());
            }
 
          static T * const allocate(const T * src, int item_count)
             {
-             const int bytes = item_count * sizeof(T);
-             char * dest = new char[bytes];
-             memcpy(dest, src, bytes);
-             return reinterpret_cast<T *>(dest);
+             T * dest = std::allocator<T>{}.allocate(item_count);
+             memcpy(dest, src, item_count * sizeof(T));
+             return dest;
             }
      };                                // class TempMatrix<T>
 
@@ -399,6 +424,7 @@ public:
         /// constructor for N column matrices
         PTVVy(Ccol N, bool with_pivot);
         ~PTVVy();                 ///< destructor
+        Ccol        N;            ///< column count (stored for deallocation)
         Ccol *      pivot;        ///< column pivot
         T *         tau;          ///< diagonal elements
         APL_Float * vn1;          ///< column norms 1
@@ -470,7 +496,7 @@ public:
   max_pos(const APL_Float * vec, ShapeItem len)
      {
        Ccol imax = 0;                 // start with index 0
-       APL_Float vec_max = vec[0];   // and its value
+       APL_Float vec_max = abs(vec[0]);   // and its value
        for (Ccol j = 1; j < len; ++j)
            {
              const APL_Float vec_j = abs(vec[j]);
@@ -514,27 +540,67 @@ public:
   static void scale(ZZ * data, size_t len, const ZZ & factor)
      { loop(l, len)   data[l] *= factor; }
 
-  //============================================================================
+  //════════════════════════════════════════════════════════════════════════════
   // (static) functions ported from LAPACK (FORTRAN) .f files...
 public:
-  /// return ║ vec ║²
+  /// return ║ vec ║ (the actual 2-norm, NOT squared -- see below)
   static APL_Float norm_2(const DD * vec, size_t len)
      {
-        APL_Float norm = 0.0;
-        loop(j, len)   norm += square(get_real(*vec++));
-        return norm;
+        // Naive sum-of-squares overflows to +Inf once an element exceeds
+        // ~1.34E154 (its square alone already exceeds DBL_MAX), silently
+        // turning e.g. a singular matrix into one gelsy()/estimate_rank()
+        // reports as full rank. Scale by the largest magnitude first
+        // (DNRM2-style) so no individual term is ever squared while > 1.
+        //
+        // IMPORTANT: this used to return the SQUARED norm (║vec║²,
+        // via `sum * square(scale)`), matching its old name/doc comment.
+        // That final `square(scale)` re-introduced the very overflow the
+        // scaling was meant to avoid -- safe for scale up to sqrt(DBL_MAX)
+        // (~1.34E154), Inf beyond it (exactly Blake McBride's H17e report,
+        // "leaves 1.34e154 .. 9.98e291 unprotected"). Every one of this
+        // function's 4 call sites immediately took sqrt() of the result
+        // anyway, so there was no reason to square-then-later-unsquare in
+        // the first place. Returning `scale * sqrt(sum)` instead (like
+        // real BLAS DNRM2) needs no such squaring-back-in step and is
+        // therefore safe for the full representable double range, not
+        // just its square root.
+        APL_Float scale = 0.0;
+        loop(j, len)
+            { const APL_Float a = abs(vec[j]);
+              if (a > scale)   scale = a; }
+        if (scale == 0.0)   return 0.0;
+
+        APL_Float sum = 0.0;
+        loop(j, len)   sum += square(get_real(vec[j]) / scale);
+        return scale * sqrt(sum);
      }
 
-     /// return ║ vec ║²
+     /// return ║ vec ║ (the actual 2-norm, NOT squared -- see the DD
+     /// overload above)
   static APL_Float norm_2(const ZZ * vec, size_t len)
         {
-          APL_Float norm = 0.0;
+          // see the DD overload above for why this is scaled, not naive,
+          // and returns the plain norm, not its square.
+          // NOTE: scale is found via max(|re|,|im|) per element (a cheap
+          // Chebyshev/L∞ bound), not abs(ZZ) -- abs(ZZ) itself squares
+          // re/im internally (sqrt(re²+im²)) and would overflow for the
+          // very huge-single-element inputs this fix targets (e.g. a bare
+          // 1E200 element: 1E200² alone already exceeds DBL_MAX).
+          APL_Float scale = 0.0;
+          loop(j, len)
+              { const APL_Float re = ::fabs(get_real(vec[j]));
+                const APL_Float im = ::fabs(get_imag(vec[j]));
+                if (re > scale)   scale = re;
+                if (im > scale)   scale = im; }
+          if (scale == 0.0)   return 0.0;
+
+          APL_Float sum = 0.0;
           loop(j, len)
              {
-               norm += square(get_real(*vec));
-               norm += square(get_imag(*vec++));
+               sum += square(get_real(vec[j]) / scale);
+               sum += square(get_imag(vec[j]) / scale);
              }
-          return norm;
+          return scale * sqrt(sum);
         }
 
    /// LApack function unm2r. Apply reflectors A(i) to matrix C.
@@ -576,33 +642,44 @@ public:
 
    /// compute Z←A⌹B (real A, B, and Z). Instatiation wrapper.
    static sRank divide_DD_matrix(Value & Z, Crow rows,
-                              Ccol cols_A, const Cell * cA,
-                              Ccol cols_B, const Cell * cB);
+                              Ccol cols_A, cValue_R VA,
+                              Ccol cols_B, cValue_R VB);
 
    /// compute Z←A⌹B (complex A or B, and Z). Instatiation wrapper.
    static sRank divide_ZZ_matrix(Value & Z, Crow rows,
-                              Ccol cols_A, const Cell * cA,
-                              Ccol cols_B, const Cell * cB);
+                              Ccol cols_A, cValue_R VA,
+                              Ccol cols_B, cValue_R VB);
 
+   // DEAD CODE: factorize_DD_matrix()/factorize_ZZ_matrix() (and the
+   // grab_Q()/grab_R()/factorize_matrix() they depend on, declared
+   // further below) are unreachable from any APL-level primitive; their
+   // definitions in LApack.cc are disabled with #if 0. See the comments
+   // there for why they are kept (rather than deleted) and disabled
+   // (rather than left compiled). Declarations kept here too, disabled
+   // the same way, so the two files stay consistent.
+#if 0
    /// template instantiation wrapper. This wrapper forces the instantiation of
    /// factorize_matrix<DD>() which is defined in a different object file and
    /// may not be instantiated otherwise.
    static void factorize_DD_matrix(Value & Z, Crow M, Ccol N,
-                                   const Cell * cB, APL_Float rcond);
+                                   cValue_R VB, APL_Float rcond);
 
    /// template instantiation wrapper. This wrapper forces the instantiation of
    /// factorize_matrix<ZZ>() which is defined in a different object file and
    /// may not be instantiated otherwise.
    static void factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
-                                   const Cell * cB, APL_Float rcond);
+                                   cValue_R VB, APL_Float rcond);
+#endif // 0 - factorize_DD_matrix/factorize_ZZ_matrix are dead code
 
 protected:   // class LA_pack
    /// compute Z←A⌹B
    template<typename T>
    static sRank divide_matrix(Value & Z, Crow M,
-                              Ccol cols_A, const Cell * cA,
-                              Ccol cols_B, const Cell * cB);
+                              Ccol cols_A, cValue_R VA,
+                              Ccol cols_B, cValue_R VB);
 
+   // DEAD CODE (see the #if 0 note on factorize_DD_matrix() above).
+#if 0
    /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
    /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
    template<typename T>
@@ -611,6 +688,7 @@ protected:   // class LA_pack
    /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
    template<typename T>
    static void grab_R(fMatrix<T> & HR, Value & Z, fMatrix<T> & Rinv);
+#endif // 0 - grab_Q/grab_R are dead code
 
    /// compute the inverse of the upper triangular matrix \b utm.
    /// On return: the inverse of qutm is stored in qaug and utm was destroyed.
@@ -628,10 +706,13 @@ protected:   // class LA_pack
    static Value_P invert_UTM(Crow M, Ccol N,
                              fMatrix<T> & UTM, fMatrix<T> & AUG);
 
-   // factorize B
+   // factorize B. DEAD CODE (see the #if 0 note on factorize_DD_matrix()
+   // above).
+#if 0
    template<typename T>
    static sRank factorize_matrix(Value & Z, Crow M, Ccol N,
-                                const Cell * cB, APL_Float rcond);
+                                cValue_R VB, APL_Float rcond);
+#endif // 0 - factorize_matrix is dead code
 
    /// return the real part of dd (= dd)
    static DD get_real(const DD & dd)
@@ -755,4 +836,4 @@ protected:   // class LA_pack
      template<typename T>
      static void larf(const T * v, T tau, fMatrix<T> & C, T * y);
 };                                     // class LA_pack
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

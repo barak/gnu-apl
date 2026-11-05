@@ -1,6 +1,8 @@
 ⍝ Index_Of.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕IO←1
       8 4 2 7 3ι3 8 4
 5 1 2
@@ -49,7 +51,7 @@
 ┃┗∼━━┛ ┗∼━━┛ ┗━┛ ┗∼━━┛┃
 ┗ϵ━━━━━━━━━━━━━━━━━━━━┛
 
-⍝ Item not found ----------------------------------
+      ⍝ Item not found ----------------------------------
 
       ⎕IO←1
       8 9 5ι2 5 8
@@ -68,7 +70,7 @@
       6 7 4ι4 7 (ι0)
 3 2 4
 
-⍝ Item recurs ----------------------------------
+      ⍝ Item recurs ----------------------------------
 
       5 5 8 8 9ι8 9 5
 3 5 1
@@ -76,9 +78,10 @@
       'BANANA'ι'BANANA'
 1 2 3 2 3 2
 
-⍝ large B
+      ⍝ large B
 
       ⎕RL←42
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters; ⍳ with a vector argument is a GNU APL extension
       (⍳100) ⍳ ?10 10⍴100
 69 71 81 91 39 33  15 18 44 95
 56 29 83 88  9 18  60 51 81 51
@@ -114,8 +117,9 @@
 ┗ϵ━━━━━━━━━━┛
 
 
-⍝ Regression ----------------------------------
+      ⍝ Regression ----------------------------------
 
+      ]FILE_CTL NO_SKIP
       A←⌽⍳64 ◊ B←⍳6 ◊ B≡A[A⍳B]
 1
 
@@ -130,5 +134,19 @@ INDEX ERROR+
 
       A←⎕IO+64|3×⍳64 ⋄ B←⍳6 ⋄ B≡A[A⍳B]
 1
+
+      ⍝ Regression (Blake McBride, LanguageVariances.md #7, 2026-08-10):
+      ⍝ ⍳ (Index Of) is not one of the axis-taking functions in
+      ⍝ apl2lrm.txt Figure 7 (p.45), so an axis on it must give AXIS
+      ⍝ ERROR per the manual's "Conditions for Axis Specification" --
+      ⍝ Function::phrase_error()'s generic "phrase not implemented"
+      ⍝ fallback used to always throw VALENCE ERROR regardless of
+      ⍝ whether the missing capability was specifically axis support.
+      ⍝
+      M←2 3⍴⍳6
+      M⍳[1]2
+AXIS ERROR+
+      M⍳[1]2
+      ^^
 
 

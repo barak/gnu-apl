@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ bool gtk_init_done = false;
 
 InterruptContext InterruptContext::interrupt_context;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 init_modules(const char * argv0, bool log_startup)
 {
@@ -120,7 +120,7 @@ rlimit rl;
    Value::init();
    VH_entry::init();
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// initialize subsystems that depend on argv[]
 void
 init_modules2(bool log_startup)
@@ -134,11 +134,18 @@ const int retry_max = UserPreferences::uprefs.emacs_mode ? 15 : 5;
                  log_startup,
                  UserPreferences::uprefs.system_do_svars);
 
+   // if the connection to APserver has failed, then continue as if shared
+   // variables were disabled, so that no further attempts to talk to the
+   // (missing) APserver are made
+   //
+   if (!Svar_DB::APserver_available())
+      UserPreferences::uprefs.system_do_svars = false;   // see ]STATUS
+
    LineInput::init(true);
 
    Parallel::init(log_startup || LOG_Parallel);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the opposite of init()
 void
 cleanup(bool soft)
@@ -173,8 +180,12 @@ cleanup(bool soft)
       }
 
    LineInput::restore_termios();
+
+#if MINGW_SRC
+   WSACleanup();
+#endif
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 InterruptContext::control_C(int)
 {
@@ -186,13 +197,17 @@ APL_time_us when = now();
       {
         const Prefix & prefix = si->get_prefix();
         
-        interrupt_context.attention_range.low  = prefix.get_range_low();
-        interrupt_context.attention_range.high = prefix.get_range_high();
+        interrupt_context.attention_range.low  = prefix.get_phrase_low();
+        interrupt_context.attention_range.high = prefix.get_phrase_high();
+        interrupt_context.attention_stat_PC = prefix.get_statement_PC();
+        interrupt_context.range_executable = si->get_executable();
       }
    else
       {
         interrupt_context.attention_range.low  = Function_PC_invalid;
         interrupt_context.attention_range.high = Function_PC_invalid;
+        interrupt_context.attention_stat_PC = Prefix_PC_invalid;
+        interrupt_context.range_executable = 0;
       }
    interrupt_context.attention_raised = true;
    ++interrupt_context.attention_count;
@@ -200,12 +215,13 @@ APL_time_us when = now();
       {
         interrupt_context.interrupt_raised = true;
         interrupt_context.interrupt_range  = interrupt_context.attention_range;
+        interrupt_context.interrupt_stat_PC = interrupt_context.attention_stat_PC;
         ++interrupt_context.interrupt_count;
       }
 
    interrupt_context.interrupt_when = when;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 // Probes...
 
@@ -219,7 +235,7 @@ Probe & Probe::P_3 = probes[Probe::PROBE_COUNT - 3];
 Probe & Probe::P_4 = probes[Probe::PROBE_COUNT - 4];
 Probe & Probe::P_5 = probes[Probe::PROBE_COUNT - 5];
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void *
 common_new(size_t size)
 {
@@ -229,14 +245,14 @@ const uint64_t iret = uint64_t(ret);
         << "  (" << HEX(size) << ")" << endl;
    return ret;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 common_delete(void * p)
 {
    CERR << "DEL " << HEX(uint64_t(p)) << endl;
    free(p);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 APL_time_us
 now()
 {
@@ -248,7 +264,7 @@ APL_time_us ret = tv_now.tv_sec;
    ret += tv_now.tv_usec;
    return ret;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 YMDhmsu::YMDhmsu(APL_time_us at)
    : micro(at % 1000000)
 {
@@ -262,7 +278,7 @@ struct tm * t = gmtime(&secs);
    minute = t->tm_min;
    second = t->tm_sec;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 APL_time_us
 YMDhmsu::get() const
 {
@@ -275,25 +291,33 @@ tm t;
    t.tm_sec   = second;
    t.tm_isdst = 0;
 
-APL_time_us ret =  mktime(&t);
+   // the constructor above (YMDhmsu(APL_time_us)) fills year..second via
+   // gmtime(), i.e. as UTC fields -- so the inverse must be timegm(), not
+   // mktime() (which interprets t as LOCAL time). The mismatch made
+   // YMDhmsu(x).get() == x hold only when TZ=UTC; e.g. )IN restoring a
+   // defined function's creation timestamp (the sole caller of get(),
+   // Cmd_IN.cc) shifted it by the local UTC offset everywhere else
+   // (Blake McBride, Bugs16 #4, "related (latent)").
+   //
+APL_time_us ret =  timegm(&t);
    ret *= 1000000;
    ret += micro;
    return ret;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & out, const Function_PC2 & ft)
 {
    return out << ft.low << ":" << ft.high;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
-print_flags(ostream & out, ValueFlags flags)
+print_flags(ostream & out, uint32_t flags)
 {
-   return out << ((flags & VF_marked)   ?  "M" : "-")
-              << ((flags & VF_complete) ?  "C" : "-");
+   return out << ((flags & 0x02) ?  "M" : "-")   // marked
+              << ((flags & 0x01) ?  "C" : "-");   // complete
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 nibble(Unicode uni)
 {
@@ -307,7 +331,7 @@ nibble(Unicode uni)
 
    return -1;   // uni is not a hex digit
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 sixbit(Unicode uni)
 {
@@ -330,4 +354,4 @@ sixbit(Unicode uni)
 
    return -1;   // uni is not a hex digit
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

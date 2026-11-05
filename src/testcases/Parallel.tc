@@ -1,6 +1,8 @@
 ⍝ Parallel.tc
 
       ⍝ parallel execution testcases. Only execute them
+⍝@ test3.
+
       ⍝ if CORE_COUNT_WANTED aka. ⎕SYL[24;] was ./configure'd to ¯3.
       ⍝
       )CLEAR

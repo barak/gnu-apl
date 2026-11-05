@@ -1,6 +1,8 @@
 ⍝ ZZ57_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       ⍝ bug-apl@gnu.org, 3/4/2023 (Mr. Sunday) ...
 
       )CLEAR

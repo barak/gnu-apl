@@ -26,18 +26,37 @@
 
 #include "Listener.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// a Listener accepting TCP connections on \b port (0 picks an
+/// OS-assigned port)
 class TcpListener : public Listener {
 public:
+    /// constructor
     TcpListener( int port_in ) : port( port_in ), closing( false ) {};
+
+    /// destructor
     virtual ~TcpListener() {};
+
+    /// see Listener::start()
     virtual std::string start( void );
+
+    /// see Listener::wait_for_connection()
     virtual void wait_for_connection( void );
+
+    /// see Listener::close_connection()
     virtual void close_connection( void );
 
 private:
+    /// the TCP port to listen on (0: let the OS pick one)
     int port;
+
+    /// the listening server socket
     int server_socket;
+
+    /// set by close_connection() so wait_for_connection() can tell a
+    /// deliberate shutdown from a real accept() error
     bool closing;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

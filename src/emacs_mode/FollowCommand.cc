@@ -103,6 +103,7 @@ static void disable_trace( NetworkConnection &conn, Symbol *symbol )
 
     conn.send_reply( "disabled" );
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void FollowCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -141,3 +142,4 @@ void FollowCommand::run_command( NetworkConnection &conn, const std::vector<std:
         disable_trace( conn, symbol );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

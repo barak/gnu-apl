@@ -1,5 +1,7 @@
 
       ⍝ the map A
+⍝@ test3.
+
       ⊢A←5 2⍴'eEwWaAzZ92'
 eE
 wW
@@ -12,7 +14,7 @@ zZ
 Halloween
 
       ⍝ the result of A ⎕MAP B
-A ⎕MAP B
+      A ⎕MAP B
 HAlloWEEn
 
       ⍝ replace scalar 'a' with vector 1 2 3
@@ -69,7 +71,7 @@ zZ
       A ⎕MAP B
 DOMAIN ERROR+
       A ⎕MAP B
-      ^      ^
+      ^ ^
 
       )MORE
 Duplicate keys (e.g. A[1] and A[3]) in 'A ⎕MAP B'

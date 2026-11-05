@@ -1,6 +1,8 @@
 ⍝ Each_monadic.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       Z←ρ¨'TOM' 'DICK'
       Z
  3  4 
@@ -16,7 +18,7 @@
       ≡W
 2
 
-⍝ regression ----------------------------------
+      ⍝ regression ----------------------------------
 
 ∇Z←depth B
  Z←≡B
@@ -39,5 +41,213 @@
 
       ⍝ dyadic defined functions should make no difference
       ⍝
-  ((⍴BB)⍴'x') depth_dya¨BB
+      ((⍴BB)⍴'x') depth_dya¨BB
 2 2
+
+      ⍝ regression (Blake McBride, Bugs12.md #2, 2026-08-06): f¨ on an
+      ⍝ empty nested array whose (disclosed) prototype item has more
+      ⍝ than one element used to build a result with uninitialized
+      ⍝ Cells (aborts via Cell::init_other()'s assert, or dispatches a
+      ⍝ garbage vtable call with asserts off). ScalarFunction.cc's
+      ⍝ do_eval_fill_B() only ever wrote cell 0 of the fill result,
+      ⍝ regardless of how many cells the (possibly non-scalar)
+      ⍝ prototype item actually needed.
+      ⍝
+      Z1←+¨ 0⍴⊂⍳3
+      ⍴⍴Z1
+1
+      ⍴Z1
+0
+
+      Z2←-¨ 0⍴⊂⍳3
+      ⍴Z2
+0
+
+      ⍝ previously-working single-element-prototype case: still correct
+      ⍝
+      Z3←+¨0⍴⊂1
+      ⍴Z3
+0
+
+      ⍝ Bugs28 #35 regression: (F⍤y)¨B (and other derived functions
+      ⍝ whose operand is a defined/⎕FX'd function) with an empty B
+      ⍝ returned a non-empty scalar/vector instead of an empty array.
+      ⍝ Root cause: the empty-argument fill-function branch called
+      ⍝ LO->eval_B(*first_B) whenever LO wasn't itself is_defined(),
+      ⍝ and returned that call's result token unchanged when its class
+      ⍝ wasn't TC_VALUE. For a derived LO wrapping a defined function,
+      ⍝ eval_B() pushes a real SI frame and returns TOK_SI_PUSHED, so
+      ⍝ the *result of running that frame* silently became the result
+      ⍝ of the whole ¨ expression. Fixed in Bif_OPER1_EACH.cc by
+      ⍝ treating LO->may_push_SI() the same as LO->is_defined() (both
+      ⍝ mean: the fill function is the identity function, i.e. B
+      ⍝ itself) -- except for ⎕EC, which also may_push_SI() but has
+      ⍝ its own dedicated fabricated fill value.
+      ⍝
+      ⎕FX 'Z←ZZ35F B' 'Z←B+1'
+ZZ35F
+
+      Z←(ZZ35F⍤1)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←(ZZ35F⍤1)¨0⍴⊂1 2 3 ⋄ 2 ⎕TF 'Z'
+Z←0⍴(⊂3⍴0 0 0)
+
+      Z←(ZZ35F⍤0)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←(ZZ35F¨)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←({⍵+1}⍤1)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←({⍵+1}¨)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←(ZZ35F⍣2)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      ⎕FX 'Z←ZZ35G LO' 'Z←LO+1'
+ZZ35G
+
+      Z←(ZZ35G/)¨⍬ ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      )ERASE ZZ35F ZZ35G
+
+      ⍝ Bugs30 #1 regression: LO¨ as a selective-assignment target.
+      ⍝
+      ⍝ A NULL lvalue (an over-take of an empty vector, 1↑V for empty
+      ⍝ V) used to segfault Bif_OPER1_EACH::do_eval_LB instead of
+      ⍝ erroring cleanly; fixed by guarding dest==0 the same way the
+      ⍝ dyadic branch now does (see Each_dyadic.tc). No display after
+      ⍝ these: a selective assignment produces none (LRM p.41).
+
+      V←⍬
+      (,¨1↑V)←,1
+INDEX ERROR
+      (,¨1↑V)←,1
+       ^
+      (⌽¨1↑V)←,1
+INDEX ERROR
+      (⌽¨1↑V)←,1
+       ^
+      (⊂¨1↑V)←,1
+INDEX ERROR
+      (⊂¨1↑V)←,1
+       ^
+
+      ⍝ leaves 3 )SI entries for the failed immediate executions above.
+      ⍝
+      )SIC
+
+      ⍝ a primitive (structural) LO must still work, per src/Value.cc's
+      ⍝ own doc-comment example for LO¨ as a selective-assignment
+      ⍝ target.
+
+      V←'v' 'vw' 'vwx' 'vwxyz'
+      (2↑¨V)←5
+      4 ⎕CR V
+┏→━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃5 ┏→━━┓ ┏→━━━━┓ ┏→━━━━━━┓┃
+┃  ┃5 5┃ ┃5 5 x┃ ┃5 5 xyz┃┃
+┃  ┗∼━━┛ ┗+━━━━┛ ┗+━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ a defined LO must never see a selective-assignment target's
+      ⍝ live LvalCell (it could smuggle it out into unrelated storage
+      ⍝ via an ordinary side effect and leave a dangling reference
+      ⍝ once the original array is freed); reject it up front instead.
+      ⍝ Before this guard, an identity dfn like F here would silently
+      ⍝ "work" by forwarding the LvalCell unchanged -- that accident
+      ⍝ is exactly the hole being closed, so it must now be SYNTAX
+      ⍝ ERROR regardless of what F does.
+
+      FLAM←{⍵}
+      W←1 2 3
+      (FLAM¨W)←9 9 9
+SYNTAX ERROR
+      (FLAM¨W)←9 9 9
+       ^       ^
+
+      ⍝ leaves an )SI entry for the failed immediate execution above.
+      ⍝
+      )SIC
+      )ERASE FLAM
+
+      ⍝ regression (Blake McBride, Bugs31 #4): (∊¨0↑V)←9 used to print a
+      ⍝ C++ stack trace and exit(0) instead of behaving like the non-Each
+      ⍝ control (∊0↑V)←9 -- selecting 0 items via an empty selective-
+      ⍝ assignment target is a no-op on V, exactly like (V[⍬])←1 2 3,
+      ⍝ regardless of whether the selecting function is wrapped in Each.
+      ⍝ Root cause: EACH's own empty-B handling substitutes a synthetic,
+      ⍝ non-lvalue prototype for its cellrefs before evaluating LO on it,
+      ⍝ purely to determine LO's result shape/type -- Bif_F12_ELEMENT's
+      ⍝ own ∊ hit an internal FIXME on that prototype. Like APL2, a
+      ⍝ selective-specification expression is itself an ordinary
+      ⍝ expression whose value is the (here, unselected) right argument,
+      ⍝ even when the specification selects nothing: X←(∊0↑V)←9 gives
+      ⍝ X≡9, not something derived from the empty selection.
+      ⍝
+      V←1 2 3
+      (∊0↑V)←9          ⍝ non-Each control: already a no-op
+      V
+1 2 3
+      X←(∊0↑V)←9        ⍝ the expression's own value is still 9
+      X
+9
+
+      V←1 2 3
+      (∊¨0↑V)←9         ⍝ same no-op, through Each
+      V
+1 2 3
+      X←(∊¨0↑V)←9
+      X
+9
+
+      ⍝ regression (Blake McBride, Bugs31 #22): a bracket-axis primitive
+      ⍝ as the LO of Each lost its selectivity -- ⌽[1] (no LO/RO of its
+      ⍝ own, just a plain function bound to an axis) is itself a
+      ⍝ DerivedFunction, and DerivedFunction::get_selectivity() reported
+      ⍝ SEL_NONE for it (falling through past the Each-only forwarding
+      ⍝ case just above), discarding Bif_F12_ROTATE.hh's real
+      ⍝ SEL_MON_X/SEL_DYA_X. Each's own selectivity check then rejected
+      ⍝ (⌽[1]¨V)←B as if ⌽[1] could never be a valid selector, even
+      ⍝ though both the non-axis Each and the axis form without Each
+      ⍝ already accept the identical target.
+      ⍝
+      V←(2 2⍴⍳4)(2 2⍴⍳4)
+      (⌽[1]¨V)←(2 2⍴4 3 2 1)(2 2⍴8 7 6 5)
+      V
+ 2 1   6 5 
+ 4 3   8 7 
+
+      V←(2 2⍴⍳4)(2 2⍴⍳4)
+      (⊖[1]¨V)←(2 2⍴4 3 2 1)(2 2⍴8 7 6 5)
+      V
+ 2 1   6 5 
+ 4 3   8 7 
+
+      V←(2 2⍴⍳4)(2 2⍴⍳4)
+      (1↑[1]¨V)←(1 2⍴9 9)(1 2⍴8 8)
+      V
+ 9 9   8 8 
+ 3 4   3 4 
+
+      ⍝ controls: the non-axis Each, and the axis form without Each,
+      ⍝ already worked and must be unaffected
+      ⍝
+      V←(2 2⍴⍳4)(2 2⍴⍳4)
+      (⌽¨V)←(2 2⍴4 3 2 1)(2 2⍴8 7 6 5)
+      V
+ 3 4   7 8 
+ 1 2   5 6 
+
+      V←(2 2⍴⍳4)(2 2⍴⍳4)
+      (⌽[1]V)←(2 2⍴4 3 2 1)(2 2⍴8 7 6 5)
+      V
+ 8 7   4 3 
+ 6 5   2 1 
+
+      )ERASE V

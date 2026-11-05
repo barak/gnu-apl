@@ -1,6 +1,8 @@
 ⍝ Quad_SQL.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ]NEXTFILE no-SQLITE3   ⍝ done if SQLITE3 is not available
 
       Filename ← "testcases/test_Quad_SQL.db"
@@ -10,12 +12,12 @@
       ⊣⎕FIO.unlink Filename
 
       create←,⊃"""
-CREATE TABLE COMPANY(
-   ID INT PRIMARY KEY     NOT NULL,
-   NAME           TEXT    NOT NULL,
-   AGE            INT     NOT NULL,
-   ADDRESS        CHAR(50),
-   SALARY         REAL);
+      CREATE TABLE COMPANY(
+      ID INT PRIMARY KEY     NOT NULL,
+      NAME           TEXT    NOT NULL,
+      AGE            INT     NOT NULL,
+      ADDRESS        CHAR(50),
+      SALARY         REAL);
                """
 
       ⍝ connect to DB and list tables
@@ -88,5 +90,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ ==================================
 

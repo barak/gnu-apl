@@ -1,6 +1,8 @@
 ⍝ Quad_XML.tc vim: syntax=apl
 
 ⍝ XML errors... ==============================================================
+⍝@ test3.
+
 
 ⍝ invalid XML character ------------------------------------------------------
 
@@ -16,7 +18,7 @@ DOMAIN ERROR+
 
 ⎕XML " "
 DOMAIN ERROR+
-      ⎕XML ' '
+      ⎕XML,' '
       ^
 )MORE
 ⎕XML B: no XML root element in B
@@ -39,7 +41,7 @@ DOMAIN ERROR+
       ⎕XML '<root><sub '
       ^
 )MORE
-⎕XML: No tag end: <sub 
+No tag end found in: <sub 
 )SIC
 
 ⍝ tag too short---------------------------------------------------------------
@@ -49,9 +51,9 @@ DOMAIN ERROR+
       ⎕XML '<root><s'
       ^
 )MORE
-⎕XML: Tag too short: <s
+No tag end found in: <s
 )MORE
-⎕XML: Tag too short: <s
+No tag end found in: <s
 )SIC
 ⍝ comment too short-----------------------------------------------------------
 ⎕XML "<root><!--->"
@@ -129,11 +131,11 @@ DOMAIN ERROR+
 
       ⊃35 ⎕CR⎕XML APL      ⍝ inverse monadic ⎕XML
   <ROOT>                       
-    <LT name='A &lt; B'/>      
-    <GT name='A&gt;B'/>        
-    <AMP name='&amp;B'/>       
-    <QU1 name='&apos;B&apos;'/>
-    <QU2 name='&quot;B&quot;'/>
+    <LT name="A &lt; B"/>      
+    <GT name="A&gt;B"/>        
+    <AMP name="&amp;B"/>       
+    <QU1 name="&apos;B&apos;"/>
+    <QU2 name="&quot;B&quot;"/>
   </ROOT>                      
                                
 
@@ -165,15 +167,15 @@ DOMAIN ERROR+
 .∆15text             
 
       APL._2ROOT._2LT.⍙2name
-'A < B'
+A < B
       APL._2ROOT._4GT.⍙2name
-'A>B'
+A>B
       APL._2ROOT._6AMP.⍙2name
-'&B'
+&B
       APL._2ROOT._8QU1.⍙2name
-''B''
+'B'
       APL._2ROOT._10QU2.⍙2name
-'"B"'
+"B"
 
 ⍝ ============================================================================
 )SI
@@ -203,9 +205,9 @@ OK      - no duplicate parents
       ⊃35 ⎕CR⎕XML APL      ⍝ inverse monadic ⎕XML
 <?xml version='1.0' encoding='UTF-8'?>                  
   <Document>                                            
-    <Tag1 name='tag1'>   <!-- first tag -->             
+    <Tag1 name="tag1">   <!-- first tag -->             
       TEXT1                                             
-      <Subtag name='subtag_1.1'>   <!-- first subtag -->
+      <Subtag name="subtag_1.1">   <!-- first subtag -->
         SUBTEXT1_1                                      
       </Subtag>                                         
     </Tag1>                                             
@@ -338,10 +340,74 @@ _3C
       ⊃15 ⎕XML APL
 DOMAIN ERROR+
       ⊃15 ⎕XML APL
-       ^       ^
+       ^  ^
       )MORE
 A ⎕XML B: Bad function number A=15
 
       )SIC
 
+      ⍝ regression (Blake McBride, Bugs12.md #4, 2026-08-06): a node with
+      ⍝ more than 8 members (attributes+children) forces
+      ⍝ Value::get_new_member()/double_ravel() to grow the structured
+      ⍝ value's member table. double_ravel() used to allocate the new
+      ⍝ (doubled) ravel via `new Cell[]` and free the old one via
+      ⍝ `delete []` (on a char*, so no destructor ran) -- mismatched with
+      ⍝ init_ravel()/~Value(), which use std::allocator<Cell> throughout.
+      ⍝ Confirmed via ASan alloc-dealloc-mismatch on this exact
+      ⍝ expression before the fix. 11 children (+2 attributes) is enough
+      ⍝ to force (at least) one growth.
+      ⍝
+      APL←⎕XML '<a><b x="1"/><c y="2"/><d/><e/><f/><g/><h/><i/><j/><k/><l/></a>'
+      APL._1a._1b.⍙2x
+1
+
+      APL._1a._2c.⍙2y
+2
+
+      (14 "") ⎕XML APL._1a
+⍙1
+
+      (14 "_10k") ⎕XML APL._1a
+_11l
+
+
+      ⍝ Regression (Blake McBride, Bugs22 #7): ⎕XML accepted duplicate
+      ⍝ attribute names in the same tag (XML 1.0 §3.1 WFC "Unique Att
+      ⍝ Spec"), silently building two members for the same attribute.
+      ⍝
+      ⎕XML '<a b="1" b="2"/>'
+DOMAIN ERROR+
+      ⎕XML '<a b="1" b="2"/>'
+      ^
+      )SIC
+
+      ⎕XML '<a b="1" c="2"/>'
+._1a: □
+._1a.⍙1:  ┌→┐
+          │a│
+          └─┘
+
+._1a.⍙2b: ┌→┐
+          │1│
+          └─┘
+
+._1a.⍙3c: ┌→┐
+          │2│
+          └─┘
+
+      ⍝ Bugs28 #9 regression: a document nested past MAX_DEPTH left the
+      ⍝ partially-built tree's XML_nodes (and their APL_values) leaked
+      ⍝ -- Value::add_member() released the target Cell before
+      ⍝ constructing its replacement PointerCell, which itself does the
+      ⍝ depth check and can throw, leaving that Cell released but never
+      ⍝ reconstructed. )CHECK then crashed walking the survivors: some
+      ⍝ pointed at already-freed siblings, others at that half-dead Cell.
+      ⍝
+      ⍴⎕XML (780⍴'<a>'),1040⍴'</a>'
+SYSTEM LIMIT (nesting depth)
+      ⍴⎕XML(780⍴'<a>'),1040⍴'</a>'
+       ^
+
+      )SIC
+      )CHECK BRIEF
 

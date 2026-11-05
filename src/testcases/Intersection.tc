@@ -1,15 +1,17 @@
 ⍝ Intersection.tc
 ⍝ ----------------------------------
 
-    1 2 3 4 ∩ 3 4 5 6
+⍝@ test3.
+
+      1 2 3 4 ∩ 3 4 5 6
 3 4
 
-    4 3 2 1 ∩ 3 4 5 6
+      4 3 2 1 ∩ 3 4 5 6
 4 3
 
       ⍝ complex numbers use a different algorithm
       ⍝
-    1 2 3J3 4 ∩ 3J3 4 5 6
+      1 2 3J3 4 ∩ 3J3 4 5 6
 3J3 4
 
       'we' 'are' 'so' 'happy' ∩ 'are' 'you' 'so' 'tired?'
@@ -31,6 +33,17 @@
       54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77
       78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100
 
-⍝ ==================================
+      ⍝ regression (Blake McBride, Bugs12.md #1, 2026-08-06): A∩B on packed
+      ⍝ (>=12-element) booleans used to SEGFAULT once (≢A)×(≢B) > 3600 (the
+      ⍝ large-A-or-B sort path) -- same root cause as Union.tc's ∪ regression
+      ⍝ (Ravel.hh's bool_fetcher() ignoring its cache parameter).
+      ⍝
+      ⍴(200⍴1 0) ∩ (100⍴1)
+100
+
+      ⍴(200⍴0) ∩ (⍳5)
+0
+
+      ⍝ ==================================
 
 
