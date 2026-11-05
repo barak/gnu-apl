@@ -18,6 +18,9 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
     installation directories to the compiler and into the preferences
     file at make time; install the preferences file only once, and do not
     distribute it
+  * Exclude HOWTOs/Bible/Bible-Preview.pdf, an excerpt of a book with
+    neither license nor sources, and patch HOWTOs/Makefile.am to not
+    build or install HOWTOs/Bible
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 

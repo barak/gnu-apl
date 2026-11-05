@@ -1,0 +1,24 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Thu, 5 Nov 2026 18:30:00 +0000
+Subject: do not build or install HOWTOs/Bible
+
+HOWTOs/Bible/Bible-Preview.pdf, an excerpt of a book distributed with
+neither license nor sources, is excluded from the Debian source (see
+Files-Excluded in debian/copyright).  HOWTOs/Bible/Makefile.am then
+installs an empty placeholder in its place, along with a README that
+describes the preview and how to order the book.
+
+Either install HOWTOs/Bible only when the PDF is present, or do not
+build it at all.  The latter is done here.
+
+Forwarded: not-needed
+---
+--- a/HOWTOs/Makefile.am
++++ b/HOWTOs/Makefile.am
+@@ -1,6 +1,4 @@
+ 
+-SUBDIRS = Bible
+-
+ # HTML files generated from ASCIIDOC sources
+ #
+ ASCIIDOC = \

@@ -2,3 +2,4 @@
 0002-no-debian-subdir.patch
 0003-install-dirs-at-make-time.patch
 0004-Quad_FIO-screen-size-no-tty.patch
+0005-no-Bible-preview.patch
