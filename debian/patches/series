@@ -4,3 +4,4 @@
 0004-Quad_FIO-screen-size-no-tty.patch
 0005-no-Bible-preview.patch
 0006-pkg-config-for-host.patch
+0007-vpath-builds-anywhere.patch
