@@ -1,0 +1,84 @@
+@ifplaintext
+\input texinfo
+@settitle Sequences with Prefixes
+@setfilename seq.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Sequences with Prefixes
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node seq
+@end ifnotplaintext
+
+@chapter Sequences with Prefixes
+@cindex sequence
+
+Workspace to provide the next entry in a sequence.  Each sequence is a
+prefix and a count.
+
+@deffn ∇ item ← seq∆posting∆ref key
+
+Function returns the next item in a sequence with prefix key,
+'Invoice0001, Invoice0002 ... for example.
+
+@end deffn
+
+@deffn ∇ key seq∆set value
+
+Function sets the value of a given sequence.  Some do not like to
+start at zero. Use seq∆set.
+
+@example
+      'foo' seq∆set 10001
+      t1←(⊂seq∆next 'foo'),⊂seq∆next 'foo'
+      t1
+foo10001 f0010002
+@end example
+
+@end deffn
+
+@deffn ∇ count← seq∆next key
+
+Function returns the next integer in the sequence
+
+@end deffn
+
+@deffn ∇ seq∆reset
+
+Function erase existing sequences.
+
+@end deffn
+
+@defvar seq∆items
+
+A lexicon of existing sequences with each prefix as a key and its
+value as the last number generated.
+
+@end defvar 

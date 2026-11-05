@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,30 +21,108 @@
 /** @file
 */
 
+#include "ArgCheck.hh"
 #include "IndexExpr.hh"
 #include "PrintBuffer.hh"
 #include "PrintOperator.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 IndexExpr::IndexExpr(Assign_state astate, const char * loc)
-   : DynamicObject(loc),
+   // Ring membership (Bugs6 #5) was tried and reverted TWICE before this
+   // (see r2053/r2054 history), both times because erase_stale() *deleted*
+   // whatever it found via the ring -- and it had no way to tell a stale
+   // IndexExpr from a live one (no owner_count; a live one is the normal
+   // case while an index is on some SI's suspended prefix stack). Deleting
+   // a live IndexExpr is a segfault waiting to happen: the dangling
+   // pointer is still sitting in a TOK_PINDEX/TOK_INDEX token, scheduled
+   // for a second delete at the next )SIC/)CLEAR/)RESET (Blake McBride,
+   // Bugs8 #1 -- almost certainly also Bill Heagy's original crash).
+   //
+   // Fix: IndexExpr::erase_stale() is gone. Actual freeing stays exactly
+   // where it already correctly happened all along (Prefix::clean_up(),
+   // the individual reduce_*() delete sites). Ring membership now exists
+   // purely so that print_stale() (used by )CHECK and by IO_Files.cc at
+   // the end of every .tc file) can independently re-derive reachability
+   // -- mark every IndexExpr in the ring, then unmark those still
+   // reachable from a live TOK_PINDEX/TOK_INDEX token on some SI's prefix
+   // stack (see Prefix::unmark_all_values()) -- and report, never delete,
+   // whatever is still marked afterwards. This mirrors how Value's own
+   // )CHECK diagnostic works: a real bug still leaks rather than crashes,
+   // but is now visible and testcase-reproducible instead of silent.
+   : DynamicObject(loc, &all_index_exprs),
      quad_io(Workspace::get_IO()),
+     assign_state(astate),
      rank(0),
      value_count(0),
-     assign_state(astate)
+     marked(false)
 {
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 IndexExpr::~IndexExpr()
 {
    if (value_count)
       {
-        loop(r, rank)   if (+values[r])   values[r].reset();
+        loop(r, rank)   if (values[r])   values[r].reset();
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+IndexExpr::check_index_range(const Shape & shape) const
+{
+   loop(r, rank)
+      {
+        if (const cValue * ival = get_axis_value(r))   // unless elided index
+           {
+             const ShapeItem dim = shape.get_shape_item(r);
+             loop(i, ival->element_count())
+                {
+                  const APL_Integer idx = ival->get_near_int(i) - quad_io;
+                  if (idx < 0 || idx >= dim)   // invalid index
+                     {
+                       MORE_ERROR() << "A[B]: index " << (idx + quad_io)
+                                    << " is not a valid index for axis "
+                                    << (r + quad_io) << " of A (expecting "
+                                    << quad_io << "≤index<" << (dim + quad_io)
+                                    << "); ⍴A is " << shape
+                                    << ArgCheck::index_io0_note(idx, dim);
+                       INDEX_ERROR;
+                     }
+                }
+           }
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+sRank
+IndexExpr::get_axis(sRank max_axis) const
+{
+   if (rank != 1)   INDEX_ERROR;
+
+const APL_Integer qio = Workspace::get_IO();
+
+Value_P I = values[0];
+   if (!I->is_scalar_or_len1_vector())     INDEX_ERROR;
+
+   if (!I->is_near_int(0))   INDEX_ERROR;
+
+const APL_Integer wide_axis = I->get_near_int(0) - qio;
+
+   // axis and max_axis are both signed, so "axis >= max_axis" alone does
+   // not catch a negative axis (same class of bug as cValue.cc's
+   // get_single_axis, see H17). This function currently has no callers,
+   // but fix it to match the validated pattern used elsewhere. Bounds
+   // are checked on the wide (APL_Integer) value *before* narrowing to
+   // sRank (int16_t), so a huge out-of-range index cannot wrap into a
+   // small in-range sRank first.
+   //
+   if (wide_axis < 0 || wide_axis >= max_axis)   INDEX_ERROR;
+
+const sRank axis = sRank(wide_axis);
+
+   return axis;
+}
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 IndexExpr::extract_axis()
 {
@@ -56,106 +134,53 @@ Value_P ret = values[0];
    values[0].reset();   // decrement owner count
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-IndexExpr::check_index_range(const Shape & shape) const
+IndexExpr::mark_all_dynamic_index_exprs()
 {
-   loop(r, rank)
-      {
-        if (const Value * ival = get_axis_value(r))   // unless elided index
-           {
-             const ShapeItem max_idx = shape.get_shape_item(r) + quad_io;
-             loop(i, ival->element_count())
-                {
-                  const APL_Integer idx = ival->get_cravel(i).get_near_int();
-                  if (idx < quad_io || idx >= max_idx)   // invalid index
-                     {
-                       UCS_string & ucs = MORE_ERROR();
-                       ucs << "Offending index: " << idx
-                           << " (with ⎕IO: " << quad_io << ")\n"
-                           << "offending axis:  " << (r + quad_io)
-                           << " of some";
-                       loop(s, shape.get_rank())
-                           ucs << " " << shape.get_shape_item(s);
-                       ucs << "⍴...";
-                       if (idx >= max_idx)
-                          ucs << "\nthe max index for axis "
-                              << (r + quad_io)<< " is: "
-                              << (max_idx - quad_io);
-                       INDEX_ERROR;
-                     }
-                }
-           }
-      }
+   for (DynamicObject * dob = all_index_exprs.get_next();
+        dob != &all_index_exprs; dob = dob->get_next())
+       {
+         dob->pIndexExpr()->mark();
+       }
 }
-//----------------------------------------------------------------------------
-sRank
-IndexExpr::get_axis(sRank max_axis) const
-{
-   if (rank != 1)   INDEX_ERROR;
-
-const APL_Integer qio = Workspace::get_IO();
-
-Value_P I = values[0];
-   if (!I->is_scalar_or_len1_vector())     INDEX_ERROR;
-
-   if (!I->get_cfirst().is_near_int())   INDEX_ERROR;
-
-   // if axis becomes (signed) negative then it will be (unsigned) too big.
-   // Therefore we need not test for < 0.
-   //
-sRank axis = I->get_cfirst().get_near_int() - qio;
-   if (axis >= max_axis)   INDEX_ERROR;
-
-   return axis;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 IndexExpr::print_stale(ostream & out)
 {
+   // independently re-derive reachability rather than trusting any
+   // bookkeeping (IndexExpr has no owner_count): mark everything, then
+   // unmark whatever Prefix::unmark_all_values() finds still reachable
+   // from a live TOK_PINDEX/TOK_INDEX token on some SI's prefix stack.
+   // See the constructor comment for why this never deletes anything.
+   //
+   mark_all_dynamic_index_exprs();
+   Workspace::unmark_all_values();
+
 int count = 0;
 
    for (const DynamicObject * dob = all_index_exprs.get_next();
         dob != &all_index_exprs; dob = dob->get_next())
        {
          const IndexExpr * idx = dob->pIndexExpr();
+         if (!idx->is_marked())   continue;   // reachable, i.e. not stale
 
          out << dob->where_allocated();
 
          try           { out << *idx; }
-         catch (...)   { out << " *** corrupt ***"; }
+         catch (Error &)      { out << " *** corrupt ***"; }
+         catch (std::bad_alloc &) { out << " *** corrupt ***"; WS_FULL; }
+         catch (...)          { FIXME; }
 
          out << endl;
 
+         idx->unmark();
          ++count;
        }
 
    return count;
 }
-//----------------------------------------------------------------------------
-void
-IndexExpr::erase_stale(const char * loc)
-{
-   Log(LOG_Value__erase_stale)
-      CERR << endl << endl << "erase_stale() called from " << loc << endl;
-
-   for (DynamicObject * dob = all_index_exprs.get_next();
-        dob != &all_index_exprs; dob = dob->get_next())
-       {
-         IndexExpr * idx = dob->pIndexExpr();
-
-         Log(LOG_Value__erase_stale)
-            {
-              CERR << "Erasing stale IndexExpr:" << endl
-                   << "  Allocated by " << idx->alloc_loc << endl;
-            }
-
-         dob = dob->get_prev();
-         idx->unlink();
-         delete idx;
-       }
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator <<(ostream & out, const IndexExpr & idx)
 {
@@ -163,7 +188,7 @@ operator <<(ostream & out, const IndexExpr & idx)
    loop(i, idx.get_rank())
       {
         if (i)   out << ";";
-        if (const Value * ival = idx.get_axis_value(i))
+        if (const cValue * ival = idx.get_axis_value(i))
            {
              // value::print() may print a trailing LF that we don't want here.
              // We therefore print the index values ourselves.
@@ -176,4 +201,4 @@ operator <<(ostream & out, const IndexExpr & idx)
       }
    return out << "]";
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

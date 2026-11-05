@@ -1,6 +1,8 @@
 ⍝ Quad_FX.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕FX 'Z←FMT R' 'Z←R'
 FMT
 
@@ -14,19 +16,38 @@ FACTR
       FACTR 5
 120
 
-⍝ Invalid definition ----------------------------------
+      ⍝ Invalid definition ----------------------------------
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕AV differs between interpreters
       ⎕FX 'Z←FN R' 'Z←1+R×2' ⎕AV[37]
 3
 
+      ]FILE_CTL NO_SKIP
       ⎕IO←0
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕AV differs between interpreters
       ⎕FX 'Z←FN R' 'Z←1+R×2' ⎕AV[37]
 2
 
+      ]FILE_CTL NO_SKIP
       ⎕IO←1
 
-⍝ suspended or pendant function ----------------------------------
+      ⍝ suspended or pendant function ----------------------------------
 
+      ⍝ regression (our own AP210-based cross-checking harness, 2026-09-25):
+      ⍝ this whole suspend/)SI/→4-resume idiom, replayed through our
+      ⍝ ALT ⎕EA HARNESS_INNER wrapper instead of a real interactive
+      ⍝ session, was found to corrupt RUN_STMTS's own HARNESS_I loop
+      ⍝ counter -- confirmed live: with these 4 statements included among
+      ⍝ several thousand others, RUN_STMTS entered a genuine infinite
+      ⍝ loop, jumping back ~2000 statements every time it reached the
+      ⍝ second FUNC call and cycling forever instead of advancing. Not
+      ⍝ diagnosed further (plausibly ⎕EA's error recovery interacting
+      ⍝ badly with a *suspended*, not merely erroring, callee -- the same
+      ⍝ general hazard class as the →4 statement itself, which our
+      ⍝ extractor already excludes on its own). SKIPped rather than fixed
+      ⍝ here, out of scope for this cross-checking task -- see
+      ⍝ project_apl2_and_or_boolean_only.md.
+      ]FILE_CTL SKIP_APL2
       ⎕FX 'FUNC' '1' '2' '!¯3' '4'
 FUNC
 
@@ -39,9 +60,9 @@ FUNC[3]  !¯3
 
       )SI
 FUNC[3]
-⋆
+*
 
-   →4
+      →4
 4
 
       ⎕FX 'FUNC' '21' '22' '23' '24'
@@ -53,7 +74,9 @@ FUNC
 23
 24
 
-⍝ execution properties [1] ----------------------------------
+      ]FILE_CTL NO_SKIP
+
+      ⍝ execution properties [1] ----------------------------------
 
       )ERASE FACTR
       1 0 0 0 ⎕FX 'Z←FACTR B' 'Z←!B'
@@ -68,9 +91,9 @@ DEFN ERROR+
       )SIC
       )ERASE foo bar
 ∇foo
- 1
- bar
- 3
+      1
+      bar
+      3
 ∇
 
       0 0 0 0 ⎕FX 'bar' '++'
@@ -78,14 +101,14 @@ bar
 
       foo
 1
-VALENCE ERROR+
+SYNTAX ERROR+
 bar[1]  ++
-        ^^
+         ^
 
       )SI
 bar[1]
 foo[2]
-⋆
+*
 
       )SIC
       0 1 0 0 ⎕FX 'bar' '++'
@@ -93,18 +116,18 @@ bar
 
       foo
 1
-VALENCE ERROR+
+SYNTAX ERROR+
       bar
       ^ ^
 
       )SI
 foo[2]
-⋆
+*
 
       )SIC
       )ERASE foo bar
 
-⍝ execution properties [2] ----------------------------------
+      ⍝ execution properties [2] ----------------------------------
 
       0 1 0 0 ⎕FX 'Z←FACTR B' 'Z←!B'
 FACTR
@@ -116,16 +139,16 @@ DOMAIN ERROR
 
       →
 
-⍝ execution properties [3] ----------------------------------
+      ⍝ execution properties [3] ----------------------------------
 
       0 0 1 0 ⎕FX 'Z←FACTR B' 'Z←!B'
 FACTR
 
-⍝     S∆FACTR←1
+      ⍝     S∆FACTR←1
       FACTR 4
 24
 
-⍝ execution properties [4] ----------------------------------
+      ⍝ execution properties [4] ----------------------------------
 
       0 0 0 1 ⎕FX 'Z←L INDEX R' 'Z←R[L]'
 INDEX
@@ -136,13 +159,295 @@ INDEX[1]  Z←R[L]
             ^^
       →
 
+      ⍝ Regression (Blake McBride, LanguageVariances.md #30, 2026-08-10):
+      ⍝ execution properties must be inherited ("or-ed") from every
+      ⍝ CALLING function too (apl2lrm.txt p.360-361), not just applied to
+      ⍝ the function that carries them -- distinct from the "0 1 0 0 bar"
+      ⍝ case above, where bar's OWN nonsuspendable property does NOT
+      ⍝ propagate back up to its caller foo. Here it is the CALLER (CV /
+      ⍝ FF2) that carries the property, and it must propagate DOWN to the
+      ⍝ callee (GG) it invokes.
+      ⍝
+      )ERASE GG CV
+      ⊣⎕FX 'GG' 'ZZZUNDEF'
+      ⊣0 0 0 1 ⎕FX 'CV' 'GG'      ⍝ CV converts non-resource errors to DOMAIN
+      CV
+DOMAIN ERROR+
+GG[1]  ZZZUNDEF
+       ^
+
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕ET depends on the test harness
+      ⎕ET
+5 4
+
+      →
+
+      )ERASE GG FF2
+      ⊣⎕FX 'GG' '!¯3'
+      ⊣0 1 0 0 ⎕FX 'FF2' 'GG'     ⍝ FF2 is nonsuspendable
+      ]FILE_CTL NO_SKIP
+      FF2
+DOMAIN ERROR
+      GG
+      ^^
+
+      ⍝ nothing suspended: FF2's nonsuspendable property propagated to GG
+      ⍝
+      )SI
+*
+
       )CHECK
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+      ⍝ Bugs28 #16 regression: redefining a function that is bound as
+      ⍝ the LO/RO operand of a *suspended* defined operator must be
+      ⍝ refused, the same as for a function that is itself suspended/
+      ⍝ executing -- otherwise the suspended frame is left holding a
+      ⍝ dangling Function* (SEGFAULT at the next )CHECK).
+      ⍝
+      )CLEAR
+CLEAR WS
 
-⍝ ==================================
+      ⎕FX 'Z←FN16 B' 'Z←B'
+FN16
+
+      ⎕FX 'Z←A (LO OP2 RO) B' 'Z←A LO RO B'
+OP2
+
+      ⊥ OP2 FN16 0                  ⍝ VALUE ERROR; OP2[1] suspended with RO←FN16
+VALUE ERROR+
+OP2[1]  Z←A LO RO B
+          ^
+
+      ⍝ refused: ⎕FX returns an error line, not the function's name
+      ⍝
+      ⎕FX 'Z←FN16 B' 'Z←B+1'
+1
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ once the suspended frame is gone, FN16 is unaffected
+      ⍝
+      )SIC
+      FN16 5
+5
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ regression (Blake McBride, Bugs28 #69, 2026-08-11): ⎕FX (and ∇)
+      ⍝ used to accept a function whose name starts with λ (e.g. λ1) as
+      ⍝ if it were an ordinary function -- is_lambda() goes by name alone,
+      ⍝ so such a function reported itself as a genuine, machine-generated
+      ⍝ lambda without ever having been through the actual lambda
+      ⍝ bookkeeping (refcount etc.), corrupting later ⎕NC/⎕EX/)ERASE/)OFF
+      ⍝ handling. λ is reserved for lambdas, same as λ←5 is already
+      ⍝ refused for variables; now DEFN ERROR at fix/edit time instead.
+      ⍝
+      Z←⎕FX 'Z←λ1 B' 'Z←9'
+      Z
+1
+      ⎕NC 'λ1'
+¯1
+
+∇Z←λ2 B
+DEFN ERROR+
+      ∇Z←λ2 B
+            ^
+ Z←9
+∇
+DEFN ERROR+
+      ∇
+      ^
+      ⎕NC 'λ2'
+¯1
+
+      ⍝ regression (Blake McBride, Bugs28 #70, 2026-08-11): ⎕FX (and ∇)
+      ⍝ used to accept a label that duplicates a header name (so the
+      ⍝ label silently shadowed the argument/result) or another label (so
+      ⍝ the last one silently won and the earlier one became unreachable)
+      ⍝ -- ISO 13751 / APL2 require header names and labels to all be
+      ⍝ distinct. Now refused at fix time (the ⎕FX result is the
+      ⍝ offending row number, and the function is not defined at all).
+      ⍝ Bugs35 #54: quietly, like any other bad line (no DEFN ERROR is
+      ⍝ printed while ⎕FX returns the row anyway).
+      ⍝
+      Z1←⎕FX 'Z←F70a B' 'Z←B' 'B:'
+      Z1
+3
+      ⎕NC 'F70a'
+0
+
+      Z2←⎕FX 'Z←F70b B' '→X' 'Z←0' 'X:Z←1' '→0' 'X:Z←2'
+      Z2
+6
+      ⎕NC 'F70b'
+0
+
+      Z3←⎕FX 'Z←F70c B' 'Z←B' 'Z:'
+      Z3
+3
+      ⎕NC 'F70c'
+0
+
+      ⍝ regression (Bugs28 #89): ⎕FX / ∇ accepted ⍺ ⍵ ⍶ ⍹ χ as a
+      ⍝ function or argument name -- the tokenizer gives these their own
+      ⍝ distinguished Symbol (not an ordinary SymbolTable entry), but
+      ⍝ they still carry the generic TC_SYMBOL class every header
+      ⍝ position's "is this a symbol" check accepted. The function
+      ⍝ became callable under the reserved name, yet could not be
+      ⍝ listed, expunged, or saved, and every redefinition leaked the
+      ⍝ previous body. is_system_var() (UserFunction_header.cc) now
+      ⍝ rejects them at every header position, the same way it already
+      ⍝ rejected ⎕-names.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
+      ⎕NC '⍵'
+6
+
+      ]FILE_CTL NO_SKIP
+      ⎕FX 'Z←⍵ B' 'Z←B+1'
+1
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension; ⎕NC of GNU APL names/classes differs
+      ⎕NC '⍵'
+6
+
+      ⍵ 5
+VALUE ERROR+
+      ⍵ 5
+      ^
+
+      )MORE
+Offending symbol: ⍵ (U+2375)
+
+      ⍝ control: the same bad name is rejected as F2's left operand too
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ⎕FX 'Z←F ⍺' 'Z←⍺+1'
+1
+
+      ⍝ regression (Bugs28 #100(b)): ⍞ has its own distinguished Symbol
+      ⍝ (Workspace::get_v_Quad_QUOTE()), tokenized separately from (and
+      ⍝ not covered by) Avec::is_quad()'s plain ⎕ check, even though ⍞
+      ⍝ is exactly as much a distinguished name as ⎕ itself -- so it was
+      ⍝ still accepted here even after the #89 fix above.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
+      ⎕NC '⍞'
+5
+
+      ]FILE_CTL NO_SKIP
+      ⎕FX 'Z←F1 ⍞' 'Z←B'
+1
+
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
+      ⎕NC '⍞'
+5
+
+      ⍝ control: ⍺ used as an operator's bracket-axis subject (not F0/
+      ⍝ F1/F2/LO/OP/A/B/Z itself) was already correctly rejected before
+      ⍝ this fix -- kept here for contrast with the cases just above.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ⎕FX 'Z←⍺[X]B' 'Z←X'
+1
+
+      ⍝ regression (Bugs28 #92): monadic ⎕FX silently replaced a locked
+      ⍝ function (UserFunction::fix()'s cant_be_defined() guard tested
+      ⍝ only is_called()/name-class, never the lock bit, unlike the ∇
+      ⍝ editor's own check), and the replacement was not itself locked;
+      ⍝ 10⎕CR and both ⎕TF forms had no lock test at all and disclosed
+      ⍝ the full body. Dyadic ⎕FX (with an explicit properties left
+      ⍝ argument) is deliberately exempt -- that IS the documented way
+      ⍝ to change a locked function's properties, including its lock
+      ⍝ bit, and testcases/Quad_FX.tc's own "execution properties"
+      ⍝ regression above already relies on it.
+      ⍝
+      1 0 0 0 ⎕FX 'Z←M B' 'Z←B+2'
+M
+
+      ⎕CR 'M'
+      10 ⎕CR 'M'
+DOMAIN ERROR+
+      10 ⎕CR 'M'
+      ^  ^
+
+      )MORE
+10 ⎕CR: 'M' is locked; its definition cannot be disclosed.
+
+      1 ⎕TF 'M'
+DOMAIN ERROR+
+      1 ⎕TF 'M'
+      ^ ^
+
+      )MORE
+⎕TF: 'M' is locked; its definition cannot be disclosed.
+
+      2 ⎕TF 'M'
+DOMAIN ERROR+
+      2 ⎕TF 'M'
+      ^ ^
+
+      )MORE
+⎕TF: 'M' is locked; its definition cannot be disclosed.
+
+      ⎕FX 'Z←M B' 'Z←99'
+DEFN ERROR+
+      ⎕FX 'Z←M B' 'Z←99'
+      ^
+
+      )MORE
+Attempt to re-define locked function 'M'. ⎕EX it first.
+
+      )SIC
+
+      ⍝ control: dyadic ⎕FX with an explicit properties vector may
+      ⍝ still redefine (and, here, unlock) M
+      ⍝
+      0 0 0 0 ⎕FX 'Z←M B' 'Z←88'
+M
+
+      ⎕CR 'M'
+Z←M B
+Z←88 
+
+      )ERASE M
+
+      ⍝ regression (Bugs28 #100(i), Bugs35 #55): a '...' (or "..." or «...»)
+      ⍝ string that never closes on its own function-body line is rejected,
+      ⍝ regardless of the OLD-MULTI-LINE-STRINGS preference (which only
+      ⍝ allows "..." strings spanning several lines, joined before
+      ⍝ tokenization). See also verify_old_multi_line_strings.sh.
+      ⍝
+      )ERASE ZZ100I
+      ⎕FX 'ZZ100I' 'A←''abc' 'B←5'
+2
+
+      ⎕FX 'ZZ100I' 'A←«abc' 'B←5'
+2
+
+      ⎕NC 'ZZ100I'
+0
+
+      ⎕FX 'Z←ZZ100I' 'Z←"abc' 'def"'
+ZZ100I
+
+      ZZ100I
+ abc def 
+
+      )ERASE ZZ100I
+
+      ⍝ ==================================
 
 

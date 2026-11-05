@@ -1,6 +1,8 @@
 ⍝ Power.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       4⋆3
 64
 
@@ -13,7 +15,7 @@
       10⋆1
 10
 
-⍝ roots ----------------------------------
+      ⍝ roots ----------------------------------
 
       5*¯2
 0.04
@@ -49,8 +51,8 @@ DOMAIN ERROR
 
       (2J0⋆999)⋆2
 DOMAIN ERROR
-      (2⋆999)⋆2
-      ^      ^
+      (2J0⋆999)⋆2
+      ^        ^
 
       (0J2⋆999)⋆2
 DOMAIN ERROR
@@ -59,5 +61,141 @@ DOMAIN ERROR
 
       )SIC
 
-⍝ ==================================
+      ⍝ Bugs28 #39 regression (Bugs27 #24 residual): ¯1⋆B for an
+      ⍝ integral B ≥ 2⋆63 returned complex noise instead of the exact
+      ⍝ real result. The #24 fix's exact-integer path only applies
+      ⍝ when B fits an int64_t (|B| < 9.2E18); a larger B fell through
+      ⍝ to complex_power() = exp(B×ln A), whose imaginary part B×π is
+      ⍝ pure rounding noise at that magnitude. Every double of
+      ⍝ magnitude ≥ 2⋆53 is necessarily an EVEN integer (a double's
+      ⍝ mantissa has only 52 bits, so the ulp is already ≥ 2 by then),
+      ⍝ so A⋆B for A<0 and such a B is real and positive, exactly
+      ⍝ pow(|A|,B) -- no parity trick or complex path needed. Fixed in
+      ⍝ FloatCell::bif_power_ff().
+      ⍝
+      ¯1*1E20
+1
+
+      ¯1*1E300
+1
+
+      ⍝ control: below 2⋆63, the exact int64 path was already correct
+      ⍝
+      ¯1*1E15+1
+¯1
+
+      ⍝ Bugs28 #40 regression (Bugs27 #24/#59(a) residual): a
+      ⍝ complex-typed power with an integral exponent went through
+      ⍝ exp/log noise instead of the exact repeated-squaring path,
+      ⍝ whenever either operand was complex-TYPED even if really a
+      ⍝ real number (e.g. 52J0, or a real A with a FloatCell-typed B
+      ⍝ promoted to complex for the call, like ¯1J0⋆1E14). Fixed in
+      ⍝ ComplexCell::bif_power_cc(): when both A and B are really real
+      ⍝ (zero imaginary part), delegate entirely to
+      ⍝ FloatCell::bif_power_ff() -- which already computes this
+      ⍝ exactly for every magnitude of B, including the huge-exponent
+      ⍝ case of Bugs28 #39; when only A is genuinely complex, route a
+      ⍝ real integral B through bif_power_ci()'s exact
+      ⍝ binary-exponentiation instead.
+      ⍝
+      ⎕PP←17
+      2*52J0
+4503599627370496
+
+      5*5J0
+3125
+
+      10*2J0
+100
+
+      ¯1J0*1E14
+1
+
+      ⎕PP←10
+
+      ⍝ regression (Bugs28 #84): 0⋆B checked only b.real() == 0.0 to
+      ⍝ decide "B is 0" and return 1, so any purely-imaginary B (0⋆0J1,
+      ⍝ 0⋆0J¯1) or a B with real part 0 but a nonzero imaginary part
+      ⍝ (0J0⋆0J1) wrongly gave 1 too. 0⋆B is 1 only for B exactly 0J0;
+      ⍝ for any other B with a non-positive real part it is undefined
+      ⍝ (0⋆¯1J1 already correctly gave DOMAIN ERROR, for comparison).
+      ⍝
+      0*0J1
+DOMAIN ERROR
+      0⋆0J1
+      ^^
+
+      0*0J¯1
+DOMAIN ERROR
+      0⋆0J¯1
+      ^^
+
+      0J0*0J1
+DOMAIN ERROR
+      0J0⋆0J1
+      ^  ^
+
+      0*¯1J1
+DOMAIN ERROR
+      0⋆¯1J1
+      ^^
+
+      )SIC
+
+      ⍝ regression (Bugs28 #100(o)): bif_power_ci()'s exact-repeated-
+      ⍝ multiplication path (used for |exponent| ≤ 1024) squared first
+      ⍝ and inverted afterwards for a negative exponent, so the
+      ⍝ intermediate squaring could already overflow to infinity (here
+      ⍝ (1E200)² = 1E400) even though the true, inverted result is
+      ⍝ finite -- unlike the real (non-complex) path, which already
+      ⍝ handles this correctly (Bugs27 #23).
+      ⍝
+      1E200J0*¯2
+0
+
+      1E200*¯2
+0
+
+      ⍝ control: an ordinary, non-overflowing case is unaffected
+      ⍝
+      3J4*¯2
+¯0.0112J¯0.0384
+
+      ⍝ regression (Blake McBride, Bugs31 #10): 0J1⋆N (or 0J¯1⋆N) for an
+      ⍝ integer N above the exact-repeated-squaring cutoff (1024) fell
+      ⍝ through to complex_power()=exp(N×ln a), whose N×π/2 intermediate
+      ⍝ loses precision as N grows, corrupting even an exactly
+      ⍝ representable unit-circle result. 0J1/0J¯1 are now recognized as
+      ⍝ exact fourth roots of unity and computed from N mod 4 directly,
+      ⍝ for any magnitude of N.
+      ⍝
+      ⎕PP←17
+
+      0J1*1024
+1
+      0J1*1025
+0J1
+      0J1*1000000
+1
+      0J1*1E15
+1
+      0J1*1E15+1
+0J1
+      0J1*¯1
+0J¯1
+      0J1*¯2
+¯1
+      0J¯1*3
+0J1
+
+      ⍝ control: a moderate exponent (exact-squaring path) is unaffected
+      ⍝
+      0J1*3
+0J¯1
+      0J1*4
+1
+
+      ⎕PP←10
+
+      ⍝ ==================================
 

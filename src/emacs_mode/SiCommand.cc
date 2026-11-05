@@ -27,6 +27,7 @@
 #include "../StateIndicator.hh"
 
 #include <sstream>
+//════════════════════════════════════════════════════════════════════════════
 
 void SiCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -38,3 +39,4 @@ void SiCommand::run_command( NetworkConnection &conn, const std::vector<std::str
 
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

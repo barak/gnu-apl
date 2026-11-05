@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 #include <ostream>
 
 #include "Assert.hh"
-#include "FileBuffers.hh"
+#include "StreamBuffers.hh"
 #include "UCS_string.hh"
 
 using namespace std;
@@ -45,30 +45,31 @@ using namespace std;
          │
          │
          V
-     ┌───────┐             ┌───────────────────┐
-     │ Input │  <────────  │ testcase files(s) │
-     └───┬───┘             └───────────────────┘
-         │                           │
-         │                           │
-         V                           │
-      ┌─────┐                        │
-      │ APL │                        │
-      └──┬──┘                        │
-         │                           │
-         │      -T testcase          │
-         ├───────────────────────┐   │
-         │                       │   │
-         │                       V   V
-         │                    ┌─────────┐
-         │                    │ compare │
-         │                    └────┬────┘
-         │                         │
-         │                         │
-         V                         V
-       (COUT)                (test results)
-
+     ┌───────┐                              ┌───────────────────┐
+     │ Input │  <─────────────┬─────────────┤ testcase files(s) │
+     └───┬───┘                │             │        *.tc       │
+         │                    │            └───────────────────┘
+         │                    │
+         V                    │
+      ┌─────┐                 │
+      │ APL │                 │
+      └──┬──┘                 │
+         │                    │
+         │  -T testcase       │
+         ├────────────────┐   │
+         │                │   │
+         │                V   V
+         │             ┌─────────┐
+         │             │ compare │
+         │             └────┬────┘
+         │                  │
+         │                  │
+         V                  V
+       (COUT)           (test results)
+                        (  *.tc.log  )
  */
 
+//════════════════════════════════════════════════════════════════════════════
 /** the output of the APL interpreter to cout and maybe to a test result file
  **/
 /// The class handling all output from the APL interpreter
@@ -87,21 +88,76 @@ public:
 
    enum { MAX_ESC_LEN = 100 };   ///< max. length of an ESC sequence
 
-   /// set the color mode (if colors_enabled). Outputs the escape sequence
-   /// for \b mode when the color mode changes
-   static void set_color_mode(ColorMode mode);
+   /// true if xterm/color is ON
+   static bool color_enabled()
+      { return colors_enabled; }
 
-   /// reset() dout_filebuf
-   static void reset_dout();
+   /// return the current column (chars since last LF).
+   static int get_column()
+       { return output_column; }
+ 
+   /// advance or reset the output_column according to (possibly UTF8-encoded)
+   //  output byte \b cc.
+   static void set_column(char cc)
+      {
+        if      (cc == '\n')             output_column = 0;
+        else if ((cc & 0x80) == 0)       ++output_column;   // ASCII
+        else if ((cc & 0xC0) == 0xC0)    ++output_column;   // first UTF
+      }
+
+   /// add spaces until \b column is reached
+   static void indent(int column)
+      // fputc() directly on the real stderr, not "cerr << ' '" -- kept
+      // consistent with ErrOut_streambuf::overflow()/Output::
+      // set_color_mode() (Output.cc), which write this way for a real
+      // reason (see ErrOut_streambuf's class comment in StreamBuffers.hh);
+      // plain std::cerr itself was never actually broken (Paul Rockwell,
+      // macOS 27, 2026-09-25/26), so this is a consistency choice here,
+      // not a fix for anything.
+      //
+      {
+        while (output_column < column)
+           {
+             fputc(' ', stderr);
+             ++output_column;
+           }
+      }
+
+   /// initialize terminal output (ANSI sequences)
+   /// @param logit true to log initialization steps to the startup log
+   static void  init(bool logit);
 
    /// reset colors to black and white
    static void reset_colors();
 
-   /// set or toggle color mode (implementation of command ]XTERM)
-   static void toggle_color(const UCS_string & arg);
+   /// mark CERR unsafe to use via get_CERR() from here on. Must be called
+   /// (via atexit(), see main.cc) before static destruction begins: within
+   /// Output.cc, ostream CERR is destroyed *before* ErrOut_streambuf
+   /// CERR_streambuf (constructed first, so -- per C++'s reverse-order-of-
+   /// construction destruction rule -- destroyed last), which left a real
+   /// window where ErrOut_streambuf::used was still true, and therefore
+   /// get_CERR() still returned CERR, after CERR itself had already been
+   /// destroyed. Any code reachable from another global's destructor during
+   /// that window (an Assert() failure, most plausibly) was reading through
+   /// an already-destroyed ostream -- undefined behavior, in practice a
+   /// crash after )OFF or at any other static-teardown exit path.
+   //
+   static void mark_CERR_unsafe()
+      {
+        ErrOut_streambuf::used = false;
+      }
 
-   /// initialize curses library
-   static void  init(bool logit);
+   /// reset() dout_filebuf
+   static void reset_dout();
+
+   /// set the color mode (if colors_enabled). Outputs the escape sequence
+   /// for \b mode when the color mode changes
+   /// @param mode the new color mode to apply
+   static void set_color_mode(ColorMode mode);
+
+   /// set or toggle color mode (implementation of command ]XTERM)
+   /// @param arg UCS string argument from the ]XTERM command
+   static void toggle_color(const UCS_string & arg);
 
    /// escape sequence for CIN colors
    static char color_CIN[MAX_ESC_LEN];
@@ -123,25 +179,25 @@ public:
 
    /// background color for CIN
    static int color_CIN_background;
- 
+
    /// foreground color for COUT
    static int color_COUT_foreground;
 
    /// background color for COUT
    static int color_COUT_background;
- 
+
    /// foreground color for CERR
    static int color_CERR_foreground;
 
    /// background color for CERR
    static int color_CERR_background;
- 
+
    /// foreground color for UERR
    static int color_UERR_foreground;
 
    /// background color for UERR
    static int color_UERR_background;
- 
+
    /// escape sequence for clear to end of line
    static char clear_EOL[MAX_ESC_LEN];
 
@@ -196,17 +252,13 @@ public:
    /// default ESC sequence for Delete key with SHIFT and/or CTRL
    static char ESC_Delete_1[MAX_ESC_LEN];
 
-   /// true if xterm/color is on
-   static bool color_enabled();
+   /// true if stdout is a real terminal (computed once, in Output::init())
+   static bool stdout_is_tty;
 
-   /// return the current column (chars since last LF).
-   static int get_column()
-       { return output_column; }
-
+protected:
    /// the current output column
    static int output_column;
 
-protected:
    /// true if colors were changed (and then reset_colors() shall reset
    /// them when leaving the interpreter
    static bool colors_changed;
@@ -223,10 +275,12 @@ class CIN_ostream : public ostream
 {
 public:
    CIN_ostream()
-   : ostream(&CIN_filebuf)
+   : ostream(&CIN_streambuf)
    {}
 
    /// set cursor to y:x (upper left corner is 0:0, negative y: from bottom)
+   /// @param y row position (0 = top; negative counts from bottom)
+   /// @param x column position (0 = leftmost column)
    void set_cursor(int y, int x);
 
    /// clear to end of line
@@ -241,6 +295,7 @@ public:
    ostream & clear_EOS()
       { return *this << Output::clear_EOS; }
 };
+//════════════════════════════════════════════════════════════════════════════
 extern CIN_ostream CIN;
 
 #endif // __OUTPUT_HH_DEFINED__

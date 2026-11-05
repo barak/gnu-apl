@@ -1,9 +1,13 @@
 ⍝ COPY.tc
 ⍝ ----------------------------------
 
-)CLEAR
+⍝@ test3.
+
+      )CLEAR
 CLEAR WS
 
+      )DROP COPY_tc
+³
 
 ∇Z←A FUN1 B
  Z←'1'
@@ -13,21 +17,21 @@ CLEAR WS
  Z←'2'
 ∇
 
-VAR1←'V1'
-VAR2←'V2'
-VAR3←1 (2 3)
+      VAR1←'V1'
+      VAR2←'V2'
+      VAR3←1 (2 3)
 
-)WSID COPY_tc
+      )WSID COPY_tc
 WAS CLEAR WS
 
-)DUMP COPY_tc
+      )DUMP COPY_tc
 ³
 
-)CLEAR
+      )CLEAR
 CLEAR WS
 
-⍝ selective COPY. Make sure that only FUN1, VAR2 and VAR3 are being copies
-)COPY COPY_tc.apl FUN1 VAR2 VAR3
+      ⍝ selective COPY. Make sure that only FUN1, VAR2 and VAR3 are being copies
+      )COPY COPY_tc.apl FUN1 VAR2 VAR3
 DUMPED ³
 
 )VARS
@@ -45,6 +49,124 @@ VAR3
 FUN1 4
 1
 
+      ⍝ regression (Roy Tobin, bug-apl@gnu.org, 2026-08-04 and 2026-08-07):
+      ⍝ )COPY/)LOAD of a file that fails every format sniff right at
+      ⍝ offset 0 (e.g. /dev/null: opens fine, but is truly zero bytes)
+      ⍝ used to leave XML_Loading_Archive's tag_name/attributes/end_attr
+      ⍝ members uninitialized -- next_tag() hits EOF before ever setting
+      ⍝ them, but nothing checked that, so is_tag()/print_tag() went on
+      ⍝ to read through the garbage pointer. Reproducibly a SEGFAULT
+      ⍝ under valgrind (deterministic there: the uninitialized tag_name
+      ⍝ reads back as exactly NULL) and allocator-layout-dependent
+      ⍝ without it. Fixed by zero-initializing all three in the
+      ⍝ constructor and guarding is_tag() against tag_name==0.
+      ⍝
+      ⍝ Separately: Sys.hh checked #if HAVE_MMAN_H but configure.ac only
+      ⍝ ever defines HAVE_SYS_MMAN_H, so the real mmap()-based Sys::mmap()
+      ⍝ had never been compiled into any build -- every build silently
+      ⍝ used a read()-based fallback instead. With that typo fixed, the
+      ⍝ real mmap() started being used, and mmap()ing 0 bytes is invalid
+      ⍝ (POSIX: EINVAL) -- Archive.cc's XML_Loading_Archive constructor
+      ⍝ treated *any* mmap() failure as WS_FULL, so a merely-empty file
+      ⍝ was misdiagnosed as "workspace file could not be mapped" instead
+      ⍝ of "wrong format" (caught by Roy again, 2026-08-07: incorrectly
+      ⍝ accepted as "intentional" in an earlier version of this comment
+      ⍝ -- it was not). Fixed by checking file_length==0 explicitly
+      ⍝ before ever calling mmap(), matching the "diagnose as wrong
+      ⍝ format" behavior of every other unrecognized-content file.
+      ⍝
+      ⍝ A related bug Roy found in the same report: even for a file that
+      ⍝ *is* correctly diagnosed (e.g. /etc/hosts, "does not have the
+      ⍝ format ..."), )COPY/)LOAD had no way to know the constructor had
+      ⍝ already rejected the content, so execution fell through into
+      ⍝ read_Workspace() anyway and produced a second, confusing error
+      ⍝ ("Got tag ... when expecting tag Workspace ... DOMAIN ERROR").
+      ⍝ Fixed by adding XML_Loading_Archive::is_valid_format() (false
+      ⍝ once the constructor prints the format diagnostic) and checking
+      ⍝ it in Workspace::copy_WS()/load_WS() right after the existing
+      ⍝ is_open() check, returning immediately instead of proceeding.
+      ⍝
+      ⍝ The file-format diagnostic itself goes to CERR (not compared
+      ⍝ here, like other CERR-only warnings elsewhere in this suite);
+      ⍝ with both fixes, )COPY/)LOAD /dev/null no longer raise any APL
+      ⍝ error at all (nothing left to WS_FULL or fall through on), so
+      ⍝ neither needs ]EXPECT any more.
+      ⍝
+      )COPY /dev/null
+      )SIC
+
+      )LOAD /dev/null
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ same regression, but for a *non-empty* file that fails the format
+      ⍝ check (i.e. the /etc/hosts case from Roy's report, reproduced
+      ⍝ with a self-contained scratch file instead of a system path):
+      ⍝ before the is_valid_format() fix, )COPY still printed the
+      ⍝ correct diagnostic but then fell through into read_Workspace()
+      ⍝ anyway, raising a second, confusing "Got tag ... when expecting
+      ⍝ tag Workspace ... DOMAIN ERROR". )SI below (nothing suspended,
+      ⍝ so no output at all) confirms neither that nor any other error
+      ⍝ was raised.
+      H←'w' ⎕FIO[3] '/tmp/COPY_test_garbage.xml'
+      R←('not xml content, deliberately wrong format') ⎕FIO[7] H
+      ⎕FIO[4] H
+0
+      )COPY /tmp/COPY_test_garbage.xml
+      )SI
+      R←⎕FIO[19] '/tmp/COPY_test_garbage.xml'
+
+      ⍝ regression (David Alden, bug-apl@gnu.org, 2026-09-27): )PCOPY of a
+      ⍝ )DUMPed (.apl) workspace behaved exactly like )COPY, silently
+      ⍝ overwriting an already-existing variable/function of the same name
+      ⍝ instead of protecting it, as documented ("Protective )COPY. Same as
+      ⍝ )COPY above, but not overwriting existing defined functions and
+      ⍝ variables"). Root cause: )COPY/)PCOPY of a )DUMPed file re-executes
+      ⍝ its source lines through InputFile::COPY_filter, which only ever
+      ⍝ checked object *names* against an explicit )COPY object list and
+      ⍝ had no concept of protection at all -- and the filter was skipped
+      ⍝ entirely whenever there was no explicit object list, exactly the
+      ⍝ common "'')PCOPY wsname'' with no object names" case reported here.
+      ⍝ The )SAVEd (.xml) )PCOPY path was already correct (Archive.cc's
+      ⍝ read_Symbol() checks protection independently of any object list);
+      ⍝ only the )DUMPed (.apl) path shared none of that logic. Fixed by
+      ⍝ adding a protection flag to InputFile::COPY_filter, consulting
+      ⍝ Workspace::lookup_existing_symbol() from both the function- and
+      ⍝ variable-name branches of check_filter(), and running the filter
+      ⍝ whenever protection is requested even without an explicit object
+      ⍝ list.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )DROP PCOPY_tc
+³
+
+      PVAR←'old'
+      )WSID PCOPY_tc
+WAS CLEAR WS
+
+      )DUMP PCOPY_tc
+³
+
+      )CLEAR
+CLEAR WS
+
+      PVAR←'new'
+      )PCOPY PCOPY_tc.apl
+DUMPED ³
+
+      ⍝ PVAR must still be 'new' (protected: not overwritten by the 'old'
+      ⍝ value from PCOPY_tc.apl)
+      PVAR
+new
+
+      )DROP PCOPY_tc.apl
+³
 
 ⍝ ==================================
 

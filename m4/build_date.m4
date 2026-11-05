@@ -22,9 +22,9 @@ apl_BUILD_OS=$(uname -s -r -m)          # current OS
 
 AS_IF( [test -n "$SOURCE_DATE_EPOCH"],
        [ apl_BUILD_OS="none"
-         apl_BUILD_DATE=             $(
-                   dash_format_date -u -d "$SOURCE_DATE_EPOCH" 2>/dev/null ||
-                   dash_format_date -u -r $SOURCE_DATE_EPOCH  ||
+         apl_BUILD_DATE=$(
+                   dash_format_date -u -d "@$SOURCE_DATE_EPOCH" 2>/dev/null ||
+                   dash_format_date -u -r "$SOURCE_DATE_EPOCH"  2>/dev/null ||
                    dash_format_date -u)
        ])
 AC_SUBST([apl_BUILD_DATE])

@@ -1,6 +1,8 @@
 ⍝ Quad_EA.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       '⍳3' ⎕EA '⍳4.5'
 1 2 3
  
@@ -12,8 +14,8 @@
 DOMAIN ERROR
       ⍳3.3
       ^
-⍝     '⍳3.3' ⎕EA '⍳4.5'
-⍝     ^      ^
+      ⍝     '⍳3.3' ⎕EA '⍳4.5'
+      ⍝     ^      ^
 
       →
 
@@ -52,8 +54,8 @@ foo_fails[1]  ÷0
 0 2 2 1 0
       )SIC
 
-   ⍝ ⎕EA with branch ----------------------------------
-   ⍝
+      ⍝ ⎕EA with branch ----------------------------------
+      ⍝
 ∇FOO_branch
  'line-1'
  '→ERR' ⎕EA '++'
@@ -82,7 +84,7 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ Escape ----------------------------------
+      ⍝ Escape ----------------------------------
 
       )SIC
       )CHECK
@@ -118,5 +120,162 @@ REACHED: FOO(LP)
 
       →
 
-⍝ ==================================
+      ⍝ regression (Blake McBride, LanguageVariances.md #27, 2026-08-11):
+      ⍝ lrm p.278-279: "Executes R. If R fails or is interrupted,
+      ⍝ executes L." A branch inside R that lands outside its caller's
+      ⍝ own range (here: immediate execution, so any →N is "outside")
+      ⍝ must fall back to L, per lrm p.349 Figure 38 ("0 or any other
+      ⍝ line number not within the function... flow of execution
+      ⍝ returns to the invoking expression"). handle_QUAD_ES_BRA()
+      ⍝ (Prefix.cc) used to just discard StateIndicator::jump()'s
+      ⍝ result instead of acting on it, silently dropping the branch.
+      ⍝
+      Z←'3×2' ⎕EA '→0'
+      Z
+6
+
+      ⍝ regression: L, executed as the fallback, itself failing with a
+      ⍝ real error is handled correctly (handle_QUAD_ES_ERR).
+      ⍝
+      Z←'!¯3' ⎕EA '!¯5'
+DOMAIN ERROR
+      !¯3
+      ^
+
+      →
+
+      ⍝ regression (Blake McBride, LanguageVariances.md #27, 2026-08-11):
+      ⍝ R fails, falls back to L, and L itself is a branch with nowhere
+      ⍝ real to go (immediate execution, no suspended function) -- lrm
+      ⍝ p.349 Figure 38 says this means "flow of execution returns to
+      ⍝ the invoking expression", i.e. a clean, valueless completion,
+      ⍝ not an error. Bif_F1_EXECUTE::execute_statement('→0') pushes a
+      ⍝ real )SI for the branch (unlike a foldable value expression);
+      ⍝ that )SI is now marked via StateIndicator::set_void_on_orphan_
+      ⍝ branch() so Command.cc's ordinarily-correct "→N without
+      ⍝ function" SYNTAX ERROR check treats it as void instead.
+      ⍝
+      '→0' ⎕EA 'Z←!¯3'
+      1+1
+2
+
+      ⍝ regression: the fallback L branching to a REAL, in-range label
+      ⍝ of the calling function must still work normally (confirms the
+      ⍝ new void-on-orphan-branch marker only fires when there is truly
+      ⍝ nothing to resume into, not whenever L happens to be a branch).
+      ⍝
+      )ERASE G8
+∇Z←G8 X
+ Z←'→L1' ⎕EA 'UNDEFINED_NAME_XYZ'
+ Z←999
+ →0
+L1: Z←-1
+∇
+      G8 5
+¯1
+
+      )ERASE G8
+
+      ⍝ Bugs28 #56 regression (Bugs27 #36 residual): ⎕EM after a
+      ⍝ failing ⎕EA showed the correct error NAME (row 1, e.g. DOMAIN
+      ⍝ ERROR) but 2 BLANK rows instead of the failed statement text
+      ⍝ and its carets -- ⎕ET (which only needs the numeric code) was
+      ⍝ already right. Root cause: the ⎕EA macro (Macro.def's
+      ⍝ Z__A_Quad_EA_B) forwards only ⎕EC's numeric ET (major/minor)
+      ⍝ to ⎕ES on the error path, never its RES (μ9) -- which
+      ⍝ Quad_EC::eoc() ALSO populates, even on the error branch, with
+      ⍝ the same 3-line ⎕EM-shaped message ⎕EM itself would show.
+      ⍝ Prefix::execute_EA_fallback() then reconstructed a bare,
+      ⍝ code-only Error from scratch, with no way to recover that
+      ⍝ text. Fixed by forwarding μ9 as a 6th ⎕ES payload element and
+      ⍝ having Prefix::handle_QUAD_ES_ERR() recover the failed-
+      ⍝ statement text and caret positions from it.
+      ⍝
+      '⎕EM' ⎕EA '1÷0'
+DOMAIN ERROR
+      1÷0   
+      ^^    
+
+      ⍝ control: ⎕ET was already correct
+      ⍝
+      '⎕ET' ⎕EA '1÷0'
+5 4
+
+      ⍝ same check, but at top level (A is just '1', then ⎕EM/⎕ET are
+      ⍝ queried in the same statement so the error is still current)
+      ⍝
+      '1' ⎕EA '1÷0' ⋄ ⎕EM ⋄ ⎕ET
+1
+DOMAIN ERROR
+      1÷0   
+      ^^    
+5 4
+
+      ⍝ regression (Blake McBride, Bugs31 #7) -- CLOSED AS NOT A BUG
+      ⍝ (2026-09-29, after discussion with the user): an SI-modifying
+      ⍝ command as the A operand -- reached only when B fails, ⎕EA's
+      ⍝ whole point -- reaches Command.cc and really executes, e.g.
+      ⍝ ')OFF' ⎕EA '1÷0' really ends the session. An earlier session
+      ⍝ "fixed" this by catching E_COMMAND_PUSHED in
+      ⍝ Prefix::execute_EA_fallback() and turning it into a DOMAIN_ERROR
+      ⍝ instead -- that was wrong and has been reverted. ⎕EC/⎕EA/⎕EB
+      ⍝ exist to make EXECUTION ERRORS in the controlled operand (B)
+      ⍝ reportable, not to veto what the program explicitly asks A to
+      ⍝ do -- ')OFF' ⎕EA INIT ("run INIT; if it fails, don't continue
+      ⍝ in a half-initialized workspace") is a legitimate, intentional
+      ⍝ pattern, and A is documented to execute exactly as if directly
+      ⍝ executed, unlike the sandboxed B. E_COMMAND_PUSHED is not a
+      ⍝ hazard needing a guard here: it is the same, already-safe,
+      ⍝ generic mechanism used for a plain execution of an SI-modifying
+      ⍝ command at any call depth (Bif_F1_EXECUTE.cc throws it; only
+      ⍝ Command.cc's main loop catches it, once the stack is already
+      ⍝ fully and safely unwound) -- catching it one frame early here
+      ⍝ just short-circuited that.
+      ⍝
+      ⍝ )OFF/)CLEAR/)SAVE themselves can't be exercised for real in this
+      ⍝ shared-process test suite (they would end or corrupt the *whole*
+      ⍝ test3 run, not just this file) -- verified live instead, outside
+      ⍝ the harness: ')OFF' ⎕EA '1÷0' (B failing) cleanly exits the
+      ⍝ session (no "still alive" line reached afterward). )SIC is on
+      ⍝ the same guarded-command list (Bif_F1_EXECUTE.cc) and goes
+      ⍝ through the identical E_COMMAND_PUSHED path, but only clears the
+      ⍝ )SI stack -- safe to actually run here, and enough to prove the
+      ⍝ command really reaches Command.cc instead of being turned into a
+      ⍝ DOMAIN_ERROR. Also confirms the whole ⎕EA statement (including
+      ⍝ any assignment around it) never completes when A turns out to be
+      ⍝ a real command -- same as a plain execution of one would.
+      ⍝
+      ⍝ Blake's original report also claimed )SAVE from within ⎕EA
+      ⍝ persists a phantom transient SI frame into the saved workspace
+      ⍝ (Bugs30 #25 reappearing). Re-verified live (2026-10-02): a real
+      ⍝ ')SAVE ...' ⎕EA '1÷0' followed by )CLEAR/)LOAD/)SI DOES show a
+      ⍝ nameless "*" )SI entry -- but so does a PLAIN ⍎')SAVE ...' at
+      ⍝ top level, with no ⎕EA/⎕EB involved at all (an earlier version
+      ⍝ of this comment claimed the ⎕EA case came back clean; it no
+      ⍝ longer does). The saved "*" is the invoking statement's own
+      ⍝ )SI frame, so it belongs to Command.cc's/)SAVE's own frame
+      ⍝ handling, not to this ticket; per the user, if it's ever
+      ⍝ addressed it should be by having )SAVE ignore its own invoking
+      ⍝ )SI frame, not by anything here.
+      ⍝
+      ⍝ )SIC is on the same guarded-command list (Bif_F1_EXECUTE.cc) as
+      ⍝ )OFF/)CLEAR/)SAVE, goes through the identical E_COMMAND_PUSHED
+      ⍝ path, but -- run here from an already-empty )SI -- has no
+      ⍝ visible effect of its own either way, making it safe to run
+      ⍝ for real inside this shared-process suite. Its only job here is
+      ⍝ to prove the command reaches Command.cc silently (as a real,
+      ⍝ successful )SIC would) instead of being turned into the old
+      ⍝ "DOMAIN ERROR ... cannot be executed from within ⎕EC/⎕EA/⎕EB":
+      ⍝ no output at all is the correct, passing result.
+      ⍝
+      ')SIC' ⎕EA '1÷0'
+      )SI
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ ==================================
 

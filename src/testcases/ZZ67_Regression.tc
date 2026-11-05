@@ -1,0 +1,53 @@
+⍝ ZZ67_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ bug-apl@gnu.org, "Bugs found in r2047" (Blake McBride, 2026-07-24),
+      ⍝ findings H17d/H17e: regression coverage for the ⌹/gelsy()/larfg()
+      ⍝ overflow findings below. See SVN log for details.
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ H17e: larfg()'s BETA_r = sqrt(square(ALPHA) + norm2_X) squared
+      ⍝ ALPHA directly, unscaled -- for ALPHA ≳ 1.34E154 that alone
+      ⍝ overflows to +Inf, and tau = (BETA_r-ALPHA_r)/BETA_r then becomes
+      ⍝ Inf/Inf = NaN. MM below is genuinely singular (both rows
+      ⍝ proportional) and must fail with DOMAIN ERROR; with the bug it
+      ⍝ silently returned -nan- -nan- / 0 1 instead.
+      ⍝
+      MM←2 2⍴1E160 1 1E160 1
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+      )SIC
+
+      ⍝ H17e, second reproducer: same root cause, different symptom --
+      ⍝ with the bug this silently dropped the ¯1 element instead of
+      ⍝ erroring or computing a correct (or correctly-refused) result.
+      ⍝
+      MM←2 2⍴1E200 0 1E200 1
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+      )SIC
+
+      ⍝ H17d: larfg()'s naive square(ALPHA)/norm2_X can also UNDERflow to
+      ⍝ exactly 0.0 for denormal-scale input, making BETA_r itself exactly
+      ⍝ 0.0 -- which the "scale small BETA" loop could never move away
+      ⍝ from (0.0 × anything is still 0.0), hanging at 100% CPU. Must
+      ⍝ complete (with some deterministic result), not hang.
+      ⍝
+      MM←2 2⍴1J1 0 0 1E¯200J1E¯200
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+      )SIC
+
+      )ERASE MM
+
+      ]NEXTFILE

@@ -1,0 +1,32 @@
+⍝ Multiply.tc
+⍝ ═══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A and B numeric
+      ⍝ inv: A×B ←→ B×A   (× is commutative, even when the product
+      ⍝ overflows and is promoted to float)
+      A ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      (A×B) ≡ B×A
+1
+      A ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      B ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      (A×B) ≡ B×A
+1
+
+      ⍝ Precond: Big sits at the int64 boundary and N is a small
+      ⍝ integer ≥2, so Big×N always crosses the conservative LARGE_INT
+      ⍝ threshold and is promoted to float (IntCell::bif_multiply_ii());
+      ⍝ N is small enough that dividing it back out of the float
+      ⍝ product is exact
+      ⍝ inv: Big ←→ (Big×N)÷N
+      N ← 2+8∣|⎕RVAL 0
+      Big ← 9223372036854775807
+      Big ≡ (Big×N)÷N
+1
+      Big ← ¯9223372036854775807
+      Big ≡ (Big×N)÷N
+1

@@ -1,12 +1,19 @@
 ⍝ Quad_FIO.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ same as File_IO_1.tc but using FILE_IO.apl library
       ⍝ This is the recommeded way to use file_io.so
       ⍝
       ⍝ This file demonstrates the use of the FILE_IO.apl library
       ⍝ and checks that the wrapper functions in FILE_IO.apl are working
       ⍝
+
+      z←⎕FIO.unlink 'FILE_IO.test'
+      z←⎕FIO.unlink 'FILE_IO.test1'
+      z←⎕FIO.unlink 'test_data/wc.txt'
+      z←⎕FIO[21] 'test_data'
 
       ⍝⍝⍝
       ⍝⍝⍝ If this segfaults then re-install GNU APL !!!
@@ -35,7 +42,7 @@ DUMPED ³
       FIO∆fclose Handle
 DOMAIN ERROR+
 FIO∆fclose[2]  Ze←⎕FIO[4]Bh
-                  ^      ^
+                  ^
       →
 
       ⍝ create new file
@@ -172,12 +179,45 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       226 141 181
 
 
+      ⍝ ⎕FIO[62]: the socket constants of this platform, as a table, by
+      ⍝ name, and by a vector of names
+      ⍝
+      2=⍴⍴T62←⎕FIO[62] ''
+1
+
+
+
+
+      ∧/(⎕FIO[62] T62[;1]) = T62[;2]
+1
+
+
+
+
+      (⎕FIO[62] 'SOL_SOCKET') ≡ T62[T62[;1]⍳⊂'SOL_SOCKET';2]
+1
+
+
+
+
+      ⎕FIO[62] 'NO_SUCH_CONSTANT'
+DOMAIN ERROR+
+      ⎕FIO[62]'NO_SUCH_CONSTANT'
+      ^
+
+      )MORE
+⎕FIO[62]: unknown socket constant 'NO_SUCH_CONSTANT' (⎕FIO[62] '' lists the known ones)
+      )SIC
+
+
+
+
       ⍝ socket communication: send 'Hello' from one socket to another socket
       ⍝ and send 'World!' back.
       ⍝
-      AF_INET     ← 2           ⍝ see /usr/include/.../bits/socket.h
-      SOCK_STREAM ← 1           ⍝ see /usr/include/.../bits/socket_type.h
-      IPPROTO_IP       ← 0      ⍝ see /usr/include/netinet/in.h
+      AF_INET     ← ⎕FIO[62] 'AF_INET'   ⍝ socket constants of this platform
+      SOCK_STREAM ← ⎕FIO[62] 'SOCK_STREAM'
+      IPPROTO_IP  ← ⎕FIO[62] 'IPPROTO_IP'
       LOCALHOST←256⊥127 0 0 1   ⍝ 127.0.0.1 in host byte order
       Port ← 22222
       Server←AF_INET, LOCALHOST, Port
@@ -189,8 +229,8 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
 
       ⍝ setsockopt(Handle, SOL_SOCKET, SO_REUSEADDR, 1)
       ⍝
-      SOL_SOCKET←1              ⍝ see /usr/include/asm-generic/socket.h
-      SO_REUSEADDR←2            ⍝ see /usr/include/asm-generic/socket.h
+      SOL_SOCKET  ← ⎕FIO[62] 'SOL_SOCKET'     ⍝ e.g. 1 on x86, 65535 on sparc64
+      SO_REUSEADDR← ⎕FIO[62] 'SO_REUSEADDR'
       (SOL_SOCKET, SO_REUSEADDR, 1) FIO∆setsockopt Handle
 0
 
@@ -284,6 +324,87 @@ World!
       FMT ⎕FIO['sscanf'] DATA
  Hallo 
 
+      ⍝ Regression: Bugs25 #4 (Blake McBride). File_or_String::
+      ⍝ scanf_long_long() accepted the lookahead character
+      ⍝ unconditionally (any character, not just a digit) before
+      ⍝ filtering the rest of the input, so a failed %d/%x conversion
+      ⍝ invented a bogus 0 instead of reporting "no conversion" --
+      ⍝ strtoll() only sets errno on overflow, never on "no digits
+      ⍝ converted". Fixed in Quad_FIO.cc by filtering the lookahead the
+      ⍝ same way the rest of the digit loop already does, and by
+      ⍝ checking strtoll()'s endptr for "nothing consumed". Also made
+      ⍝ %x/%X hex-letter-aware (0-9a-fA-F, not just 0-9) in both the
+      ⍝ lookahead and the loop, fixing multi-digit hex conversions
+      ⍝ (e.g. 'ff') as a side effect of the same code path.
+      ⍝
+      ⍴'%d' ⎕FIO[55] 'xyz'
+0
+
+      '%d %d %d' ⎕FIO[55] '12 xyz'
+12
+
+      '%x' ⎕FIO[55] 'zz'
+
+
+      '%d' ⎕FIO[55] '-'
+
+
+      '%d' ⎕FIO[55] '42'
+42
+
+      '%d' ⎕FIO[55] '¯42'
+¯42
+
+      '%x' ⎕FIO[55] 'ff'
+255
+
+      '%x' ⎕FIO[55] 'FF'
+255
+
+      ⍝ Bugs28 #49 regression: a suppressed conversion (%*d) ended the
+      ⍝ scan outright instead of continuing with the next directive --
+      ⍝ do_scanf()'s integer/float branches took the "scan failed" path
+      ⍝ (goto out) whenever suppress was set, even on a successful
+      ⍝ count==1, discarding every directive after the %*d. Fixed by
+      ⍝ separating "did the scan itself succeed" (count==1, controls
+      ⍝ whether to continue) from "should the result be kept"
+      ⍝ (!suppress, controls whether to append to Z).
+      ⍝
+      '%*d %d' ⎕FIO[55] '1 2'
+2
+
+      ⍝ control: a suppressed %s was already correct
+      ⍝
+      '%*s %d' ⎕FIO[55] 'ab 2'
+2
+
+      '%d %*d %d' ⎕FIO[55] '1 2 3'
+1 3
+
+      '%*d %*d %d' ⎕FIO[55] '1 2 3'
+3
+
+      ⍝ regression (Bugs28 #100(j)): a field width in an integer/float
+      ⍝ scanf conversion was silently ignored -- File_or_String::
+      ⍝ scanf_long_long()/scanf_double() (Quad_FIO.cc) never received
+      ⍝ do_scanf()'s own conv_len, unlike %c/%s, which already honoured
+      ⍝ it. '%5d' on '1234567' used to consume and return the whole
+      ⍝ 1234567 instead of stopping at the first 5 characters.
+      ⍝
+      '%5d' ⎕FIO[55] '1234567'
+12345
+
+      '%d' ⎕FIO[55] '1234567'
+1234567
+
+      '%3f' ⎕FIO[55] '12.34567'
+12
+
+      ⍝ control: %s already honoured field width before this fix
+      ⍝
+      '%2s' ⎕FIO[55] '1234567'
+ 12 
+
       ⍝ execve
       ⍝
       ⍝Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
@@ -298,6 +419,51 @@ World!
       TLV ← 33 ⎕CR 99,'quit'              ⍝ encode stop command, Tag 99
       ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
       ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops TLV_server)
+
+      ⍝ Regression: Bugs25 #9 (Blake McBride). fio_def(30, getcwd) in
+      ⍝ Quad_FIO.def advertises ⎕FIO[30]/⎕FIO['getcwd']/⎕FIO.getcwd as
+      ⍝ equivalent to ⎕FIO 30 (via ⎕FIO ⍬'s listing and the name lookup
+      ⍝ table), but only eval_B() (the ⎕FIO 30 form) had an
+      ⍝ implementation -- eval_XB() had no case 30, so the other three
+      ⍝ advertised spellings all fell into default: and reported
+      ⍝ themselves as invalid. Fixed in Quad_FIO.cc by adding case 30 to
+      ⍝ eval_XB() too. The actual path is host-dependent, so compare
+      ⍝ against the known-working ⎕FIO 30 form instead of a literal path.
+      ⍝
+      CWD←⎕FIO 30
+      CWD ≡ ⎕FIO[30] ⍬
+1
+      CWD1←⎕FIO['getcwd'] 0
+      CWD ≡ CWD1
+1
+      CWD2←⎕FIO.getcwd ⍬
+      CWD ≡ CWD2
+1
+
+      ⍝ Regression: found while writing the tests just above (NOT one of
+      ⍝ Blake's Bugs25 findings). Prefix::reduce_MISC_F_C_B() -- the F-C-B
+      ⍝ shift-reduce phrase for "something f[C]B" where f[C]B itself has
+      ⍝ a function/operand to its left -- special-cases ⎕FIO[49] (the one
+      ⍝ ⎕FIO subfunction that is an operator) by calling
+      ⍝ C->get_sole_integer() to compare the axis against 49. But ⎕FIO
+      ⍝ axes can also be spelled as subfunction name strings (e.g.
+      ⍝ 'strerror', 'getcwd' -- see Quad_FIO::value_to_subfun()), and
+      ⍝ get_sole_integer() throws LENGTH_ERROR for any value with more
+      ⍝ than one element. So any ⎕FIO[STRING] call with so much as a
+      ⍝ monadic function to its left raised a spurious LENGTH ERROR,
+      ⍝ even though the identical call with nothing to its left worked
+      ⍝ fine (a different, unaffected reduce phrase handles that case).
+      ⍝ Fixed in Prefix.cc by checking C->element_count()==1 before
+      ⍝ calling get_sole_integer() on it.
+      ⍝
+      1 ≡ ⎕FIO['strerror'] 0
+0
+
+      ⍴⎕FIO['strerror'] 0
+7
+
+      1 ≡ ⎕FIO['getcwd'] 0
+0
 
       FIO∆mkdir_777 FIO∆getcwd,'/test_data'
 0
@@ -369,6 +535,125 @@ Hello -12,345.77 world
 Hello -1,234.77 world
       "Hello %'.2f world" ⎕FIO.sprintf ¯123.77
 Hello -123.77 world
+
+      ⍝ Regression: Bugs25 #5 (Blake McBride). Quad_FIO::do_snprintf()'s
+      ⍝ integer conversion branch strips any user-supplied length
+      ⍝ modifier (h/l/L/q/j/z/t) and forces a 64-bit one, since APL
+      ⍝ integers are always 64 bits -- but the float branch appended the
+      ⍝ conversion char straight onto whatever modifier the user typed,
+      ⍝ unfiltered. '%Lf' etc. then told snprintf() to read a long
+      ⍝ double off the vararg slot holding a plain double (APL_Float) --
+      ⍝ undefined behaviour, observed as spurious 'nan' and confirmed via
+      ⍝ ASan's printf interceptor. Fixed in Quad_FIO.cc by stripping
+      ⍝ length modifiers in the float branch too (no replacement is
+      ⍝ added back: no modifier is correct for a plain double).
+      ⍝
+      '%f' ⎕FIO[58] 1.5
+1.500000
+
+      '%Lf' ⎕FIO[58] 1.5
+1.500000
+
+      '%Le' ⎕FIO[58] 1.5
+1.500000e+00
+
+      '%Lg' ⎕FIO[58] 1.5
+1.5
+
+      '%hf' ⎕FIO[58] 1.5
+1.500000
+
+      ⍝ regression (Bugs28 #100(j)): do_snprintf()'s integer and float
+      ⍝ conversion branches called get_real_value() on a genuinely
+      ⍝ complex argument without checking is_near_real() first --
+      ⍝ ComplexCell::get_real_value() unconditionally returns just the
+      ⍝ real part, silently discarding the imaginary part, instead of
+      ⍝ the DOMAIN ERROR every other scalar-function complex-argument
+      ⍝ check in this codebase already gives.
+      ⍝
+      '%d' ⎕FIO[58] 1J2
+DOMAIN ERROR+
+      '%d' ⎕FIO[58]1J2
+      ^    ^
+
+      )MORE
+argument 0 is complex and cannot be used with integer format '%d' in A ⎕FIO.snprintf B
+      )SIC
+
+      '%f' ⎕FIO[58] 1J2
+DOMAIN ERROR+
+      '%f' ⎕FIO[58]1J2
+      ^    ^
+
+      )MORE
+argument 0 is complex and cannot be used with format '%f' in A ⎕FIO.snprintf B
+      )SIC
+
+      ⍝ control: a tolerantly real complex argument is unaffected
+      ⍝
+      '%d' ⎕FIO[58] 1J0
+1
+
+      '%f' ⎕FIO[58] 1.5J0.0000000001
+1.500000
+
+      ⍝ Regression: Bugs25 #8 (Blake McBride). eval_AXB__202()/
+      ⍝ eval_XB__202() (⎕FIO[202]/⎕FIO[203], get/set monadic/dyadic
+      ⍝ threshold) called Tokenizer::tokenize_function() on an
+      ⍝ arbitrary user character and then checked tok.is_function() --
+      ⍝ but tokenize_function()'s own fall-through for a non-function
+      ⍝ character is Assert(0 && "Missing Function"), so that check was
+      ⍝ unreachable dead code and the assertion fired instead of a clean
+      ⍝ DOMAIN ERROR. Fixed in Quad_FIO.cc by pre-filtering with
+      ⍝ Avec::uni_to_token()'s is_function() (safe to call before the
+      ⍝ token's function pointer is set, since is_function() only reads
+      ⍝ the tag) instead of relying on tokenize_function()'s own check.
+      ⍝
+      ⎕FIO[202] 'x'
+DOMAIN ERROR
+      ⎕FIO[202]'x'
+      ^
+
+      )SIC
+
+      ⎕FIO[202] ''
+DOMAIN ERROR
+      ⎕FIO[202]''
+      ^
+
+      )SIC
+
+      ⎕FIO[202] '∇'
+DOMAIN ERROR
+      ⎕FIO[202]'∇'
+      ^
+
+      )SIC
+
+      1 ⎕FIO[203] ''
+DOMAIN ERROR
+      1 ⎕FIO[203]''
+      ^ ^
+
+      )SIC
+
+      ⍝ valid function unaffected, and reset + back to its default
+      ⍝ threshold afterward so later tests are not affected.
+      ⍝
+      OldThresh←⎕FIO[202] '+'
+      OldThresh ⎕FIO[202] '+'
+8888888888888888888
+
+⍝ regression (Bugs28 #76): ⎕FIO[22] (fprintf) to a handle open for
+⍝ reading only (handle 0, stdin) used to raise SYSTEM ERROR from the
+⍝ generic fwrite()-failed check in do_fprintf(). A failed fwrite() on a
+⍝ non-writable stream is a normal, expectable I/O outcome, not an
+⍝ internal error -- report it the same way the other ⎕FIO write
+⍝ functions (e.g. ⎕FIO[7]) report a failed write: return 0 (nothing
+⍝ written) and leave errno for ⎕FIO[1] to inspect, instead of throwing.
+⍝
+      ('%d' 5) ⎕FIO[22] 0
+0
 
 ⍝     )VARS
 

@@ -72,8 +72,10 @@ TD(TOK_APL_VALUE1    , TC_VALUE     , TV_VAL  , ID_APL_VALUE1   ) // grouped
 TD(TOK_APL_VALUE2    , TC_VALUE     , TV_VAL  , ID_APL_VALUE2   ) // assigned
 TD(TOK_APL_VALUE3    , TC_VALUE     , TV_VAL  , ID_APL_VALUE3   ) // strand
 TD(TOK_APL_VALUE4    , TC_VALUE     , TV_VAL  , ID_APL_VALUE4   ) // optimized
+TD(TOK_APL_VALUE5    , TC_VALUE     , TV_VAL  , ID_APL_VALUE5   ) // derived from a label
 
-TD(TOK_BRANCH        , TC_R_ARROW   , TV_INT  , ID_BRANCH       ) // →N
+TD(TOK_BRANCH_INT    , TC_R_ARROW   , TV_INT  , ID_BRANCH_INT   ) // →N
+TD(TOK_BRANCH_LAB    , TC_R_ARROW   , TV_INT  , ID_BRANCH_LAB   ) // →LAB
 
 TD(TOK_CHI           , TC_SYMBOL    , TV_SYM  , ID_CHI          )
 TD(TOK_CHARACTER     , TC_VALUE     , TV_CHAR , ID_CHARACTER    )
@@ -160,7 +162,7 @@ TD(TOK_L_PARENT      , TC_L_PARENT  , TV_INT  , ID_L_PARENT     )
 
 TD(TOK_MARKER        , TC_INDEX     , TV_INT  , ID_MARKER       ) // string placeholder
 
-TD(TOK_NOBRANCH      , TC_R_ARROW   , TV_NONE , ID_BRANCH       ) // →⍬
+TD(TOK_NOBRANCH      , TC_R_ARROW   , TV_NONE , ID_BRANCH_INT   ) // →⍬
 
 TD(TOK_OMEGA         , TC_SYMBOL    , TV_SYM  , ID_OMEGA        )
 TD(TOK_OMEGA_U       , TC_SYMBOL    , TV_SYM  , ID_OMEGA_U      )

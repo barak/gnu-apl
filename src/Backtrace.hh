@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,54 +25,92 @@
 #define __BACKTRACE_HH_DEFINED__
 
 #include <stdint.h>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include "Common.hh"
 #include "PrintOperator.hh"
 
-/// (maybe) init a dwarf object for the apl binary
-extern void init_DWARF(const char * bin_dir, const char * bin_file);
-
+//════════════════════════════════════════════════════════════════════════════
 /// show the current function call stack.
 class Backtrace
 {
 public:
-   /// show the current function call stack.
-   static void show(const char * file, int line);
-
    /// show the current caller (only valid while being called)
+   /// @param offset  stack frame offset from the current call
    static const char * caller(int offset);
 
+   /// show the current function call stack.
+   /// @param file  source filename where the call is made
+   /// @param line  source line number where the call is made
+   static void show(const char * file, int line);
+
+   /// show the current function call stack using only async-signal-safe
+   /// operations (raw backtrace() + backtrace_symbols_fd() + write();
+   /// no malloc, no __cxa_demangle, no iostream). Call this -- never
+   /// show() above -- from inside a signal handler: show()'s use of
+   /// backtrace_symbols()/__cxa_demangle() calls malloc() internally,
+   /// which can deadlock or crash a second time if the fault interrupted
+   /// the crashing thread while it already held glibc's malloc arena
+   /// lock. Prints raw (non-demangled) addresses only.
+   ///
+   /// @param extra_fd  if >= 0, an already-open file descriptor that the
+   /// same raw backtrace is ALSO written to (via the same signal-safe
+   /// backtrace_symbols_fd() call), so a crash's backtrace survives on
+   /// disk independent of whatever else happens to CERR/STDERR_FILENO
+   /// afterward. The fd is written to, but neither opened nor closed
+   /// here -- the caller (main.cc, before installing/triggering the
+   /// signal) is responsible for both, since open()/close() are not
+   /// guaranteed async-signal-safe either.
+   /// @param to_stderr  false: write only to extra_fd
+   static void show_signal_safe(int extra_fd = -1, bool to_stderr = true);
+
+   /// the PC of the instruction that caused a crash signal (set by the
+   /// signal handler, 0 if unknown). Unlike the other PCs in a backtrace
+   /// it is not a return address (that points behind a call).
+   static const void * signal_PC;
+
 protected:
-   /// demangle a line returned by backtrace_symbols()
-   static int demangle_line(char * result, size_t result_max, const char * buf);
-
-   /// find the source for PC \b pc
-   static const char * find_src(int64_t pc);
-
-   /// read the file apl.lines (if present) and set main_offset from the
-   /// address of main() in apl.lines.
-   static void read_apl_lines_file();
-
-   /// print one item in the backtrace to cerr. NOTE: modifies s.
-   static void show_item(int idx, char * s);
-
-   /// print the dwarf info of one item in the backtrace to cerr.
-   static void show_dwarf(int idx, const char * s);
-
-   /// a mapping from PCs to source lines.
-   struct PC_src
+   /// what is known about one stack frame from the symbol tables and the
+   /// line numbers (DWARF) in the binaries themselves
+   struct Frame_info
       {
-        int64_t pc;             ///< the pc
-        const char * src_loc;   ///< the source locstion
+        /// the (demangled) name of the function (empty if unknown)
+        std::string fun;
+
+        /// the source location (file:line) in \b fun (empty if unknown)
+        std::string src_loc;
+
+        /// the functions that were inlined into \b fun at this point
+        /// (outermost first), as "function at file:line"
+        std::vector<std::string> inlined;
       };
 
-   /// a mapping from PCs to source lines.
-   static std::vector<PC_src> pc_2_src;
+   /// resolve the function names and source locations of the \b size PCs
+   /// in \b buffer (as returned by backtrace())
+   static void resolve_frames(void * const * buffer, int size,
+                              std::vector<Frame_info> & frames);
 
-   /// compare PCs (helper for binary search)
-   static int pc_cmp(const int64_t & key,
-                     const Backtrace::PC_src & pc2, const void *);
+   /// run addr2line (if installed) for the \b addrs (pairs of frame index
+   /// and address in \b file) and store the results in \b frames
+   static void run_addr2line(const std::string & file,
+                     const std::vector<std::pair<int, uint64_t>> & addrs,
+                     std::vector<Frame_info> & frames);
+
+   /// demangle a line returned by backtrace_symbols()
+   /// @param result      output buffer for demangled name
+   /// @param result_max  size of the output buffer
+   /// @param buf         raw mangled symbol string from backtrace_symbols()
+   static int demangle_line(char * result, size_t result_max, const char * buf);
+
+   /// print one item in the backtrace to cerr. NOTE: modifies s.
+   /// @param idx  index (depth) of the stack frame
+   /// @param s    mutable backtrace symbol string for this frame
+   /// @param frame what resolve_frames() found out about this frame
+   static void show_item(int idx, char * s, const Frame_info & frame);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #define BACKTRACE Backtrace::show(__FILE__, __LINE__);
 

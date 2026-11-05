@@ -1,6 +1,8 @@
 ⍝ Multiply.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       3×4
 12
 
@@ -31,5 +33,93 @@
 2 2 2 2 2
 3 3 3 3 3
 
-⍝ ==================================
+      ⍝ Integer overflow → float promotion (IntCell::bif_multiply_ii()).
+      ⍝ Like + and -, × now promotes only on a genuine int64 overflow
+      ⍝ (via __builtin_mul_overflow, exact) -- it used to promote as
+      ⍝ soon as a double-precision approximation of the product crossed
+      ⍝ the conservative LARGE_INT/SMALL_INT threshold (≈9.2E18, ⎕SYL
+      ⍝ "largest/smallest integer"), well before the true int64 boundary
+      ⍝ (≈9.223E18), losing precision for no reason (Bugs28 #82).
+      ⍝ ⎕PP←17 so the still-promoted (genuinely overflowing) results
+      ⍝ print with enough digits to be unambiguous.
+      ⍝
+      ⎕PP←17
+
+      ⍝ below the true int64 limit either way: stays integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      1000000000×9199999999
+9199999999000000000
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 1000000000×9199999999
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ used to cross the old conservative threshold and get promoted
+      ⍝ to (imprecise) float even though the exact product fits in
+      ⍝ int64 -- now stays an exact integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      1000000000×9200000001
+9200000001000000000
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 1000000000×9200000001
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ clear overflow (positive): promoted to float
+      9223372036854775807×10
+9.2233720368547758E19
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 9223372036854775807×10
+32
+      ]FILE_CTL NO_SKIP
+
+      ⍝ clear overflow (negative): promoted to float
+      ¯9223372036854775807×10
+¯9.2233720368547758E19
+      ]FILE_CTL SKIP_APL2
+      26⎕CR ¯9223372036854775807×10
+32
+      ]FILE_CTL NO_SKIP
+
+      ⍝ Bugs28 #82 report examples directly: an exact-int64-result
+      ⍝ multiplication by 1, and squaring a value just below sqrt(int64
+      ⍝ max) -- both used to be promoted to float by the old
+      ⍝ conservative check.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9223372036854775807×1
+9223372036854775807
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 9223372036854775807×1
+16
+      ]FILE_CTL NO_SKIP
+
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      3037000499×3037000499
+9223372030926249001
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 3037000499×3037000499
+16
+      ]FILE_CTL NO_SKIP
+
+      ⎕PP←10
+
+      ⍝ regression (Bugs28 #79): ComplexCell::is_near_real() used to
+      ⍝ treat *any* complex number with an absolutely-tiny imaginary
+      ⍝ part as real, regardless of how the real part compared -- so a
+      ⍝ product of two comparably-tiny complex numbers displayed with
+      ⍝ its J part silently dropped, even though the underlying value
+      ⍝ was correct (as the third line below shows by scaling it back
+      ⍝ into a displayable range).
+      ⍝
+      1J1×1E¯20J1E¯20
+0J2E¯20
+
+      1E¯20J1E¯20
+1E¯20J1E¯20
+
+      (1E¯20J1E¯20)×1E20
+1J1
+
+      ⍝ ==================================
 

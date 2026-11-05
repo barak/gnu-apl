@@ -1,6 +1,8 @@
 
       ⍝ Hans-Peter Sorge, Aug-16-2018
 
+⍝@ test3.
+
 ∇qio_test
  ⎕IO
 ∇

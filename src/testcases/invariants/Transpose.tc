@@ -1,0 +1,21 @@
+⍝ Transpose.tc
+⍝ ════════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar/vector nonneg integer; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ (⍴B)[⍋A]
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 3 (2 3 4) (,0 1 0 0 0)
+      A ← 2 3 1                               ⍝ permutation of ⍳3
+      Z ← A⍉B
+      (⍴Z) ≡ (⍴B)[⍋A]
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: ⍉B ←→ (⌽⍳⍴⍴B)⍉B   (reversed axes = monadic transpose)
+      B ← ⎕RVAL 3 (2 3 4) (,0 1 0 0 0)
+      (⍉B) ≡ (⌽⍳⍴⍴B)⍉B
+1

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,11 +24,17 @@
 #ifndef __QUAD_WA_HH_DEFINED__
 #define __QUAD_WA_HH_DEFINED__
 
-#include <sys/resource.h>   // for rlim_t
+#include "config.h"   // for HAVE_xxx
+#if HAVE_SYS_RESOURCE_H
+#  include <sys/resource.h>   // for rlim_t
+#else  // windows
+#include <cstdint>
+typedef uint64_t rlim_t;
+#endif // HAVE_SYS_RESOURCE_H
 
 #include "SystemVariable.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
    System variable Quad-WA (Workspace Available).
  */
@@ -40,10 +46,21 @@ public:
    Quad_WA();
 
    /// initialize total_memory
+   /// @param log_startup if true print startup diagnostics
    static void init(bool log_startup);
 
-   /// parse a -mem command line option
-   static void parse_mem(bool log_startup);
+   /// parse a -mem command line option (or an equivalent MEMORY line from
+   /// a preferences file, in which case \b opt_name should identify that
+   /// so its own diagnostics don't misattribute the value to --mem)
+   /// @param log_startup if true print startup diagnostics
+   /// @param opt_name    name to use in diagnostics for the value's origin
+   static void parse_mem(bool log_startup, const char * opt_name = "--mem");
+
+   /// the memory limit at startup
+   static rlim_t initial_rlimit;
+
+   /// the sbrk() at startup
+   static unsigned long long initial_sbrk;
 
    /// the estimated (!) the amount of free memory
    static uint64_t total_memory;
@@ -54,13 +71,20 @@ public:
    /// a percentage between 45% and 100% to compensate malloc() losses
    static int WA_scale;
 
-   /// the memory limit at startup
-   static rlim_t initial_rlimit;
-
-   /// the sbrk() at startup
-   static unsigned long long initial_sbrk;
-
 protected:
+   /// overloaded Symbol::get_apl_value().
+   virtual Value_P get_apl_value() const;
+
+   /// estimate (!) the amount of free memory
+   static uint64_t get_free_memory();
+
+   /// read /proc/meminfo, return the number of items found
+   static int read_meminfo();
+
+   /// read a (supposedly short) file in /proc
+   /// @param filename path to the /proc file to read
+   static int64_t read_procfile(const char * filename);
+
    /// some relevant values in /proc/meminfo
    static struct _mem_info
       {
@@ -75,18 +99,9 @@ protected:
         uint64_t MemFree;     ///< kilobytes free
       } meminfo;              ///< values read from /proc/meminfo
 
-   /// read /proc/meminfo, return the number of items found
-   static int read_meminfo();
-
-   /// read a (supposedly short) file in /proc
-   static int64_t read_procfile(const char * filename);
-
-   /// overloaded Symbol::get_apl_value().
-   virtual Value_P get_apl_value() const;
-   /// estimate (!) the amount of free memory
-   static uint64_t get_free_memory();
-
+   /// \b true iff total_memory was provided by the user
+   static bool total_memory_by_user;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __QUAD_WA_HH_DEFINED__

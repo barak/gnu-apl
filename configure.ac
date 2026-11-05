@@ -107,9 +107,21 @@ AC_CONFIG_SRCDIR([src])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 
+# Parse special build targets (Android, Erlang, libapl, Python, MinGW) early
+# so that --with-mingw can preset CC/CXX/host_alias before the compiler
+# detection macros below run.
+#
+m4_include([m4/apl_TARGETs.m4])
+
 # use g++ for tests
 #
 AC_LANG(C++)
+
+# Detect compilers here, before LT_INIT, so that --with-mingw's preset
+# CC/CXX values take effect before LT_INIT's AC_REQUIRE pulls these in.
+#
+AC_PROG_CXX
+AC_PROG_CC
 
 # initialize libtool in dlopen mode
 #
@@ -120,11 +132,9 @@ apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
 apl_TOPIC([compiler checks])
 
-# Checks for programs.
-#
-AC_PROG_CXX
-AC_PROG_CC
-# AC_PROG_RANLIB   obsolteted by LT_INIT
+# AC_PROG_CXX and AC_PROG_CC were moved earlier (before LT_INIT) so that
+# --with-mingw's preset CC/CXX values take effect before compiler detection.
+# AC_PROG_RANLIB   obsoleted by LT_INIT
 
 AC_USE_SYSTEM_EXTENSIONS
 
@@ -141,56 +151,45 @@ CXXFLAGS="$CXXFLAGS -I `pwd`"
 #
 apl_TOPIC([checks for the presence and usablility of header files])
 
-# check for ncurses.h first and for curses.h only if ncurses.h was not found.
-
-AC_CHECK_HEADER(
-    [ncurses.h],
-    [AC_DEFINE(HAVE_NCURSES_H, 1,
-               [Define to 1 iff <ncurses.h> is present])],
-    [AC_CHECK_HEADER(
-        [curses.h],
-        [AC_DEFINE(HAVE_CURSES_H, 1,
-                    [Define to 1 iff <curses.h> is present])])
-    ])
-
-AC_CHECK_HEADER(
-    [term.h],
-    [AC_DEFINE( [HAVE_TERM_H], 1,
-                [Define to 1 iff <term.h> is present])],
-    [],
-    [ [ #if HAVE_NCURSES_H   ]
-      [ # include <ncurses.h> ]
-      [ #elif HAVE_CURSES_H  ]
-      [ # include <curses.h>  ]
-      [ #endif ]
-    ])
-
 # keep headers in roughy alphabetical order as to find them more easily
 #
-apl_missing_headers=0
-AC_CHECK_HEADERS([      \
-   dirent.h             \
-   execinfo.h           \
-   ext/atomicity.h      \
-   fcntl.h fenv.h       \
-   fftw3.h              \
-   inttypes.h           \
-   libpng16/png.h       \
-   limits.h             \
-   locale.h             \
-   malloc.h             \
-   netdb.h              \
-   netinet/in.h         \
-   stdint.h             \
-   stdlib.h             \
-   string.h             \
-   strings.h            \
-   sys/un.h             \
-   termios.h            \
-   unistd.h             \
-   utmpx.h              \
-   vector               \
-   zlib.h               \
+apl_missing_headers=-1 # since either sys/socket,h or winsock2.h will be missing
+AC_CHECK_HEADERS([  \
+   dirent.h         \
+   execinfo.h       \
+   fcntl.h fenv.h   \
+   fftw3.h          \
+   inttypes.h       \
+   libpng16/png.h   \
+   limits.h         \
+   locale.h         \
+   malloc.h         \
+   netdb.h          \
+   netinet/in.h     \
+   netinet/tcp.h    \
+   stdint.h         \
+   stdlib.h         \
+   string.h         \
+   strings.h        \
+   sys/fcntl.h      \
+   sys/ioctl.h      \
+   sys/mman.h       \
+   sys/resource.h   \
+   sys/select.h     \
+   sys/socket.h     \
+   sys/stat.h       \
+   sys/time.h       \
+   sys/types.h      \
+   sys/time.h       \
+   sys/un.h         \
+   sys/wait.h       \
+   termios.h        \
+   unistd.h         \
+   utmpx.h          \
+   vector           \
+   zlib.h           \
+   windows.h        \
+   winsock2.h       \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -255,16 +254,12 @@ AC_CHECK_FUNCS([                                             \
 # keep libraries in inverse-alphabetic order so ./configure prints them
 # in alphabetic order
 #
-AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
 AC_CHECK_LIB([pthread],   [sem_init])
 AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
-AC_CHECK_LIB([curses],    [setupterm])
-AC_CHECK_LIB([ncurses],   [setupterm])
 AC_CHECK_LIB([m],         [acosh])
 AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([c],         [initstate_r])
-AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
 AC_STRUCT_ST_BLOCKS
 
@@ -363,6 +358,32 @@ CXXFLAGS=$apl_save_CXXFLAGS
 AC_MSG_RESULT([$HAVE_SEM_INIT])
 
 
+############################# sem_timedwait() check #############################
+# check if sem_timedwait() is declared (it is not on OS-X: Darwin's
+# <semaphore.h> declares sem_init()/sem_wait()/sem_trywait()/sem_post()
+# for unnamed semaphores but never sem_timedwait() at all -- unlike
+# sem_init() above this is a compile-time absence, not a runtime one
+# (Paul Rockwell, bug-apl@gnu.org, 2026-08-20).
+#
+apl_save_CXXFLAGS=$CXXFLAGS
+CXXFLAGS="-Wall -Werror"
+
+AC_MSG_CHECKING([whether sem_timedwait() is declared])
+AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <semaphore.h>
+                            #include <time.h>]],
+        [[sem_t sema;
+          struct timespec deadline = { 0, 0 };
+          sem_timedwait(&sema, &deadline);
+        ]]
+    )], [HAVE_SEM_TIMEDWAIT=yes], [HAVE_SEM_TIMEDWAIT=no])
+if apl_YES($HAVE_SEM_TIMEDWAIT); then
+   AC_DEFINE(HAVE_SEM_TIMEDWAIT, 1, [Define to 1 iff sem_timedwait() is declared])
+fi
+CXXFLAGS=$apl_save_CXXFLAGS
+AC_MSG_RESULT([$HAVE_SEM_TIMEDWAIT])
+
+
 ######################## pthread_getaffinity_np() check #######################
 # see if TIOCGWINSZ is available
 #
@@ -401,14 +422,10 @@ AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
 AC_MSG_CHECKING([whether pthread_setaffinity_np is available])
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <pthread.h>]
-                       [#include <ext/atomicity.h>]
                      ],
                      [ [cpu_set_t cpuset;]
                        [pthread_setaffinity_np(0, sizeof(cpuset), &cpuset);]
                        [pthread_getaffinity_np(0, sizeof(cpuset), &cpuset);]
-                       [_Atomic_word count = 0;]
-                       [__gnu_cxx::__exchange_and_add_dispatch(&count, 1);]
-                       [__gnu_cxx::__atomic_add_dispatch(&count, 1);]
                      ])],
     [HAVE_AFFINITY_NP=yes
      AC_DEFINE(HAVE_AFFINITY_NP, 1,
@@ -434,40 +451,6 @@ AC_COMPILE_IFELSE(
     [HAVE_PTHREAD_SETNAME_NP=no])
 AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
 
-############################### atomicity checks ##############################
-# check for alternatives for ext/atomicity.h on OS/X
-#
-AC_MSG_CHECKING([whether OSAtomicAdd32Barrier() is available])
-apl_save_CXXFLAGS=$CXXFLAGS
-CXXFLAGS="-Wall -Werror"
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([ [#include <libkern/OSAtomic.h>] ],
-                     [ [OSAtomicAdd32Barrier(0, 0);]   ])],
-    [HAVE_OSX_ATOMIC=yes
-     AC_DEFINE(HAVE_OSX_ATOMIC, 1,
-               [Define to 1 iff OSAtomicAdd32Barrier() is available])
-    ],
-    [HAVE_OSX_ATOMIC=no])
-CXXFLAGS=$apl_save_CXXFLAGS
-AC_MSG_RESULT([$HAVE_OSX_ATOMIC])
-
-
-# check for alternatives for ext/atomicity.h on Solaris
-#
-AC_MSG_CHECKING([whether atomic_add_32_nv() is available])
-AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([ [#include <atomic.h>] ],
-                     [ [atomic_add_32_nv(0, 0);]
-                       [atomic_add_32   (0, 0);]
-                     ])],
-    [HAVE_SOLARIS_ATOMIC=yes
-     AC_DEFINE(HAVE_SOLARIS_ATOMIC, 1,
-               [Define to 1 iff atomic_add_32_nv() is available])
-    ],
-    [HAVE_SOLARIS_ATOMIC=no])
-AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
-
-
 apl_TOPIC([choices made by the user (via ./configure arguments)])
 
 # the standard convention is that ^D means EOF aka. end-of-file. Some users
@@ -485,10 +468,9 @@ if apl_YES($cfg_CTRLD_DEL); then
 fi
 AC_MSG_RESULT([$cfg_CTRLD_DEL])
 
-m4_include([m4/apl_TARGETs.m4])
-
 AC_CONFIG_FILES([Makefile
                  build/Makefile
+                 Claude/Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile
@@ -498,17 +480,20 @@ AC_CONFIG_FILES([Makefile
                  gnu-apl.d/Makefile
                  gnu-apl.d/preferences
                  HOWTOs/Makefile
+                 HOWTOs/Bible/Makefile
                  rpm/Makefile
                  rpm/apl.spec
                  src/Makefile
                  src/APs/Makefile
                  src/Gtk/Makefile
                  src/emacs_mode/Makefile
+                 src/libapl.pc
                  src/native/Makefile
                  src/sql/Makefile
                  src/testcases/Makefile
-                 src/workspaces/Makefile
+                 src/testcases/invariants/Makefile
                  support-files/Makefile
+                 support-files/fonts/Makefile
                  support-files/105-key-International-Keyboard/Makefile
                  support-files/Bill_Daly_Ubuntu/Makefile
                  support-files/Dirk/Makefile
@@ -519,6 +504,7 @@ AC_CONFIG_FILES([Makefile
                  support-files/OS-X-Keyboard/Makefile
                  support-files/Unicomp-Keyboard/Makefile
                  support-files/WASD-Keyboard/Makefile
+                 support-files/windows-installer/Makefile
                  tools/Makefile
                  websock/Makefile
                  websock/client/Makefile
@@ -740,6 +726,15 @@ AC_DEFINE_UNQUOTED(cfg_SHORT_VALUE_LENGTH_WANTED, $SHORT_VALUE_LENGTH_WANTED,
           [short value cellcount])
 AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
 
+# APL: minimum element count for automatic ravel packing ?
+AC_MSG_CHECKING([minimum element count for automatic ravel packing])
+AC_ARG_VAR(PACKED_MINIMUM_LENGTH_WANTED,
+    [ Minimum element count for automatic ravel packing (default: 12) ])
+if apl_EQ($PACKED_MINIMUM_LENGTH_WANTED, ); then PACKED_MINIMUM_LENGTH_WANTED=12; fi
+AC_DEFINE_UNQUOTED(cfg_PACKED_MINIMUM_LENGTH_WANTED, $PACKED_MINIMUM_LENGTH_WANTED,
+          [minimum element count for automatic ravel packing])
+AC_MSG_RESULT([$PACKED_MINIMUM_LENGTH_WANTED])
+
 
 # APL: visible markers (debug only option) ?
 AC_MSG_CHECKING([whether visible markers shall be used])
@@ -935,6 +930,29 @@ AC_DEFINE_UNQUOTED(apl_DIR__prefix,      "$apl_prefix",      [--prefix]        )
 AC_DEFINE_UNQUOTED(apl_DIR__sysconf,     "$apl_sysconfdir",  [--sysconfdir])
 AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/apl",
                    [installation directory for GNU APL libraries])
+AC_DEFINE_UNQUOTED(apl_DIR__pkgdata,     "$apl_datarootdir/apl",
+                   [installation directory for GNU APL data files])
+
+# where to install support-files/apl (bash command-line completion for the
+# "apl" command itself, see that file's own header comment). Prefer asking
+# pkg-config for bash-completion's own idea of its completions directory --
+# this correctly follows wherever bash-completion was itself configured to
+# look, which need not be the same as GNU APL's own --datadir. Falls back to
+# the standard bash-completion >= 2.x default if pkg-config or the
+# bash-completion .pc file is not found (installing there is harmless even
+# on a system without bash-completion -- completion simply starts working
+# automatically if bash-completion is installed later).
+#
+AC_PATH_PROG([PKG_CONFIG], [pkg-config], [])
+if test -n "$PKG_CONFIG" && "$PKG_CONFIG" --exists bash-completion 2>/dev/null
+then
+   bashcompletiondir=`"$PKG_CONFIG" --variable=completionsdir bash-completion`
+   AS_ECHO(["   bash-completion directory (from pkg-config): $bashcompletiondir"])
+else
+   bashcompletiondir='${datarootdir}/bash-completion/completions'
+   AS_ECHO(["   bash-completion directory (default, pkg-config unavailable): $bashcompletiondir"])
+fi
+AC_SUBST(bashcompletiondir)
 
 if test -n "$SOURCE_DATE_EPOCH"
 then   # reproducible build
@@ -977,6 +995,15 @@ else
    AC_DEFINE_UNQUOTED(apl_PNG, 0)
 fi
 
+# Finalize MinGW target: also fires when --host=x86_64-w64-mingw32 is used
+# directly (without --with-mingw).  AM_CONDITIONAL lives here (not in
+# apl_TARGETs.m4) because $host_os is only set after AC_CANONICAL_HOST runs.
+case $host_os in
+    mingw*)   AC_DEFINE(MINGW_SRC, 1, [Compiling for Windows with MinGW-w64])
+              apl_TARGET_MINGW=yes
+              AM_CONDITIONAL(apl_TARGET_MINGW, true);;
+    *)        AM_CONDITIONAL(apl_TARGET_MINGW, false);;
+esac
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 
@@ -1069,6 +1096,7 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
 
     # B. computed variables (most of them in m4/*.m4
     #
+    host_os:                     $host_os
     apl_BUILD_DATE:              $apl_BUILD_DATE
     apl_BUILD_OS:                $apl_BUILD_OS
     apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
@@ -1091,4 +1119,5 @@ $as_me:    ---- SUMMARY OF TESTS (please include it in error reports) ----
         Erlang:                  $apl_TARGET_ERLANG
         libapl:                  $apl_TARGET_LIBAPL
         Python:                  $apl_TARGET_PYTHON
+        Windows (MinGW):         $apl_TARGET_MINGW
 "])

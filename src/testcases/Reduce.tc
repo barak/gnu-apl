@@ -1,6 +1,8 @@
 ⍝ Reduce.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       +/1 2 3 4 5
 15
 
@@ -27,7 +29,7 @@
       ≡W
 2
 
-⍝ higher rank arrays ----------------------------------
+      ⍝ higher rank arrays ----------------------------------
 
       M←3 4ρι12
       M
@@ -51,7 +53,7 @@
       ≡Y
 2
 
-⍝ scalar or last axis one ----------------------------------
+      ⍝ scalar or last axis one ----------------------------------
 
       =/15
 15
@@ -60,7 +62,7 @@
       ÷/N
 2 4 6 8
 
-⍝ empty R ----------------------------------
+      ⍝ empty R ----------------------------------
 
       +/ι0
 0
@@ -83,10 +85,12 @@
 
       ⍝ regression
       ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ f/ as a reduction operand is a GNU APL extension
       //(1 0 1) (1 2 3)
  1 3 
 
 
+      ]FILE_CTL NO_SKIP
       ((1 1) (1 0))/¨'ab' 'cd'
  ab c 
 
@@ -99,7 +103,7 @@
 
       )SIC
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       ⍝ regression
       ⍝
@@ -120,3 +124,128 @@
       +/0 0⍴0
 
 
+
+      ⍝ Regression (Blake McBride, LanguageVariances.md #19, 2026-08-10):
+      ⍝ identity items of Figure 28 (apl2lrm.txt p.212) for the primitive
+      ⍝ NONSCALAR dyadic functions, applied when reduce hits a length-0
+      ⍝ axis. ⊃/↓/∼ had no identity function at all (DOMAIN ERROR);
+      ⍝ ⍴/,/⍉/↑/⌹ inherited a generic "fill with prototype" fallback that
+      ⍝ gave a bare scalar 0 for all five instead of each function's own
+      ⍝ distinct Figure 28 value. Expected values are ⊂⍳0 (same
+      ⍝ SR⍴⊂.... broadcast as ⍴/,/⍉/↑, corrected 2026-09-03 -- see
+      ⍝ Bugs27 #27; the table literally gives ⊃'s and ∼'s identity
+      ⍝ FUNCTION as ⍳0, not "B unchanged") for ⊃/∼, B's own prototype
+      ⍝ as a scalar for ↓, ⊂B (depth 2, nested empty) for ⍴/,/⍉/↑, and
+      ⍝ ⊂(0 0⍴prototype) for ⌹.
+      ⍝
+      ⊃/⍳0
+  
+      ↓/⍳0
+0
+
+      ∼/⍳0
+  
+      ⍴/⍳0
+  
+
+      ,/⍳0
+  
+
+      ⍉/⍳0
+  
+
+      ↑/⍳0
+  
+
+      ⌹/⍳0
+
+      ⍴⊃⌹/⍳0
+0 0
+
+      ⍝ Regression: Bugs25 #7 (Blake McBride). The A f⌿B (n_wise==0)
+      ⍝ scalar-B shortcut passed the bare scalar B straight to
+      ⍝ LO->eval_identity_fun(), but eval_identity_fun() (via
+      ⍝ NonscalarFunction_default_identity::enclosed_identity(),
+      ⍝ PrimitiveFunction.hh) documents and relies on B being genuinely
+      ⍝ non-scalar, and asserts on a simple scalar. The rank>=1 branch a
+      ⍝ few lines below already wraps B in a length-0 axis first; fixed
+      ⍝ by doing the same in the scalar shortcut (Bif_OPER1_REDUCE.cc).
+      ⍝
+      0⍉⌿0
+     
+      0,⌿0
+     
+      0⍪⌿0
+     
+      0↑⌿0
+     
+      0⍴⌿0
+     
+      (0⍉⌿(≥⍀0))⌈[1](1 1 1⍴1)
+     
+
+      ⍝ Bugs28 #33 regression: F/ (plain reduce, len > 1 along the
+      ⍝ reduced axis) with a *defined* F over a frame that is empty
+      ⍝ along some OTHER axis was INDEX ERROR instead of ⍬/an empty
+      ⍝ result, exactly as the primitive-F case (+/0 3⍴0) already gave
+      ⍝ -- Bif_REDUCE::reduce()'s may_push_SI() branch dispatched to
+      ⍝ MAC_Z__LO_REDUCE_X4_B without first checking shape_Z was empty,
+      ⍝ unlike scan/n-wise-reduce, which already had exactly this guard.
+      ⍝
+      ⎕FX 'Z←A ZZ33F B' 'Z←A+B'
+ZZ33F
+
+      ⍴(ZZ33F/0 3⍴0)
+0
+
+      ⍴(ZZ33F⌿3 0⍴0)
+0
+
+      ⍴(ZZ33F/[1]3 0⍴0)
+0
+
+      ⍝ frame empty along an axis OTHER than the removed one: result
+      ⍝ shape is non-scalar (0 3), not just ⍬
+      ⍝
+      ⍴(ZZ33F/0 3 4⍴0)
+0 3
+
+      ⍝ control: scan and n-wise reduce were already correct
+      ⍝
+      ⍴ZZ33F\0 3⍴0
+0 3
+
+      ⍴2 ZZ33F/0 3⍴0
+0 2
+
+      )ERASE ZZ33F
+
+      ⍝ Bugs28 #36 regression: the identity element of a scalar
+      ⍝ reduction over an empty frame (e.g. ¯MAX_DOUBLE for ⌈/, 1 for
+      ⍝ ×/) was used as the empty result's *prototype* instead of a
+      ⍝ type-correct default (0 or ' ') -- invisible in the printed
+      ⍝ (empty) display, but visible through ≡, 2 ⎕TF, )SAVE/)DUMP.
+      ⍝ Fixed in ScalarFunction.cc's eval_scalar_identity_fun():
+      ⍝ Z->set_default(B, LOC) instead of FI0.init_other(...).
+      ⍝
+      (⌈/0 0⍴0)≡⍬ ⋄ (×/0 0⍴0)≡⍬ ⋄ (∧/0 0⍴0)≡⍬ ⋄ (=/0 0⍴0)≡⍬
+1
+1
+1
+1
+
+      Z←×/0 0⍴0 ⋄ 2 ⎕TF 'Z'
+Z←0⍴0
+
+      Z←⌈/0 0⍴'' ⋄ 2 ⎕TF 'Z'
+Z←''
+
+      ⍝ same bug, reached via reduce_n_wise's identity-function path
+      ⍝
+      Z←0×/0 3⍴0 ⋄ 2 ⎕TF 'Z'
+Z←0 4⍴0
+
+      ⍝ same bug, reached via a derived (rank-operator) LO
+      ⍝
+      Z←(⌈/⍤1)0 0⍴0 ⋄ 2 ⎕TF 'Z'
+Z←0⍴0

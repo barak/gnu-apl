@@ -1,0 +1,66 @@
+
+]log 46
+⎕PW←200
+
+DATA←"""
+''
+5⍴'hello'
+42
+3⍴1 2 3
+⊂1⍴1
+5⍴('') (0⍴0) (2⍴'Q' 3.2000000000000002) (3⍴5 8 13) (5⍴'D∆n''t')
+⊂2⍴(⊂3⍴1 0 1) (2 3⍴4 6 4 6 4 6)
+⎕UCS 1111
+1⍴⎕UCS 1111
+2⍴⎕UCS 1111 1112   ⍝ comment
+2⍴⎕UCS 33 1112
+"""
+
+⍝ --------------------------------------------------------
+∇Z←test_TF2 EXPR;X;XX;TF2;ASS
+EXPR←(¯1+EXPR⍳'⍝')↑EXPR                 ⍝ remove comment
+EXPR←⌽EXPR ◊ EXPR←⌽(∼∧\EXPR=' ')/EXPR   ⍝ remove trailing blanks
+Z←"=" ◊ XX←VAR←⍎EXPR ◊ ASS←'VAR←',EXPR
+'TESTING:' EXPR
+
+TF2←2 ⎕TF 'VAR'   ⍝ TF2 is e.g. 'X←EXPR'
+→(ASS≡TF2)⍴FORWARD_OK
+
+ERROR0: 'TESTING 2 ⎕TF with:' EXPR 'failed.'
+'    Forward 2 ⎕TF MISMATCH'
+'    expected:' ◊ 4 ⎕CR ASS
+'    got:     ' ◊ 4 ⎕CR TF2
+Z←Z,'∆' ◊ →FORWARD_DONE
+
+FORWARD_OK:
+'FORWARD 2⎕TF was OK:' TF2 '-------------------------------'
+FORWARD_DONE:
+VAR←¯999
+
+INV←2 ⎕TF TF2     ⍝ INV is 'VAR' on success and ⍬ on error
+
+→(INV≢'VAR')⍴ERROR1
+→(VAR≢XX)   ⍴ERROR2
+'TESTING 2 ⎕TF' EXPR 'OK ≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡≡'  ◊ ''
+→0
+
+ERROR1: 'TESTING 2 ⎕TF with:' EXPR 'failed.'
+'   inverse ⎕TF2 failed:'
+'   VAR≡INV:' (VAR≡INV)
+'   TF2:'   TF2
+'   VAR:'   ◊ 4 ⎕CR VAR
+'   INV:'   ◊ 4 ⎕CR INV
+Z←Z,'⎕TF'
+→0
+
+ERROR2: 'TESTING 2 ⎕TF:' EXPR 'failed.'
+'inverse ⎕TF2 returned a difference:'
+'XX:'  ◊ 4 ⎕CR XX
+'VAR:' ◊ 4 ⎕CR VAR
+Z←Z,'≢'
+→0
+∇
+⍝ --------------------------------------------------------
+
+test_TF2 ¨ DATA
+

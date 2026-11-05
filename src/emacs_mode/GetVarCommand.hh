@@ -26,10 +26,16 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "getvar" network command: report the printed value of a variable
 class GetVarCommand : public NetworkCommand {
 public:
+    /// constructor
     GetVarCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

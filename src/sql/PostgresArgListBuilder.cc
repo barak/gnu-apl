@@ -27,6 +27,7 @@
 #include <vector>
 
 template<class T>
+//════════════════════════════════════════════════════════════════════════════
 PostgresBindArg<T>::~PostgresBindArg()
 {
     if( string_arg != NULL ) {
@@ -264,3 +265,4 @@ Value_P db_result_value;
     db_result_value->check_value( LOC );
     return db_result_value;
 }
+//════════════════════════════════════════════════════════════════════════════

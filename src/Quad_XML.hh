@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,12 +26,16 @@
 
 #include "QuadFunction.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// a helper class (doubly linked list) for parsing XML
 class XML_node
 {
 public:
    /// constructor
+   /// @param anchor doubly-linked list anchor to append this node after
+   /// @param src entire XML source string
+   /// @param spos start position of this node in src
+   /// @param slen length of this node in src
    XML_node(XML_node * anchor, const UCS_string & src,
             ShapeItem spos, ShapeItem slen);
 
@@ -49,6 +53,7 @@ public:
         NT_comment     =  5,    // <!-- ... -->
         NT_declaration =  6,    // <?xml ... ?>
         NT_doctype     =  7,    // <!DOCTYPE ... >
+        NT_cdata       =  8,    // <![CDATA[ ... ]]>
       };
 
    /// return the next XML node in the document
@@ -87,9 +92,13 @@ public:
    /// leading <, /m or _.
    UCS_string get_tagname() const;
 
+   /// return the root element name declared by this node, which shall be
+   /// an NT_doctype node, e.g. "html" for <!DOCTYPE html ...>
+   UCS_string get_doctype_root_name() const;
+
    /// return true iff this XML_node was parsed (and has produced an APL value)
    bool is_parsed() const
-      { return +APL_value; }
+      { return bool(APL_value); }
 
    /// unlink \b this node from the doubly-linked list that contains it
    XML_node * unlink()
@@ -104,6 +113,7 @@ public:
       }
 
    /// append \b garbage to this garbage can (for later deletion)
+   /// @param garbage node to append for deferred deletion
    void append_garbage(XML_node * garbage)
       {
         // check that garbage was properly unlinked.
@@ -116,6 +126,7 @@ public:
       }
 
    /// (debug-) print this node
+   /// @param out output stream
    void print(ostream & out) const;
 
    /// parse an XML start or leaf tag, store result in \b this->APL_value
@@ -123,26 +134,42 @@ public:
    bool parse_tag();
 
    /// (debug-) print all nodes·
+   /// @param out output stream
+   /// @param anchor list anchor node
    static void print_all(ostream & out, const XML_node & anchor);
 
    /// return the type of this node as string
    const char * get_node_type_name() const;
 
    /// reduce nodes starting at \b start, return true on error
+   /// @param anchor list anchor for nodes to translate
+   /// @param garbage list anchor for nodes pending deletion
    static bool translate(XML_node & anchor, XML_node & garbage);
 
    /// collect nodes starting at \b anchor, return true on error
+   /// @param anchor list anchor for nodes to collect
+   /// @param garbage list anchor for nodes pending deletion
+   /// @param Z APL value to receive the collected result
    static bool collect(XML_node & anchor, XML_node & garbage, Value * Z);
 
    /// add member \b name with value \b value to structured value Z
+   /// @param Z structured APL value to add to
+   /// @param first first Unicode character of the member name category prefix
+   /// @param name member name (ASCII portion)
+   /// @param number position number for sorting
+   /// @param value APL value for the new member
    static void add_member(Value * Z, Unicode first, const char * name,
                           int number, Value * value);
 
    /// merge the items from start(-tag) to (end(-tag) into start tag
+   /// @param start start-tag node to merge into
+   /// @param end matching end-tag node
+   /// @param garbage_can list anchor for nodes pending deletion
    static bool merge_range(XML_node & start, XML_node & end,
                            XML_node & garbage_can);
 
    /// return true if uni is a validchar
+   /// @param uni Unicode character to test
    static bool is_name_char(Unicode uni);
 
    /// return true if uni is a valid char in an XML tag name
@@ -154,13 +181,25 @@ public:
    /// return the length of the tag at string_B + offset...
    static ShapeItem get_taglen(const UCS_string & string_B, ShapeItem offset);
 
-   /// perform an in-place attribute value normalization (XML standard 3.3.3).
+   /// decode XML predefined entities and numeric character references
+   /// (XML standard 4.6) in-place. Unlike normalize_attribute_value(),
+   /// does not collapse whitespace -- used for text-node content, where
+   /// whitespace is significant. On error set MORE_ERROR() and return
+   /// \b true
+   static bool decode_entities(UCS_string & text);
+
+   /// perform an in-place attribute value normalization (XML standard 3.3.3):
+   /// collapse whitespace to spaces, then decode_entities().
    /// On error set MORE_ERROR() and return \b true
    static bool normalize_attribute_value(UCS_string & attval);
 
-   /// return the inverse of normalize_attribute_value()
-   static UCS_string denormalize_attribute_value(const UCS_string & UCS_string,
-                                                 bool quoted);
+   /// return the inverse of decode_entities() for text-node content
+   /// (does not escape control chars or quotes, unlike
+   /// denormalize_attribute_value())
+   static UCS_string encode_text(const UCS_string & text);
+
+   /// return the inverse of decode_entities() / normalize_attribute_value()
+   static UCS_string denormalize_attribute_value(const UCS_string & UCS_string);
 
 protected:
    /// return true iff \b end_tag matches \b this start tag
@@ -196,7 +235,7 @@ protected:
    /// the position of this node (at its level)
    int position;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕XML
  */
@@ -217,41 +256,41 @@ public:
    /// split src, e.g. "_2_name" into integer 2, Unicode '_', and
    /// UCS_string 'name'. Null pointers if not relevant.
    static int split_name(Unicode * category, ShapeItem * position,
-                         UCS_string * name, const Value & src);
+                         UCS_string * name, const cValue & src);
 protected:
    /// overloaded Function::eval_AB()
-   Token eval_AB(Value_P A, Value_P B) const;
+   Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// convert APL associative array to XML string
-   static Value_P APL_to_XML(const Value & B);
+   static Value_P APL_to_XML(const cValue & B);
 
    /// return the entities in B, sorted by their position prefix
-   static void add_sorted_entities(vector<const UCS_string *> & entities,
-                                   const Value & B);
+   static void add_sorted_entities(vector<UCS_string> & entities,
+                                   const cValue & B);
 
    /// convert XML string to APL associative array
-   static Value_P XML_to_APL(const Value & B);
+   static Value_P XML_to_APL(const cValue & B);
 
    /// overloaded Function::eval_B()
-   Token eval_B(Value_P B) const;
+   Token eval_B(cValue_R B) const;
 
    /// return XML file (-name in B) converted to APL structured value
-   Token convert_file(const Value & B) const;
+   Token convert_file(const cValue & B) const;
 
    /// "M1" M2" ... "Mn" ← "M1.M2...Mn"
-   static Value_P path_split(const Value & B);
+   static Value_P path_split(const cValue & B);
 
    /// (POS CATEGORY TAG_NAME) ← MEMBER_NAME
-   static Value_P name_split(const Value & B);
+   static Value_P name_split(const cValue & B);
 
    /// MEMBER_NAME ← POS CATEGORY TAG_NAME
-   static Value_P name_unsplit(const Value & B);
+   static Value_P name_unsplit(const cValue & B);
 
    /// return all XML nodes as member names
-   static Token all_members(const Value & B, int flags);
+   static Token all_members(const cValue & B, int flags);
 
    /// iterator: return the next member after A in structured value B
-   static Token next_member(const Value & A, const Value & B);
+   static Token next_member(const cValue & A, const cValue & B);
 
    /// display details for tree() functions
    enum tree_flags
@@ -270,16 +309,17 @@ protected:
       };
 
    /// return a tree-view of the members in B according to flags
-   static Value_P tree(const Value & B, int flags);
+   static Value_P tree(const cValue & B, int flags);
 
    /// return a sub-tree-view of the members in B at \b level
-   static void tree(const Value & B, UCS_string & z, UCS_string & prefix,
+   static void tree(const cValue & B, UCS_string & z, UCS_string & prefix,
                     const UCS_string & name_prefix, int flags);
 
    /// return all member names according to flags
-   static void all_members(UCS_string_vector & result, const Value & B,
+   static void all_members(UCS_string_vector & result, const cValue & B,
                            const UCS_string & name_prefix, int flags);
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_XML_DEFINED__
 

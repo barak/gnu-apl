@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,8 +36,10 @@
     #define GNUC__noreturn
 #endif
 
+class Executable;
 class StateIndicator;
 
+//════════════════════════════════════════════════════════════════════════════
 /**
  ** The exception that is thrown when errors occur. 
  ** The primary item is the error_code; the other items are only valid if
@@ -48,14 +50,17 @@ class Error
 {
 public:
    /// constructor: error with error code ec
+   /// @param ec error code identifying the APL error
+   /// @param loc caller location for diagnostics
    Error(ErrorCode ec, const char * loc);
 
-   /// return true iff error_code is known (as opposed to an arbitrary
-   /// error code constructed by ⎕ES)
-   bool is_known() const;
+   /// clear error line 1
+   void clear_error_line_1()
+      { *error_message_1 = 0; }
 
-   /// return true iff error_code is some SYNTAX ERROR or VALUE ERROR
-   bool is_syntax_or_value_error() const;
+   /// set the error code
+   void clear_error_code()
+      { error_code = E_NO_ERROR; }
 
    /// return the error code of \b this error
    const ErrorCode get_error_code() const
@@ -67,34 +72,18 @@ public:
    UCS_string get_error_line_1() const
       { return UCS_string(UTF8_string(error_message_1)); }
 
-   /// clear error line 1
-   void clear_error_line_1()
-      { *error_message_1 = 0; }
-
    /// return error_message_2. This is the second of 3 error lines.
    /// It contains the failed statement and is NOT subject to translation.
    UCS_string get_error_line_2() const
       { return UCS_string(UTF8_string(error_message_2)); }
 
-   /// return the major class (⎕ET) of the error
-   static int error_major(ErrorCode err)
-      { return err >> 16; }
-
-   /// return the category (⎕ET) of the error
-   static int error_minor(ErrorCode err)
-      { return err & 0xFFFF; }
+   /// return the left caret (^) position in the third error line
+   int get_left_caret() const
+      { return left_caret; }
 
    /// return source file location where this error was printed (0 if not)
    const char * get_print_loc() const
       { return print_loc; }
-
-   /// return the source code location where the error was thrown
-   const char * get_throw_loc() const
-      { return throw_loc; }
-
-   /// return the left caret (^) position in the third error line
-   int get_left_caret() const
-      { return left_caret; }
 
    /// return the right caret (^) position in the third error line
    int get_right_caret() const
@@ -104,14 +93,50 @@ public:
    bool get_show_locked() const
       { return show_locked; }
 
-   /// print the error and its related information
-   void print(ostream & out, const char * loc) const;
+   /// return the source code location where the error was thrown
+   const char * get_throw_loc() const
+      { return throw_loc; }
 
-   /// set the first error line
-   void set_error_line_1(const char * msg_1);
+   /// set the left caret (^) position in the third error line
+   /// @param col column index for the left caret
+   void set_left_caret(int col)
+      { left_caret = col; }
+
+   /// set the source code line where a parse error was thrown
+   /// @param loc caller location for diagnostics
+   void set_parser_loc(const char * loc)
+      { parser_loc = loc; }
+
+   /// set the right caret (^) position in the third error line
+   /// @param col column index for the right caret
+   void set_right_caret(int col)
+      { right_caret = col; }
+
+   /// set the show_locked flag
+   /// @param on new value for show_locked
+   void set_show_locked(bool on)
+      { show_locked = on; }
+
+   /// return the major class (⎕ET) of the error
+   /// @param err error code to classify
+   static int error_major(ErrorCode err)
+      { return err >> 16; }
+
+   /// return the category (⎕ET) of the error
+   /// @param err error code to classify
+   static int error_minor(ErrorCode err)
+      { return err & 0xFFFF; }
+
+   /// return true iff error_code is known (as opposed to an arbitrary
+   /// error code constructed by ⎕ES)
+   bool is_known() const;
+
+   /// return true iff error_code is some SYNTAX ERROR or VALUE ERROR
+   bool is_syntax_or_value_error() const;
 
    /// add a '+' to error_message_1 unless it hast one already. The caller
-   /// has checked that 
+   /// has checked that
+   /// @param have_more true if there is more context available
    void add_MORE_indicator(bool have_more);
 
    /// compute the caret line. This is the third of the 3 error lines.
@@ -119,53 +144,91 @@ public:
    /// to translation.
    UCS_string get_error_line_3() const;
 
+   /// print the 3 error message lines as per ⎕EM
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
+   void print_EM(ostream & out, const char * loc);
+
+   /// print the error and its related information
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
+   void print(ostream & out, const char * loc) const;
+
+   /// set the first error line
+   /// @param msg_1 error name text for ⎕EM[1;]
+   void set_error_line_1(const char * msg_1);
+
    /// set the second error line to \b msg_2
-   void set_error_line_2(const char * msg_2);
+   /// @param msg_2 failed-statement text for ⎕EM[2;]
+   /// @return the resulting (possibly truncated) character count of
+   ///         error_message_2, so callers can clamp carets against it
+   int set_error_line_2(const char * msg_2);
 
    /// set error line 2, left caret, and right caret
+   /// @param ucs failed-statement text
+   /// @param lcaret left caret column position
+   /// @param rcaret right caret column position
    void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
 
-   /// print the 3 error message lines as per ⎕EM
-   void print_em(ostream & out, const char * loc);
-
-   /// set the error code
-   void clear_error_code()
-      { error_code = E_NO_ERROR; }
-
-   /// set the show_locked flag
-   void set_show_locked(bool on)
-      { show_locked = on; }
-
-   /// set the left caret (^) position in the third error line
-   void set_left_caret(int col)
-      { left_caret = col; }
-
-   /// set the right caret (^) position in the third error line
-   void set_right_caret(int col)
-      { right_caret = col; }
-
-   /// set the source code line where a parse error was thrown
-   void set_parser_loc(const char * loc)
-      { parser_loc = loc; }
-
    /// update error information in \b this and copy it to si
+   /// @param si state indicator entry to update with error info
    void update_error_info(StateIndicator * si);
 
-   /// throw an Error related to \b Symbol \b symbol
-   static void throw_symbol_error(const UCS_string & symbol,
-                                  const char * loc) GNUC__noreturn;
-
-   /// throw a error with a parser location
-   static void throw_parse_error(ErrorCode code, const char * par_loc,
-                                 const char * loc) GNUC__noreturn;
+   /// return a string describing the error
+   /// @param err error code to look up
+   static const char * error_name(ErrorCode err);
 
    /// throw a DEFN ERROR for function \b fun
+   /// @param fun function name that caused the DEFN ERROR
+   /// @param cmd command text associated with the definition attempt
+   /// @param loc caller location for diagnostics
    static void throw_define_error(const UCS_string & fun,
                                   const UCS_string & cmd,
                                   const char * loc) GNUC__noreturn;
 
-   /// return a string describing the error
-   static const char * error_name(ErrorCode err);
+   /// throw a error with a parser location
+   /// @param code error code to throw
+   /// @param par_loc parser source location where the error was detected
+   /// @param loc caller location for diagnostics
+   static void throw_parse_error(ErrorCode code, const char * par_loc,
+                                 const char * loc) GNUC__noreturn;
+
+   /// throw a lexical/parse error together with a precise error range:
+   /// error_message_2 becomes line[start:end] (the offending lexeme,
+   /// dropping earlier context -- a Tokenizer.cc SYNTAX ERROR concerns
+   /// exactly one lexeme in isolation, never an inter-token relationship,
+   /// see devel_doc/Carets.txt "Known gaps" #1), left_caret is set to 0
+   /// (the start of that fragment), and right_caret to the fragment's
+   /// length (one past its last character).
+   /// @param code error code to throw
+   /// @param line full source line being tokenized
+   /// @param start start offset (in line) of the offending lexeme
+   /// @param end end offset (in line), one past the last character
+   ///        consumed while attempting to lex it
+   /// @param par_loc parser source location where the error was detected
+   /// @param loc caller location for diagnostics
+   static void throw_parse_error(ErrorCode code, const UCS_string & line,
+                                 int start, int end, const char * par_loc,
+                                 const char * loc) GNUC__noreturn;
+
+   /// throw an Error related to \b Symbol \b symbol
+   /// @param symbol name of the offending symbol
+   /// @param loc caller location for diagnostics
+   static void throw_symbol_error(const UCS_string & symbol,
+                                  const char * loc) GNUC__noreturn;
+
+   /// remember the token (at \b pc in the body of \b exec) that caused the
+   /// next VALUE ERROR: a symbol without a value, or a function that has
+   /// returned no value. update_error_info() then places a single caret
+   /// under it (instead of deriving it from the range being reduced).
+   static void set_failed_token(const Executable * exec, Function_PC pc)
+      { failed_exec = exec;   failed_PC = pc;   failed_is_result = false; }
+
+   /// like set_failed_token(), but for the (missing) result (with PC \b pc)
+   /// of a function: update_error_info() then places a single caret under
+   /// the function.
+   static void set_failed_function(const Executable * exec, Function_PC pc)
+      { failed_exec = exec;   failed_PC = pc;   failed_is_result = true; }
 
 protected:
    /// the error code
@@ -199,8 +262,19 @@ protected:
    /// where this error was printed (0 if not yet printed)
    const char * print_loc;
 
+   /// the executable of the failed token (see set_failed_token()), or 0
+   static const Executable * failed_exec;
+
+   /// the PC of the failed token (see set_failed_token())
+   static Function_PC failed_PC;
+
+   /// true if failed_PC is the PC of a function result (rather than of the
+   /// failed token itself)
+   static bool failed_is_result;
+
 private:
-   /// constructor (not implemented): prevent construction without error code
-   Error();
+   /// constructor (deleted): prevent construction without error code
+   Error() = delete;
 };
+//════════════════════════════════════════════════════════════════════════════
 #endif // __ERROR_HH_DEFINED__

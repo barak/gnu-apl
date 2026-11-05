@@ -1,36 +1,43 @@
 ⍝ Quad_AT.tc
 ⍝ ----------------------------------
 
-⍝ A←1 valences ----------------------------------
+⍝@ test3.
+
+      ⍝ A←1 valences ----------------------------------
 
       ⎕FX 'TOTAL R' '⎕←''TOTAL IS'',+/R'
 TOTAL
 
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       1 ⎕AT 'TOTAL'
 0 1 0
 
+      ]FILE_CTL NO_SKIP
       ⎕FX 'Z←TOTAL R' 'Z←+/R'
 TOTAL
 
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       1 ⎕AT 'TOTAL'
 1 1 0
 
+      ]FILE_CTL NO_SKIP
       ANSWER←TOTAL 1 9 3
       1 ⎕AT 2 6ρ'TOTAL ANSWER'
 1 1 0
 1 0 0
 
-⍝ A←2 : creation time ----------------------------------
+      ⍝ A←2 : creation time ----------------------------------
 
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       2 ⎕AT 'TOTAL'
 ⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
 
-⍝ A←3 : execution properties ----------------------------------
+      ⍝ A←3 : execution properties ----------------------------------
 
       3 ⎕AT 'TOTAL'
 0 0 0 0
 
-1 0 0 0 ⎕FX ⎕CR 'TOTAL'
+      1 0 0 0 ⎕FX ⎕CR 'TOTAL'
 TOTAL
 
       3 ⎕AT 'TOTAL'
@@ -39,7 +46,7 @@ TOTAL
       3 ⎕AT '⎕FX'
 1 1 1 0
 
-⍝ A←4 : CDR sizes ----------------------------------
+      ⍝ A←4 : CDR sizes ----------------------------------
 
       4 ⎕AT 'TOTAL'
 0 0
@@ -47,23 +54,33 @@ TOTAL
       4 ⎕AT '⎕FX'
 0 0
 
+      ]FILE_CTL NO_SKIP
       VARIABLE←10 20 30
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       4 ⎕AT 'VARIABLE'
 32 12
 
+      ]FILE_CTL NO_SKIP
       VARIABLE←'ABC'
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       4 ⎕AT 'VARIABLE'
 32 3
 
+      ]FILE_CTL NO_SKIP
       VARIABLE←'A' 'BC'
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       4 ⎕AT 'VARIABLE'
 96 3
 
+      ]FILE_CTL NO_SKIP
       VARIABLE←''
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       4 ⎕AT 'VARIABLE'
 32 1
 
+      ]FILE_CTL NO_SKIP
       VARIABLE←⍳0
+      ]FILE_CTL SKIP_APL2   ⍝ time/session-dependent values
       4 ⎕AT 'VARIABLE'
 32 1
 
@@ -76,7 +93,7 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ ==================================
 
-   )ERASE TOTAL
+      )ERASE TOTAL
 

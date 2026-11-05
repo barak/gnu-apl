@@ -1,6 +1,8 @@
 ⍝ Quad_PNG.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
        ]NEXTFILE no-⎕PNG        ⍝ done if ⎕PNG is not available
        ]NEXTFILE no-GTK3        ⍝ done if GTK is not available
 
@@ -30,6 +32,31 @@
 ²
       MAX_DIFF<0.1
 1
+
+      ⍝ regression (Blake McBride, Bugs12.md #10, 2026-08-06):
+      ⍝ valid_type_and_bits() computed "1 << bit_depth" directly on a
+      ⍝ user-supplied, unchecked bit_depth; the shift is UB outside
+      ⍝ [0, 31] and, on x86 (which masks the shift count to 5 bits),
+      ⍝ made out-of-range depths like 33 and 40 wrongly pass validation
+      ⍝ (33 mod 32 == 1, a genuinely valid depth's bit). Both are
+      ⍝ rejected now via an explicit bit_depth<=16 range check before
+      ⍝ the shift; a genuinely valid depth (8, used throughout this
+      ⍝ file's own IMAGE writes above) is unaffected.
+      ⍝
+      B←1 4 4⍴16⍴0.5
+      ('/tmp/bugs12_10.png' 33) ⎕PNG B
+DOMAIN ERROR+
+      '/tmp/bugs12_10.png' 33 ⎕PNG B
+      ^                            ^
+)SIC
+
+      ('/tmp/bugs12_10.png' 40) ⎕PNG B
+DOMAIN ERROR+
+      '/tmp/bugs12_10.png' 40 ⎕PNG B
+      ^                            ^
+)SIC
+
+      )ERASE B
 
       )ERASE IMAGE IMAGE1 HANDLE MAX_DIFF
 

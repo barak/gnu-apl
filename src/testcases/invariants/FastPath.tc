@@ -1,0 +1,214 @@
+⍝ FastPath.tc
+⍝ ═══════════
+⍝ Check that packed-ravel fast paths produce packed output.
+⍝@ test4.
+
+⍝ ⎕RVAL force-packs all results (try_pack(true)), so every input
+⍝ variable is already packed.  A failing assertion (0 instead of 1)
+⍝ means the fast path for that primitive is missing or broken.
+⍝
+⍝ Ordering constraint: tests that need A or B to be packed come BEFORE
+⍝ A+B / A-B / A×B, which have no vv_i2i fast path and therefore fall
+⍝ back to cell-by-cell via get_cravel(), leaving A and B as RPT_CELLS.
+⍝ Dyadic ⌈/⌊ (vv_max_i/vv_min_i) and all monadic integer ops (v_i2i)
+⍝ and comparisons (vv_i2b) DO have fast paths and do not explode A or B.
+
+      ⎕IO←1
+
+      ⍝ RPT type codes: ⍵ + 256 × ×/⍵/2 for type indices 1 (BOOL), 4 (INT64), 5 (FLOAT64)
+      (BOOL INT64 FLOAT64)←{ ⍵+256××/⍵/2 }¨1 4 5
+
+      ⍝ TH: packing threshold; N safely above it so try_pack()-based paths fire
+      TH←⎕CR.pack_threshold ⍬
+      N←TH+8
+
+      ⍝ ── INT64 vectors (bounded 0..999999 to avoid scalar-function overflow)
+      A←1000000|⎕RVAL 1 (,N) (,0 1 0 0 0)
+      B←1000000|⎕RVAL 1 (,N) (,0 1 0 0 0)
+
+      INT64=48 ⎕CR A
+1
+      INT64=48 ⎕CR B
+1
+
+      ⍝ ── Operations that need A and B to be packed INT64 ──────────────────
+      ⍝    Run these BEFORE A+B/A-B/A×B which explode A and B.
+
+      ⍝ ── A⍳B index-of (linear path: len_A=N < 64) → INT64
+      INT64=48 ⎕CR A⍳B
+1
+
+      ⍝ ── A⍳B index-of (sorted path: len_A=100 ≥ 64, len_B=N > 5) → INT64
+      LA←1000000|⎕RVAL 1 (,100) (,0 1 0 0 0)
+      INT64=48 ⎕CR LA⍳B
+1
+
+      ⍝ ── A∊B membership INT64×INT64 → BOOL (commit_ravel_Bool)
+      BOOL=48 ⎕CR A∊B
+1
+
+      ⍝ ── SA⍸B interval-index sorted-INT64×INT64 → INT64 (commit_ravel_Int64)
+      SA←⍳N
+      INT64=48 ⎕CR SA⍸B
+1
+
+      ⍝ ── A⍴B reshape INT64 → INT64 (memcpy fast path)
+      INT64=48 ⎕CR N⍴A
+1
+      INT64=48 ⎕CR (2×N)⍴A
+1
+
+      ⍝ ── BB⍴B reshape BOOL → BOOL (bit-copy fast path)
+      BB←A=A
+      BOOL=48 ⎕CR BB
+1
+      BOOL=48 ⎕CR N⍴BB
+1
+      BOOL=48 ⎕CR (2×N)⍴BB
+1
+
+      ⍝ ── A,B catenate same type → INT64 (pack_like, unconditional)
+      INT64=48 ⎕CR A,B
+1
+
+      ⍝ ── A↑B take 1D → INT64 (commit_ravel_like, unconditional)
+      INT64=48 ⎕CR 3↑A
+1
+      INT64=48 ⎕CR ¯3↑A
+1
+
+      ⍝ ── A↓B drop 1D → INT64 (commit_ravel_like, unconditional)
+      INT64=48 ⎕CR 3↓A
+1
+      INT64=48 ⎕CR ¯3↓A
+1
+
+      ⍝ ── scalar arithmetic: INT64×INT64 → INT64 ──────────────────────────
+      ⍝    ⌈ and ⌊ use vv_max_i / vv_min_i (don't explode A/B).
+      ⍝    Monadic |A / -A use v_abs_i / v_negate_i (don't explode A).
+      ⍝    A+B / A-B / A×B have no vv_i2i; they fall back to cell-by-cell,
+      ⍝    explode A and B, and pack the result via try_pack().
+      INT64=48 ⎕CR A⌈B
+1
+      INT64=48 ⎕CR A⌊B
+1
+      INT64=48 ⎕CR |A
+1
+      INT64=48 ⎕CR -A
+1
+      INT64=48 ⎕CR A+B
+1
+      INT64=48 ⎕CR A-B
+1
+      INT64=48 ⎕CR A×B
+1
+
+      ⍝ ── scalar comparisons: INT64×INT64 → BOOL (vv_i2b fast path)
+      ⍝    vv_i2b reads cravel_int64() directly; A/B are already RPT_CELLS
+      ⍝    at this point but the cell-by-cell fallback + try_pack also gives BOOL.
+      BOOL=48 ⎕CR A=B
+1
+      BOOL=48 ⎕CR A≠B
+1
+      BOOL=48 ⎕CR A<B
+1
+      BOOL=48 ⎕CR A≤B
+1
+      BOOL=48 ⎕CR A>B
+1
+      BOOL=48 ⎕CR A≥B
+1
+
+      ⍝ ── ⍳N → INT64 (commit_ravel_Int64, unconditional)
+      INT64=48 ⎕CR ⍳N
+1
+
+      ⍝ ── ⍸B where BOOL 1D → INT64 (commit_ravel_Int64)
+      BB←A=A
+      BOOL=48 ⎕CR BB
+1
+      INT64=48 ⎕CR ⍸BB
+1
+
+      ⍝ ── ,A ravel → INT64 (pack_like: falls back to try_pack for RPT_CELLS)
+      INT64=48 ⎕CR ,A
+1
+
+      ⍝ ── ⌽A reverse → INT64 (commit_ravel_like, unconditional)
+      INT64=48 ⎕CR ⌽A
+1
+
+      ⍝ ── A⌽B rotate → INT64 (commit_ravel_like, unconditional)
+      INT64=48 ⎕CR 3⌽A
+1
+
+      ⍝ ── ⍋A, ⍒A grade → INT64 (commit_ravel_Int64)
+      INT64=48 ⎕CR ⍋A
+1
+      INT64=48 ⎕CR ⍒A
+1
+
+      ⍝ ── ∊A enlist simple → INT64 (commit_ravel_like, unconditional)
+      INT64=48 ⎕CR ∊A
+1
+
+      ⍝ ── ⍉M transpose 2D INT64 → INT64 (commit_ravel_like, unconditional)
+      M←1000000|⎕RVAL 2 (N N) (,0 1 0 0 0)
+      INT64=48 ⎕CR M
+1
+      INT64=48 ⎕CR ⍉M
+1
+
+      ⍝ ── A∘.+B outer product INT64 → INT64 (try_pack, N×N > TH)
+      INT64=48 ⎕CR A∘.+B
+1
+
+      ⍝ ── A∘.=B outer product comparison → BOOL (try_pack, N×N > TH)
+      BOOL=48 ⎕CR A∘.=B
+1
+
+      ⍝ ── FLOAT64 inputs
+      FA←⎕RVAL 1 (,N) (,0 0 1 0 0)
+      FB←⎕RVAL 1 (,N) (,0 0 1 0 0)
+      FLOAT64=48 ⎕CR FA
+1
+
+      ⍝ ── scalar arithmetic: FLOAT64×FLOAT64 → FLOAT64 (vv_f2f fast path)
+      FLOAT64=48 ⎕CR FA+FB
+1
+      FLOAT64=48 ⎕CR FA-FB
+1
+      FLOAT64=48 ⎕CR FA×FB
+1
+      FLOAT64=48 ⎕CR FA⌈FB
+1
+      FLOAT64=48 ⎕CR FA⌊FB
+1
+
+      ⍝ ── ⍋FA, ⍒FA grade FLOAT64 → INT64 (commit_ravel_Int64)
+      INT64=48 ⎕CR ⍋FA
+1
+      INT64=48 ⎕CR ⍒FA
+1
+
+      ⍝ ── FA∘.+FB outer product FLOAT64 → FLOAT64 (try_pack, N×N > TH)
+      FLOAT64=48 ⎕CR FA∘.+FB
+1
+
+      ⍝ MISC
+      ⍝
+      Q←'Hello' ◊ Q[3]←⎕UCS 100000
+      ⎕UCS Q
+72 101 100000 108 111
+
+      Q←20⍴1 ◊ (48 ⎕CR Q) Q
+ 513  1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+      Q[2]←2 ◊ (48 ⎕CR Q) Q
+ 4100  1 2 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+      Q[3]←3.141 ◊ (48 ⎕CR Q) Q
+ 8197  1 2 3.141 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+      Q[4]←4J4 ◊ (48 ⎕CR Q) Q
+ 16390  1 2 3.141 4J4 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 
+
+      )CHECK BRIEF
+

@@ -1,13 +1,15 @@
 ⍝ Take.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       3↑34 12 73 53 41
 34 12 73
 
       ¯3↑34 12 73 53 41
 73 53 41
 
-⍝ nonscalar right argument ----------------------------------
+      ⍝ nonscalar right argument ----------------------------------
 
       Y←4 5ρ'TRIADFIELDMOOSEDINER'
       Y
@@ -43,7 +45,7 @@ DO
       ρZ
 1 2 2
 
-⍝ overtake ----------------------------------
+      ⍝ overtake ----------------------------------
 
       5↑21 33 52
 21 33 52 0 0
@@ -90,7 +92,7 @@ RED
  0 0 0  0 0 0  0 0 0 
  0 0 0  0 0 0  0 0 0 
 
-⍝  scalar right argument ----------------------------------
+      ⍝  scalar right argument ----------------------------------
 
       E←1↑2
       ρE
@@ -118,7 +120,7 @@ RED
 2 0 0
 0 0 0
 
-⍝ effect on depth ----------------------------------
+      ⍝ effect on depth ----------------------------------
 
       T←'T' 'TO' ('TOT' 'TOTE')
 
@@ -152,7 +154,7 @@ T
       3↑Q
   6 5  4 3   8   0 0  0 0  
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       P←'ABCDE'
       (2↑P)←1 2
@@ -172,4 +174,35 @@ A BCD
 1 FGH
 2 JKL
 
-⍝ ==================================
+      ⍝ Bugs28 #31 regression: selective assignment with an *empty*
+      ⍝ right argument used to silently scalar-extend B's prototype
+      ⍝ into every selected cell instead of raising LENGTH ERROR, the
+      ⍝ way plain indexed assignment (A[...]←⍬) already correctly does
+      ⍝ for the same shape mismatch -- Value::assign_cellrefs() checked
+      ⍝ new_value->nz_element_count() (documented as "at least 1, for
+      ⍝ the prototype"), which made a real, empty new_value look
+      ⍝ exactly like a legitimate 1-element (scalar-extendable) one.
+      ⍝
+      A←10 20 30 40 50
+      (3↑A)←⍬
+LENGTH ERROR+
+      (3↑A)←⍬
+      ^    ^
+
+      )SIC
+      A←10 20 30
+      (2↑A)←0 2⍴0
+LENGTH ERROR+
+      (2↑A)←0 2⍴0
+      ^    ^
+
+      ⍝ control: an each result that happens to be empty (0 0⍴⍵, not a
+      ⍝ selective-assignment target) must NOT be affected -- the same
+      ⍝ assign_cellrefs() is also how an *ordinary* "V←B" resolves V as
+      ⍝ an lvalue (e.g. a lambda's own synthesized "λ←B"), and B←⍬ or
+      ⍝ B←0 0⍴X there must always succeed regardless of B's own shape.
+      ⍝
+      )SIC
+      ⊣{0 0⍴⍵}¨ 'a' 'b'
+
+      ⍝ ==================================

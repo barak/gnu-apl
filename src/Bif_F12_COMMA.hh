@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,42 +26,84 @@
 
 #include "PrimitiveFunction.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /** Comma related functions (catenate, laminate, and ravel.) */
 /// Base class for , and ⍪
 class Bif_COMMA : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
+   /// @param tag token tag identifying this function variant
    Bif_COMMA(TokenTag tag)
    : NonscalarFunction_default_identity(tag)
    {}
 
+   /// overloaded NonscalarFunction_default_identity::eval_identity_fun().
+   /// Figure 28 (apl2lrm.txt p.212): the identity item for , (and,
+   /// sharing this base class, ⍪) is ⊂B.
+   virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
+      { return enclosed_identity(B, axis); }
+
+   /// overloaded Function::get_selectivity(): monadic ,/⍪ (Ravel), with
+   /// or without axis, genuinely selects (confirmed empirically for
+   /// each individually) -- but dyadic ,/⍪ (Catenate/Laminate) does
+   /// not: it computes a new, differently-shaped value from A and B
+   /// rather than selecting item(s) of B.
+   virtual Fun_selectivity get_selectivity() const
+      { return Fun_selectivity(SEL_MON | SEL_MON_X); }
+
    /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
-   static Token ravel_axis(Value_P X, Value_P B, uAxis axis);
+   /// @param where arity-prefix for )MORE text, e.g. ",[X]B" or "⍪[X]B"
+   /// @param X    axis specification value
+   /// @param B    APL value to ravel
+   /// @param axis default axis to use when X is absent
+   static Token ravel_axis(const char * where, cValue_R X, cValue_R B,
+                           uAxis axis);
 
    /// Return the ravel of B as APL value
-   static Token ravel(const Shape & new_shape, Value_P B);
+   /// @param new_shape desired shape of the result
+   /// @param B         APL value to ravel
+   static Token ravel(const Shape & new_shape, cValue_R B);
 
    /// Catenate A and B
-   static Value_P catenate(const Value & A, sAxis axis, const Value & B);
+   /// @param where arity-prefix for )MORE text, e.g. "A,B" or "A⍪B"
+   /// @param A    left APL value
+   /// @param axis axis along which to catenate
+   /// @param B    right APL value
+   static Value_P catenate(const char * where, const cValue & A, sAxis axis,
+                           const cValue & B);
 
    /// Laminate A and B
-   static Value_P laminate(const Value & A, sAxis axis, const Value & B);
+   /// @param where arity-prefix for )MORE text, e.g. "A,[X]B" or "A⍪[X]B"
+   /// @param A    left APL value
+   /// @param axis fractional axis between existing axes
+   /// @param B    right APL value
+   static Value_P laminate(const char * where, const cValue & A, sAxis axis,
+                           const cValue & B);
 
    /// either catenate A and B or laminate A and B
-   static Value_P catenate_or_laminate(const Value & A, const Value & X,
-                                       const Value & B);
+   /// @param where arity-prefix for )MORE text, e.g. "A,[X]B" or "A⍪[X]B"
+   /// @param A left APL value
+   /// @param X axis specification (integer → catenate, fractional → laminate)
+   /// @param B right APL value
+   static Value_P catenate_or_laminate(const char * where, const cValue & A,
+                                       const cValue & X, const cValue & B);
 
    /// Prepend scalar cell_A to B along axis
+   /// @param cell_A scalar cell to prepend
+   /// @param axis   axis along which to prepend
+   /// @param B      APL value to prepend to
    static Value_P prepend_scalar(const Cell & cell_A, uAxis axis,
-                                 const Value & B);
+                                 const cValue & B);
 
    /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(const Value & A, uAxis axis,
+   /// @param A      APL value to append to
+   /// @param axis   axis along which to append
+   /// @param cell_B scalar cell to append
+   static Value_P append_scalar(const cValue & A, uAxis axis,
                                 const Cell & cell_B);
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions catenate, laminate, and ravel along last axis */
 /// The class implementing ,
 class Bif_F12_COMMA : public Bif_COMMA
@@ -72,26 +114,34 @@ public:
    : Bif_COMMA(TOK_F12_COMMA)
    {}
 
-   /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
-   /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// overloaded Function::eval_AXB()
+   /// @param A left argument APL value
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const
+      { return Token(TOK_APL_VALUE1,
+               catenate_or_laminate("A,[X]B", A, X, B)); }
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { return ravel_axis(X, B, B->get_rank()); }
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const
+      { return ravel_axis(",[X]B", X, B, B.get_rank()); }
 
-   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return Token(TOK_APL_VALUE1,
-               catenate_or_laminate(*A, *X, *B)); }
+   /// overloaded Function::eval_AB()
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
+
+   /// overloaded Function::eval_B()
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
 
    static Bif_F12_COMMA  fun;   ///< Built-in function
 
 protected:
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /** primitive functions catenate and laminate along first axis, table */
 /// The class implementing ⍪
 class Bif_F12_COMMA1 : public Bif_COMMA
@@ -103,24 +153,32 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
 
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const
-      { return ravel_axis(X, B, 0); }
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const
+      { return ravel_axis("⍪[X]B", X, B, 0); }
 
   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
-      { return Token(TOK_APL_VALUE1, catenate_or_laminate(*A, *X, *B)); }
+   /// @param A left argument APL value
+   /// @param X axis specification
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const
+      { return Token(TOK_APL_VALUE1, catenate_or_laminate("A⍪[X]B", A, X, B)); }
 
    static Bif_F12_COMMA1  fun;   ///< Built-in function
 
 protected:
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __BIF_COMMA_HH_DEFINED__
 

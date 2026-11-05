@@ -39,11 +39,32 @@ help:
 #
 .PHONY: develop
 develop:
-	CXXFLAGS="-fstrict-aliasing -rdynamic -gdwarf-2" \
+	CXXFLAGS="-O2 -fstrict-aliasing -rdynamic -gdwarf-2" \
         ./configure  --enable-maintainer-mode        \
                      DEVELOP_WANTED=yes              \
                      CXX_WERROR=yes
 	make all
+
+###############################################################################
+# a shortcut to ./configure for developing and troubleshooting, but with all
+# optional libraries disabled (to compile #else sections in the source code).
+#
+.PHONY: nolibs
+nolibs:
+	CXXFLAGS="-O2 -fstrict-aliasing -rdynamic -gdwarf-2" \
+        ./configure	--enable-maintainer-mode         \
+                    DEVELOP_WANTED=yes               \
+                     CXX_WERROR=yes                  \
+                    --without-optional_libs
+	make -j 10 all
+
+.PHONY: test3
+test3:
+	make -j 10 -C src test3
+
+.PHONY: test4
+test4:
+	make -j 10 -C src test4
 
 ###############################################################################
 # a shortcut to ./configure for compiling the python library

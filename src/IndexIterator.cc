@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,20 @@
 #include "Output.hh"
 #include "PrintOperator.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+ostream &
+IndexIterator::print(ostream & out) const
+{
+   out << "Iterator "     << voidP(this) << ":"  << endl
+       << "   upper:       " << voidP(upper)     << endl
+       << "   value:       " << get_ivalue()     << endl
+       << "   indices[" << get_index_count()     << "] :";
+
+   loop(i, get_index_count())   out << " " << get_pos(i);
+
+   return out << endl;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 IndexIterator::operator ++()
 {
@@ -47,20 +60,7 @@ IndexIterator::operator ++()
 
    // print(CERR);
 }
-//----------------------------------------------------------------------------
-ostream &
-IndexIterator::print(ostream & out) const
-{
-   out << "Iterator "     << voidP(this) << ":"  << endl
-       << "   upper:       " << voidP(upper)     << endl
-       << "   value:       " << get_ivalue()     << endl
-       << "   indices[" << get_index_count()     << "] :";
-
-   loop(i, get_index_count())   out << " " << get_pos(i);
-
-   return out << endl;
-}
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
                                      uint32_t qio, ShapeItem max_idx)
    : IndexIterator(w, value->element_count())
@@ -71,16 +71,21 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
    indices = new ShapeItem[count];
    loop(v, count)
       {
-        const ShapeItem idx = value->get_cravel(v).get_near_int() - qio;
+        const ShapeItem idx = value->get_near_int(v) - qio;
 
-        // instead of testing signed < 0 and >= max, we test unsigned >= max.
+        // idx and max_idx are both (signed) ShapeItem, so "idx >= max_idx"
+        // alone is a signed comparison and does NOT catch a negative idx.
+        // The sole caller (cValue::index()) already validates via
+        // IndexExpr::check_index_range() before constructing this
+        // iterator, so this is currently unreachable in practice -- but
+        // test both bounds explicitly rather than relying on that.
         //
-        if (idx >= max_idx)   INDEX_ERROR;
+        if (idx < 0 || idx >= max_idx)   INDEX_ERROR;
 
         indices[v] = idx * w;
       }
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 MultiIndexIterator::MultiIndexIterator(const Shape & shape,
                                        const IndexExpr & IDX)
    : highest_it(0),
@@ -113,34 +118,55 @@ MultiIndexIterator::MultiIndexIterator(const Shape & shape,
       }
 
 ShapeItem weight = 1;
-   loop(idx_r, shape.get_rank())
-       {
-         const sAxis ax_r = shape.get_rank() - idx_r - 1;  // see comment above.
-         const ShapeItem  sh_r = shape.get_shape_item(ax_r);
-         Value_P I = IDX.values[idx_r];
-         IndexIterator * new_it;
-         if (!I)   // elided index
+   // TrueIndexIterator's ctor can throw INDEX_ERROR (and 'new' itself
+   // can throw bad_alloc); if that happens partway through this loop,
+   // the iterators built and chained by EARLIER iterations are only
+   // reachable via lowest_it/highest_it -- but since this constructor
+   // never finishes, ~MultiIndexIterator() never runs either (a
+   // throwing ctor leaves the object "never constructed" in C++), so
+   // that partial chain leaked. Catch, walk and delete it the same way
+   // the destructor does, then rethrow.
+   try
+      {
+        loop(idx_r, shape.get_rank())
             {
-              new_it = new ElidedIndexIterator(weight, sh_r);
-              if (sh_r == 0)   empty = true;
+              const sAxis ax_r = shape.get_rank() - idx_r - 1;  // see comment above.
+              const ShapeItem  sh_r = shape.get_shape_item(ax_r);
+              Value_P I = IDX.values[idx_r];
+              IndexIterator * new_it;
+              if (!I)   // elided index
+                 {
+                   new_it = new ElidedIndexIterator(weight, sh_r);
+                   if (sh_r == 0)   empty = true;
+                 }
+              else
+                 {
+                   new_it = new TrueIndexIterator(weight, I, IDX.quad_io, sh_r);
+                   if (I->element_count() == 0)   empty = true;
+                 }
+
+              Log(LOG_delete)
+                 CERR << "new    " << voidP(new_it) << " at " LOC << endl;
+
+              if (highest_it)   highest_it->set_upper(new_it);
+              else              lowest_it = new_it;
+
+              weight *= sh_r;
+              highest_it = new_it;
             }
-         else
+      }
+   catch (...)
+      {
+        for (IndexIterator * it = lowest_it; it;)
             {
-              new_it = new TrueIndexIterator(weight, I, IDX.quad_io, sh_r);
-              if (I->element_count() == 0)   empty = true;
+              IndexIterator * del = it;
+              it = it->get_upper();
+              delete del;
             }
-
-         Log(LOG_delete)
-            CERR << "new    " << voidP(new_it) << " at " LOC << endl;
-
-         if (highest_it)   highest_it->set_upper(new_it);
-         else              lowest_it = new_it;
-
-         weight *= sh_r;
-         highest_it = new_it;
-       }
+        throw;
+      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 MultiIndexIterator::~MultiIndexIterator()
 {
    for (IndexIterator * it = lowest_it; it;)
@@ -153,7 +179,7 @@ MultiIndexIterator::~MultiIndexIterator()
          delete del;
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ShapeItem
 MultiIndexIterator::operator ++(int)
 {
@@ -166,5 +192,5 @@ ShapeItem ret = 0;
    if (lowest_it)   ++*lowest_it;
    return ret;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 

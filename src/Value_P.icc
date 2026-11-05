@@ -21,7 +21,31 @@
 /** @file
 */
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+inline const cValue *
+Value_P_Base::get() const
+{
+   return value_p;
+}
+//════════════════════════════════════════════════════════════════════════════
+inline int
+cValue::get_owner_count() const
+{
+   return static_cast<const Value *>(this)->owner_count;
+}
+//════════════════════════════════════════════════════════════════════════════
+inline const cValue &
+Value_P_Base::operator*() const
+{
+   return *value_p;
+}
+//════════════════════════════════════════════════════════════════════════════
+inline const cValue *
+Value_P_Base::operator->() const
+{
+   return value_p;
+}
+//════════════════════════════════════════════════════════════════════════════
 inline void
 Value_P_Base::reset()
 {
@@ -31,20 +55,26 @@ Value_P_Base::reset()
         value_p = 0;
       }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline void
 Value_P_Base::clear(const char * loc)
 {
   if (value_p)
      {
+        // capture the post-decrement count BEFORE decrementing: if this
+        // was the last owner, decrement_owner_count() does 'delete this'
+        // -- value_p (the pointer variable) stays non-NULL, but what it
+        // points to no longer exists, so re-reading value_p->owner_count
+        // afterward (the old code below) was a use-after-free read.
+        const int count_after = value_p->owner_count - 1;
         value_p->decrement_owner_count(LOC);
-       ADD_EVENT(value_p, VHE_PtrClr,
-                 value_p ? value_p->owner_count : -99, loc);
+       ADD_EVENT(value_p, VHE_PtrClr, count_after, loc);
+       (void)count_after;   // else unused without --with-value-history
 
        value_p = 0;
      }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline void
 Value_P_Base::clear_pointer(const char * loc)
 {
@@ -61,7 +91,7 @@ Value_P_Base::clear_pointer(const char * loc)
 
 #include "Error.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline Value_P::Value_P(const char * loc)
 {
 const char * args = "const char * loc";
@@ -75,17 +105,20 @@ const char * args = "const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::~Value_P()
 {
    if (value_p)
       {
+        // see Value_P_Base::clear() above for why this is captured
+        // before decrementing, not re-read from value_p afterward.
+        const int count_after = value_p->owner_count - 1;
         value_p->decrement_owner_count(LOC);
-        ADD_EVENT(value_p, VHE_PtrDel,
-                  value_p ? value_p->owner_count : -99, LOC);
+        ADD_EVENT(value_p, VHE_PtrDel, count_after, LOC);
+        (void)count_after;   // else unused without --with-value-history
       }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const Cell & cell, const char * loc)
 {
 const char * args = "const Cell & cell, const char * loc";
@@ -99,7 +132,7 @@ const char * args = "const Cell & cell, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(ShapeItem len, const char * loc)
 {
 const char * args = "ShapeItem len, const char * loc";
@@ -113,7 +146,7 @@ const char * args = "ShapeItem len, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(ShapeItem rows, ShapeItem cols, const char * loc)
 {
 const char * args = "ShapeItem rows, Shapeitem cols, const char * loc";
@@ -127,7 +160,7 @@ const char * args = "ShapeItem rows, Shapeitem cols, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const UCS_string & ucs, const char * loc)
 {
 const char * args = "const UCS_string & ucs, const char * loc";
@@ -141,7 +174,7 @@ const char * args = "const UCS_string & ucs, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const CDR_string & cdr, const char * loc)
 {
 const char * args = "const CDR_string & cdr, const char * loc";
@@ -155,7 +188,7 @@ const char * args = "const CDR_string & cdr, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const PrintBuffer & pb, const char * loc)
 {
 const char * args = "const PrintBuffer & ob, const char * loc";
@@ -169,7 +202,7 @@ const char * args = "const PrintBuffer & ob, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const UTF8_string & utf, const char * loc)
 {
 const char * args = "const UTF8_string & utf, const char * loc";
@@ -183,7 +216,7 @@ const char * args = "const UTF8_string & utf, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const char * loc, const Shape * shape)
 {
 const char * args = "const char * loc, const Shape & shape";
@@ -197,7 +230,7 @@ const char * args = "const char * loc, const Shape & shape";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline void
 Value_P::operator =(const Value_P & other)
 {
@@ -206,7 +239,8 @@ Value_P::operator =(const Value_P & other)
    if (value_p)   // override existing pointer
       {
         value_p->decrement_owner_count(LOC);   // give up our (co-)ownership
-        ADD_EVENT(value_p, VHE_PtrClr, other.value_p->owner_count, LOC);
+        ADD_EVENT(value_p, VHE_PtrClr,
+                  other.value_p ? other.value_p->owner_count : 0, LOC);
       }
 
    value_p = other.value_p;
@@ -216,7 +250,7 @@ Value_P::operator =(const Value_P & other)
         ADD_EVENT(value_p, VHE_PtrCopy3, value_p->owner_count, LOC);
       }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const Value_P & other, const char * loc)
 {
    value_p = other.value_p;
@@ -226,7 +260,7 @@ inline Value_P::Value_P(const Value_P & other, const char * loc)
         ADD_EVENT(value_p, VHE_PtrCopy, value_p->owner_count, loc);
       }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const Value_P & other)
 {
    value_p = other.value_p;
@@ -236,7 +270,7 @@ inline Value_P::Value_P(const Value_P & other)
         ADD_EVENT(value_p, VHE_PtrCopy, value_p->owner_count, LOC);
       }
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const Shape & shape, const char * loc)
 {
 const char * args = "const Shape & shape, const char * loc";
@@ -255,7 +289,7 @@ const char * args = "const Shape & shape, const char * loc";
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(const Shape & shape, uint64_t * bits, const char * loc)
 {
    // cannot WS_FULL since bits were allocated beforehand
@@ -264,14 +298,14 @@ inline Value_P::Value_P(const Shape & shape, uint64_t * bits, const char * loc)
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline Value_P::Value_P(Value * val, const char * loc)
 {
    value_p = val;
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline void
 Value_P_Base::isolate(const char * loc)
 {
@@ -285,14 +319,29 @@ Value_P_Base::isolate(const char * loc)
       }
 #endif
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline void
 Value_P_Base::isolate_deep(const char * loc)
 {
 #ifdef NEW_CLONE
    isolate(LOC);
 
-   if (value_p)
+   // This walk is the anchor point for depth-cache invalidation (see
+   // plan.txt's 2026-09-01 analysis): every node visited here is a node
+   // that could subsequently be mutated by whatever left-value assignment
+   // is calling isolate_deep(), so marking each one dirty here is both
+   // necessary (nothing outside this walk needs invalidating -- COW
+   // guarantees a mutation can never reach a node this walk didn't visit)
+   // and sufficient (every level between the top and the eventual write
+   // gets invalidated, not just the endpoints). Free: the walk itself is
+   // mandatory for COW correctness regardless of depth caching.
+   //
+   if (value_p)   value_p->invalidate_depth();
+
+   // Packed ravels contain no PointerCells, so there is nothing to recurse
+   // into.  Also, get_wravel(j) indexes 24-byte Cell slots which goes out of
+   // bounds for sub-Cell packings (uint16_t, uint32_t, …).  Skip the loop.
+   if (value_p && !value_p->is_packed())
       {
         loop(j, value_p->nz_element_count())
             {
@@ -306,10 +355,17 @@ Value_P_Base::isolate_deep(const char * loc)
       }
 #endif
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline void
 Value_P_Base::move(Value_P_Base & other, const char * loc)
 {
+   // Bugs8 #9 (Blake McBride): with &other == this, decrementing (and
+   // possibly deleting) *this below, then re-reading other.value_p (the
+   // same, now-dangling object) is a use-after-free. No known caller
+   // does this, so this is hardening only.
+   //
+   if (this == &other)   return;
+
    if (value_p)   value_p->decrement_owner_count(loc);
    value_p = other.value_p;
    if (value_p)
@@ -317,5 +373,5 @@ Value_P_Base::move(Value_P_Base & other, const char * loc)
 
    other.value_p = 0;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

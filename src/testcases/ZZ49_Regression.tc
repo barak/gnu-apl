@@ -1,6 +1,8 @@
 ⍝ ZZ49_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       ⍝ David Tran, Dec. 2019
       ⍝
       )CLEAR
@@ -28,7 +30,7 @@ CLEAR WS
 
       ⍝ Selective specification with dyadic ¨
       ⍝
-4 ⎕CR v ← 12 (13 (14 15)) (16 17 18)
+      4 ⎕CR v ← 12 (13 (14 15)) (16 17 18)
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃12 ┏→━━━━━━━━━┓ ┏→━━━━━━━┓┃
 ┃   ┃13 ┏→━━━━┓┃ ┃16 17 18┃┃
@@ -37,14 +39,14 @@ CLEAR WS
 ┃   ┗ϵ━━━━━━━━━┛           ┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-(2↑¨v)←6 ◊ 4 ⎕CR v
+      (2↑¨v)←6 ◊ 4 ⎕CR v
 ┏→━━━━━━━━━━━━━━━┓
 ┃6 ┏→━━┓ ┏→━━━━━┓┃
 ┃  ┃6 6┃ ┃6 6 18┃┃
 ┃  ┗∼━━┛ ┗∼━━━━━┛┃
 ┗ϵ━━━━━━━━━━━━━━━┛
 
-)CHECK
+      )CHECK
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices

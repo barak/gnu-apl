@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,11 @@
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
-#include <sys/mman.h>
+
+#if HAVE_SYS_MMAN_H
+# include <sys/mman.h>
+#endif // HAVE_SYS_MMAN_H
+
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <unistd.h>
@@ -42,7 +46,7 @@ extern TCP_socket get_tcp2_for_id();
 extern uint16_t get_udp_port_for_id(const AP_num3 & id);
 extern TCP_socket get_tcp_fd2_for_id(const AP_num3 & id);
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Svar_event
 Svar_DB_server::clear_all_events(AP_num3 id)
 {
@@ -67,7 +71,7 @@ int ret = SVE_NO_EVENTS;
 
    return static_cast<Svar_event>(ret);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Svar_DB_server::get_events(Svar_event & events, AP_num3 proc) const
 {
@@ -88,7 +92,7 @@ Svar_DB_server::get_events(Svar_event & events, AP_num3 proc) const
 
    return 0;   // no key.
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB_server::add_event(SV_key key, AP_num3 proc, Svar_event event)
 {
@@ -109,7 +113,7 @@ Svar_record * svar = find_var(key, LOC);
            }
       }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Svar_DB_server::find_pairing_key(SV_key key) const
 {
@@ -127,7 +131,7 @@ const Svar_record * svar1 = find_var(key, LOC);
 
    return 0;   // pairing not found
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Svar_record *
 Svar_DB_server::find_var(SV_key key, const char * loc) const
 {
@@ -148,7 +152,7 @@ Svar_DB_server::find_var(SV_key key, const char * loc) const
         << " not found in find_var() called from " << loc << endl;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 AP_num3
 Svar_DB_server::find_offering_id(SV_key key) const
 {
@@ -159,7 +163,7 @@ Svar_record * svar = find_var(key, LOC);
 AP_num3 not_found(NO_AP, AP_NULL, NO_AP);
    return not_found;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB_server::get_offering_processors(AP_num to_proc,
                                         vector<AP_num> & processors)
@@ -196,19 +200,23 @@ vector<AP_num> procs;
          //
          processors.push_back(smallest);
 
-         // remove smallest
+         // remove smallest (all occurrences)
          //
-          loop(p, procs.size())
+          for (size_t p = 0; p < procs.size(); )
               {
                 if (smallest == procs[p])
                    {
                      procs[p] = procs.back();
                      procs.pop_back();
                    }
+                else
+                   {
+                     ++p;
+                   }
               }
        }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB_server::get_offered_variables(AP_num to_proc, AP_num from_proc,
                                       vector<uint32_t> & vars) const
@@ -238,7 +246,7 @@ Svar_DB_server::get_offered_variables(AP_num to_proc, AP_num from_proc,
             }
        }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return true iff ctl/dat is CTL/DAT, or Cxxx/Dxxx (or vice versa)
 bool
 Svar_DB_server::compare_ctl_dat_etc(const uint32_t * ctl, const uint32_t * dat)
@@ -268,7 +276,7 @@ Svar_DB_server::compare_ctl_dat_etc(const uint32_t * ctl, const uint32_t * dat)
    /* not reached */
    return false;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 SV_key
 Svar_DB_server::match_or_make(const uint32_t * UCS_varname, const AP_num3 & to,
                               const Svar_partner & from, TCP_socket tcp2)
@@ -302,7 +310,7 @@ usleep(50000);
 
    return svar->key;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Svar_record *
 Svar_DB_server::match_pending_offer(const uint32_t * UCS_varname,
                                     const AP_num3 & to,
@@ -351,7 +359,7 @@ Svar_record * pending_offer = 0;
 
    return 0;   // no match
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Svar_record *
 Svar_DB_server::create_offer(const uint32_t * UCS_varname, const AP_num3 & to,
                              const Svar_partner & from, TCP_socket tcp2)
@@ -367,7 +375,11 @@ SV_key key  = from.id.proc;   key <<= 16;
        key |= ++seq;
 
    svar->key = key;
-   for (int v = 0; v < (MAX_SVAR_NAMELEN + 1); ++v)
+   // UCS_varname (the caller's buffer) has MAX_SVAR_NAMELEN elements, so
+   // read at most that many; svar->varname has one extra slot (below) to
+   // guarantee NUL-termination regardless of how many were copied.
+   //
+   for (int v = 0; v < MAX_SVAR_NAMELEN; ++v)
        {
          svar->varname[v] = UCS_varname[v];
          if (UCS_varname[v] == 0)   break;
@@ -389,4 +401,4 @@ const TCP_socket peer = get_tcp_fd2_for_id(to);
 
    return svar;   // success
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

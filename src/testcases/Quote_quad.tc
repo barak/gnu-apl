@@ -1,6 +1,8 @@
 ⍝ Quote_quad.tc
 
 ⍝ assignment ----------------------------------
+⍝@ test3.
+
 
       2 3 4,⍞←'A HA '
 A HA 2 3 4 A HA 

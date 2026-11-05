@@ -1,0 +1,87 @@
+@ifplaintext
+\input texinfo
+@settitle Simple Stack
+@setfilename stack.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Simple Stack
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node stack
+@end ifnotplaintext
+
+@chapter Simple Stack
+@cindex stack
+
+Workspace to implements a simple stack using functional programming
+constructs.
+
+This means that whenever the stack changes the function returns a
+modified stack. Accordingly four functions are required:
+
+@deffn ∇ st∆init
+
+Function returns a new, empty stack.
+@end deffn
+
+@deffn ∇ old st∆push item
+
+Function returns stack old with item as the first item on old.
+@end deffn
+
+@deffn ∇ old st∆peek item
+
+Function returns the first item on stack old.
+@end deffn
+
+@deffn ∇ st∆pop old
+
+Function returns stack old with the first item removed.
+
+@end deffn
+
+To use this library, first initiate the stack:
+
+@example
+      my_stack←st∆init
+@end example
+
+Add items to the stack:
+
+@example
+      my_stack←my_stack st∆push item
+@end example
+
+Pop items from the stack:
+
+@example
+      item←st∆peek my_stack
+      my_stack← st∆pop my_stack
+@end example

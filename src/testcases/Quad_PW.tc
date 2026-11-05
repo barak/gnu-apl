@@ -1,6 +1,8 @@
 ⍝ Quad_PW.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕PW
 80
 
@@ -13,7 +15,7 @@
 SUPERCALIFRAGILISTIC|EXPIALIDO
       CIOUS
 
-⍝ rows folded together ----------------------------------
+      ⍝ rows folded together ----------------------------------
 
       2 36ρ'AAaBBbCCcDDdEEeFFfGGgHHhIIiJJjKKkLLl'
 AAaBBbCCcDDdEEeFFfGGgHHhIIiJJj
@@ -21,14 +23,14 @@ AAaBBbCCcDDdEEeFFfGGgHHhIIiJJj
 AAaBBbCCcDDdEEeFFfGGgHHhIIiJJj
       KKkLLl
 
-⍝ numbers folded before ⎕PW reached ----------------------------------
+      ⍝ numbers folded before ⎕PW reached ----------------------------------
       2 3∘.⍟10 20 30
 3.321928095 4.321928095
       4.906890596
 2.095903274 2.726833028
       3.095903274
 
-⍝ ==================================
+      ⍝ ==================================
 
       ⎕PW←80
 

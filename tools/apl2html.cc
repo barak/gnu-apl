@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -97,12 +97,22 @@ bool apl_to_html = true;
 int year, mon, day;
 
    {
+     // Blake McBride, Bugs12.md #12a: the statements below used to read
+     // tv.tv_sec *before* gettimeofday() filled it in (uninitialized), and
+     // dereferenced localtime()'s result without checking for NULL (which
+     // it returns for an out-of-range time_t).
+     //
      timeval tv;
      gettimeofday(&tv, 0);
-     tm * t = localtime(&tv.tv_sec);
-     year = 1900 + t->tm_year;
-     mon = 1 + t->tm_mon;
-     day = t->tm_mday;
+     const time_t seconds = tv.tv_sec;
+     tm * t = localtime(&seconds);
+     if (t == 0)   { year = 1900;   mon = 1;   day = 1; }
+     else
+        {
+          year = 1900 + t->tm_year;
+          mon = 1 + t->tm_mon;
+          day = t->tm_mday;
+        }
    }
 
    for (int a = 1; a < argc; )

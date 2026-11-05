@@ -210,7 +210,24 @@ char_uni(DOUBLE_ARROW_L    , 0x21E8 , END          , NO_SPACE      ) /* ⇨ */
 char_def(DELTA             , 0x2206 , SYMBOL       , SYMBOL   ,  B6) /* ∆ */
 char_def(NABLA             , 0x2207 , END          , NO_SPACE ,  B7) /* ∇ */
 char_uni(ELEMENT1          , 0x2208 , F12_ELEMENT  , NO_SPACE      ) /* ∈ */
-char_uni(ELEMENT2          , 0x220A , F12_ELEMENT  , NO_SPACE      ) /* ∊ */
+// ELEMENT2 (∊, U+220A): GNU APL's canonical F12_ELEMENT glyph is still
+// ELEMENT (ϵ, U+03F5) above -- ∊ is merely also recognized as valid
+// input and, since apl2lrm.txt p.273/Appendix A lists it as one of the
+// APL2 primitive characters that must be present in ⎕AV, also given a
+// slot in ⎕AV (Blake McBride, LanguageVariances.md #36: GNU APL's ⎕AV
+// omitted it entirely, which also caused 2⎕TF to needlessly ⎕UCS-escape
+// it, LanguageVariances.md #34a). Took over the AV slot vacated by
+// demoting DIAMOND_UNDERBAR (⍚) below to char_uni: per this file's own
+// header comment, the char_def(, 0xx, ...) entries are "characters in
+// ⎕AV without APL relevance ... subject to being removed in favour of
+// new APL characters with APL relevance" -- DIAMOND_UNDERBAR is exactly
+// such an entry (Token END, confirmed unreferenced anywhere else in the
+// source tree or testcases except the ⎕AV dump itself). Must stay here,
+// in ascending-Unicode file order among char_def entries (Avec::find_char()
+// binary-searches character_table, which is built strictly in char_def
+// file order -- char_uni lines don't participate and don't break that).
+//
+char_def(ELEMENT2          , 0x220A , F12_ELEMENT  , NO_SPACE , 0A7) /* ∊ */
 char_def(RING_OPERATOR     , 0x2218 , JOT          , NO_SPACE ,  F8) /* ∘ */
 char_uni(INFINITY          , 0x221E , END          , NO_SPACE      ) /* ∞ */
 char_def(DIVIDES           , 0x2223 , F12_STILE    , NO_SPACE ,  B2) /* ∣ */
@@ -265,12 +282,16 @@ char_def(UP_VANE           , 0x234F , END          , NO_SPACE , 09B) /* ⍏ */
 char_def(Quad_UP_ARROW     , 0x2350 , END          , NO_SPACE , 0A0) /* ⍐ */
 char_def(UP_TACK_OVERBAR   , 0x2351 , END          , NO_SPACE , 0A1) /* ⍑ */
 char_def(SORT_DECENDING    , 0x2352 , F12_SORT_DES , NO_SPACE ,  FC) /* ⍒ */
+// Quad_UP_CARET/Quad_DEL (⍓/⍔, U+2353/U+2354): tolerated per n3067
+// (devel_doc/n3067.pdf), see CIRCLE_SLASH above for rationale.
+char_uni(Quad_UP_CARET     , 0x2353 , END          , NO_SPACE      ) /* ⍓ */
+char_uni(Quad_DEL          , 0x2354 , END          , NO_SPACE      ) /* ⍔ */
 char_def(FORMAT            , 0x2355 , F12_FORMAT   , NO_SPACE ,  AE) /* ⍕ */
 char_def(DOWN_VANE         , 0x2356 , END          , NO_SPACE , 0A4) /* ⍖ */
 char_def(Quad_DOWN_ARROW   , 0x2357 , END          , NO_SPACE , 0A5) /* ⍗ */
 char_def(QUOTE_UNDERBAR    , 0x2358 , END          , NO_SPACE , 0A6) /* ⍘ */
 char_def(DELTA_UNDERBAR    , 0x2359 , SYMBOL       , SYMBOL   ,  F7) /* ⍙ */
-char_def(DIAMOND_UNDERBAR  , 0x235A , END          , NO_SPACE , 0A7) /* ⍚ */
+char_uni(DIAMOND_UNDERBAR  , 0x235A , END          , NO_SPACE      ) /* ⍚ */
 char_def(JOT_UNDERBAR      , 0x235B , END          , NO_SPACE , 0A8) /* ⍛ */
 char_def(CIRCLE_UNDERBAR   , 0x235C , END          , NO_SPACE , 0AA) /* ⍜ */
 char_def(COMMENT           , 0x235D , END          , NO_SPACE ,  E4) /* ⍝ */

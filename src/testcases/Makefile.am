@@ -1,26 +1,70 @@
 
 # testcases that may be of interest
 
+SUBDIRS      = invariants
+DIST_SUBDIRS = invariants
+
+# testcases for STRICT_IBM_APL2_FORMATTING parentheses (make testPARENS)
+# and yes (make testSTRICT)
+#
+EXTRA_DIST = parentheses/FORMAT_PARENS.tc \
+             strict/FORMAT_CPLX.tc \
+             strict/FORMAT_STRICT.tc
+
+# the library root of the testcases (make test etc. run ./apl --libroot
+# testcases/libroot). Not installed. Its files workspaces/ASSERT.apl,
+# wslib5/FILE_IO.apl, and wslib5/FILE_IO1.apl are copied from the master
+# copies in ../../wslib5/ by src/Makefile (TEST_LIBROOT_COPIES); the files
+# below are separate copies for the testcases.
+#
+EXTRA_DIST += libroot/workspaces/DIJKSTRA.atf           \
+              libroot/workspaces/DOMINO-APL.apl         \
+              libroot/workspaces/FORMAT_FUZZ.apl        \
+              libroot/workspaces/GPROF_LOOP.apl         \
+              libroot/workspaces/Performance.apl        \
+              libroot/workspaces/Performance.gnuplot    \
+              libroot/workspaces/TEST3.atf              \
+              libroot/workspaces/TF2_test.tc            \
+              libroot/workspaces/qq111.atf              \
+              libroot/workspaces/display/DISPLAY.atf    \
+              libroot/workspaces/display/DISPLAY.fun    \
+              libroot/workspaces/display/DISPLAYC.fun   \
+              libroot/workspaces/display/DISPLAYG.fun   \
+              libroot/wslib1/arg_parser.apl             \
+              libroot/wslib1/arg_parser_script.apl      \
+              libroot/wslib3/INVARIANTS.apl             \
+              libroot/wslib5/ISO-13751.apl
+
 # put them into apl-x.x.tar.gz, but don't install them.
 #
 dist_noinst_DATA =                              \
-		0000_OBSOLETE_TESTCASES                 \
+        0000_OBSOLETE_TESTCASES                 \
         AAA0_Global_Settings.tc                 \
         AAA1.tc                                 \
         AAA2.tc                                 \
         AAA3.tc                                 \
         AAA4_Function_headers.tc                \
         Add.tc                                  \
+        AllExpressions.tc                       \
+        AllPrimitives.tc                        \
         And.tc                                  \
         AP100.tc                                \
         AP210.tc                                \
         APnnn.tc                                \
+        APnnn_1011.sh                           \
+        APnnn_1011.tc2                          \
+        apl2lrm.tc                              \
         Binding.tc                              \
         Branch.tc                               \
         Binomial.tc                             \
         BobSmithChars.tc                        \
         Boolean.tc                              \
         Bracket_Index.tc                        \
+        Bugs35_Workspace.tc                     \
+        Bugs37_A.tc                             \
+        Bugs37_B.tc                             \
+        Bugs37_CD.tc                            \
+        Bugs37_Workspace.tc                     \
         Catenate.tc                             \
         Catenate_with_Axis.tc                   \
         Ceiling.tc                              \
@@ -33,6 +77,7 @@ dist_noinst_DATA =                              \
         Conjugate.tc                            \
         CopyOnWrite.tc                          \
         COPY.tc                                 \
+        Coverage.tc                             \
         Deal.tc                                 \
         Decode.tc                               \
         Depth.tc                                \
@@ -40,6 +85,7 @@ dist_noinst_DATA =                              \
         Disclose.tc                             \
         Disclose_with_axis.tc                   \
         Divide.tc                               \
+        Domino_stress.tc                        \
         Drop.tc                                 \
         Drop_with_axis.tc                       \
         DumpLoad.tc                             \
@@ -50,6 +96,7 @@ dist_noinst_DATA =                              \
         Encode.tc                               \
         Enlist.tc                               \
         Execute_Each.tc                         \
+        Execute_NEXTFILE.tc                     \
         Execute.tc                              \
         Expand.tc                               \
         Expand_with_axis.tc                     \
@@ -64,6 +111,9 @@ dist_noinst_DATA =                              \
         Format_by_example.tc                    \
         Format_by_spec.tc                       \
         Format.tc                               \
+        FORMAT_COLS.tc                          \
+        FORMAT_RANK.tc                          \
+        FORMAT_SCALE.tc                         \
         Grade_down.tc                           \
         Grade_down_with_collating_sequence.tc   \
         Grade_up.tc                             \
@@ -75,6 +125,7 @@ dist_noinst_DATA =                              \
         Inner_product.tc                        \
         Intersection.tc                         \
         Interval.tc                             \
+        Interval_Index.tc                       \
         Lambda.tc                               \
         Laminate.tc                             \
         Logarithm.tc                            \
@@ -103,12 +154,14 @@ dist_noinst_DATA =                              \
         Or.tc                                   \
         OuterProduct.tc                         \
         Parallel.tc                             \
+        Parentheses.tc                          \
         Partition.tc                            \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
         PiTimes.tc                              \
         Polynomials.tc                          \
         Power.tc                                \
+        Prototype.tc                            \
         Quad_AF.tc                              \
         Quad_AI.tc                              \
         Quad_ARG.tc                             \
@@ -124,10 +177,12 @@ dist_noinst_DATA =                              \
         Quad_EC.tc                              \
         Quad_EM.tc                              \
         Quad_ES.tc                              \
+        Quad_ES_issuer.tc                       \
         Quad_ET.tc                              \
         Quad_EX.tc                              \
         Quad_FC.tc                              \
         Quad_FIO.tc                             \
+        Quad_FIO1.tc                            \
         Quad_FX.tc                              \
         Quad_INP.tc                             \
         Quad_JSON.tc                            \
@@ -136,6 +191,7 @@ dist_noinst_DATA =                              \
         Quad_L.tc                               \
         Quad_LX.tc                              \
         Quad_MAP.tc                             \
+        Quad_MX.tc                              \
         Quad_NC.tc                              \
         Quad_NL.tc                              \
         Quad_PLOT.tc                            \
@@ -146,6 +202,7 @@ dist_noinst_DATA =                              \
         Quad_RL.tc                              \
         Quad_R.tc                               \
         Quad_RE.tc                              \
+        Quad_RVAL.tc                            \
         Quad_SQL_postgres.tc                    \
         Quad_SQL_sqlite.tc                      \
         Quad_SVE.tc                             \
@@ -180,6 +237,7 @@ dist_noinst_DATA =                              \
         Rotate.tc                               \
         Rotate_with_axis.tc                     \
         SaveLoad.tc                             \
+        Scalar_function.tc                      \
         Scan.tc                                 \
         Scan_with_axis.tc                       \
         Shape.tc                                \
@@ -197,6 +255,7 @@ dist_noinst_DATA =                              \
         Without.tc                              \
         Zilde.tc                                \
         ZZ01_Invariants.tc                      \
+        ZZ02_GTK.tc                             \
         ZZ03_Regression.tc                      \
         ZZ04_Regression.tc                      \
         ZZ05_Regression.tc                      \
@@ -229,6 +288,7 @@ dist_noinst_DATA =                              \
         ZZ33_Regression.tc                      \
         ZZ34_Regression.tc                      \
         ZZ35_Regression.tc                      \
+        ZZ36_Regression.tc                      \
         ZZ37_Regression.tc                      \
         ZZ38_Regression.tc                      \
         ZZ39_Regression.tc                      \
@@ -256,6 +316,17 @@ dist_noinst_DATA =                              \
         ZZ61_Regression.tc                      \
         ZZ62_Regression.tc                      \
         ZZ63_Regression.tc                      \
+        ZZ64_Regression.tc                      \
+        ZZ65_Regression.tc                      \
+        ZZ66_Regression.tc                      \
+        ZZ67_Regression.tc                      \
+        ZZ68_Regression.tc                      \
+        ZZ69_Regression.tc                      \
+        ZZ70_Regression.tc                      \
+        ZZ71_Regression.tc                      \
+        ZZ72_Regression.tc                      \
+        ZZ73_Regression.tc                      \
+        ZZ74_Regression.tc                      \
         ZZZ0_Standard_08x.tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \

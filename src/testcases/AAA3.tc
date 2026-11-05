@@ -1,6 +1,8 @@
 ⍝ AAA3.tc
 
-⍝ nested vector p. 10 ----------------------------------
+      ⍝ nested vector p. 10 ----------------------------------
+⍝@ test3.
+
 
       4⎕CR  1 2 'MORE' (3 'A') (2 2ρι4) 'B'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━┓
@@ -19,14 +21,14 @@
 ┃           ┗ϵ━━━━━┛        ┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-⍝ small real or complext parts, lrm 13 ----------------------------------
+      ⍝ small real or complext parts, lrm 13 ----------------------------------
 
-      ⎕PP←17
+      ⎕PP←17   ⍝ maximum ⎕PP: no part is dropped (lrm p. 13, Bugs32 #13)
       3E45J2   ⍝ complex part << real part × 10⋆⎕PP
-3E45
+3.0000000000000001E45J2
 
       2J3E45   ⍝ real part << complex part
-2J3E45
+2J3.0000000000000001E45
 
       ⎕PP←10
       3E45J2   ⍝ complex part << real part × 10⋆⎕PP
@@ -35,7 +37,25 @@
       2J3E45   ⍝ real part << complex part
 0J3E45
 
-⍝ vector notation p. 14 ----------------------------------
+      ⍝ "orders of magnitude" are the decimal exponents (as in IBM APL2,
+      ⍝ verified with APL2): with ⎕PP←5, 18.104 (exponent 1) in 2.46E6J18.104
+      ⍝ (exponent 6) differs by 5 orders and is displayed, while 0.0055 in
+      ⍝ 2.41E4J0.0055 (¯3 vs. 4) and 1.49E¯8 in 1.49E¯8J0.0404 (¯8 vs. ¯2)
+      ⍝ differ by more than 5 and are not.
+      ⍝
+      ⎕PP←5
+      2.46E6J18.104
+2.46E6J18.104
+
+      2.41E4J0.0055
+24100
+
+      1.49E¯8J0.0404
+0J0.0404
+
+      ⎕PP←10
+
+      ⍝ vector notation p. 14 ----------------------------------
 
       3 4 5 6
 3 4 5 6
@@ -47,7 +67,7 @@ FACE
       2 3 X 36
 2 3 6 36
 
-⍝ simple vector p. 14 ----------------------------------
+      ⍝ simple vector p. 14 ----------------------------------
 
       X1←1 2
       X1
@@ -89,13 +109,13 @@ FACE
       (2('X')(8))
 2 X 8
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
       ('F' 'A' 'C' 'E')
 FACE
       'FACE'
 FACE
 
-⍝ nested vector p. 15 ----------------------------------
+      ⍝ nested vector p. 15 ----------------------------------
 
       (1 2 3)(4 5 6)(7 8)
  1 2 3  4 5 6  7 8 
@@ -117,7 +137,117 @@ FACE
       ⍴'O' V 'X'
 3
 
-⍝ general# ----------------------------------
+      ⍝ complex columns p. 17-18 ----------------------------------
+      ⍝
+      ⍝ The real parts and the imaginary parts of a column are formatted
+      ⍝ as two sub-columns, each in the same format (scaled as a whole if
+      ⍝ one item needs it, same number of fractional digits). The J's are
+      ⍝ aligned, but unlike in the LRM example on p. 18 (2   J3, which
+      ⍝ also aligns the decimal points of the real parts) without blanks
+      ⍝ inside a number: the real part is directly left and the imaginary
+      ⍝ part directly right of the J. A column without any J is aligned
+      ⍝ like a real column.
+      ⍝
+      2 4⍴1 12.3 345 6J7 .1 .12 1J2 16J6
+1   12.3  345    6J7
+0.1  0.12   1J2 16J6
+
+
+
+      4 4⍴0 1 2J3 4J5.6 7.8J9
+  0       1       2J3 4J5.6
+7.8J9     0       1   2J3
+  4J5.6 7.8J9     0   1
+  2J3     4J5.6 7.8J9 0
+
+
+
+      ⎕PP←5
+      2 2⍴600J100 1 7.39E5J1 6160
+6.00E2J100    1
+7.39E5J1   6160
+
+
+
+      3 1⍴1.25J2 ¯10J3.5 7
+  1.25J2
+   ¯10J3.5
+     7
+
+
+
+      3 2⍴0J7.39E5 1 6E2J1E2 6160 1.5 2J3
+    0J7.39E5    1
+  600J1.00E2 6160
+  1.5           2J3
+
+
+
+      ⍝ no J displayed (lrm p. 13), but still the format of the column
+      ⍝ (used to be 17.0300E0)
+      ⍝
+      2 1⍴1.3059E7J1.4E¯9 17.030490339926011J7.2831999999999998E¯9
+1.3059E7
+1.7030E1
+
+
+
+      2 1⍴1.5E¯8 1E¯7J1E5
+1.5E¯8
+ 0.0E0J1E5
+
+
+
+      ⍝ a complex scalar: the real part is only scaled if it needs it
+      ⍝ (used to be 9.5715E3J1.824E5)
+      ⍝
+      9.5715E3J1.824E5
+9571.5J1.824E5
+
+
+
+      ⎕PP←10
+
+      ⍝ columns of mixed and nested arrays ----------------------------
+      ⍝
+      ⍝ As in IBM APL2, the numbers in a column of a mixed or nested array
+      ⍝ have no common format (e.g. 600.0E0). Unlike IBM APL2 (and unless
+      ⍝ STRICT_IBM_APL2_FORMATTING), unscaled real numbers are aligned at
+      ⍝ their decimal points; other items are right-aligned.
+      ⍝
+      ⎕PP←5
+      3 1⍴600 (⊂1 2) 4.2E¯9
+    600 
+   1 2  
+ 4.2E¯9 
+
+
+
+      4 1⍴1.5 22.25 333 (⊂4 5)
+   1.5  
+  22.25 
+ 333    
+   4 5  
+
+
+
+      3 1⍴'X' 8E6J4.2E5 3
+        X
+8E6J4.2E5
+        3
+
+
+
+      3 1⍴1J2 'X' 10.5
+ 1J2
+   X
+10.5
+
+
+
+      ⎕PP←10
+
+      ⍝ general# ----------------------------------
 
       ⎕IO←1
       ⎕IO

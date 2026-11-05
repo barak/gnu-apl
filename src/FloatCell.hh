@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "IntCell.hh"
 #include "RealCell.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
  A cell containing a single APL floating point value.  This class overloads
  certain functions in class Cell with floating point number specific
@@ -49,12 +49,15 @@ class FloatCell : public RealCell
 
 public:
    /// Construct an floating point cell from a double \b r.
+   /// @param r the floating-point value to store
    FloatCell(APL_Float r)
       { value.fval.u1.flt = r;   value.fval.denominator = 0; }
 
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// Construct an floating point cell from a quotient of integers. The caller
    /// must ensure that denom > 0 and that common divisors have been removed!
+   /// @param numer numerator of the rational value
+   /// @param denom denominator of the rational value (must be > 0)
    FloatCell(APL_Integer numer, APL_Integer denom)
       {
         Assert1(denom > 0);
@@ -63,6 +66,9 @@ public:
       }
 
    /// overloaded Cell::init_other
+   /// @param other uninitialized storage for the new cell
+   /// @param cell_owner the Value that will own the new cell
+   /// @param loc caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner,
                            const char * loc) const
       { if (value.fval.denominator)
@@ -89,17 +95,21 @@ public:
         return value.fval.u1.flt;
       }
 
-# if APL_Float_is_class
+#  if APL_Float_is_class
    /// overloaded Cell::release()
+   /// @param loc caller location for diagnostics
    virtual void release(const char * loc)
       {
         if (get_denominator() == 0)   // APL_Float class used
            release_APL_Float(value.fval.u1.flt.pAPL_Float());
       }
-# endif
+#  endif
 
 #else // not cfg_RATIONAL_NUMBERS_WANTED
    /// overloaded Cell::init_other
+   /// @param other uninitialized storage for the new cell
+   /// @param cell_owner the Value that will own the new cell
+   /// @param loc caller location for diagnostics
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   FloatCell(dfval()); }
 
@@ -108,11 +118,12 @@ public:
    APL_Float dfval() const
       { return value.fval.u1.flt; }
 
-# if APL_Float_is_class
+#  if APL_Float_is_class
    /// overloaded Cell::release()
+   /// @param loc caller location for diagnostics
    virtual void release(const char * loc)
       { release_APL_Float(value.fval.u1.flt.pAPL_Float()); }
-# endif
+#  endif
 
 #endif
 
@@ -124,108 +135,162 @@ public:
       { return isfinite(dfval()); }
 
    /// Overloaded Cell::greater().
+   /// @param other the cell to compare against
    virtual bool greater(const Cell & other) const;
 
    /// Overloaded Cell::equal().
+   /// @param other the cell to compare against
+   /// @param qct comparison tolerance (⎕CT)
    virtual bool equal(const Cell & other, double qct) const;
 
    /// Overloaded Cell::bif_add().
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_add(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_ceiling(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_conjugate(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_direction(Cell * Z) const;
 
    /// Overloaded Cell::bif_divide().
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_divide(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_exponential(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_factorial(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_floor(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_magnitude(Cell * Z) const;
 
    /// Overloaded Cell::bif_multiply().
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply(Cell * Z, const Cell * A) const;
 
    /// Overloaded Cell::bif_power().
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_power(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_nat_log(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_negative(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_pi_times(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_pi_times_inverse(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_reciprocal(Cell * Z) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_roll(Cell * Z) const;
 
    /// compare this with other, throw DOMAIN ERROR on illegal comparisons
+   /// @param other the cell to compare against
    virtual Comp_result compare(const Cell & other) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_maximum(Cell * Z, const Cell * A) const;
 
   /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_minimum(Cell * Z, const Cell * A) const;
 
    /// Overloaded from the corresponding Cell:: function (see class Cell).
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_residue(Cell * Z, const Cell * A) const;
 
    /// Overloaded Cell::bif_subtract().
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_subtract(Cell * Z, const Cell * A) const;
 
    /// the Quad_CR representation of this cell.
+   /// @param pctx print context (precision, print width, format style)
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
    /// return true iff this cell needs scaling (exponential format) in pctx.
+   /// @param pctx print context (precision, print width, format style)
    virtual bool need_scaling(const PrintContext &pctx) const
       { return need_scaling(dfval(), pctx.get_PP()); }
 
    /// overloaded Cell::bif_add_inverse()
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_multiply_inverse()
+   /// @param Z result cell to initialize
+   /// @param A left argument cell
    virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
 
    /// return true if the integer part of val is longer than ⎕PP
+   /// @param val the floating-point value to test
+   /// @param quad_pp current value of ⎕PP (print precision)
    static bool is_big(APL_Float val, int quad_pp);
 
    /// Return true iff the (fixed point) floating point number num shall
    /// be printed in scaled form (like 1.2E6).
+   /// @param val the floating-point value to test
+   /// @param quad_pp current value of ⎕PP (print precision)
    static bool need_scaling(APL_Float val, int quad_pp);
 
-   /// replace normal chars by special chars specified in ⎕FC
+   /// replace . and ¯ by ⎕FC[1] and ⎕FC[6] (for format by specification,
+   /// the only formatter besides format by example that uses ⎕FC, LRM p.291)
+   /// @param ucs the string whose characters are mapped in-place
    static void map_FC(UCS_string & ucs);
 
    /// greatest common divisor, Knuth Vol. 1 p. 14
+   /// @param m first integer operand
+   /// @param n second integer operand
    static APL_Integer gcd(APL_Integer m, APL_Integer n)
       {
-        if (m == 0)   return n;
-        if (n == 0)   return m;
-
+        // Bugs28 #100(l): the zero shortcuts below used to run BEFORE
+        // the abs() calls, so they returned the OTHER operand with
+        // whatever sign it happened to have (e.g. 0∨¯5 gave ¯5 instead
+        // of 5) -- every other GCD result here is already normalised
+        // non-negative via the abs() calls, which just needed to run
+        // first.
+        //
         if (m < 0)   m = -m;
         if (n < 0)   n = -n;
+
+        if (m == 0)   return n;
+        if (n == 0)   return m;
 
         // E1: Initialize
         APL_Integer a_ = 1;
@@ -269,12 +334,17 @@ public:
 #endif
 
    /// initialize the (un-initialized) Cell *Z to APL_Float flt
+   /// @param Z uninitialized cell to construct in-place
+   /// @param flt the floating-point value to store
    static ErrorCode zF(Cell * Z, APL_Float flt)
       { new (Z) FloatCell(flt);   return E_NO_ERROR; }
 
 protected:
 #ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// initialize the (un-initialized) Cell *Z to APL_Float numer ÷ denom)
+   /// @param Z uninitialized cell to construct in-place
+   /// @param numer numerator of the rational value
+   /// @param denom denominator of the rational value (must be > 0)
    static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
       { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }
 #endif
@@ -307,10 +377,12 @@ protected:
    virtual bool is_near_int() const
       { return Cell::is_near_int(dfval()); }
 
-   /// overloaded Cell::bif_near_int()
+   /// overloaded Cell::bif_near_int64_t()
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_near_int64_t(Cell * Z) const;
 
    /// overloaded Cell::bif_within_quad_CT()
+   /// @param Z result cell to initialize
    virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
 
    /// Overloaded Cell::is_near_zero().
@@ -338,7 +410,35 @@ protected:
 
    /// downcast to FloatCell
    virtual FloatCell & vFloatCell()   { return *this; }
+
+   // ── bif_XXX_ff / _fi / _f workers (moved from NumericCell) ──────────────
+   static ErrorCode bif_add_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_subtract_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_multiply_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_divide_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_power_fi(Cell * Z, APL_Float a, APL_Integer b);
+   static ErrorCode bif_power_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_logarithm_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_maximum_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_minimum_ff(Cell * Z, APL_Float a, APL_Float b);
+   static ErrorCode bif_residue_ff(Cell * Z, APL_Float a, APL_Float b);
+
+   static ErrorCode bif_ceiling_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_floor_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_conjugate_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_direction_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_exponential_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_factorial_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_magnitude_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_nat_log_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_negative_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_pi_times_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_pi_times_inverse_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_reciprocal_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_roll_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_near_int64_t_f(Cell * Z, APL_Float b);
+   static ErrorCode bif_within_quad_CT_f(Cell * Z, APL_Float b);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __FLOATCELL_HH_DEFINED__

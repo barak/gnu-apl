@@ -55,7 +55,7 @@
    6-byte encodings
 */
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 UTF8_string::UTF8_string(const UCS_string & ucs)
 {
    Log(LOG_char_conversion)
@@ -70,7 +70,27 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
            }
         else                       // N-byte unicode
            {
-             char sixbits[5];
+             // For uni >= 0x80000000 (every genuinely negative Unicode,
+             // e.g. ⎕UCS ¯1, once cast to uint32_t here) the loop below
+             // needs a 7th continuation byte -- one byte more than any
+             // UTF-8 variant (even the old pre-RFC-3629 6-byte/31-bit
+             // scheme) can represent, and one byte more than
+             // libapl.h's Unicode_to_UTF8() contract ("provide at least
+             // 7 bytes for dest, dest will be 0-terminated") accounts
+             // for: that function writes exactly this string's bytes
+             // plus a NUL, so an 8-byte need against a 7-byte documented
+             // buffer is a 1-byte OOB write for any caller that follows
+             // the documented contract. Clamp instead of growing past
+             // the 6-byte/31-bit maximum -- 0x7FFFFFFF is not a
+             // meaningful Unicode codepoint either way.
+             if (uni >= 0x80000000U)   uni = 0x7FFFFFFF;
+
+             // sixbits must hold up to 6 continuation bytes: for
+             // uni == 0x7FFFFFFF the loop below writes indices 0..5
+             // (confirmed with ASan -- sixbits[5] overflowed by one
+             // byte before the clamp above existed).
+             //
+             char sixbits[6];
              char * s = sixbits;
              while (uni >= 0x40U >> (s - sixbits))  
                    { *s++ = 0x80 | (uni & 0x3F);   uni >>= 6; }
@@ -83,7 +103,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 UTF8_string::dump_hex(ostream & out, const UTF8 * utf, int size, int max_bytes)
 {
@@ -114,9 +134,10 @@ UTF8_string::dump_hex(ostream & out, const UTF8 * utf, int size, int max_bytes)
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
-UTF8_string::toUni(const UTF8 * string, int & len, bool verbose)
+UTF8_string::toUni(const UTF8 * string, int & len, bool verbose,
+                  const UTF8 * end)
 {
 const uint32_t b0 = *string++;
    if (b0 < 0x80)                  { len = 1;   return Unicode(b0); }
@@ -132,6 +153,11 @@ uint32_t bx = b0;   // the "significant" bits in b0
         CERR << "Bad UTF8 sequence: " << HEX(b0);
         loop(j, 6)
            {
+             // most callers pass no end, in which case we must not read
+             // any further bytes at all (rather than only bounding the
+             // read when end happens to be supplied): confirmed OOB read
+             // of up to 6 bytes past string with end == 0.
+             if (end == 0 || string + j >= end)   break;
              const uint32_t bx = string[j];
              if (bx & 0x80)   CERR << " " << HEX(bx);
              else              break;
@@ -139,10 +165,38 @@ uint32_t bx = b0;   // the "significant" bits in b0
 
         CERR <<  " at " LOC << endl;
 
-        BACKTRACE
-        Assert(0 && "Internal error in UTF8_string::toUni()");
+        // Bugs28 #100(x): a BACKTRACE call used to sit here too. The
+        // CERR diagnostic and the recovery/fallback below it (see the
+        // comment) are both deliberate, but a full stack-trace dump for
+        // perfectly ordinary bad input (e.g. )LOAD of a workspace file
+        // containing invalid UTF-8) is not -- unlike the genuinely
+        // exceptional cases BACKTRACE exists for elsewhere.
+        //
+        // No Assert() here: at the project's *default* ASSERT_LEVEL (1,
+        // not 0 -- see configure.ac), Assert(0 && ...) is not a no-op,
+        // it throws via do_Assert(), so it would pre-empt exactly the
+        // fallback below that a malformed/truncated workspace file (or
+        // any other bad input) needs: without it, len keeps whatever
+        // the caller passed in and the continuation-byte code below
+        // runs with a garbage/attacker-uninfluenced length -- an
+        // infinite loop (some callers pre-set len=0, advancing the
+        // cursor by 0 forever) or an OOB read (DiffOut::different()
+        // leaves len uninitialized). Fail the same way the non-verbose
+        // branch already does.
+        len = 0;
+        return Invalid_Unicode;
       }
    else
+      {
+        len = 0;
+        return Invalid_Unicode;
+      }
+
+   // string already advanced past b0; len-1 continuation bytes remain
+   // to be read at string[0]..string[len-2]. Reject a sequence that
+   // would read at or past end instead of reading out of bounds.
+   //
+   if (end && string + (len - 1) > end)
       {
         len = 0;
         return Invalid_Unicode;
@@ -155,7 +209,17 @@ uint32_t uni = 0;
          if ((subc & 0xC0) != 0x80)
             {
               CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;
-              Assert(0 && "Internal error in UTF8_string::toUni()");
+
+              // No Assert() here: at the project's default ASSERT_LEVEL
+              // (1), Assert(0 && ...) throws via do_Assert() instead of
+              // being a no-op, which would pre-empt exactly this
+              // fallback -- without it, a bad continuation byte would
+              // fall through and get silently folded into uni as if it
+              // were valid instead of failing the decode. len was
+              // already fully consumed by the time we get here (this
+              // loop doesn't advance len), so just return the failure
+              // the same way the lead-byte checks above do.
+              return Invalid_Unicode;
             }
 
          bx  <<= 6;
@@ -165,7 +229,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 UTF8_string::bytes_chars(const void * string)
 {
@@ -175,7 +239,7 @@ int ret = 0;
    while (*str)   { if (0x80 == (0xC0 & *str++))   ++ret; }
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Unicode
 UTF8_string::getc(istream & in)
 {
@@ -188,7 +252,9 @@ int len;
 
    if      ((b0 & 0xE0) == 0xC0)   { len = 1;   bx &= 0x1F; }
    else if ((b0 & 0xF0) == 0xE0)   { len = 2;   bx &= 0x0F; }
-   else if ((b0 & 0xF8) == 0xF0)   { len = 3;   bx &= 0x0E; }
+   else if ((b0 & 0xF8) == 0xF0)   { len = 3;   bx &= 0x07; }
+   else if ((b0 & 0xFC) == 0xF8)   { len = 4;   bx &= 0x03; }
+   else if ((b0 & 0xFE) == 0xFC)   { len = 5;   bx &= 0x01; }
    else
       {
         CERR << "Bad UTF8 sequence: " << HEX(b0) << "... at " LOC << endl;
@@ -196,7 +262,7 @@ int len;
         return Invalid_Unicode;
       }
 
-char cc[4];
+char cc[8];   // max 6 continuation bytes + NUL, rounded up
    in.get(cc, len + 1);   // read subsequent characters + terminating 0
    if (!in.good())   return Invalid_Unicode;
 
@@ -217,7 +283,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UTF8_string::starts_with(const char * path) const
 {
@@ -231,7 +297,7 @@ const size_t path_len = strlen(path);
    loop(p, path_len)   if (at(p) != path[p])   return false;
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 UTF8_string::ends_with(const char * ext) const
 {
@@ -245,7 +311,7 @@ const size_t ext_len = strlen(ext);
    loop(e, ext_len)   if (at(size() - ext_len + e) != ext[e])   return false;
    return true;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 UTF8_string::un_HTML(int in_HTML)
 {
@@ -286,7 +352,7 @@ bool got_tag = false;
         //
         const int rest = size() - src;
         if (rest > 3 && at(src + 1) == '#' &&
-            strchr("0123456789", at(src + 2)))
+            (strchr("0123456789", at(src + 2)) || at(src + 2) == 'x'))
            {
              src += 2;   // skip "&#"
              int val = 0;
@@ -318,7 +384,7 @@ bool got_tag = false;
              at(dest++) = '<';
              src += 3;   // skip "lt;"
            }
-        else if (rest > 4 && at(src + 1) == 'n' &&
+        else if (rest > 5 && at(src + 1) == 'n' &&
                              at(src + 2) == 'b' &&
                              at(src + 3) == 's' &&
                              at(src + 4) == 'p' &&
@@ -337,7 +403,7 @@ bool got_tag = false;
    resize(dest);
    return in_HTML;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint64_t
 UTF8_string::long_value() const
 {
@@ -345,52 +411,21 @@ uint64_t ret = 0;
    loop(j, size())   ret = 10*ret + (at(j) - UNI_0);
    return ret;
 }
-//----------------------------------------------------------------------------
-bool
-UTF8_string::round_0_1()
-{
-   if (back() >= '5')   // round up
-      {
-        // rounding up of the last digit creates a carry
-        //
-        for (int j = size() - 2; j >= 0; --j)
-            {
-              if (at(j) == '9')   // propagate carry
-                 {
-                   at(j) = '0';
-                   continue;      // carry survived
-                 }
-
-              // eat carry
-              //
-              ++at(j);
-              pop_back();   // discard last digit.
-              return false;   // no carry
-            }
-      }
-
-   // if carry survived then digits were 0.999... and were then rounded
-   // up to 1.000...
-   //
-   at(0) = '1';
-   pop_back();
-   return true;   // 1.0 → 0.1
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// declared in PrintOperator.hh
 ostream &
 operator <<(ostream & os, const UTF8_string & utf)
 {
    return os << utf.c_str();
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// declared in PrintOperator.hh
 ostream &
 operator <<(ostream & os, const UTF8 * utf)
 {
    return os << charP(utf);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 UTF8_string_vector::UTF8_string_vector(const char * lines)
 {
 UTF8_string current;
@@ -413,11 +448,4 @@ UTF8_string current;
    if (current.size())   push_back(current);
 
 }
-//============================================================================
-int
-UTF8_filebuf::overflow(int c)
-{
-   data += c;
-   return 0;
-}
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

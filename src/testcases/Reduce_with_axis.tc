@@ -1,6 +1,8 @@
 ⍝ Reduce_with_axis.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       M←3 4ρι12
       M
 1  2  3  4
@@ -35,15 +37,15 @@
 15 18 21 24
 51 54 57 60
 
-⍝ applied to first axis ----------------------------------
+      ⍝ applied to first axis ----------------------------------
 
-     ×/[1]M
+      ×/[1]M
 45 120 231 384
 
-     ×⌿M
+      ×⌿M
 45 120 231 384
 
-⍝ Xth axis has length one ----------------------------------
+      ⍝ Xth axis has length one ----------------------------------
 
       N←2 1 4ρ2×ι8
       N
@@ -55,7 +57,7 @@
  2  4  6  8
 10 12 14 16
 
-⍝ empty B ----------------------------------
+      ⍝ empty B ----------------------------------
 
       ÷/[2]2 0 3ρ0
 1 1 1
@@ -68,6 +70,72 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+      ⍝ regression (Bugs28 #100(d)): a bad (non-axis) token in bracket-
+      ⍝ axis position for a reduction used to unconditionally dump an
+      ⍝ internal debug trace (Token::get_function_axis()'s bare Q1()
+      ⍝ call) before reporting the real AXIS ERROR.
+      ⍝
+      +/@1@ ⍳3
+AXIS ERROR+
+      +/@1@⍳3
+      ^^
 
-⍝ ==================================
+      )MORE
+Invalid Token type for function axis.
+      )SIC
+
+      ⍝ regression (Bugs28 #91): two bracket axes on a reduce or scan
+      ⍝ were both accepted, with the FIRST one silently discarded --
+      ⍝ DerivedFunction::eval_XB()'s monadic branch always preferred the
+      ⍝ call-time axis over a member axis already baked in at parse
+      ⍝ time (e.g. by "+/[1]" itself), instead of rejecting the
+      ⍝ redundant second axis the way every other two-axis form (,/¨,
+      ⍝ 1⌷, a derived operator via ⍤, three axes) already does.
+      ⍝
+      Q←2 3ρι6
+      +/[1]Q
+5 7 9
+      +/[2]Q
+6 15
+
+      +/[1][2]Q
+SYNTAX ERROR
+      +/[1][2]Q
+      ^       ^
+
+      )SIC
+      +/[2][1]Q
+SYNTAX ERROR
+      +/[2][1]Q
+      ^       ^
+
+      )SIC
+      (+/[1])[2]Q
+SYNTAX ERROR
+      (+/[1])[2]Q
+      ^         ^
+
+      )SIC
+      ⌽[1][2]Q
+SYNTAX ERROR+
+      ⌽[1][2]Q
+      ^      ^
+
+      )SIC
+
+      ⍝ control: a single axis is unaffected
+      ⍝
+      +\[1]Q
+1 2 3
+5 7 9
+
+      +⌿[1]Q
+5 7 9
+      +⍀[1]Q
+1 2 3
+5 7 9
+
+      )ERASE Q
+
+      ⍝ ==================================
 

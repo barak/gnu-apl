@@ -47,7 +47,7 @@ const CC_BASE_64      CC_BASE_64::     instance;
 const CC_PRINT        CC_PRINT::       instance;
 const CC_ASCII        CC_ASCII::       instance;
 
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 CC_base::check() const
 {
@@ -83,15 +83,16 @@ Unicode maxi = Unicode(0x0000);
    Assert(contains(Unicode(mini - 1)) == false);
    Assert(contains(Unicode(maxi + 1)) == false);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 bool
 CC_base::contains(Unicode uni) const
 {
-const UCS_string ucs(uni);
+const UTF8_string utf(get_ravel());
+const UCS_string ucs(utf);
    loop(u, ucs.size())   if (uni == ucs[u])   return true;
    return false;   // not found
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const CC_base &
 CC_base::get_instance(CharClass cls)
 {
@@ -123,21 +124,53 @@ CC_base::get_instance(CharClass cls)
    MORE_ERROR() << "⎕CC B: invalid character class B (= " << cls << ")";
    DOMAIN_ERROR;
 }
-//---------------------------------------------------------------------------
-Token
-Quad_CC::eval_AB(Value_P A, Value_P B) const
+//════════════════════════════════════════════════════════════════════════════
+bool
+CC_SUPERSCRIPT::contains(Unicode uni) const
 {
-Value_P Z(A->get_shape(), LOC);
+   if (uni < 178)    return false;
+   if (uni > 8319)   return false;
+   return CC_base::contains(uni);
+}
+//════════════════════════════════════════════════════════════════════════════
+bool
+CC_SUBSCRIPT::contains(Unicode uni) const
+{
+   if (uni < 7522)    return false;
+   if (uni > 11388)   return false;
+   return CC_base::contains(uni);
+}
+//════════════════════════════════════════════════════════════════════════════
+bool
+CC_LINE_DRAWING::contains(Unicode uni) const
+{
+   if (uni < 9472)   return false;
+   if (uni > 9580)   return false;
+   return CC_base::contains(uni);
+}
+//════════════════════════════════════════════════════════════════════════════
+bool
+CC_MATH::contains(Unicode uni) const
+{
+   if (uni < 8450)   return false;
+   if (uni > 9139)   return false;
+   return CC_base::contains(uni);
+}
+//════════════════════════════════════════════════════════════════════════════
+Token
+Quad_CC::eval_AB(cValue_R A, cValue_R B) const
+{
+Value_P Z(A.get_shape(), LOC);
    new (&Z->get_wproto())   IntCell(0);   // prototype
  
-   loop(a, A->element_count())
+   loop(a, A.element_count())
        {
-         const Unicode uni_a = A->get_cravel(a).get_char_value();
+         const Unicode uni_a = A.get_char_value(a);
          bool found = false;
-         loop(b, B->element_count())
+         loop(b, B.element_count())
              {
                const CC_base::CharClass cc =
-                     CC_base::CharClass(B->get_cravel(b).get_int_value());
+                     CC_base::CharClass(B.get_int_value(b));
                if (contained_in(uni_a, cc))
                   {
                     found = true;
@@ -151,30 +184,30 @@ Value_P Z(A->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Quad_CC::eval_B(Value_P B) const
+Quad_CC::eval_B(cValue_R B) const
 {
-   if (B->get_rank() > 1)         RANK_ERROR;
-   if (B->element_count() == 0)
+   if (B.get_rank() > 1)         RANK_ERROR;
+   if (B.element_count() == 0)
       {
         print_classes(CERR);
         return Token();
       }
 
-   if (B->is_scalar())
+   if (B.is_scalar())
       {
         const CC_base::CharClass b =
-              CC_base::CharClass(B->get_cfirst().get_int_value());
+              CC_base::CharClass(B.get_int_value(0));
         Value_P Z = get_character_class(b);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-Value_P Z(B->get_shape(), LOC);
-   loop(b, B->element_count())
+Value_P Z(B.get_shape(), LOC);
+   loop(b, B.element_count())
        {
          const CC_base::CharClass bb =
-               CC_base::CharClass(B->get_cravel(b).get_int_value());
+               CC_base::CharClass(B.get_int_value(b));
         Value_P ZZ = get_character_class(bb);
         Z->next_ravel_Pointer(ZZ.get());
        }
@@ -182,33 +215,14 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//---------------------------------------------------------------------------
-void
-Quad_CC::print_classes(ostream & out)
+//────────────────────────────────────────────────────────────────────────────
+bool
+Quad_CC::contained_in(Unicode uni, CC_base::CharClass cls)
 {
-   out << "      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
-       << "      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
-       << "      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
-       << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
-       << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
-       << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
-       << "      ⎕CC   7:  Line drawing chatacters"                    << endl
-       << "      ⎕CC   8:  Octal digits 0-7"                           << endl
-       << "      ⎕CC   9:  Some mathematical symbols"                  << endl
-       << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
-       << "      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
-       << "      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
-       << "      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
-       << "      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
-       << "      ⎕CC ¯26:  lowercase characters a-z"                   << endl
-       << "      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
-       << "      ⎕CC  52:  characters A-Z a-z"                         << endl
-       << "      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
-       << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
-       << "      ⎕CC 128:  ASCII characters"                           << endl;
+const CC_base & inst = CC_base::get_instance(cls);
+   return inst.contains(uni);
 }
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 Quad_CC::get_character_class(CC_base::CharClass cls)
 {
@@ -231,43 +245,30 @@ Value_P Z(inst.get_shape(), LOC);
    Z->check_value(LOC);
    return Z;
 }
-//---------------------------------------------------------------------------
-bool
-Quad_CC::contained_in(Unicode uni, CC_base::CharClass cls)
+//════════════════════════════════════════════════════════════════════════════
+void
+Quad_CC::print_classes(ostream & out)
 {
-const CC_base & inst = CC_base::get_instance(cls);
-   return inst.contains(uni);
+   out << "      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)"                << endl
+       << "      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)"  << endl
+       << "      ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)" << endl
+       << "      ⎕CC   4:  ASCII characters (same as ⎕CC 127)"         << endl
+       << "      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )"     << endl
+       << "      ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )"        << endl
+       << "      ⎕CC   7:  Line drawing characters"                    << endl
+       << "      ⎕CC   8:  Octal digits 0-7"                           << endl
+       << "      ⎕CC   9:  Some mathematical symbols"                  << endl
+       << "      ⎕CC  10:  Decimal digits 0-9"                         << endl
+       << "      ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F"       << endl
+       << "      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f"       << endl
+       << "      ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f"             << endl
+       << "      ⎕CC  26:  UPPERCASE CHARACTERS A-Z"                   << endl
+       << "      ⎕CC ¯26:  lowercase characters a-z"                   << endl
+       << "      ⎕CC  33:  base32 encoding (RFC 4648)"                 << endl
+       << "      ⎕CC  48:  greek characters A-Ω α-ω"                   << endl
+       << "      ⎕CC  52:  characters A-Z a-z"                         << endl
+       << "      ⎕CC  65:  base64 encoding (RFC 4648)"                 << endl
+       << "      ⎕CC  95:  printable characters 0x20 ... 0x7E"         << endl
+       << "      ⎕CC 128:  ASCII characters"                           << endl;
 }
-//---------------------------------------------------------------------------
-bool
-CC_SUPERSCRIPT::contains(Unicode uni) const
-{
-   if (uni < 178)    return false;
-   if (uni > 8319)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_SUBSCRIPT::contains(Unicode uni) const
-{
-   if (uni < 7522)    return false;
-   if (uni > 11388)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_LINE_DRAWING::contains(Unicode uni) const
-{
-   if (uni < 9472)   return false;
-   if (uni > 9580)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
-bool
-CC_MATH::contains(Unicode uni) const
-{
-   if (uni < 8450)   return false;
-   if (uni > 9139)   return false;
-   return CC_base::contains(uni);
-}
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

@@ -1,12 +1,14 @@
 ⍝ Decode.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       2⊥1 0 0 1
 9
       60 60 60⊥1 30 20
 5420
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       3⊥1 2 1
 16
@@ -15,7 +17,7 @@
       2⊥1 1 1 1
 15
 
-⍝ Conformability ----------------------------------
+      ⍝ Conformability ----------------------------------
 
       L←2 1ρ2 10
       L
@@ -32,15 +34,50 @@
       24 60 60⊥2 23 12
 8592
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       2⊥1 1 1 1
 15
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       ⍝ Regression
       ⍝
       2⊥64⍴1
 1.844674407E19
+
+      ⍝ Bugs28 #42 regression: decode overflowed to ∞ instead of
+      ⍝ raising DOMAIN ERROR, letting a non-finite value into the
+      ⍝ workspace -- unlike every scalar function (1E300×1E300 is
+      ⍝ already DOMAIN ERROR). Fixed in Bif_F12_ENCODE_DECODE.cc's
+      ⍝ decode_real()/decode_complex(): isfinite() check on the
+      ⍝ accumulated Horner value before returning it.
+      ⍝
+      1E300⊥1 1 1
+DOMAIN ERROR
+      1E300⊥1 1 1
+      ^    ^
+
+      )SIC
+      10⊥1E308 1
+DOMAIN ERROR
+      10⊥1E308 1
+      ^ ^
+
+      )SIC
+
+      ⍝ regression (Bugs28 #82): decode_int()'s overflow check used to
+      ⍝ track a parallel double-precision shadow of the exact int64
+      ⍝ computation, comparing it against the conservative
+      ⍝ LARGE_INT/SMALL_INT margin -- so a decode landing in the top
+      ⍝ ~0.4% of the int64 range (like 2^63-1 here) was wrongly declared
+      ⍝ "overflowed" and recomputed as an imprecise float even though
+      ⍝ the exact integer result fits.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      2⊥63⍴1
+9223372036854775807
+
+      26⎕CR 2⊥63⍴1
+16
 

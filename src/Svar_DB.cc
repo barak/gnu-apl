@@ -20,20 +20,30 @@
 
 /** @file
 */
+#include "config.h"
 
 #include <errno.h>
 #include <fcntl.h>           /* For O_* constants */
 #include <limits.h>
-#include <netinet/tcp.h>
 #include <signal.h>
 #include <string.h>
 #include <stdio.h>
 #include <sys/time.h>
 
+#if HAVE_NETINET_TCP_H
+#include <netinet/tcp.h>
+#endif // HAVE_NETINET_TCP_H
+
+#include "Sys.hh"
 #include "Common.hh"   // for HAVE_xxx macros
 
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>
+#endif
+
+#if ! MINGW_SRC
+#include <sys/select.h>
+#include <sys/socket.h>
 #endif
 
 #include <iomanip>
@@ -42,6 +52,7 @@
 #include "Logging.hh"
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 
 extern ostream & get_CERR();
@@ -49,6 +60,7 @@ extern ostream & get_CERR();
 uint16_t Svar_DB::APserver_port = cfg_APSERVER_PORT;
 
 TCP_socket Svar_DB::DB_tcp = NO_TCP_SOCKET;
+char Svar_DB::connect_error[100] = "";
 bool Svar_DB::do_log = false;
 
 Svar_record Svar_record_P::cache;
@@ -68,84 +80,126 @@ union SockAddr
   sockaddr_un uNix;
 #endif
 };
-//----------------------------------------------------------------------------
-bool
-Svar_DB::start_APserver(const char * server_sockname,
-                        const char * bin_dir, bool logit)
+//════════════════════════════════════════════════════════════════════════════
+
+Svar_record_P::Svar_record_P(SV_key key)
 {
-   // bin_dir is the directory where the apl interpreter binary lives.
-   // The APserver then lives in:
-   //
-   // bin_dir/      if apl was built and installed, or
-   // bin_dir/APs/  if apl was started from the src directory in the source tree
-   //
-   // set APserver_path to the case that applies.
-   //
-char APserver_path[APL_PATH_MAX + 1];
-   SPRINTF(APserver_path, "%s/APserver", bin_dir);
-   if (access(APserver_path, X_OK) != 0)   // no APserver in bin_dir
-      {
-        logit && get_CERR() << "    Executable " << APserver_path
-                 << " not found (this is OK when apl was started\n"
-                    "    from the src directory): " << strerror(errno) << endl;
+   cache.clear();
 
-        SPRINTF(APserver_path, "%s/APs/APserver", bin_dir);
-        if (access(APserver_path, X_OK) != 0)   // no APs/APserver either
+   if (!Svar_DB::APserver_available())   return;
+
+const int sock = Svar_DB::get_DB_tcp();
+
+   { READ_SVAR_RECORD_c request(sock, key); }
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
+ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
+                                               del, log, &err_loc);
+   if (response)
+      {
+        const string record = response->get__SVAR_RECORD_IS__record();
+        if (record.size() >= sizeof(Svar_record))
            {
-             get_CERR() << "Executable " << APserver_path << " not found.\n"
-"This could mean that 'apl' was not installed ('make install') or that it\n"
-"was started in a non-standard way. The expected location of APserver is \n"
-"either the same directory as the binary 'apl' or the subdirectory 'APs' of\n"
-"that directory (the directory should also be in $PATH)." << endl;
-
-             return true;   // error
+             memcpy(reinterpret_cast<void *>(&cache),
+                    record.data(), sizeof(Svar_record));
            }
+        else
+           {
+             // peer sent a truncated SVAR_RECORD_IS -- reading
+             // sizeof(Svar_record) bytes from it would read past the
+             // string's own heap buffer. Treat as a protocol error.
+             get_CERR() << "Svar_record_P(): short SVAR_RECORD_IS record ("
+                        << record.size() << " < " << sizeof(Svar_record)
+                        << " bytes) at " << LOC << endl;
+           }
+
+        delete response;
       }
-
-   logit && get_CERR() << "Found " << APserver_path << endl;
-
-char popen_args[APL_PATH_MAX + 50];
-   {
-     if (server_sockname)
-        SPRINTF(popen_args, "%s --path %s --auto",
-                            APserver_path, server_sockname)
-     else
-        SPRINTF(popen_args, "%s --port %u --auto",
-                            APserver_path, APserver_port)
-   }
-
-   logit && get_CERR() << "Starting " << popen_args << "..." << endl;
-
-FILE * fp = popen(popen_args, "r");
-   if (fp == 0)
-      {
-        get_CERR() << "popen(" << popen_args << " failed: " << strerror(errno)
-             << endl;
-        return true;   // error
-      }
-
-   // wait until the parent process (= this process) in APserver returns.
-   // APserver does not really output anything (and we would see if it would),
-   // but the interesting part is the EOF of the parent process in APserfver.
-   //
-   for (int cc; (cc = getc(fp)) != EOF;)
-       {
-         logit && get_CERR() << char(cc);
-       }
-
-const int APserver_result = pclose(fp);
-
-   logit && get_CERR() << endl;
-
-   if (APserver_result && (errno != ECHILD))
-      {
-         get_CERR() << "pclose(APserver) returned error " << errno << ": "
-                    << strerror(errno) << endl;
-      }
-
-   return false;   // success
+   else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
+   if (del)   delete[] del;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+void
+Svar_DB::add_event(SV_key key, AP_num3 id, Svar_event event)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+ADD_EVENT_c request(tcp, key, id.proc, id.parent, id.grand, event);
+}
+//────────────────────────────────────────────────────────────────────────────
+Svar_event
+Svar_DB::clear_all_events(AP_num3 id)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)
+      {
+        return SVE_NO_EVENTS;
+      }
+
+CLEAR_ALL_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
+   if (response)
+      {
+        const Svar_event ret = Svar_event(response->get__EVENTS_ARE__events());
+        delete response;
+        if (del)   delete[] del;
+        return ret;
+      }
+   else
+      {
+        if (del)   delete[] del;
+        return SVE_NO_EVENTS;
+      }
+}
+//════════════════════════════════════════════════════════════════════════════
+void
+Svar_DB::close_connection()
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+DISCONNECT_c request(tcp, 0);   // no response
+}
+//────────────────────────────────────────────────────────────────────────────
+/// ::connect() on \b sock has failed with \b err. Return true if \b sock is
+/// connected nevertheless: with EISCONN it already is, and with EINTR (a
+/// signal, e.g. SIGCHLD, interrupted ::connect()) POSIX says that the
+/// connection is still established asynchronously. Closing such a socket
+/// would make APserver exit (after its last connection was closed) before
+/// the next attempt.
+static bool
+connected_anyway(int sock, int err)
+{
+#if MINGW_SRC
+   return false;
+#else
+   if (err == EISCONN)   return true;
+   if (err != EINTR && err != EINPROGRESS && err != EALREADY)   return false;
+
+   // wait (at most 1 second) for the connection to complete
+   fd_set write_fds;
+   FD_ZERO(&write_fds);
+   FD_SET(sock, &write_fds);
+   timeval timeout = { 1, 0 };
+   if (select(sock + 1, 0, &write_fds, 0, &timeout) <= 0)   return false;
+
+int so_error = 0;
+socklen_t len = sizeof(so_error);
+   if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &so_error, &len))   return false;
+   return so_error == 0;
+#endif
+}
+//────────────────────────────────────────────────────────────────────────────
 TCP_socket
 Svar_DB::connect_to_APserver(const char * bin_dir, const char * prog,
                                       int retry_max, bool logit)
@@ -154,63 +208,74 @@ int sock = NO_TCP_SOCKET;
 const char * server_sockname = cfg_APSERVER_PATH;
 char peer[100];
 
-   // we use AF_UNIX sockets if the platform supports it and unix_socket_name
-   // is provided. Otherwise fall back to TCP.
+   // a socket for one ::connect() attempt. A socket whose ::connect() has
+   // failed must not be used for another ::connect() (POSIX leaves its state
+   // unspecified; Linux accepts it, but macOS then fails with EISCONN or
+   // EINVAL), so every attempt below gets a fresh one.
    //
+auto open_socket = [&]() -> int
+   {
+      // we use AF_UNIX sockets if the platform supports it and unix_socket_name
+      // is provided. Otherwise fall back to TCP.
+      //
 #if HAVE_SYS_UN_H && cfg_APSERVER_TRANSPORT != 0
-      {
-        logit && get_CERR() << prog
-                            << ": Using AF_UNIX socket towards APserver..."
-                            << endl;
-        sock = socket(AF_UNIX, SOCK_STREAM, 0);
-        if (sock == NO_TCP_SOCKET)
-           {
-             get_CERR() << prog
-                        << ": socket(AF_UNIX, SOCK_STREAM, 0) failed at "
-                        << LOC << endl;
-             return NO_TCP_SOCKET;
-           }
+         {
+           logit && get_CERR() << prog
+                               << ": Using AF_UNIX socket towards APserver..."
+                               << endl;
+           sock = socket(AF_UNIX, SOCK_STREAM, 0);
+           if (sock == NO_TCP_SOCKET)
+              {
+                get_CERR() << prog
+                           << ": socket(AF_UNIX, SOCK_STREAM, 0) failed at "
+                           << LOC << endl;
+                return NO_TCP_SOCKET;
+              }
 
-        SPRINTF(peer, "%s", server_sockname);
-      }
+           SPRINTF(peer, "%s", server_sockname);
+         }
 #else // use TCP
-      {
-        server_sockname = 0;
-        logit && get_CERR() << "Using TCP socket towards APserver..."
-                            << endl;
-        sock = TCP_socket(socket(AF_INET, SOCK_STREAM, 0));
-        if (sock == NO_TCP_SOCKET)
+         {
+           server_sockname = 0;
+           logit && get_CERR() << "Using TCP socket towards APserver..."
+                               << endl;
+           sock = TCP_socket(socket(AF_INET, SOCK_STREAM, 0));
+           if (sock == NO_TCP_SOCKET)
+              {
+                get_CERR() << "*** socket(AF_INET, SOCK_STREAM, 0) failed at "
+                           << LOC << endl;
+                return NO_TCP_SOCKET;
+              }
+
+           // disable nagle
            {
-             get_CERR() << "*** socket(AF_INET, SOCK_STREAM, 0) failed at "
-                        << LOC << endl;
-             return NO_TCP_SOCKET;
+             const int ndelay = 1;
+             sys_setsockopt(sock, 6, TCP_NODELAY, &ndelay, sizeof(int));
            }
 
-        // disable nagle
-        {
-          const int ndelay = 1;
-          setsockopt(sock, 6, TCP_NODELAY,
-                     reinterpret_cast<const char *>(&ndelay), sizeof(int));
-        }
+           // bind local port to 127.0.0.1
+           //
+           SockAddr local;
+           memset(&local, 0, sizeof(SockAddr));
+           local.inet.sin_family = AF_INET;
+           local.inet.sin_addr.s_addr = htonl(0x7F000001);
 
-        // bind local port to 127.0.0.1
-        //
-        SockAddr local;
-        memset(&local, 0, sizeof(SockAddr));
-        local.inet.sin_family = AF_INET;
-        local.inet.sin_addr.s_addr = htonl(0x7F000001);
+           if (::bind(sock, &local.addr, sizeof(sockaddr_in)))
+              {
+                get_CERR() << "bind(127.0.0.1) failed: "
+                           << strerror(errno) << endl;
+                ::close(sock);
+                return NO_TCP_SOCKET;
+              }
 
-        if (::bind(sock, &local.addr, sizeof(sockaddr_in)))
-           {
-             get_CERR() << "bind(127.0.0.1) failed: "
-                        << strerror(errno) << endl;
-             ::close(sock);
-             return NO_TCP_SOCKET;
-           }
-
-        SPRINTF(peer, "127.0.0.1 TCP port %d", APserver_port);
-      }
+           SPRINTF(peer, "127.0.0.1 TCP port %d", APserver_port);
+         }
 #endif
+   return sock;
+   };
+
+   sock = open_socket();
+   if (sock == NO_TCP_SOCKET)   return NO_TCP_SOCKET;
 
    // We try to connect to the APserver. If that fails then no
    // APserver is running; we fork one and try again.
@@ -221,17 +286,40 @@ char peer[100];
    loop(retry, retry_max)
        {
 #if HAVE_SYS_UN_H
+
+        /* An absract socket address starts with a 0-byte followed by a name,
+           see man 7 unix. The socket name given to ./configure has no leading
+           0 and we insert it here in case the socket is abstract.
+
+           The memset() below clears the entire address (and in particular
+           the first byte, thus making the socket abstract).
+
+           The strncpy() below truncates too long names (which make little
+           sense here).
+         */
         if (server_sockname)
            {
              SockAddr remote;
+             const int max_path_len = sizeof(remote.uNix.sun_path)
+                                             - ABSTRACT_OFFSET;
+             if (strlen(server_sockname) > max_path_len - 1)
+                {
+                  get_CERR() << "*** WARNING: the ./configure'd APserver "
+                              "socket name:\n    '" << server_sockname
+                             << "' is too long and may be truncated." << endl;
+                }
+
              memset(&remote, 0, sizeof(SockAddr));
              remote.uNix.sun_family = AF_UNIX;
-             strcpy(remote.uNix.sun_path + ABSTRACT_OFFSET, server_sockname);
+             strncpy(remote.uNix.sun_path + ABSTRACT_OFFSET,
+                     server_sockname, max_path_len);
+              remote.uNix.sun_path[sizeof(remote.uNix.sun_path) - 1 ] = 0;
 
-             if (::connect(sock, &remote.addr, sizeof(sockaddr_un)) == 0)
+             if (::connect(sock, &remote.addr, sizeof(sockaddr_un)) == 0 ||
+                 connected_anyway(sock, errno))
                 break;   // success
            }
-        else   // TCP
+        else   // TCP transport
 #endif
            {
              SockAddr remote;
@@ -240,7 +328,8 @@ char peer[100];
              remote.inet.sin_port = htons(APserver_port);
              remote.inet.sin_addr.s_addr = htonl(0x7F000001);
 
-             if (::connect(sock, &remote.addr, sizeof(sockaddr_in)) == 0)
+             if (::connect(sock, &remote.addr, sizeof(sockaddr_in)) == 0 ||
+                 connected_anyway(sock, errno))
                 break;   // success
            }
 
@@ -249,6 +338,15 @@ char peer[100];
          //
          if (logit)   get_CERR() << "connecting to " << peer
                                  << " failed." << endl;
+
+         // use a fresh socket for the next attempt (see open_socket())
+         {
+           const int connect_errno = errno;
+           ::close(sock);
+           sock = open_socket();
+           if (sock == NO_TCP_SOCKET)   return NO_TCP_SOCKET;
+           errno = connect_errno;
+         }
 
          if (retry == 0)   // first attempt
             {
@@ -274,6 +372,8 @@ char peer[100];
 
          if ((retry == (retry_max - 1)) && bin_dir)   // last attempt: give up
             {
+              SPRINTF(connect_error, "::connect() failed: %s",
+                      strerror(errno))
               get_CERR() <<
                          "::connect() to supposedly existing APserver failed: "
                          << strerror(errno) << endl;
@@ -296,7 +396,7 @@ char peer[100];
 
    return TCP_socket(sock);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB::DB_tcp_error(const char * op, int got, int expected)
 {
@@ -311,41 +411,195 @@ Svar_DB::DB_tcp_error(const char * op, int got, int expected)
 
    ::close(DB_tcp);
 }
-//============================================================================
-
-Svar_record_P::Svar_record_P(SV_key key)
+//────────────────────────────────────────────────────────────────────────────
+void
+Svar_DB::disconnect()
 {
-   cache.clear();
+  if (DB_tcp != NO_TCP_SOCKET)
+     {
+        close_connection();
+        close(DB_tcp);
+        DB_tcp = NO_TCP_SOCKET;
+     }
 
-   if (!Svar_DB::APserver_available())   return;
+  do_log && get_CERR() << "APserver disconnected" << endl;
+}
+//────────────────────────────────────────────────────────────────────────────
+AP_num3
+Svar_DB::find_offering_id(SV_key key)
+{
+AP_num3 offering_id;
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return offering_id;
 
-const int sock = Svar_DB::get_DB_tcp();
-
-   { READ_SVAR_RECORD_c request(sock, key); }
+FIND_OFFERING_ID_c request(tcp, key);
 
 char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
-ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
 const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
-                                               del, log, &err_loc);
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
    if (response)
       {
-        memcpy(reinterpret_cast<void *>(&cache),
-               response->get__SVAR_RECORD_IS__record().data(),
-               sizeof(Svar_record));
-
+         offering_id.proc = AP_num(response->get__OFFERING_ID_IS__proc());
+         offering_id.parent = AP_num(response->get__OFFERING_ID_IS__parent());
+         offering_id.grand = AP_num(response->get__OFFERING_ID_IS__grand());
         delete response;
       }
-   else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
-   if (del)   delete del;
+
+   if (del)   delete[] del;
+   return offering_id;
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
+SV_key
+Svar_DB::find_pairing_key(SV_key key)
+{
+const TCP_socket tcp = Svar_DB::get_DB_tcp();
+   if (tcp == NO_TCP_SOCKET)   return 0;
+
+FIND_PAIRING_KEY_c request(tcp, key);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
+   if (response)
+      {
+        const SV_key ret = response->get__PAIRING_KEY_IS__pairing_key();
+        delete response;
+        if (del)   delete[] del;
+        return ret;
+     }
+
+   if (del)   delete[] del;
+   return 0;
+}
+//════════════════════════════════════════════════════════════════════════════
+SV_key
+Svar_DB::get_events(Svar_event & events, AP_num3 id)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)
+      {
+        events = SVE_NO_EVENTS;
+        return 0;
+      }
+
+GET_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response =
+       Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc);
+
+   if (response)
+      {
+        events = Svar_event(response->get__EVENTS_ARE__events());
+        const SV_key ret = response->get__EVENTS_ARE__key();
+        delete response;
+        if (del)   delete[] del;
+        return ret;
+      }
+   else
+      {
+        events = SVE_NO_EVENTS;
+        if (del)   delete[] del;
+        return 0;
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
+                               std::vector<uint32_t> & varnames)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+GET_OFFERED_VARS_c request(tcp, to_proc, from_proc);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
+   if (response)
+      {
+        const string & ov = response->get__OFFERED_VARS_ARE__offered_vars();
+        const uint32_t * names = reinterpret_cast<const uint32_t *>(ov.data());
+        const size_t count = ov.size() / sizeof(uint32_t);
+
+        loop(c, count)   varnames.push_back(*names++);
+        delete response;
+      }
+   if (del)   delete[] del;
+}
+//════════════════════════════════════════════════════════════════════════════
+void
+Svar_DB::get_offering_processors(AP_num to_proc,
+                                 std::vector<AP_num> & processors)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+GET_OFFERING_PROCS_c request(tcp, to_proc);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
+   if (response)
+      {
+        const string & op = response->get__OFFERING_PROCS_ARE__offering_procs();
+        const AP_num * procs = reinterpret_cast<const AP_num *>(op.data());
+        const size_t count = op.size() / sizeof(AP_num);
+
+        loop(c, count)   processors.push_back(*procs++);
+        delete response;
+      }
+   if (del)   delete[] del;
+}
+//════════════════════════════════════════════════════════════════════════════
+/// false if shared variables are disabled or the connection to APserver has
+/// failed (and was reported), so that Svar_DB is unconnected by design
+static bool connection_expected = true;
+
+TCP_socket
+Svar_DB::get_Svar_DB_tcp(const char * calling_function)
+{
+const TCP_socket tcp = Svar_DB::get_DB_tcp();
+
+   // with shared variables disabled (--noSV, SharedVars Disabled) there is
+   // no connection by design.
+   //
+   if (tcp == NO_TCP_SOCKET && connection_expected)
+      {
+        static bool warned = false;
+        if (!warned)
+           {
+             warned = true;
+             get_CERR() << "Svar_DB not connected in Svar_DB::"
+                  << calling_function << "()"
+                  << " (APserver not running; shared variables unavailable)"
+                  << endl;
+           }
+      }
+
+   return tcp;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
               bool logit, bool do_svars)
 {
    do_log = logit;
+   connection_expected = do_svars;
    if (!do_svars)   // shared variables disabled
       {
         if (logit)
@@ -359,21 +613,37 @@ Svar_DB::init(const char * bin_dir, const char * prog, int retry_max,
       {
         if (logit)   get_CERR() << "using Svar_DB on APserver!" << endl;
       }
+
+   // a failed connection was already reported (e.g. "APserver not found")
+   connection_expected = APserver_available();
 }
-//----------------------------------------------------------------------------
-void
-Svar_DB::disconnect()
+//────────────────────────────────────────────────────────────────────────────
+bool
+Svar_DB::is_registered_id(const AP_num3 & id)
 {
-  if (DB_tcp != NO_TCP_SOCKET)
-     {
-        close_connection();
-        close(DB_tcp);
-        DB_tcp = NO_TCP_SOCKET;
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return 0;
+
+IS_REGISTERED_ID_c request(tcp, id.proc, id.parent, id.grand);
+
+char * del = 0;
+char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
+const char * err_loc = 0;
+Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
+                                               del, 0, &err_loc);
+
+   if (response)
+      {
+        const bool ret = response->get__YES_NO__yes();
+        delete response;
+        if (del)   delete[] del;
+        return ret;
      }
 
-  do_log && get_CERR() << "APserver disconnected" << endl;
+   if (del)   delete[] del;
+   return false;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 SV_key
 Svar_DB::match_or_make(const uint32_t * UCS_varname, const AP_num3 & to,
                        const Svar_partner & from)
@@ -406,92 +676,14 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
       {
         const SV_key ret = response->get__MATCH_OR_MAKE_RESULT__key();
         delete response;
+        if (del)   delete[] del;
         return ret;
      }
 
-   else            return 0;
+   if (del)   delete[] del;
+   return 0;
 }
-//----------------------------------------------------------------------------
-SV_key
-Svar_DB::get_events(Svar_event & events, AP_num3 id)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)
-      {
-        events = SVE_NO_EVENTS;
-        return 0;
-      }
-
-GET_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response =
-       Signal_base::recv_TCP(tcp, buffer, sizeof(buffer), del, 0, &err_loc);
-
-   if (response)
-      {
-        events = Svar_event(response->get__EVENTS_ARE__events());
-        const SV_key ret = response->get__EVENTS_ARE__key();
-        delete response;
-        return ret;
-      }
-   else
-      {
-        events = SVE_NO_EVENTS;
-        return 0;
-      }
-}
-//----------------------------------------------------------------------------
-Svar_event
-Svar_DB::clear_all_events(AP_num3 id)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)
-      {
-        return SVE_NO_EVENTS;
-      }
-
-CLEAR_ALL_EVENTS_c request(tcp, id.proc, id.parent, id.grand);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-        const Svar_event ret = Svar_event(response->get__EVENTS_ARE__events());
-        delete response;
-        return ret;
-      }
-   else
-      {
-        return SVE_NO_EVENTS;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::set_control(SV_key key, Svar_Control ctl)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-SET_CONTROL_c request(tcp, key, ctl);
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::set_state(SV_key key, bool used, const char * loc)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-string sloc(loc);
-SET_STATE_c request(tcp, key, used, sloc);
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 bool
 Svar_DB::may_set(SV_key key, int attempt)
 {
@@ -510,12 +702,14 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
       {
         const bool ret = response->get__YES_NO__yes();
         delete response;
+        if (del)   delete[] del;
         return ret;
      }
 
+   if (del)   delete[] del;
    return true;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 bool
 Svar_DB::may_use(SV_key key, int attempt)
 {
@@ -534,177 +728,13 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
       {
         const bool ret = response->get__YES_NO__yes();
         delete response;
+        if (del)   delete[] del;
         return ret;
      }
+   if (del)   delete[] del;
    return true;
 }
-//----------------------------------------------------------------------------
-void
-Svar_DB::add_event(SV_key key, AP_num3 id, Svar_event event)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-ADD_EVENT_c request(tcp, key, id.proc, id.parent, id.grand, event);
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::retract_var(SV_key key)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-RETRACT_VAR_c request(tcp, key);
-}
-//----------------------------------------------------------------------------
-AP_num3
-Svar_DB::find_offering_id(SV_key key)
-{
-AP_num3 offering_id;
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return offering_id;
-
-FIND_OFFERING_ID_c request(tcp, key);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-         offering_id.proc = AP_num(response->get__OFFERING_ID_IS__proc());
-         offering_id.parent = AP_num(response->get__OFFERING_ID_IS__parent());
-         offering_id.grand = AP_num(response->get__OFFERING_ID_IS__grand());
-        delete response;
-      }
-
-   return offering_id;
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::get_offering_processors(AP_num to_proc,
-                                 std::vector<AP_num> & processors)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-GET_OFFERING_PROCS_c request(tcp, to_proc);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-        const string & op = response->get__OFFERING_PROCS_ARE__offering_procs();
-        const AP_num * procs = reinterpret_cast<const AP_num *>(op.data());
-        const size_t count = op.size() / sizeof(AP_num);
-
-        loop(c, count)   processors.push_back(*procs++);
-        delete response; 
-      }
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::get_offered_variables(AP_num to_proc, AP_num from_proc,
-                               std::vector<uint32_t> & varnames)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-GET_OFFERED_VARS_c request(tcp, to_proc, from_proc);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-        const string & ov = response->get__OFFERED_VARS_ARE__offered_vars();
-        const uint32_t * names = reinterpret_cast<const uint32_t *>(ov.data());
-        const size_t count = ov.size() / sizeof(uint32_t);
-
-        loop(c, count)   varnames.push_back(*names++);
-        delete response; 
-      }
-}
-//----------------------------------------------------------------------------
-bool
-Svar_DB::is_registered_id(const AP_num3 & id)
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return 0;
-
-IS_REGISTERED_ID_c request(tcp, id.proc, id.parent, id.grand);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-        const bool ret = response->get__YES_NO__yes();
-        delete response;
-        return ret;
-     }
-
-   return false;
-}
-//----------------------------------------------------------------------------
-void
-Svar_DB::close_connection()
-{
-const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
-   if (tcp == NO_TCP_SOCKET)   return;
-
-DISCONNECT_c request(tcp, 0);   // no response
-}
-//----------------------------------------------------------------------------
-TCP_socket
-Svar_DB::get_Svar_DB_tcp(const char * calling_function)
-{
-const TCP_socket tcp = Svar_DB::get_DB_tcp();
-   if (tcp == NO_TCP_SOCKET)
-      {
-        get_CERR() << "Svar_DB not connected in Svar_DB::"
-             << calling_function << "()" << endl;
-      }
-
-   return tcp;
-}
-//----------------------------------------------------------------------------
-SV_key
-Svar_DB::find_pairing_key(SV_key key)
-{
-const TCP_socket tcp = Svar_DB::get_DB_tcp();
-   if (tcp == NO_TCP_SOCKET)   return 0;
-
-FIND_PAIRING_KEY_c request(tcp, key);
-
-char * del = 0;
-char buffer[2*MAX_SIGNAL_CLASS_SIZE + 16];
-const char * err_loc = 0;
-Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
-                                               del, 0, &err_loc);
-
-   if (response)
-      {
-        const SV_key ret = response->get__PAIRING_KEY_IS__pairing_key();
-        delete response;
-        return ret;
-     }
-
-   return 0;
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Svar_DB::print(ostream & out)
 {
@@ -723,6 +753,142 @@ const char * err_loc = 0;
         out << response->get__SVAR_DB_PRINTED__printout();
         delete response;
       }
+   if (del)   delete[] del;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Svar_DB::retract_var(SV_key key)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+RETRACT_VAR_c request(tcp, key);
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Svar_DB::set_control(SV_key key, Svar_Control ctl)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+SET_CONTROL_c request(tcp, key, ctl);
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Svar_DB::set_state(SV_key key, bool used, const char * loc)
+{
+const TCP_socket tcp = get_Svar_DB_tcp(__FUNCTION__);
+   if (tcp == NO_TCP_SOCKET)   return;
+
+string sloc(loc);
+SET_STATE_c request(tcp, key, used, sloc);
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Svar_DB::start_APserver(const char * server_sockname,
+                        const char * bin_dir, bool logit)
+{
+   // bin_dir is the directory where the apl interpreter binary lives.
+   // The APserver then lives in:
+   //
+   // bin_dir/      if apl was built and installed, or
+   // bin_dir/APs/  if apl was started from the src directory in the source tree
+   //
+   // set APserver_path to the case that applies.
+   //
+char APserver_path[APL_PATH_MAX + 1];
+#if MINGW_SRC
+# define APSERVER_EXE "APserver.exe"
+#else
+# define APSERVER_EXE "APserver"
+#endif
+   SPRINTF(APserver_path, "%s/" APSERVER_EXE, bin_dir);
+   if (access(APserver_path, X_OK) != 0)   // no APserver in bin_dir
+      {
+        logit && get_CERR() << "    Executable " << APserver_path
+                 << " not found (this is OK when apl was started\n"
+                    "    from the src directory): " << strerror(errno) << endl;
+
+        SPRINTF(APserver_path, "%s/APs/" APSERVER_EXE, bin_dir);
+        if (access(APserver_path, X_OK) != 0)   // no APs/APserver either
+           {
+             SPRINTF(connect_error, "%s", "APserver not found");
+             get_CERR() << "Executable " << APserver_path << " not found.\n"
+"This could mean that 'apl' was not installed ('make install') or that it\n"
+"was started in a non-standard way. The expected location of APserver is \n"
+"either the same directory as the binary 'apl' or the subdirectory 'APs' of\n"
+"that directory (the directory should also be in $PATH)." << endl;
+
+             return true;   // error
+           }
+      }
+
+   logit && get_CERR() << "Found " << APserver_path << endl;
+
+char popen_args[APL_PATH_MAX + 50];
+   {
+     if (server_sockname)
+        SPRINTF(popen_args, "%s --path %s --auto",
+                            APserver_path, server_sockname)
+     else
+        SPRINTF(popen_args, "%s --port %u --auto",
+                            APserver_path, APserver_port)
+   }
+
+   logit && get_CERR() << "Starting " << popen_args << "..." << endl;
+
+#if MINGW_SRC
+   // On Windows there is no fork(), so popen()/pclose() would block forever
+   // waiting for APserver to exit (it never does — it's a daemon).
+   // Use _spawnl(_P_NOWAIT) to launch APserver detached and return immediately.
+   {
+   char port_str[20];
+   SPRINTF(port_str, "%u", APserver_port);
+   const intptr_t pid = server_sockname
+       ? _spawnl(_P_NOWAIT, APserver_path, APserver_path,
+                 "--path", server_sockname, "--auto", NULL)
+       : _spawnl(_P_NOWAIT, APserver_path, APserver_path,
+                 "--port", port_str, "--auto", NULL);
+   if (pid == -1)
+      {
+        get_CERR() << "_spawnl(" << APserver_path << ") failed: "
+                   << strerror(errno) << endl;
+        return true;   // error
+      }
+   Sleep(500);   // give APserver time to bind and start listening
+   }
+#else
+PipeReader reader(popen_args);
+   if (!reader)
+      {
+        SPRINTF(connect_error, "starting APserver failed: %s",
+                strerror(errno))
+        get_CERR() << "popen(" << popen_args << " failed: " << strerror(errno)
+             << endl;
+        return true;   // error
+      }
+
+   // wait until the parent process (= this process) in APserver returns.
+   // APserver does not really output anything (and we would see if it would),
+   // but the interesting part is the EOF of the parent process in APserver.
+   //
+   for (int cc; (cc = reader.fgetc()) != EOF;)
+       {
+         logit && get_CERR() << char(cc);
+       }
+
+const int APserver_result = reader.close();
+
+   logit && get_CERR() << endl;
+
+   if (APserver_result && (errno != ECHILD))
+      {
+         get_CERR() << "pclose(APserver) returned error " << errno << ": "
+                    << strerror(errno) << endl;
+      }
+#endif
+
+   return false;   // success
+}
+//════════════════════════════════════════════════════════════════════════════
 

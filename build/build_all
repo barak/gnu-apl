@@ -1,34 +1,26 @@
 #!/bin/bash
 
-# process command line arguments. By default build all configurations
-# (aka. nightly build)
-   #
-   case "$1" in
+# The source tree of this script (i.e. the content of the GNU APL tarball
+# made by "make dist" on the maintainer's machine) is kept up to date by
+# server72-push-apl on that machine, which rsyncs it here (server72 cannot
+# reach that machine, so it must push). Files that are no longer in the
+# tarball are removed by that rsync, so the build sees exactly the files
+# that a user gets from Savannah.
 
-      "")   # default: build all configurations
-         configs="$configs standard"
-         configs="$configs develop"
-         configs="$configs tar"
-       # configs="$configs git"
-         configs="$configs libxcb"
-         configs="$configs rational"
-         configs="$configs libapl"
-         configs="$configs parallel_bench"
-         configs="$configs erlang"
-         configs="$configs python"
-         ;;
+# Source build target definitions (configure options, artifacts, test flags,
+# and DEFAULT_CONFIGS).  The file lives next to this script.
+#
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+source "$SCRIPT_DIR/build_all.cfg"
 
-      "clean")   # clean up everything
-         configs=""
-         ;;
-
-      "nightly")   # only refresh /var/www/html/nightly_build_results.html
-         configs=""
-         ;;
-
-      *)
-         configs="$*"
-   esac
+# process command line arguments
+#
+case "$1" in
+   "")        configs="$DEFAULT_CONFIGS" ;;
+   "clean")   configs="" ;;
+   "nightly") configs="" ;;
+   *)         configs="$*" ;;
+esac
 
 echo "configs requested: $configs"
 
@@ -45,6 +37,9 @@ echo "configs requested: $configs"
 #    the top-level directory that contains this script. The different
 #    configurations produced by this script are stored in corresponding
 #    subdirectories, e.g. in builddir_standard for configuration "standard"
+#    The build directory and the logs of a configuration are deleted as
+#    soon as the configuration is done; only what the results email needs
+#    is kept (see finish_config()).
 #
 #    Example: /home/username/apl-1.9/build
 #
@@ -55,7 +50,7 @@ echo "configs requested: $configs"
 # ROOT_dir:
 #    the GNU APL top-level directory. This is the one and only
 #    directory than contains the ./configure script for GNU APL.
-#    Normally #    TOP_BUILD_dir is $ROOT_dir/build.
+#    Normally TOP_BUILD_dir is $ROOT_dir/build.
 #
 #    Example: /home/username/apl-1.9
 #
@@ -64,28 +59,35 @@ echo "configs requested: $configs"
 #
 #    Example: apl-1.9
 #
-# VSRC_dir:
-#    this is (despite of its name 'src' the destination directory for a single
-#    configuration. For example: the VSRC_dir for configuration "standard" is:
-#    $TOP_BUILD_dir/build/builddir_standard/src
-#
-#    Example: /home/username/apl-1.9/src
-#
 START_dir=$(pwd)      # e.g. /etc/cron.daily
 
-cd $(dirname $0)      # e.g. /root/apl-1.9
+cd "$SCRIPT_DIR"
 TOP_BUILD_dir=$(pwd)
-SVN_VERSION=$(svnversion)
+ROOT_dir=$(dirname $TOP_BUILD_dir)
 
-# NOTE: -j8 fails with out of memory on small hosts (like those
-# used for nightly builds). By setting J8="" we avoid that
-J8="-j8"
-J8=""
+# svnversion reports "Unversioned directory" here: this tree is the content
+# of a tarball (see the top of this script), never an svn checkout, so
+# there is no .svn metadata for it to read. Fall back to exported_from,
+# a marker file written into the tarball (by "make DIST")
+# from the exporting machine's own svnversion, so the nightly report still
+# shows a real revision instead of "Unversioned directory".
+#
+SVN_VERSION=$(svnversion)
+case "$SVN_VERSION" in
+   *[Uu]nversioned*|"")
+      if [ -f "$ROOT_dir/exported_from" ]
+      then
+         SVN_VERSION=$(sed 's/^.*SVN version *//' "$ROOT_dir/exported_from")
+      fi
+      ;;
+esac
+
+# -j1 is safe on all hosts including server72 (848 MB RAM, 1 core).
+J8="-j1"
 
 # TOP_LOG_dir="/tmp"       # where to store longer build logs
 TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
 
-ROOT_dir=$(dirname $TOP_BUILD_dir)
 APL_VERSION=$(basename $ROOT_dir)
 
 # some counters for what happens
@@ -95,8 +97,9 @@ declare -i configs_bad=0
 declare -i configs_good=0
 declare -i test_errors=0
 bad_configs=""
+DISK_AT_START=""         # free space on / (df -h) at the start of the run
 
-# print the.html table row for one build artifact
+# print the .html table row for one build artifact
 # print nothing if the artifact does not exist
 #
 artifact()
@@ -111,7 +114,7 @@ local TD1="<TD><b>$htmlname</b> : </TD>"
 local TD2="<TD><A href=\"$linkname\">$filename</A><$1</TD>"
 local noTD2="<TD>missing (<b>$linkname</b>: No such file or directory)<$1</TD>"
 
-if [ -f $linkname ]
+if [ -f /var/www/html/$linkname ]
 then
       echo "
 $indent <TR>
@@ -129,6 +132,160 @@ $indent </TR>
 fi
 }
 
+send_results_email()
+{
+   [ -z "$RESULTS_EMAIL" ] && return   # disabled in build_all.cfg
+
+   local html_file="/var/www/html/nightly_build_results.html"
+   if [ ! -f "$html_file" ]
+   then
+      echo "send_results_email: $html_file not found, skipping email" >&2
+      return
+   fi
+
+   # ALL_PRIMITIVES_ERROR_N.apl reproducers (see run_all_primitives() and
+   # testcases/AllPrimitives.tc's ON_ERROR): attach them, if any, so the
+   # nightly email is self-contained for reproducing a fault.
+   #
+   local attachments=(/tmp/ALL_PRIMITIVES_ERROR_*.apl)
+   [ -e "${attachments[0]}" ] || attachments=()   # glob did not match
+
+   if [ ${#attachments[@]} -eq 0 ]
+   then
+      # no attachments: plain HTML email, as before
+      {
+         echo "From: build_all@$(hostname)"
+         echo "To: $RESULTS_EMAIL"
+         echo "Subject: GNU APL nightly build result (SVN $SVN_VERSION)"
+         echo "Content-Type: text/html; charset=\"UTF-8\""
+         echo ""
+         cat "$html_file"
+      } | sendmail -t
+      return
+   fi
+
+   # one or more AllPrimitives reproducers: multipart/mixed email with the
+   # HTML body plus each reproducer attached (base64, since they contain
+   # APL Unicode glyphs).
+   #
+   local boundary="APLNIGHTLY_$(date +%s)_$$"
+   {
+      echo "From: build_all@$(hostname)"
+      echo "To: $RESULTS_EMAIL"
+      echo "Subject: GNU APL nightly build result (SVN $SVN_VERSION) - ${#attachments[@]} AllPrimitives reproducer(s) attached"
+      echo "MIME-Version: 1.0"
+      echo "Content-Type: multipart/mixed; boundary=\"$boundary\""
+      echo ""
+      echo "--$boundary"
+      echo "Content-Type: text/html; charset=\"UTF-8\""
+      echo ""
+      cat "$html_file"
+      echo ""
+      local f
+      for f in "${attachments[@]}"
+      do
+         echo "--$boundary"
+         echo "Content-Type: text/plain; charset=\"UTF-8\"; name=\"$(basename "$f")\""
+         echo "Content-Transfer-Encoding: base64"
+         echo "Content-Disposition: attachment; filename=\"$(basename "$f")\""
+         echo ""
+         base64 "$f"
+         echo ""
+      done
+      echo "--$boundary--"
+   } | sendmail -t
+}
+
+# run the AllPrimitives.tc fuzzer testcase against the freshly built
+# "standard" apl binary $1 (before its build directory is deleted), and
+# record a short summary in $ALL_PRIMITIVES_SUMMARY for
+# write_nightly_build_results(). The reproducers
+# /tmp/ALL_PRIMITIVES_ERROR_*.apl are attached to the email; stale ones
+# are removed at the start of the run.
+#
+run_all_primitives()
+{
+   local apl_bin="$1"
+   ALL_PRIMITIVES_LOG="$TOP_LOG_dir/all_primitives.log"
+
+   if [ -x "$apl_bin" ]
+   then
+      # AllPrimitives.tc limits its own fuzz loop to CONTEXT.SECONDS (5s,
+      # see testcases/AllPrimitives.tc) but only checks the clock *between*
+      # fuzz iterations; a single iteration that hangs (e.g. an interpreter
+      # bug causing an infinite loop inside one primitive call) is never
+      # caught by that internal check and can wedge the whole nightly
+      # build indefinitely. Run the test in the background and enforce an
+      # external watchdog well beyond its own budget as a backstop.
+      #
+      # "exec" (rather than a plain subshell) replaces the backgrounded
+      # subshell's process image with $apl_bin itself, so $! below is the
+      # actual apl PID and not an intermediate shell that a kill would
+      # miss.
+      #
+      local watchdog_seconds=60   # generous multiple of CONTEXT.SECONDS=5
+
+      ( cd "$ROOT_dir/src" && \
+        exec "$apl_bin" --id 1010 -T testcases/AllPrimitives.tc ) \
+           > "$ALL_PRIMITIVES_LOG" 2>&1 &
+      local apl_pid=$!
+
+      local waited=0
+      while [ "$waited" -lt "$watchdog_seconds" ] && kill -0 "$apl_pid" 2>/dev/null
+      do
+         sleep 1
+         waited=$((waited + 1))
+      done
+
+      if kill -0 "$apl_pid" 2>/dev/null
+      then
+         kill -9 "$apl_pid" 2>/dev/null
+         wait "$apl_pid" 2>/dev/null
+         echo "*** AllPrimitives.tc did not finish within ${watchdog_seconds}s" \
+              "(own budget: CONTEXT.SECONDS=5s) - killed by watchdog ***" \
+              >> "$ALL_PRIMITIVES_LOG"
+      else
+         wait "$apl_pid" 2>/dev/null
+      fi
+
+      # the test runner colours its output unconditionally (even when not
+      # a tty); strip the ANSI/cursor escapes before extracting the
+      # human-readable summary line(s).
+      #
+      ALL_PRIMITIVES_SUMMARY=$(sed -r 's/\x1b\[[0-9;]*[A-Za-z]//g' "$ALL_PRIMITIVES_LOG" \
+                                | grep -E "errors in|Failed testcase|killed by watchdog")
+      [ -z "$ALL_PRIMITIVES_SUMMARY" ] && \
+         ALL_PRIMITIVES_SUMMARY="(no summary line found, last lines of the log:)
+$(sed -r 's/\x1b\[[0-9;]*[A-Za-z]//g' "$ALL_PRIMITIVES_LOG" | tail -n 10 \
+  | cut -c1-300 | html_escape)"
+      rm -f "$ALL_PRIMITIVES_LOG"
+   fi
+}
+
+# HTML-escape stdin
+html_escape()
+{
+   sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g'
+}
+
+# remove the ANSI colour escapes that the test runner writes
+strip_ansi()
+{
+   sed -r 's/\x1b\[[0-9;]*[A-Za-z]//g'
+}
+
+# print (HTML) the failure details of this run, which finish_config()
+# extracted from the logs before deleting them.
+#
+failure_details()
+{
+   local files=("$TOP_LOG_dir"/details-*.html)
+   [ -e "${files[0]}" ] || return   # glob did not match: no failures
+
+   echo "<H3>Failure Details</H3>"
+   cat "${files[@]}"
+}
+
 write_nightly_build_results()
 {
 # produce a .html file with the nightly build result. We do not
@@ -138,7 +295,7 @@ write_nightly_build_results()
 #
    if [ -d /var/www/html ]
    then
-   { 
+   {
 echo "<!DOCTYPE html>
 <html>
 <head>
@@ -155,6 +312,7 @@ echo "<!DOCTYPE html>
   $configs_bad configurations failed: $bad_configs<br>
   $configs_good configurations succeeded<br>
   $test_errors testcases failed<br>
+  Free disk space on /: ${DISK_AT_START:-?} at the start, $(df -h --output=avail / | tail -1 | tr -d ' ') at the end$( [ $(df --output=avail / | tail -1) -lt 1048576 ] && echo " <b>(less than 1G left!)</b>")<br>
 "
 
 echo "<H3>Nightly Build Artifacts (if any)</H3>
@@ -163,11 +321,24 @@ artifact "GNU APL interpreter" "apl" "apl"
 artifact "libapl.so (shared library)" "build/xxx" "libapl.so"
 artifact "libapl.a  (static library)" "build/xxx" "libapl.a"
 echo "</TABLE>"
+
+echo "<H3>AllPrimitives Fuzzer (testcases/AllPrimitives.tc)</H3>
+<PRE>${ALL_PRIMITIVES_SUMMARY:-(not run)}</PRE>"
+
+echo "<H3>Per-Configuration Timing</H3>
+<PRE>"
+grep -E '(build|test) [^:]+: (OK|FAILED) \([0-9]+ seconds\)' "$TOP_LOG_dir/summary.log" 2>/dev/null \
+   || echo "(no timing data available)"
+echo "</PRE>"
+
+failure_details
+
 echo "<H3>Other</H3>"
 
 } > /var/www/html/nightly_build_results.html
    fi
 }
+
 # refresh /var/www/html/nightly_build_results.html
 if [ "x$1" = "xnightly" ]
 then
@@ -175,15 +346,23 @@ then
    exit 0
 fi
 
-# new run (takes a long timr)
+# new run (takes a long time)
 
-# remove old build results and start a fresh summary file
+# remove old build results and start a fresh summary file. apl--<config>
+# (here and in /var/www/html) and failed-<config> are left over from older
+# versions of this script.
 #
 rm -f "$TOP_BUILD_dir"/apl-*
-rm -f "$TOP_BUILD_dir"/*.so
+rm -f "$TOP_BUILD_dir"/*.so "$TOP_BUILD_dir"/*.a
 rm -f "$TOP_LOG_dir"/*.log
 rm -f "$TOP_LOG_dir"/*.log2
+rm -f "$TOP_LOG_dir"/details-*.html
 rm -Rf builddir_*
+rm -Rf "$TOP_LOG_dir"/failed-*
+rm -f /var/www/html/apl--*
+rm -f /tmp/ALL_PRIMITIVES_ERROR_*.apl
+DISK_AT_START=$(df -h --output=avail / | tail -1 | tr -d ' ')
+ALL_PRIMITIVES_SUMMARY="(standard build missing or failed, AllPrimitives.tc skipped)"
 
 # the user can clean this directory up by calling this script with
 # argument 'clean'
@@ -200,6 +379,82 @@ then
 fi
 
 ###################################################################
+# a configuration is done: if it failed, then extract what the results
+# email shall show about the failure (see failure_details()) into the small
+# file $TOP_LOG_dir/details-<config>.html. Then delete everything else of
+# the configuration (its build directory and its configure and make logs)
+# before the next configuration starts.
+#
+# The purpose of the nightly build is to discover new issues. A failure is
+# followed up by building the failed configuration again (build_all
+# <config>), not by looking at the remains of the nightly run. A build
+# directory takes 350-450M (object files, copied testcases, ...), and the
+# disk space is needed by the other applications on this host.
+#
+finish_config()
+{
+   # $1: configuration name
+   # $2: what failed: "build", "test", or "" (nothing)
+   #
+   local bdir="$TOP_BUILD_dir/builddir_$1"
+   local clog="$TOP_LOG_dir/configure-$1.log"
+   local blog="$TOP_LOG_dir/build-$1.log"
+
+   if [ "$2" = "build" ]
+   then
+      {
+         echo "<H4>build $1: FAILED</H4>"
+         echo "<PRE>"
+         {
+            grep -h -m 5 "configure: error" "$clog" 2>/dev/null
+            grep -n -m 10 -B 2 -A 3 -E \
+                 "error:|Error [0-9]+|No space left|Killed|virtual memory exhausted|cannot allocate|undefined reference" \
+                 "$blog" 2>/dev/null | head -60
+            echo "..."
+            tail -n 5 "$blog" 2>/dev/null
+         } | strip_ansi | cut -c1-300 | html_escape
+         echo "</PRE>"
+         echo "To reproduce: build/build_all $1<br>"
+      } > "$TOP_LOG_dir/details-$1.html"
+   elif [ "$2" = "test" ]
+   then
+      local summ="$bdir/src/testcases/summary.log"
+      {
+         echo "<H4>test $1: FAILED</H4>"
+         echo "<PRE>"
+         {
+            if [ -f "$summ" ]
+            then
+               # a failed testcase in summary.log, e.g.:
+               #   3   16.425 ms  (0 APL, 0 assert, 3 diff, 0 parse) testcases/Rank.tc
+               strip_ansi < "$summ" | awk '$1 ~ /^[0-9]+$/ && $1 > 0'
+               local tc
+               strip_ansi < "$summ" | awk '$1 ~ /^[0-9]+$/ && $1 > 0 { print $NF }' |
+               while read tc
+               do
+                  [ -f "$bdir/src/$tc.log" ] || continue
+                  echo
+                  echo "=== $tc: first differences"
+                  strip_ansi < "$bdir/src/$tc.log" |
+                     grep -m 12 -B 1 -A 2 -E "^(apl|ref|extra): |abnormal|Assert|SEGMENTATION" |
+                     head -40
+               done
+            else
+               echo "(no testcases/summary.log: make test stopped early."
+               echo " Its last lines were:)"
+               tail -n 20 "$bdir/src/make_test.log" 2>/dev/null | strip_ansi
+            fi
+         } | cut -c1-300 | html_escape
+         echo "</PRE>"
+         echo "To reproduce: build/build_all $1<br>"
+      } > "$TOP_LOG_dir/details-$1.html"
+   fi
+
+   cd "$TOP_BUILD_dir"
+   rm -Rf "$bdir" "$clog" "$blog"
+}
+
+###################################################################
 # build one configuration
 #
 build_one()
@@ -210,10 +465,9 @@ build_one()
    #
 
    cd "$TOP_BUILD_dir"
-   rm -f "$3"   # remove stale build results (should not exist)
    rm -Rf "builddir_$1"
    mkdir "builddir_$1"
-   cd "builddir_$1"   # like  the top-level directory in a non-VPATH build
+   cd "builddir_$1"   # like the top-level directory in a non-VPATH build
    VSRC_dir="$TOP_BUILD_dir/builddir_$1/src"
 
    local time_FROM=$(date +%s)
@@ -242,26 +496,32 @@ build_one()
    local secs=$(( $time_TO - $time_FROM ))
    local summ="$TOP_LOG_dir/summary.log"
    local OK_failed="OK"
+   local this_build_ok=1   # 0 once an expected artifact is actually found
    if [ $make_result -eq 0 ] ; then   # make succeeded
       echo "    make OK for configuration: $1" >> $summ
-      if [ -f "$VSRC_dir/apl" ] ; then
-         cp -f "$VSRC_dir/apl" "/var/www/html/apl--$1"
-         mv -f "$VSRC_dir/apl" "$TOP_BUILD_dir/apl--$1"
-         configs_good=$((configs_good+1))
-      elif [ -f "$VSRC_dir/.libs/libapl.so" ] ; then
-         cp -f "$VSRC_dir/.libs/libapl.so" "/var/www/html/libapl.so"
-         mv -f "$VSRC_dir/.libs/libapl.so" "$TOP_BUILD_dir/"
-         configs_good=$((configs_good+1))
-      elif [ -f "$VSRC_dir/.libs/lib_gnu_apl.so" ] ; then
-         cp -f "$VSRC_dir/.libs/lib_gnu_apl.so" "/var/www/html/lib_gnu_apl.so"
-         mv -f "$VSRC_dir/.libs/lib_gnu_apl.so" "$TOP_BUILD_dir/"
-         configs_good=$((configs_good+1))
-      elif [ ! -f $3 ] ; then
+      # publish the build results of "standard" and "libapl" for the
+      # artifact table of the results email (see
+      # write_nightly_build_results()). The build results of the other
+      # configurations are only checked for existence.
+      #
+      if [ ! -f "$3" ] ; then
          echo "**** no file $3 after building $1" >> $summ
          missing_files=$((missing_files+1))
          configs_bad=$((configs_bad+1))
          bad_configs="$bad_configs $1"
          OK_failed="FAILED (make target missing)"
+      else
+         if [ "$1" = "standard" ] ; then
+            cp -f "$VSRC_dir/apl" "/var/www/html/apl"
+         elif [ "$1" = "libapl" ] ; then
+            cp -f "$VSRC_dir/.libs/libapl.so" "/var/www/html/libapl.so"
+            # libtool builds the static archive alongside the shared
+            # object (LT_INIT has no --disable-static in configure.ac).
+            [ -f "$VSRC_dir/.libs/libapl.a" ] && \
+               cp -f "$VSRC_dir/.libs/libapl.a" "/var/www/html/libapl.a"
+         fi
+         configs_good=$((configs_good+1))
+         this_build_ok=0
       fi
       echo "    build $1: OK ($secs seconds)" >> $summ
    else                        # make failed
@@ -275,6 +535,7 @@ build_one()
    fi
    echo "    configuration: \"$1\" done." >> $summ
    echo "  configuration: \"$1\" done ($OK_failed)"
+   return $this_build_ok
 }
 
 ###################################################################
@@ -288,9 +549,13 @@ test_one()
    local time_FROM=$(date +%s)
    local summ="$TOP_LOG_dir/summary.log"
    cd $VSRC_dir
-   cp $ROOT_dir/src/testcases/* testcases/        # copy testcases
-   cp $ROOT_dir/src/workspaces/* workspaces/      # needed by testcases
-   make test > /dev/null 2>&1
+   # all testcases (make test runs testcases/*.tc), their helper and data
+   # files (e.g. APnnn_1011.*), and their library root testcases/libroot
+   # (make test runs ./apl --libroot testcases/libroot). Since the tree is a
+   # copy of the tarball content, these are exactly the distributed files.
+   cp $ROOT_dir/src/testcases/* testcases/ 2>/dev/null  # (skips subdirs)
+   cp -R $ROOT_dir/src/testcases/libroot testcases/     # needed by testcases
+   make test > make_test.log 2>&1   # for finish_config()
    local make_result=$?
    local time_TO=$(date +%s)
    local secs=$(( $time_TO - $time_FROM ))
@@ -300,8 +565,131 @@ test_one()
       echo "*** test $1: FAILED ($secs seconds)" >> $summ
       test_errors=$((1+$test_errors))
    fi
+   return $make_result
 }
 
+###################################################################
+# special build functions (not driven by build_all.cfg)
+#
+
+# build the standard configuration in the source tree itself (a plain,
+# non-VPATH build, like a user who unpacks the GNU APL tar file and runs
+# ./configure; make). The tree is the unpacked tar file (see above), so
+# copy it, without the build results in build/, and build the copy. build/
+# itself must be copied, since it is one of the SUBDIRS (config.status
+# fails without build/Makefile.in), but builddir_* must not: the copy is
+# made into build/builddir_tar.
+build_tar()
+{
+  echo "building configuration 'standard' from a copy of the GNU APL tree"
+  echo "the APL_VERSION is: $APL_VERSION"
+  cd $TOP_BUILD_dir
+  rm -Rf builddir_tar
+  mkdir builddir_tar
+  tar -C $ROOT_dir                     \
+      --exclude='./build/builddir_*'   \
+      --exclude='./build/apl--*'       \
+      --exclude='./build/failed-*'     \
+      --exclude='./build/details-*'    \
+      --exclude='./build/*.log'        \
+      --exclude='./build/*.log2'       \
+      --exclude='./build/*.so'         \
+      --exclude='./build/*.a'          \
+      -cf - . | tar -C builddir_tar -xf -
+  cd builddir_tar
+  local time_FROM=$(date +%s)
+  ./configure > "$TOP_LOG_dir/configure-tar.log" 2>&1
+  make $J8    > "$TOP_LOG_dir/build-tar.log"     2>&1
+  local make_result=$?
+  local secs=$(( $(date +%s) - $time_FROM ))
+  cd $TOP_BUILD_dir
+  if [ $make_result -eq 0 ] && [ -f builddir_tar/src/apl ]
+  then
+     echo "    build tar: OK ($secs seconds)" >> "$TOP_LOG_dir/summary.log"
+     configs_good=$((configs_good+1))
+     finish_config tar ""
+  else
+     echo "*** build tar: FAILED ($secs seconds)" >> "$TOP_LOG_dir/summary.log"
+     build_errors=$((build_errors+1))
+     configs_bad=$((configs_bad+1))
+     bad_configs="$bad_configs tar"
+     finish_config tar build
+  fi
+}
+
+# build from a clean svn export of the local working copy
+# (avoids hitting the Savannah repos, which are already under heavy load)
+build_git()
+{
+  echo "building configuration 'git' from a local svn export of $ROOT_dir"
+  cd $TOP_BUILD_dir
+  rm -Rf builddir_git
+  svn export "$ROOT_dir" builddir_git
+  cd builddir_git
+  { autoreconf && ./configure ; } > "$TOP_LOG_dir/configure-git.log" 2>&1
+  make $J8                        > "$TOP_LOG_dir/build-git.log"     2>&1
+  local make_result=$?
+  cd $TOP_BUILD_dir
+  if [ $make_result -eq 0 ] && [ -f builddir_git/src/apl ]
+  then
+     configs_good=$((configs_good+1))
+     finish_config git ""
+  else
+     build_errors=$((build_errors+1))
+     configs_bad=$((configs_bad+1))
+     bad_configs="$bad_configs git"
+     finish_config git build
+  fi
+}
+
+# build the AddressSanitizer variant -- CXXFLAGS/LDFLAGS with embedded
+# spaces can't go through build_cfg_asan (build_one passes it to
+# ../../configure as one unquoted, word-split argument, which would
+# split "-fsanitize=address -fno-omit-frame-pointer -g -O1" into
+# separate bogus configure options instead of one CXXFLAGS value) -- so
+# this exports them as real environment variables around build_one/
+# test_one instead, same as testing this manually from a shell.
+#
+# ASan roughly doubles both compile-time and run-time memory use, which
+# is a real risk on server72 (848M RAM, 1 core -- see the disk-full
+# incidents in project history) but not on server68 (15G RAM, 12
+# cores). Rather than maintain two different DEFAULT_CONFIGS lists (and
+# risk them diverging across the server72-push-apl rsync), this
+# function checks its own host and is a no-op everywhere except
+# server68.
+build_asan()
+{
+   if [ "$(hostname)" != "server68" ]
+   then
+      echo "skipping 'asan' configuration: only runs on server68 (needs" \
+           "more RAM/CPU than this host has to offer safely)."
+      return
+   fi
+
+   echo "building configuration 'asan' (AddressSanitizer)"
+   VSRC_dir="$TOP_BUILD_dir/builddir_asan/src"
+   local failed=""
+   CXXFLAGS="-fsanitize=address -fno-omit-frame-pointer -g -O1" \
+   LDFLAGS="-fsanitize=address" \
+      build_one "asan" "$STD ASSERT_LEVEL_WANTED=2" "$VSRC_dir/apl" \
+      || failed="build"
+
+   if [ -z "$failed" ]
+   then
+      # LeakSanitizer (bundled with ASan, on by default) flags a lot of
+      # GTK/GLib's own internal caching as "leaks" -- not real bugs,
+      # just noise from a GUI toolkit that was never designed to be run
+      # under a leak checker. Disable it here and keep the
+      # memory-corruption detectors (buffer overflows, use-after-free,
+      # alloc/dealloc mismatches -- the actually useful part) active.
+      ASAN_OPTIONS="detect_leaks=0" test_one "asan" || failed="test"
+   fi
+   finish_config asan "$failed"
+}
+
+###################################################################
+# main build loop
+#
 cd $ROOT_dir
 echo "running autoreconf in $ROOT_dir..."
 autoreconf
@@ -311,135 +699,52 @@ if [ "$?" != 0 ]; then
 fi
 echo "  ├─── autoreconf done (OK)."
 
-# some shortcuts for various configure options
-#
-STD="--enable-maintainer-mode"
-LIBAPL="--with-libapl"
-PYTHON="--with-python"
-ERLANG="--with-erlang"
-DEV="DEVELOP_WANTED=yes"
-RAT="RATIONAL_NUMBERS_WANTED=yes"
-
-PERF="PERFORMANCE_COUNTERS_WANTED=yes"
-DYLO="DYNAMIC_LOG_WANTED=yes"
-XCB="--without-gtk3"
-CC_3="CORE_COUNT_WANTED=-3"		# ⎕SYL controls the number of cores
-noVC="VALUE_CHECK_WANTED=no"
-noVH="VALUE_HISTORY_WANTED=no"
-AL0="ASSERT_LEVEL_WANTED=0"             # no ASSERTions
-FAST="$noVC $noVH $AL0"
-
-################################################################################
-# build the standard configuration
-#
-build_standard()
 {
-  build_one "standard" "$STD" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-# build the standard configuration from the GNU APL tar file
-build_tar()
-{
-  echo "building configuration 'standard' from the GNU APL tar file"
-  echo "the APL_VERSION is: $APL_VERSION"
-  cd $TOP_BUILD_dir
-  tar xf $ROOT_dir/$APL_VERSION.tar.gz 
-  mv $APL_VERSION builddir_tar
-  cd builddir_tar
-  ./configure
-  make $J8
-  cd $TOP_BUILD_dir
-}
-
-# build the standard configuration from a git checkout
-build_git()
-{
-  echo "building configuration 'standard' from the git repository"
-  git clone https://git.savannah.gnu.org/git/apl.git builddir_git
-  cd builddir_git
-  ./configure
-  make $J8
-}
-
-#
-build_libxcb()
-{
-  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-################################################################################
-# build the standard configuration with libxcb (even if GTK3 is present)
-#
-build_libxcb()
-{
-  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-  test_one  "standard"
-}
-
-# build the developer configuration with rational number support
-#
-build_rational()
-{
-  build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
-}
-################################################################################
-# build apl as a library
-#
-build_libapl()
-{
-  build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
-}
-################################################################################
-# build the python interface to APL
-#
-build_python()
-{
-  build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
-}
-################################################################################
-# build apl for parallel benchmarking
-#
-build_parallel_bench()
-{
- build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
-}
-################################################################################
-# build the erlang interface to APL
-#
-build_erlang()
-{
-  build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
-}
-################################################################################
-# build the developer configuration.
-#
-build_develop()
-{
-  build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
-  test_one "develop"
-}
-
-# build all relevant configurations
-{
-  # clear the summary files
-  #
   echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
   echo "Build Summary Errors:" 2> "$TOP_LOG_dir/summary.log2"
 
   for config in $configs
   do
-        echo -n "  ├─── building configuration $config..." > /dev/stderr
-        build_$config
-        echo " done" > /dev/stderr
+     echo -n "  ├─── building configuration $config..." > /dev/stderr
+
+     cfg_var="build_cfg_${config}"
+     art_var="build_art_${config}"
+     tst_var="build_test_${config}"
+
+     if [ -n "${!cfg_var+set}" ]
+     then
+        # config defined in build_all.cfg: use the generic path
+        VSRC_dir="$TOP_BUILD_dir/builddir_${config}/src"
+        failed=""
+        build_one "$config" "${!cfg_var}" "$VSRC_dir/${!art_var}" \
+           || failed="build"
+        if [ -z "$failed" ] && [ "${!tst_var}" = "yes" ]
+        then
+           test_one "$config" || failed="test"
+        fi
+        if [ "$config" = "standard" ] && [ "$failed" != "build" ]
+        then
+           run_all_primitives "$VSRC_dir/apl"
+        fi
+        finish_config "$config" "$failed"
+
+     elif declare -f "build_${config}" > /dev/null
+     then
+        # special build function defined in this script (tar, git, …)
+        build_${config}
+
+     else
+        echo "*** unknown configuration: $config (no build_cfg_${config} in build_all.cfg and no build_${config}() function)"
+     fi
+
+     echo " done" > /dev/stderr
   done
   echo "  └─── DONE." > /dev/stderr
 
   echo
   echo  "$build_errors build errors"
   echo "$missing_files missing files (build results)"
-  [ ! -z "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
+  [ -n "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
   echo  "$configs_good configurations succeeded"
   echo   "$test_errors testcases failed"
 } >> "$TOP_LOG_dir/summary.log" 2>> "$TOP_LOG_dir/summary.log2"
@@ -447,7 +752,7 @@ build_develop()
 cat "$TOP_LOG_dir/summary.log"
 
 write_nightly_build_results
+send_results_email
 
 cd $START_dir     # undo all cds in this script
 stty sane         # in case some testcase failed badly
-

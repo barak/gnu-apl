@@ -1,6 +1,8 @@
 ⍝ Reciprocal.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ÷4
 0.25
 
@@ -13,5 +15,48 @@
       ÷0J1 0J¯1
 0J¯1 0J1
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #77): ÷ of a complex number with both parts
+      ⍝ individually smaller than ⎕CT's absolute floor used to be
+      ⍝ rejected as "near zero" (and, separately, the "near-real"
+      ⍝ shortcut used to fire on an absolute-tiny imaginary part alone,
+      ⍝ computing 1.0/0.0 for an exactly-zero real part). Neither 0J1E¯11
+      ⍝ nor 1E¯20J1E¯20 is mathematically zero, and both have a finite
+      ⍝ reciprocal (only exact 0J0 is now rejected).
+      ⍝
+      ÷0J1E¯11
+0J¯1E11
+
+      ÷1E¯20J1E¯20
+5E19J¯5E19
+
+      ÷0J0
+DOMAIN ERROR
+      ÷0J0
+      ^
+
+      ⍝ regression (Blake McBride, Bugs31 #11): Smith's algorithm (Bugs30
+      ⍝ #6) divides by the larger-magnitude component first to keep every
+      ⍝ intermediate bounded -- but "bounded" still meant as large as
+      ⍝ fabs(real)+fabs(imag), which itself overflows once both
+      ⍝ magnitudes approach DBL_MAX/2, even though the true reciprocal is
+      ⍝ a perfectly representable (possibly subnormal) finite value.
+      ⍝ Fixed by prescaling both components by their common larger
+      ⍝ magnitude before applying Smith's algorithm.
+      ⍝
+      ÷8E307J8E307
+6.25E¯309J¯6.25E¯309
+
+      ÷9E307J9E307
+5.555555556E¯309J¯5.555555556E¯309
+
+      ÷1E308J1E308
+5E¯309J¯5E¯309
+
+      ⍝ control: a moderate-magnitude case (well within the old,
+      ⍝ unscaled algorithm's safe range) is unaffected
+      ⍝
+      ÷1E150J1E150
+5E¯151J¯5E¯151
+
+      ⍝ ==================================
 

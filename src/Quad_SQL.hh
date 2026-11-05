@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ class ArgListBuilder;
 class Connection;
 class Provider;   // SQL provider (SQLite, PostgreSQL)
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
    The system function ⎕SQL
  */
@@ -51,12 +51,18 @@ public:
    static void close_all_connections();
 
    /// run a (read-only) database query
-   static Value_P run_query(const Value & A, const Value & X, const Value & B)
+   /// @param A left-argument APL value (SQL statement or parameters)
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (query parameters)
+   static Value_P run_query(const cValue & A, const cValue & X, const cValue & B)
       { return run_generic(param_to_db(X), A, B, /*  query = */ true); }
 
 
    /// run a (read/write) database update
-   static Value_P run_update(const Value & A, const Value & X, const Value & B)
+   /// @param A left-argument APL value (SQL statement or parameters)
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (update parameters)
+   static Value_P run_update(const cValue & A, const cValue & X, const cValue & B)
       { return run_generic(param_to_db(X), A, B, /*  query = */ false); }
 
 
@@ -65,71 +71,107 @@ protected:
    static const FunctionGroup::function_info subfunction_infos[];
 
    /// overloaded Function::eval_AB().
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left-argument APL value (SQL command or options)
+   /// @param B right-argument APL value (query parameters or data)
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left-argument APL value (SQL command or options)
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (query parameters or data)
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 
    /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right-argument APL value (SQL sub-function selector)
+   virtual Token eval_B(cValue_R B) const;
 
    /// overloaded Function::eval_XB().
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (SQL sub-function selector)
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
 
    /// overloaded FunctionGroup::print_map_syntax()
+   /// @param out output stream to write to
+   /// @param info descriptor for the sub-function being printed
    virtual void print_map_syntax(ostream & out,
                                  const function_info & info) const;
 
    /// list ⎕SQL functions
+   /// @param out output stream to write the function list to
    Token list_functions(ostream & out) const;
 
    /// overloaded FunctionGroup::get_legend()
+   /// @param lt legend type selector
    virtual const char * get_legend(Legend_type lt) const;
 
    /// open a database, return its handle
-   static Value_P open_database(const Value & A, const Value & B);
+   /// @param A left-argument APL value (connection options)
+   /// @param B right-argument APL value (database filename or URL)
+   static Value_P open_database(const cValue & A, const cValue & B);
 
    /// return the names of the database columns
+   /// @param A left-argument APL value identifying the table
+   /// @param B right-argument APL value (database handle)
    static Value_P column_names(Value_P A, Value_P B);
 
    /// perform a generic query
-   static Value_P run_generic(Connection * conn, const Value & A,
-                              const Value & B, bool query);
+   /// @param conn active database connection
+   /// @param A left-argument APL value (SQL statement)
+   /// @param B right-argument APL value (bind parameters)
+   /// @param query true for read-only query, false for read/write update
+   static Value_P run_generic(Connection * conn, const cValue & A,
+                              const cValue & B, bool query);
 
    /// return the version number of the SQL provider named B
+   /// @param ucs_B provider name string
    static Value_P get_version_number(const UCS_string & ucs_B);
 
    /// return the version string of the SQL provider (synthesized as needed).
+   /// @param ucs_B provider name string
    static Value_P get_version_string(const UCS_string & ucs_B);
 
    /// run one SQL query
-    static Value_P run_generic_one_query(ArgListBuilder * arg_list,
-                                         const Value & B, int start,
-                                         int num_args);
+   /// @param arg_list prepared argument list builder for the query
+   /// @param B right-argument APL value (bind parameters)
+   /// @param start first parameter index to bind
+   /// @param num_args number of parameters to bind
+   static Value_P run_generic_one_query(ArgListBuilder * arg_list,
+                                        const cValue & B, int start,
+                                        int num_args);
 
+   /// @param filename database file path to search for
    static int find_free_connection(const UTF8_string & filename);
 
+   /// @param handle illegal database handle value to report
    static void throw_illegal_db_handle(int handle);
 
+   /// @param db_id numeric database connection identifier
    static Connection * db_id_to_connection(int db_id);
 
+   /// @param B APL value encoding the database connection handle
    static Connection * value_to_db_id(const Value & B);
 
+   /// @param B APL value identifying the database connection to close
    static Token close_database(Value_P B);
 
+   /// @param B APL value identifying the database connection
    static Token run_transaction_begin(Value_P B);
 
+   /// @param B APL value identifying the database connection
    static Token run_transaction_commit(Value_P B);
 
+   /// @param B APL value identifying the database connection
    static Token run_transaction_rollback(Value_P B);
 
+   /// @param B APL value identifying the database connection
    static Token show_tables(Value_P B);
 
    /// convert axis argument X to a database connection. X may have length 2
    /// (for function number and database handle) or length 1 (function number
    /// only with B nested and ↑B being the database handle).
    ///
-   static Connection * param_to_db(const Value & X);
+   /// @param X axis argument encoding the function number and optional DB handle
+   static Connection * param_to_db(const cValue & X);
 
    /// init a table of supported provides (as detected by ./configure)
    static void init_provider_map();
@@ -145,12 +187,12 @@ protected:
       };
    static std::vector<conn_file> SQL_connections;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /**
    The system function ⎕SQL_3.  It is a wrapper for ⎕SQL[3, DB]
    with a simpler axis
  */
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 class Quad_SQL_3 : public QuadFunction
 {
@@ -162,10 +204,12 @@ public:
 
 protected:
    /// overloaded Quad_SQL::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left-argument APL value (SQL statement or options)
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (query parameters)
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 };
-
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 class Quad_SQL_4 : public QuadFunction
 {
@@ -177,8 +221,12 @@ public:
 
 protected:
    /// overloaded Quad_SQL::eval_AXB().
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left-argument APL value (SQL statement or options)
+   /// @param X axis argument identifying the database connection
+   /// @param B right-argument APL value (query parameters)
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_SQL_HH_DEFINED__
 

@@ -1,0 +1,1004 @@
+⍝ ZZ73_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ Blake McBride's Bugs34 report (48 items). Not here: items that need
+      ⍝ files, a special build, ^C, or --rawCIN (#2, #24, #27, #28, #37, #38, #46).
+      ⍝
+      )CLEAR
+CLEAR WS
+
+
+
+      ⍝ #1 a ⎕STOP line in a function that ignores stop control (exec
+      ⍝ property 3) is skipped; it ended the interpreter
+      ⍝
+      ⊣0 0 1 0 ⎕FX 'FOO' 'A←1' 'B←2'
+
+
+
+
+
+      1 ⎕STOP 'FOO'
+
+
+
+
+
+      FOO
+
+
+
+
+
+      A B
+1 2
+
+
+
+
+
+
+
+      ⍝ #3 B's →N in A ⎕EA B or A ⎕EB B whose caller is a lambda: ⎕EA falls
+      ⍝ back to A, ⎕EB is a SYNTAX ERROR; it ended the interpreter or looped
+      ⍝ forever
+      ⍝
+      {⍵⊢'1' ⎕EA '→2'}⍬
+1
+
+
+
+
+
+      {⍵⊢'1' ⎕EA '→1'}⍬
+1
+
+
+
+
+
+      {⍵⊢'1' ⎕EB '→1'}⍬
+SYNTAX ERROR+
+λ1[1]  λ←⍵⊢'1' ⎕EB '→1'
+           ^
+
+
+
+
+
+      )MORE
+A ⎕EB B: B's →N cannot branch out of a lambda
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #4 an error raised by ⎕ES in a macro frame (here LENGTH ERROR of
+      ⍝ A{⍺}¨B) read a deleted SI entry
+      ⍝
+      1 2 3{⍺}¨1 (2 3)
+LENGTH ERROR
+      1 2 3{⍺}¨1 (2 3)
+      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      1 2 3{⍺}¨'ab' 'cd'
+LENGTH ERROR
+      1 2 3{⍺}¨'ab' 'cd'
+      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #5 ⊃ of an empty array whose prototype item is a nested scalar keeps
+      ⍝ the nesting and leaves no stale values
+      ⍝
+      ≡⊃0⍴⊂⊂1 2
+2
+
+
+
+
+
+      (⊃0⍴⊂2 2⍴⊂1 2)≡0 2 2⍴⊂0 0
+1
+
+
+
+
+
+      Z←⊃0⍴⊂(⊂1 2)(⊂3 4)
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+
+      )ERASE Z
+
+
+
+
+
+
+
+      ⍝ #6 V[I]←C with a matrix index I: C must have the shape of I
+      ⍝
+      V←1 2 3 4
+
+
+
+
+
+      V[2 2⍴1 2 3 4]←2 2⍴5 6 7 8
+
+
+
+
+
+      V
+5 6 7 8
+
+
+
+
+
+      V[2 2⍴1 2 3 4]←1 2 3 4
+RANK ERROR+
+      V[2 2⍴1 2 3 4]←1 2 3 4
+      ^             ^
+
+
+
+
+
+      )MORE
+A[B]←C: expecting ⍴C to be ⍴B (2 2); ⍴C is 4
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #8 a zero with an exponent (as displayed in a scaled column) reads
+      ⍝ back
+      ⍝
+      ⍎'0E0'
+0
+
+
+
+
+
+      ⍎'0.0000000000000000E0 0.0E¯5 0E0J1'
+0 0 0J1
+
+
+
+
+
+
+
+      ⍝ #9 the digits of E-format dyadic ⍕ are correctly rounded, and exact
+      ⍝ for integers
+      ⍝
+      ⎕PP←17
+
+
+
+
+
+      ¯17⍕1E300
+1.0000000000000001E300
+
+
+
+
+
+      ¯17⍕1÷3
+3.3333333333333331E¯1
+
+
+
+
+
+      ¯19⍕9223372036854775807
+9.223372036854775807E18
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+
+
+      ⍝ #10 format by example: a negative exponent without a decorator for
+      ⍝ its sign is a DOMAIN ERROR
+      ⍝
+      '1.7000E01'⍕0.1
+DOMAIN ERROR+
+      '1.7000E01'⍕0.1
+      ^          ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      '1.7000E¯01'⍕0.1 10
+1.0000E¯011.0000E 01
+
+
+
+
+
+
+
+      ⍝ #11 A|B at ⎕CT←0 with an integral float B beyond 2⋆63 is exact
+      ⍝
+      ⎕CT←0
+
+
+
+
+
+      3|1E19
+1
+
+
+
+
+
+      7|1E19
+3
+
+
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+
+
+
+      ⍝ #12 the small component of ¯3○ and ¯6○ of a near-real complex number
+      ⍝ is accurate
+      ⍝
+      ⎕PP←12
+
+
+
+
+
+      11○¯3○1J1E¯11
+5E¯12
+
+
+
+
+
+      9○¯6○0J1E¯11
+1E¯11
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+
+
+      ⍝ #13 1 ⎕TF of an empty nested array is '' (the migration form cannot
+      ⍝ represent it)
+      ⍝
+      D←0⍴⊂'ab'
+
+
+
+
+
+      ⍴1 ⎕TF 'D'
+0
+
+
+
+
+
+      )ERASE D
+
+
+
+
+
+
+
+      ⍝ #14 the prompt after a fractional insert is not an existing line
+      ⍝ (which the next line replaced)
+      ⍝
+      ∇FOO14
+      A←1
+      B←2
+      ∇
+
+
+
+
+
+      ∇FOO14
+      [1.6] X←6
+      [1.5] Y←5
+      Z←0
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO14'
+FOO14    
+      A←1
+Y←5      
+      Z←0
+X←6      
+      B←2
+
+
+
+
+
+
+
+      ⍝ #15 a trailing ⍫ or ∇ inside a multi-line string is string text: it
+      ⍝ closed (and locked) the editor
+      ⍝
+      ∇FOO15
+      X←"""
+      abc ⍫
+      line ∇ two
+      """
+      ∇
+
+
+
+
+
+      3 ⎕AT 'FOO15'
+0 0 0 0
+
+
+
+
+
+      ⎕CR 'FOO15'
+FOO15           
+      X←"""     
+      abc ⍫     
+      line ∇ two
+      """       
+
+
+
+
+
+
+
+      ⍝ #16 [∆] without a line number is rejected (it deleted the last line),
+      ⍝ #17 an empty line does not replace an existing line
+      ⍝
+      ∇FOO16
+      A←1
+      B←2
+      C←3
+      ∇
+
+
+
+
+
+      ∇FOO16
+      [∆]
+∇-command failed: [∆] needs a line number (DEFN ERROR)
+      [2]
+      
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO16'
+FOO16    
+      A←1
+      B←2
+      C←3
+
+
+
+
+
+
+
+      ⍝ #18 (A⊃¨N)←B replaces the picked items wholesale
+      ⍝
+      N←((1 2)(3 4))((5 6)(7 8))
+
+
+
+
+
+      (1⊃¨N)←(⊂1 2 3)(⊂4 5 6)
+
+
+
+
+
+      N
+  1 2 3  3 4    4 5 6  7 8  
+
+
+
+
+
+
+
+      ⍝ #19 LO⍣RO with a defined RO: the condition must be a single Boolean
+      ⍝
+      ⊣⎕FX 'Z←BAR B' 'Z←B+1'
+
+
+
+
+
+      ⊣⎕FX 'Z←A CND B' 'Z←0 1'
+
+
+
+
+
+      (BAR⍣CND) 1
+DOMAIN ERROR
+      (BAR⍣CND)1
+      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #20 ⎕ES in immediate execution reports at its own statement and
+      ⍝ leaves an earlier suspension alone
+      ⍝
+      ⊣⎕FX 'Z←FES20 B' 'O'
+
+
+
+
+
+      FES20 1
+VALUE ERROR+
+FES20[1]  O
+          ^
+
+
+
+
+
+      'MYERR' ⎕ES 5 4
+MYERR
+      'MYERR' ⎕ES 5 4
+      ^       ^
+
+
+
+
+
+      )SI
+*
+FES20[1]
+*
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #21 a misspelled system name is a SYNTAX ERROR (⎕PPX←7 assigned the
+      ⍝ variable X)
+      ⍝
+      X←3
+
+
+
+
+
+      ⎕PPX←7
+SYNTAX ERROR+
+      ⎕PPX
+      ^   ^
+
+
+
+
+
+      X
+3
+
+
+
+
+
+      ⎕UCS65
+A
+
+
+
+
+
+
+
+      ⍝ #23 default mode: an integer in a complex column causes no scaling
+      ⍝ and loses no digits
+      ⍝
+      ⎕PP←5
+
+
+
+
+
+      2 1⍴1J1 123456
+     1J1
+123456
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+
+
+      ⍝ #25 ⎕FIO file handles are not truncated to 32 bits
+      ⍝
+      ⎕FIO[4] 4294967296
+DOMAIN ERROR+
+      ⎕FIO[4]4294967296
+      ^
+
+
+
+
+
+      )MORE
+4294967296 is not an open file handle managed by ⎕FIO, see ⎕FIO 0.
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #26 ]USERCMD: only the same name is a conflict, #47 a refused
+      ⍝ redefinition is not also "installed"
+      ⍝
+      ⊣⎕FX 'Z←UC B' 'Z←⍴B'
+
+
+
+
+
+      ]USERCMD ]LOGGER UC
+
+
+
+
+
+      ]USERCMD ]LOG UC
+
+
+
+
+
+      ]USERCMD ]LOGGER UC 1
+
+
+
+
+
+      ]USERCMD REMOVE ]LOGGER
+
+
+
+
+
+
+
+      ⍝ #29 a line number above 2147483647 is rejected (it replaced line
+      ⍝ 2147483647)
+      ⍝
+      ∇FOO29
+      [1] [2147483647] A←1
+      [2147483648] B←2
+??? line number too large (max. 2147483647)
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO29'
+FOO29
+A←1  
+
+
+
+
+
+
+
+      ⍝ #30 ⎕RVAL: a shape item that does not fit is a DOMAIN ERROR
+      ⍝
+      2 ⎕RVAL 2*32
+DOMAIN ERROR+
+      2 ⎕RVAL 2⋆32
+      ^ ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #31 a hex literal with more than 64 bits is a bad number
+      ⍝
+      $10000000000000000
+Bad number+
+      $10000000000000000
+      ^                 ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      $FFFFFFFFFFFFFFFF
+¯1
+
+
+
+
+
+
+
+      ⍝ #32 the carets of a statement with a literal axis and a folded A⍴B
+      ⍝ constant
+      ⍝
+      1 2 3,[1]2 2⍴9
+LENGTH ERROR+
+      1 2 3,[1]2 2⍴9
+      ^    ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #33 ⍬+¨1 2 is a LENGTH ERROR
+      ⍝
+      ⍬+¨1 2
+LENGTH ERROR+
+      ⍬+¨1 2
+      ^^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #34 ⎕ES as the cleanup A of A ⎕EB B in a function: )MORE names B's
+      ⍝ failure
+      ⍝
+      ⊣⎕FX 'W12' '''⎕ES ''''EB A'''''' ⎕EB ''3÷0'''
+
+
+
+
+
+      W12
+EB A+
+      W12
+      ^
+
+
+
+
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: 3÷0
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #35 B's →N in A ⎕EB B in immediate execution
+      ⍝
+      '2' ⎕EB '→0'
+SYNTAX ERROR+
+      '2' ⎕EB '→0'
+      ^
+
+
+
+
+
+      )MORE
+A ⎕EB B: B's →N cannot branch in immediate execution
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #36 a rejected strand of lvalues leaves no LvalCells behind
+      ⍝
+      V←1 2 3 ◊ Q←1 2
+
+
+
+
+
+      ((⌽Q) V)←7 8
+SYNTAX ERROR+
+      ((⌽Q)V)←7 8
+      ^       ^
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+
+      )SIC
+
+
+
+
+
+
+
+      ⍝ #39 an empty vector is one empty line, whatever its prototype
+      ⍝
+      'a' ◊ 0⍴⊂1 2 3 ◊ 'b'
+a
+
+b
+
+
+
+
+
+
+
+      ⍝ #43 [] is not a ∇-command (it edited the header)
+      ⍝
+      ∇FOO43
+      A←1
+      ∇
+
+
+
+
+
+      ∇FOO43
+      []
+∇-command failed: [] is not a ∇-command
+      A←2
+      ∇
+
+
+
+
+
+      ⎕CR 'FOO43'
+FOO43    
+      A←1
+      A←2
+
+
+
+
+
+
+
+      ⍝ #45 S[]←B on a scalar is a RANK ERROR (like S[])
+      ⍝
+      S←5
+
+
+
+
+
+      S[]←6
+RANK ERROR+
+      S[]←6
+      ^  ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      S
+5
+
+
+
+
+
+
+
+      ⍝ redefining a function (∇-editor, ⎕FX) resets its ⎕STOP and ⎕TRACE
+      ⍝ settings
+      ⍝
+      ⊣⎕FX 'GSTOP' 'A←1' 'B←2'
+
+
+
+
+
+      2 ⎕STOP 'GSTOP'
+
+
+
+
+
+      ⊣⎕FX 'GSTOP' 'A←5' 'B←6'
+
+
+
+
+
+      ⍴⎕STOP 'GSTOP'
+0
+
+
+
+
+

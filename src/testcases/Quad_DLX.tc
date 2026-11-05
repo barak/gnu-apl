@@ -1,6 +1,8 @@
 ⍝ Quad_DLX.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ ]log 43
 
       ⍝ Knuth's example
@@ -93,7 +95,7 @@
      1        1         2         2           
        1   1       2               2          
 
-   ⍴¯1 ⎕DLX Q8   ⍝ number of solutions
+      ⍴¯1 ⎕DLX Q8   ⍝ number of solutions
 92
 
       ¯2 ⎕DLX Q8
@@ -141,5 +143,19 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ Bugs11 #11 (Blake McBride, 2026-08-04): &nodes[0] on the empty
+      ⍝ std::vector produced when B has no 1s at all (ones==0) was UB
+      ⍝ (out-of-range operator[]); n itself is never actually
+      ⍝ dereferenced on this path (the empty-column check below raises
+      ⍝ DOMAIN ERROR first), so this only ever mattered under
+      ⍝ _GLIBCXX_ASSERTIONS -- fixed by using nodes.data() instead.
+      ⍝
+      ⎕DLX 2 2⍴0
+DOMAIN ERROR+
+      ⎕DLX 2 2⍴0
+      ^
+
+      )SIC
+
+      ⍝ ==================================
 

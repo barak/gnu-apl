@@ -1,0 +1,139 @@
+⍝ Coverage.tc
+⍝ Exercises code paths not well-covered by the standard test3 suite.
+⍝ ------------------------------------------------------------------
+⍝@ test3.
+
+
+⍝ 1. Reduction with explicit axis in parentheses
+⍝    triggers Prefix::reduce_F_M_C_() (F M C phrase, creates Derived_LO_M_X)
+⍝ ------------------------------------------------------------------
+
+      A ← 2 3⍴⍳6
+      (,/[1]) A
+ 1 4  2 5  3 6 
+
+      A ← 2 3⍴⍳6
+      (,/[2]) A
+ 1 2 3  4 5 6 
+
+      A ← 2 3⍴⍳6
+      (+/[1]) A
+5 7 9
+
+⍝ 2. Inverse of monadic pi function
+⍝    triggers ComplexCell::bif_pi_times_inverse
+⍝ ------------------------------------------------------------------
+
+      (○⍣¯1) 1
+0.3183098862
+
+      (○⍣¯1) 0J1
+0J0.3183098862
+
+⍝ 3. Complex factorial
+⍝    triggers ComplexCell::bif_factorial
+⍝ ------------------------------------------------------------------
+
+      ! 0J1
+0.4980156681J¯0.1549498283
+
+⍝ 4. Nested array arithmetic (both args are pointer cells)
+⍝    triggers ScalarFunction.cc pointer-cell paths
+⍝ ------------------------------------------------------------------
+
+      (⊂1 2 3) + (⊂4 5 6)
+ 5 7 9 
+
+      (⊂10 20) × (⊂3 4)
+ 30 80 
+
+      (⊂1 2 3) + ⊂4 5 6
+ 5 7 9 
+
+⍝ 5. Scalar enclosed value with non-nested right arg
+⍝ ------------------------------------------------------------------
+
+      (⊂1 2 3) + 0
+ 1 2 3 
+
+⍝ 6. System quad variable reads
+⍝ ------------------------------------------------------------------
+
+      0 < ⎕WA
+1
+
+      7 = ⍴⎕TS
+1
+
+      0 ≤ |⎕TZ
+1
+
+      0 ≤ ⎕AI[1]
+1
+
+⍝ 7. Selective assignment
+⍝ ------------------------------------------------------------------
+
+      A ← 1 2 3 4 5
+      (3↑A) ← 10 20 30
+      A
+10 20 30 4 5
+
+      A ← 2 3⍴⍳6
+      A[2;2] ← 99
+      A
+1  2 3
+4 99 6
+
+⍝ 8. Vector (strand) assignment
+⍝ ------------------------------------------------------------------
+
+      (A B) ← 3 7
+      A
+3
+      B
+7
+
+      (A B C) ← 10 20 30
+      A
+10
+      B
+20
+      C
+30
+
+⍝ 9. ⎕TF transfer format
+⍝ ------------------------------------------------------------------
+
+      A ← 1 2 3
+      2 ⎕TF 'A'
+A←1 2 3
+
+⍝ 10. ⎕NC name class on various name types
+⍝ ------------------------------------------------------------------
+
+      ⎕NC 'A'
+2
+
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕NC of GNU APL names/classes differs
+      ⎕NC '__NONEXISTENT__'
+0
+
+⍝ 11. Complex-number equality and magnitude
+⍝    triggers ComplexCell::bif_equal
+⍝ ------------------------------------------------------------------
+
+      ]FILE_CTL NO_SKIP
+      0J1 = 0J1
+1
+
+      0J1 = 0J2
+0
+
+      |0J1
+1
+
+      0J0 = 0
+1
+
+      )ERASE A B C

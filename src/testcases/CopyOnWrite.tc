@@ -1,8 +1,33 @@
 ⍝ CopyOnWrite.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕←Q←1+⊂2 3
  3 4 
 
       ]OWNERS
+
+      ⍝ regression (Bugs28 #97): ]OWNERS asserted ufun||fun->is_native()
+      ⍝ for an NC_FUNCTION/NC_OPERATOR value-stack item, but the LO/RO
+      ⍝ operand of a called defined operator can hold a *primitive*
+      ⍝ function, for which get_func_ufun() is 0 and is_native() is
+      ⍝ false -- crashing the interpreter whenever ]OWNERS ran while
+      ⍝ such an operator was suspended (e.g. ÷OP1 0 below, with
+      ⍝ LO←÷ still localised). Symbol::unmark_all_values() already
+      ⍝ documented and correctly skipped exactly this case; show_owners()
+      ⍝ now does the same instead of asserting.
+      ⍝
+      ⎕FX 'Z←(LO OP1) B' 'Z←LO B'
+OP1
+
+      ÷OP1 0
+DOMAIN ERROR
+OP1[1]  Z←LO B
+          ^
+
+      ]OWNERS
+
+      )SIC
+      )ERASE OP1
 

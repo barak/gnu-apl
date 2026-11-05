@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "Value.hh"
 #include "UCS_string_vector.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// The class implementing ⎕GTK
 class Quad_GTK : public QuadFunction
 {
@@ -54,28 +55,39 @@ protected:
         gtype_F = 3,   ///< float
       };
 
+   /// the context for a GTL window
+   struct window_entry
+      {
+        int fd;   ///< pipe to the windw process
+      };
+
    /// true iff tag is a Gtk command without response (as opposed to
    /// response tags or event classes
+   /// @param tag GTK message tag to classify
    static inline bool is_command_without_response(int tag)
       { return tag > 0 && tag < Command_0; }
 
    /// true iff tag is a Gtk command with response (as opposed to
    /// response tags or event classes
+   /// @param tag GTK message tag to classify
    static inline bool is_command_with_response(int tag)
       { return tag > Command_0 && tag < Command_max; }
 
    /// true iff tag is a Gtk response (as opposed to command tags or
    /// event class
+   /// @param tag GTK message tag to classify
    static inline bool is_response(int tag)
       { return tag > Response_0 && tag < Response_max; }
 
    /// true iff tag is a Gtk event class (as opposed to command tags or
    /// response tags
+   /// @param tag GTK message tag to classify
    static inline bool is_event_class(int tag)
       { return tag > Event_0 && tag < Event_max; }
 
    /// convert 1-character generic type names (V, I, S, or F) or longer
    /// enum types to the corresponding Gtype.
+   /// @param str type name string (single character or enum name)
    static Gtype get_gtype(const char * str)
       {
         if (str[1])        return gtype_I;   // enum -> int
@@ -88,45 +100,61 @@ protected:
 
 #include "Gtk/Gtk_enums.hh"
 
-   /// the context for a GTL window
-   struct window_entry
-      {
-        int fd;   ///< pipe to the windw process
-      };
-
    /// overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left-argument APL value (GTK command or parameters)
+   /// @param B right-argument APL value (GTK arguments)
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left-argument APL value (GTK command or parameters)
+   /// @param X axis argument identifying the window
+   /// @param B right-argument APL value (GTK arguments)
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right-argument APL value (GTK command selector)
+   virtual Token eval_B(cValue_R B) const;
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis argument identifying the window
+   /// @param B right-argument APL value (GTK command selector)
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
 
    /// X is supposed to be something like 4,"win_id". Store win_id in window_id
    /// and return the window number (4 in this  example)
-   static int resolve_window(const Value * X, UTF8_string & window_id);
+   /// @param X axis argument encoding the window number and optional ID
+   /// @param window_id output string receiving the window identifier
+   static int resolve_window(cValue_R X, UTF8_string & window_id);
 
-   /// B is a function name (-suffix). 
-   static Fnum resolve_fun_name(UTF8_string & window_id, const Value * B);
+   /// B is a function name (-suffix).
+   /// @param window_id window identifier string (updated if present in B)
+   /// @param B APL value containing the function name or suffix
+   static Fnum resolve_fun_name(UTF8_string & window_id, cValue_R B);
 
    /// write a TLV with an empty V (thus L=0)
+   /// @param fd file descriptor of the GTK server pipe
+   /// @param tag GTK message tag
    static int write_TL0(int fd, int tag);
 
    /// write a TLV
+   /// @param fd file descriptor of the GTK server pipe
+   /// @param tag GTK message tag
+   /// @param value payload string to send
    static int write_TLV(int fd, int tag, const UTF8_string & value);
 
    /// start a Gtk_server, return its file desriptor
    static int start_Gtk_server();
 
    /// send file or filename to the Gtk_server
+   /// @param fd file descriptor of the GTK server pipe
+   /// @param tag GTK message tag for the data type
+   /// @param name_or_data filename or raw data content to send
    static void send_name_or_data(int fd, int tag,
                                  const UCS_string & name_or_data);
 
    /// open the GTH window described by gui_filename and optional css_filename
+   /// @param gui_name_or_data GUI definition filename or inline XML data
+   /// @param css_name_or_data optional CSS stylesheet filename or data
    static int open_window(const UCS_string & gui_name_or_data,   // mandatory
                    const UCS_string * css_name_or_data);         // optional
 
@@ -134,6 +162,7 @@ protected:
    static Value_P window_list();
 
    /// close the window with file descriptor fd
+   /// @param fd file descriptor of the window to close
    static Value_P close_window(int fd);
 
    /// poll all fds and insert events into \b event_queue until no more
@@ -141,6 +170,8 @@ protected:
    static void poll_all();
 
    /// poll for a TLV on fd with a specific (reponse-) tag
+   /// @param fd file descriptor to read from
+   /// @param tag expected response tag
    static Value_P poll_response(int fd, int tag);
 
    /** read a TLV with a given tag (or any TLV if tag == -1) on a fd
@@ -148,12 +179,16 @@ protected:
        then insert it into event_queue and return 0; otherwise the TLV
        is a response that is returned.
     **/
+   /// @param fd file descriptor to read from
+   /// @param tag expected tag (-1 to accept any)
    static Value_P read_fd(int fd, int tag);
 
    /// return the function name for function number fnum.
+   /// @param fnum GTK function number to look up
    static Value_P fnum_to_function_name(Fnum fnum);
 
    /// return the class name for function number fnum.
+   /// @param fnum GTK function number to look up
    static Value_P fnum_to_widget_class(Fnum fnum);
 
    /// the currently open GTK windows
@@ -165,5 +200,6 @@ protected:
    /// whether the next new window shall grab the focus
    static bool focus_on_map;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __Quad_GTK_DEFINED__

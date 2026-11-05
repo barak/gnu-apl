@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,34 +33,31 @@
 #include "UserFunction_header.hh"
 #include "UTF8_string.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// One user-defined function
 class UserFunction : public Function, public Executable
 {
 public:
    /// constructor for a lambda
+   /// @param sig function signature (valence and result flags)
+   /// @param lambda_num unique lambda identifier
+   /// @param text source text of the lambda expression
+   /// @param body pre-parsed token string for the lambda body
+   /// @param lvars list of symbols localised by the lambda
    UserFunction(Fun_signature sig, Lambda_number lambda_num,
-                const UCS_string & text, Token_string & body,
+                const UCS_string & text, const Token_string & body,
                 const vector<Symbol *> & lvars);
 
    /// Destructor.
    ~UserFunction();
 
-   /// overloaded Function::is_lambda()
-   virtual bool is_lambda() const
-      { return header.get_name()[0] == UNI_LAMBDA; }
+   /// return the entity that has created the function
+   const UTF8_string get_creator() const
+      { return creator; }
 
-   /// overloaded Function::is_defined()
-   virtual bool is_defined() const
-      { return true; }
-
-   /// Overloaded \b Function::is_operator.
-   virtual bool is_operator() const
-      { return header.is_operator(); }
-
-   /// return the macro number (if this function is one) or -1
-   virtual int get_macnum() const
-      { return -1; }
+   /// return the execution properties (dyadic ⎕FX) of this defined function
+   virtual const int * get_exec_properties() const
+      { return exec_properties; }
 
    /// overloaded Executable::get_exec_ufun()
    virtual const UserFunction * get_exec_ufun() const
@@ -70,70 +67,60 @@ public:
    virtual const UserFunction * get_func_ufun() const
    { return this; }
 
-   /// overloaded Executable::get_exec_ufun()
-   virtual UserFunction * get_exec_ufun()
-   { return this; }
-
    /// overloaded Function::get_fun_valence()
    virtual int get_fun_valence() const
       { return header.get_fun_valence(); }
 
-   /// overloaded Function::get_oper_valence()
-   virtual int get_oper_valence() const
-      { return header.get_oper_valence(); }
-
-   /// overloaded Function::has_result()
-   virtual bool has_result() const
-      { return header.has_result(); }
-
-   /// overloaded Function::has_axis()
-   virtual bool has_axis() const
-      { return header.has_axis(); }
-
-   /// return \b true if this function localizes \b sym
-   bool localizes(const Symbol * sym) const
-      { return header.localizes(sym); }
-
-   /// pop all
-   void pop_local_vars() const
-      { header.pop_local_vars(); }
-
-   /// print the local variables for command )SINL
-   void print_local_vars(ostream & out) const
-      { return header.print_local_vars(out); }
-
-   /// return the number of local variables
-   ShapeItem local_var_count() const
-      { return header.local_var_count(); }
+   /// return the header object (return value name, argument names, local vars,
+   /// and function name) for this function
+   const UserFunction_header & get_header() const
+      { return header; }
 
    /// return the idx'th local variable
+   /// @param idx zero-based index of the local variable to retrieve
    const Symbol * get_local_var(ShapeItem idx) const
       { return header.get_local_var(idx); }
 
-   /// add a label
-   void add_label(Symbol * sym, Function_Line line)
-      { header.add_label(sym, line); }
-
-   /// return the execution properties (dyadic ⎕FX) of this defined function
-   virtual const int * get_exec_properties() const
-      { return exec_properties; } 
-
-   /// ovewrloaded Executable::cannot_suspend
-   virtual bool cannot_suspend() const
-      { return exec_properties[1] != 0; }
-
-   /// set execution properties (as per A ⎕FX)
-   void set_exec_properties(const int * props)
-      { loop(i, 4)   exec_properties[i] = props[i]; }
-
-   /// overloaded Executable::print()
-   virtual ostream & print(ostream & out) const;
+   /// return the macro number (if this function is one) or -1
+   virtual int get_macnum() const
+      { return -1; }
 
    /// return the name of \b this function
    virtual UCS_string get_name() const
       { return header.get_name(); }
 
+   /// overloaded Function::get_oper_valence()
+   virtual int get_oper_valence() const
+      { return header.get_oper_valence(); }
+
+   /// return stop lines (from S∆fun ← lines)
+   const std::vector<Function_Line> & get_stop_lines() const
+      { return stop_lines; }
+
+   /// overloaded Executable::get_sym_Z()
+   virtual Symbol * get_sym_Z() const   { return header.Z(); }
+
+   /// return trace lines (from S∆fun ← lines)
+   const std::vector<Function_Line> & get_trace_lines() const
+      { return trace_lines; }
+
+   /// Overloaded Function::has_alpha()
+   virtual bool has_alpha() const   { return true; }
+
+   /// overloaded Function::has_axis()
+   virtual bool has_axis() const
+      { return header.has_axis(); }
+
+   /// overloaded Function::has_result()
+   virtual bool has_result() const
+      { return header.has_result(); }
+
+   /// overloaded Function::is_defined()
+   virtual bool is_defined() const
+      { return true; }
+
    /// return \b true if \b symbol is a label of \b this function
+   /// @param symbol symbol to test
    bool is_label(const Symbol * symbol) const
       {
         loop(l, header.get_label_count())
@@ -144,18 +131,48 @@ public:
         return false;
       }
 
-   /// return \b true if \b token is for a label of \b this function
-   bool is_label(const Token & tok)
-      { return tok.get_Class() == TC_SYMBOL && is_label(tok.get_sym_ptr()); }
+   /// overloaded Function::is_lambda()
+   virtual bool is_lambda() const
+      { return header.get_name()[0] == UNI_LAMBDA; }
 
-   /// return \b true if \b token is for a label of \b this function
-   bool is_label_or_value(const Token & tok)
-      {
-        if (tok.get_Class() == TC_VALUE)   return true;
-         return is_label(tok);
-      }
+   /// throw AXIS ERROR (with )MORE info) for a function or operator that
+   /// was called with an axis but has none
+   void axis_error() const;
+
+   /// Overloaded \b Function::is_operator.
+   virtual bool is_operator() const
+      { return header.is_operator(); }
+
+   /// return the number of local variables
+   ShapeItem local_var_count() const
+      { return header.local_var_count(); }
+
+   /// return \b true if this function localizes \b sym
+   /// @param sym symbol to test for localisation
+   bool localizes(const Symbol * sym) const
+      { return header.localizes(sym); }
+
+   /// pop all
+   void pop_local_vars() const
+      { header.pop_local_vars(); }
+
+   /// print the local variables for command )SINL
+   /// @param out output stream to write the variable list to
+   void print_local_vars(ostream & out) const
+      { return header.print_local_vars(out); }
+
+   /// add a label
+   /// @param sym symbol used as the label name
+   /// @param line function line number the label refers to
+   void add_label(Symbol * sym, Function_Line line)
+      { header.add_label(sym, line); }
+
+   /// overloaded Executable::get_exec_ufun()
+   virtual UserFunction * get_exec_ufun()
+   { return this; }
 
    /// return the line number for label \b symbol \b this function
+   /// @param symbol label symbol whose line number is requested
    Function_Line get_label_line(const Symbol * symbol)
       {
         loop(l, header.get_label_count())
@@ -167,132 +184,159 @@ public:
         return Function_Invalid;
       }
 
-   /// return e.g. 'FOO[10]' for the given \b pc
-   UCS_string get_name_and_line(Function_PC pc) const;
+   /// return \b true if \b token is for a label of \b this function
+   /// @param tok lexical token to test
+   bool is_label(const Token & tok) const
+      { return tok.get_Class() == TC_SYMBOL && is_label(tok.get_sym_ptr()); }
 
-   /// Overloaded Function::print_properties()
-   virtual void print_properties(ostream & out, int indent) const;
+   /// return \b true if \b token is for a label of \b this function
+   /// @param tok lexical token to test
+   bool is_label_or_value(const Token & tok)
+      {
+        if (tok.get_Class() == TC_VALUE)   return true;
+         return is_label(tok);
+      }
 
-   /// )SAVE this function in the workspace named \b workspace
-   /// (in the file system).
-   void save(const char * workspace, const char * function);
+   /// set execution properties (as per A ⎕FX)
+   /// @param props array of four execution property integers
+   void set_exec_properties(const int * props)
+      { loop(i, 4)   exec_properties[i] = props[i]; }
 
-   /// )LOAD this function into the workspace named \b workspace.
-   /// Return a pounter to this newly created function (or 0 on error).
-   static UserFunction * load(const char * workspace, const char * function);
-
-   /// overloaded Function::destroy()
-   virtual void destroy();
-
-   /// overloaded Executable::pushes_sym() const
-   virtual bool pushes_sym(const Symbol * sym) const;
-
-   /// print help for this function on out (for the )HELP command)
-   void help(ostream & out) const;
-
-   /// Load this function into the workspace named \b workspace.
-   static void load(const char * workspace, const char * function,
-                    UserFunction * & fun);
-
-   /// create a user defined function according to \b data of length \b len
-   /// in workspace \b w.
-   static UserFunction * fix(const UCS_string & text, int & err_line,
-                             bool keep_existing, const char * loc,
-                             const UTF8_string &  creator, bool tolerant);
-
-   /// (re-)create a lambda
-   static UserFunction * fix_lambda(Symbol & var, const UCS_string & text);
-
-   /// return the pc of the first token in line l (valid line), or
-   /// the pc of the last token in the function (invalid line)
-   Function_PC pc_for_line(Function_Line line) const;
-
-   /// Overloaded Function::has_alpha()
-   virtual bool has_alpha() const   { return true; }
-
-   /// overloaded Executable::get_sym_Z()
-   virtual Symbol * get_sym_Z() const   { return header.Z(); }
-
-   /// overloaded Executable::get_line()
-   Function_Line get_line(Function_PC pc) const;
+   /// Quad_CR of this function
+   /// @param with_lines true to include line numbers in the output
+   virtual UCS_string canonical(bool with_lines) const;
 
    /// Overloaded Function::eval_()
    virtual Token eval_() const;
 
-   /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
-
-   /// Overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const;
-
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
-
-   /// Overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
-
-   /// Overloaded Function::eval_LB.
-   virtual Token eval_LB(Token & LO, Value_P B) const;
-
-   /// Overloaded Function::eval_LXB()
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param B right argument APL value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// Overloaded Function::eval_ALB.
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
-
-   /// Overloaded Function::eval_ALXB()
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
-
-   /// Overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
-
-   /// Overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param B right argument APL value
+   virtual Token eval_ALB(cValue_R A, Token & LO, cValue_R B) const;
 
    /// Overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right argument APL value
+   virtual Token eval_ALRB(cValue_R A, Token & LO, Token & RO, cValue_R B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
-                            Value_P B) const;
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_ALRXB(cValue_R A, Token & LO, Token & RO, cValue_R X, cValue_R B) const;
 
-   /// Quad_CR of this function
-   virtual UCS_string canonical(bool with_lines) const;
+   /// Overloaded Function::eval_ALXB()
+   /// @param A left argument APL value
+   /// @param LO left operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_ALXB(cValue_R A, Token & LO, cValue_R X, cValue_R B) const;
+
+   /// Overloaded Function::eval_AXB()
+   /// @param A left argument APL value
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
+
+   /// Overloaded Function::eval_B()
+   /// @param B right argument APL value
+   virtual Token eval_B(cValue_R B) const;
+
+   /// Overloaded Function::eval_LB.
+   /// @param LO left operand token
+   /// @param B right argument APL value
+   virtual Token eval_LB(Token & LO, cValue_R B) const;
+
+   /// Overloaded Function::eval_LRB()
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right argument APL value
+   virtual Token eval_LRB(Token & LO, Token & RO, cValue_R B) const;
+
+   /// Overloaded Function::eval_LRXB()
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_LRXB(Token & LO, Token & RO, cValue_R X, cValue_R B) const;
+
+   /// Overloaded Function::eval_LXB()
+   /// @param LO left operand token
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_LXB(Token & LO, cValue_R X, cValue_R B) const;
+
+   /// Overloaded Function::eval_XB()
+   /// @param X axis specification APL value
+   /// @param B right argument APL value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
+
+   /// overloaded Executable::get_line()
+   Function_Line get_line(Prefix_PC pc) const;
+
+   /// return e.g. 'FOO[10]' for the given \b pc
+   /// @param pc program counter position within the function body
+   UCS_string get_name_and_line(Prefix_PC pc) const;
+
+   /// print help for this function on out (for the )HELP command)
+   /// @param out output stream to write help text to
+   void help(ostream & out) const;
 
    /// overloaded Executable::line_start()
-   virtual Function_PC line_start(Function_Line line) const;
+   virtual Prefix_PC line_start(Function_Line line) const;
 
-   /// overloaded Executable::remove_TOK_VOID()
-   virtual VoidCount remove_TOK_VOID();
+   /// return the pc of the first token in line l (valid line), or
+   /// the pc of the last token in the function (invalid line)
+   Prefix_PC pc_for_line(Function_Line line) const;
 
-   /// compute lines 2 and 3 in \b error
-   void set_locked_error_info(Error & error) const;
+   /// return true iff \b line is a real line of this function (i.e.
+   /// pc_for_line(line) would return that line's own first token,
+   /// rather than silently falling back to the end-of-function PC).
+   /// Line 0 (the conventional "return" target for monadic →0) is
+   /// deliberately NOT counted as real here.
+   bool is_valid_line(Function_Line line) const
+      { return line > Function_Line_0 &&
+               line < Function_Line(line_starts.size()); }
 
-   /// return the entity that has created the function
-   const UTF8_string get_creator() const
-      { return creator; }
+   /// return the last real line number of this function
+   Function_Line get_last_line() const
+      { return Function_Line(line_starts.size() - 1); }
 
-   /// set trace or stop vector
-   void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
-
-   /// recompile the body
-   void parse_body(const char * loc, bool tolerant, bool macro);
-
-   /// return stop lines (from S∆fun ← lines)
-   const std::vector<Function_Line> & get_stop_lines() const
-      { return stop_lines; }
-
-   /// return trace lines (from S∆fun ← lines)
-   const std::vector<Function_Line> & get_trace_lines() const
-      { return trace_lines; }
-
-   /// return the header object (return value name, argument names, local vars,
-   /// and function name) for this function
-   const UserFunction_header & get_header() const
-      { return header; }
+   /// overloaded Executable::print()
+   virtual ostream & print(ostream & out) const;
 
    // debug function: print the PC for every linr
+   /// @param loc caller location for diagnostics
    void print_line_PCs(const char * loc) const;
+
+   /// Overloaded Function::print_properties()
+   /// @param out output stream to write properties to
+   /// @param indent indentation level for formatting
+   virtual void print_properties(ostream & out, int indent) const;
+
+   /// overloaded Executable::pushes_sym() const
+   /// @param sym symbol to test for localisation in the function header
+   virtual bool pushes_sym(const Symbol * sym) const;
+
+   /// compute lines 2 and 3 in \b error
+   /// @param error error object to populate with function context
+   void set_locked_error_info(Error & error) const;
+
+   /// overloaded Function::destroy()
+   virtual void destroy();
+
+   /// optimize vectors of labels
+   bool optimize_label_vectors();
 
    /// resolve labels in the function body. Return \b true if any
    /// labels were resolved.
@@ -300,39 +344,103 @@ public:
 
    bool optimize_labels2();
 
-   /// optimize vectors of labels
-   bool optimize_label_vectors();
+   /// recompile the body
+   /// @param loc caller location for diagnostics
+   /// @param macro true if re-parsing macro code
+   void parse_body(const char * loc, bool macro);
+
+   /// overloaded Executable::remove_TOK_VOID()
+   virtual VoidCount remove_TOK_VOID();
+
+   /// set trace or stop vector
+   /// @param lines function line numbers to set as trace or stop points
+   /// @param stop true to set stop lines, false to set trace lines
+   void set_trace_stop(const std::vector<Function_Line> & lines, bool stop);
+
+   /// create a user defined function according to \b data of length \b len
+   /// in workspace \b w.
+   /// @param text full source text of the function definition
+   /// @param err_line output: line number of any parse error, or -1
+   /// @param keep_existing true to silently keep any existing function of the same name
+   /// @param loc caller location for diagnostics
+   /// @param creator entity (editor, ⎕FX, filename) creating the function
+   /// @param quiet true to suppress the internal parser debug trace
+   /// @param honor_lock false to allow replacing a locked function
+   ///        (dyadic ⎕FX only, Bugs28 #92: its left argument IS the
+   ///        documented way to change a function's execution
+   ///        properties, including its lock bit -- every other caller
+   ///        must go through the default, which refuses)
+   static UserFunction * fix(const UCS_string & text, int & err_line,
+                             bool keep_existing, const char * loc,
+                             const UTF8_string &  creator,
+                             bool quiet = false,
+                             bool honor_lock = true);
+
+   /// (re-)create a lambda
+   /// @param var symbol to which the lambda will be bound
+   /// @param text source text of the lambda expression
+   static UserFunction * fix_lambda(Symbol & var, const UCS_string & text);
 
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
+   /// @param txt full source text of the function
+   /// @param loc caller location for diagnostics
+   /// @param _creator entity (editor, ⎕FX, filename) that created the function
+   /// @param macro true if the function is a system macro
    UserFunction(const UCS_string txt, const char * loc,
-                const UTF8_string &  _creator, bool tolerant, bool macro);
+                const UTF8_string &  _creator, bool macro,
+                bool quiet = false);
 
-   /// overladed Function::may_push_SI()
-   virtual bool may_push_SI() const   { return true; }
-
-   /// Overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B) const;
-
-   /// Overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
-
-   /// return the line number where an error has occurred (-1 if none)
-   int get_error_line() const
-      { return error_line; }
+   void bind_to_symbol() const
+      {
+        if (header.LO())   header.FUN()->set_NC(NC_OPERATOR, this);
+        else               header.FUN()->set_NC(NC_FUNCTION, this);
+      }
 
    /// return information about an error (if any)
    const char * get_error_info() const
       { return error_info; }
 
-   /// helper function to print token with Function or Value content
-   static ostream & print_val_or_fun(ostream & out, Token & tok);
+   /// return the line number where an error has occurred (-1 if none)
+   int get_error_line() const
+      { return error_line; }
+
+   /// overladed Function::may_push_SI()
+   virtual bool may_push_SI() const   { return true; }
+
+   /// Overloaded Function::eval_fill_AB()
+   /// @param A left argument APL value used to determine fill element
+   /// @param B right argument APL value used to determine fill element
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const;
+
+   /// Overloaded Function::eval_fill_B()
+   /// @param B right argument APL value used to determine fill element
+   virtual Token eval_fill_B(cValue_R B) const;
 
    /// return the "[nn] " prefix
+   /// @param nn function line number for the prefix
    UCS_string line_prefix(Function_Line nn) const;
 
    // debug function: print the body tokens line by line.
+   /// @param where caller location label for the debug output header
    void print_body_by_line(const char * where) const;
+
+   /// helper function to print token with Function or Value content
+   /// @param out output stream to write to
+   /// @param tok token whose function or value content is printed
+   static ostream & print_val_or_fun(ostream & out, const Token & tok);
+
+   /// the entity (∇ editor, ⎕FX, or filename) that has created this function
+   const UTF8_string creator;
+
+   /// information about an error (if any) when constructing \b this function
+   const char * error_info;
+
+   /// the line number where an error has occurred (-1 if none)
+   int error_line;
+
+   /// execution properties as per 3⎕AT
+   int exec_properties[4];
 
    /// the header (line [0]) of the user-defined function
    UserFunction_header header;
@@ -358,26 +466,14 @@ protected:
       [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <──┘
 
    **/
-   std::vector<Function_PC> line_starts;
+   std::vector<Prefix_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
    vector<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
    vector<Function_Line> trace_lines;
-
-   /// execution properties as per 3⎕AT
-   int exec_properties[4];
-
-   /// the entity (∇ editor, ⎕FX, or filename) that has created this function
-   const UTF8_string creator;
-
-   /// the line number where an error has occurred (-1 if none)
-   int error_line;
-
-   /// information about an error (if any) when constructing \b this function
-   const char * error_info;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __USERFUNCTION_HH_DEFINED__

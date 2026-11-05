@@ -5,7 +5,7 @@ CPU cores in parallel.
 1. Supported Platforms
 ======================
 
-As of SVN 484 parallel execution in GNU APL requires the following:
+Parallel execution in GNU APL requires the following:
 
 a.	POSIX thread (pthread) support
 
@@ -13,10 +13,11 @@ b.	functions pthread_getaffinity_np() and pthread_setaffinity_np() to
 	set core affinities (i.e. which thread runs on which CPU core) of the
 	threads created by GNU APL for parallel execution.
 
-c.	an atomic fetch-and-add function
+c.	atomic counters, which are taken from the C++ standard library
+	(std::atomic, C++11) and are therefore available on all platforms.
 
-While a. is normally available on all platforms supported by GNU APL, b. and
-c. may not be available. Recent Linux versions provide a., b., and c., Other
+While a. is normally available on all platforms supported by GNU APL, b.
+may not be available. Recent Linux versions provide a., b., and c., Other
 platforms may be added later.
 
 2. ./configure Options
@@ -42,7 +43,7 @@ PERFORMANCE_COUNTERS_WANTED=yes.
 3. Parallelized Functions
 =========================
 
-As of SVN 484 the following APL functions were parallelized:
+The following APL functions are parallelized:
 
 a. all monadic and dyadic scalar functions
 b. inner products of all dyadic scalar functions

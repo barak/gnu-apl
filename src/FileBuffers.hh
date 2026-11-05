@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,25 +22,46 @@
 #define __FILEBUFFERS_HH_DEFINED__
 
 #include <fstream>
+#include <streambuf>
 
+#include "DiffOut.hh"
 #include "UTF8_string.hh"
 
-//============================================================================
-/// a filebuf for stdin echo
-class CinOut_filebuf : public filebuf
+//════════════════════════════════════════════════════════════════════════════
+/// a streambuf for stdin echo. Deliberately derived from streambuf, NOT
+/// filebuf (see ErrOut_filebuf below for why).
+class CinOut_filebuf : public streambuf
 {
-   /// overloaded filebuf::overflow
-   virtual int overflow(int c);
+   /// overloaded streambuf::overflow
+   /// @param c character to overflow into the buffer
+   virtual int_type overflow(int_type c);
 };
 extern CinOut_filebuf CIN_filebuf;
-//============================================================================
-// a filebuf for stderr output
-class ErrOut_filebuf : public filebuf
+//════════════════════════════════════════════════════════════════════════════
+// a streambuf for stderr output. Deliberately derived from streambuf, NOT
+// filebuf: this class never calls filebuf::open(), so a filebuf's own
+// inherited FILE* member stays permanently NULL -- harmless as long as
+// every write goes through our overridden overflow(), but libc++'s
+// basic_filebuf::xsputn() has its own bulk-write fast path that, once the
+// (never-managed) put-buffer looks "full" (true for us: pbase()==epptr()
+// ==0), calls overflow() ONCE to ask "anything to flush?" and then --
+// unless that returned eof() -- writes the ENTIRE remaining string via
+// fwrite() straight onto that inherited, never-opened, NULL FILE*,
+// bypassing our own overflow() for the actual character data entirely.
+// Confirmed root cause of a macOS 27/libc++ segfault (Paul Rockwell,
+// bug-apl@gnu.org, 2026-09-24..27): every multi-character write to CERR
+// (e.g. the "-h"/"--v" usage text, a single "CERR << "usage: " << ..."
+// chain) took that fast path and crashed in fwrite() on a NULL FILE* --
+// previously misdiagnosed as std::cerr's own internal FILE* being NULL,
+// but Paul's own standalone "std::cerr << "hi"" test never crashed, and
+// the crash backtrace's "this->epptr()-this->pbase()"/"this->__file_" are
+// OUR ErrOut_filebuf's own inherited members, not std::cerr's -- proven
+// by Paul's fix (switching this class's base to streambuf, which has no
+// FILE*-based xsputn() fast path at all) eliminating the crash completely.
+// A plain streambuf's default xsputn() just calls sputc() in a loop, so
+// every character reliably reaches our own overflow() override instead.
+class ErrOut_filebuf : public streambuf
 {
-protected:
-   /// overloaded filebuf::overflow()
-   virtual int overflow(int c);
-
 public:
    /// constructor
    ErrOut_filebuf()
@@ -50,6 +71,7 @@ public:
    /// destructor
    ~ErrOut_filebuf()   { used = false; }
    /// set LF → CRLF expansion mode
+   /// @param on true to enable LF→CRLF expansion
    bool LF_to_CRLF(bool on)
       {
         const int ret = expand_LF;
@@ -66,7 +88,7 @@ public:
        get_CERR() checks \b used and returns cerr instead of CERR if it is
        false.
     **/
-   filebuf * use()   { used = true;   return this; }
+   streambuf * use()   { used = true;   return this; }
 
    /// true iff the constructor for CERR was called
    static bool used;   // set when CERR is constructed
@@ -75,43 +97,11 @@ public:
    bool expand_LF;
 
    /// current column
-};
-//============================================================================
-/// a filebuf that compares its output with a file.
-class DiffOut : public filebuf
-{
-public:
-   /// constructor
-   DiffOut(bool _errout)
-   : aplout(""),
-     errout(_errout),
-     expand_LF(false)
-   { aplout.clear(); }
-
-   /// discard all characters
-   void reset()
-   { aplout.clear(); }
-
-   /// set LF → CRLF expansion mode
-   int LF_to_CRLF(int on)
-      { const int old = expand_LF;   expand_LF = on;   return old; }
 
 protected:
-   /// overloaded filebuf::overflow()
-   virtual int overflow(int c);
-
-   /// return true iff 0-terminated strings apl and ref differ
-   /// at \b pos
-   bool different(const UTF8 * apl, const UTF8 * ref, size_t & pos);
-
-   /// a buffer for one line of APL output
-   UTF8_string aplout;
-
-   /// true for error messages, false for normal APL output
-   bool errout;
-
-   /// expand LF to CRLF
-   bool expand_LF;
+   /// overloaded streambuf::overflow()
+   /// @param c character to overflow into the buffer
+   virtual int_type overflow(int_type c);
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __FILEBUFFERS_HH_DEFINED__

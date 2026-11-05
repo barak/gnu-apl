@@ -1,7 +1,9 @@
 ⍝ Each_dyadic.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
+⍝@ test3.
+
+      ⍝ ----------------------------------
 
       Z←4 6ρ¨'ME' 'YOU'
       Z
@@ -15,7 +17,7 @@
       'SET',¨'HES'
  SH EE TS 
 
-⍝ scalar argument ----------------------------------
+      ⍝ scalar argument ----------------------------------
 
       2ρ¨3 4 5
  3 3  4 4  5 5 
@@ -23,7 +25,7 @@
  4 4 4   6 6 6 
  4 4 4   6 6 6 
 
-⍝ empty argument ----------------------------------
+      ⍝ empty argument ----------------------------------
 
       Z←5↑¨0ρ⊂0 0 0
       ρZ
@@ -31,7 +33,7 @@
       ρ↑Z
 5
 
-⍝ regression ----------------------------------
+      ⍝ regression ----------------------------------
 
       Q←⊂'hello'
       Q≡¨Q
@@ -58,4 +60,107 @@
 
       (,3)↑¨'abcd'
  a   b   c   d   
+
+      ⍝ regression (Blake McBride, Bugs12.md #2, 2026-08-06): same
+      ⍝ uninitialized-Cell bug as Each_monadic.tc, dyadic form -- an
+      ⍝ empty nested left AND right argument, whose (disclosed)
+      ⍝ prototype items have more than one element.
+      ⍝
+      Z←⍬+¨0⍴⊂⍳3
+      ⍴Z
+0
+
+      Z←1+¨0⍴⊂⍳3
+      ⍴Z
+0
+
+      Z←(0⍴⊂2 3⍴⍳6)⌊¨(0⍴⊂⍳3)
+      ⍴Z
+0
+
+      ⍝ Bugs28 #57 regression (Bugs27 #56 residual): dyadic ¨ (like
+      ⍝ ∘.f, f⍤y, and f.g) still broke when the operand changed ⎕IO --
+      ⍝ Z__vA_LO_EACH_vB/sB and Z__sA_LO_EACH_vB (Macro.def) indexed
+      ⍝ μ1/μ2/μ6 with the raw loop counter μ8, seeded from ⎕IO ONCE at
+      ⍝ the start; if LO's own ⎕IO←0 (global, not auto-localized in a
+      ⍝ lambda) persisted past its first call, every later iteration's
+      ⍝ indexing (relative to the NEW ⎕IO) silently misaligned instead
+      ⍝ of INDEX-ERROR-ing outright, unlike the ALREADY-fixed monadic ¨
+      ⍝ (Z__LO_EACH_B). Fixed the same self-correcting way: recompute
+      ⍝ ⎕IO+(μ8-savedIO) fresh at each use instead of trusting μ8 alone.
+      ⍝ 1+⍳2 (⎕IO=0) = 1 2; 2+⍳3 (⎕IO now 0 from the first call, but
+      ⍝ self-correctingly still right) = 2 3 4.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      1 2 {⎕IO←0 ⋄ ⍺+⍳⍵}¨ 2 3
+ 1 2  2 3 4 
+
+      ]FILE_CTL NO_SKIP
+      ⎕IO←1
+
+      ⍝ Bugs30 #1 regression: L LO¨ R as a selective-assignment target.
+      ⍝
+      ⍝ A NULL lvalue (an over-take of an empty vector, 1↑V for empty
+      ⍝ V) used to segfault Bif_OPER1_EACH::eval_ALB instead of
+      ⍝ erroring cleanly; fixed by guarding dest==0 the same way the
+      ⍝ already-fixed monadic branch does (see Each_monadic.tc). No
+      ⍝ display after these: a selective assignment produces none
+      ⍝ (LRM p.41).
+
+      V←⍬
+      (1⌽¨1↑V)←1
+INDEX ERROR
+      (1⌽¨1↑V)←1
+       ^^
+
+      ⍝ leaves an )SI entry for the failed immediate execution above.
+      ⍝
+      )SIC
+
+      ⍝ a genuinely selecting primitive LO (Function::get_selectivity(),
+      ⍝ SEL_DYADIC bit) must still work end to end: ⌽ (rotate) does.
+
+      V←,5
+      (1⌽¨1↑V)←1
+      V
+1
+
+      ⍝ a primitive LO that does NOT select -- + (scalar) computes a new
+      ⍝ value from B's content instead of selecting a position in it, so
+      ⍝ it can never work as a selective-assignment target regardless of
+      ⍝ the target's validity. Before get_selectivity() this reached
+      ⍝ ScalarFunction's own evaluation and DOMAIN-ERRORed on a raw
+      ⍝ LvalCell it could not interpret -- an accident of implementation,
+      ⍝ not a principled rejection (see Bugs30 #1 write-up); now rejected
+      ⍝ up front with the same SYNTAX ERROR a defined LO gets below.
+
+      V2←,5
+      (1 2+¨1↑V2)←1 2
+SYNTAX ERROR
+      (1 2+¨1↑V2)←1 2
+       ^          ^
+      V2
+5
+
+      ⍝ leaves an )SI entry for the failed immediate execution above.
+      ⍝
+      )SIC
+
+      ⍝ a defined LO must never see a selective-assignment target's
+      ⍝ live LvalCell (it could smuggle it out into unrelated storage
+      ⍝ via an ordinary side effect and leave a dangling reference
+      ⍝ once the original array is freed); reject it up front instead,
+      ⍝ for both operands of a dyadic each.
+
+      KLAM←{⍺}
+      W←1 2 3
+      (1 1 1 KLAM¨W)←9 9 9
+SYNTAX ERROR
+      (1 1 1 KLAM¨W)←9 9 9
+       ^             ^
+
+      ⍝ leaves an )SI entry for the failed immediate execution above.
+      ⍝
+      )SIC
+      )ERASE KLAM
 

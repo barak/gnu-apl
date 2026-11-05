@@ -1,6 +1,8 @@
 ⍝ Execute_Each.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍎¨'00'
 0 0
 
@@ -12,38 +14,38 @@
 
       ⍎¨ '0 '     
 VALUE ERROR in macro ⍎¨
-      μ-Z__EXEC_EACH_B '0 '
-      ^                   ^
+      ⍎¨'0 '
+      ^
       →
 
       ⍎¨ ' 0'
 VALUE ERROR in macro ⍎¨
-      μ-Z__EXEC_EACH_B ' 0'
-      ^                   ^
+      ⍎¨' 0'
+      ^
       →
 
       ⍎¨ "00" "⍟0"
 DOMAIN ERROR in macro ⍎¨
-      μ-Z__EXEC_EACH_B '00' '⍟0'
-      ^                        ^
+      ⍎¨'00' '⍟0'
+      ^
       →
 
       ⍎¨ "00" "⍟0" "0"
 DOMAIN ERROR in macro ⍎¨
-      μ-Z__EXEC_EACH_B '00' '⍟0' '0'
-      ^                            ^
+      ⍎¨'00' '⍟0' (,'0')
+      ^
       →
 
       ⍎¨ "00" "→5"    
-SYNTAX ERROR: →N in macro ⍎¨
-      μ-Z__EXEC_EACH_B '00' '→5'
-      ^                        ^
+DOMAIN ERROR: →N in macro ⍎¨
+      ⍎¨'00' '→5'
+      ^
       →
 
       ⍎¨ "00" "→" 
-SYNTAX ERROR: → in macro ⍎¨
-      μ-Z__EXEC_EACH_B '00' '→'
-      ^                       ^
+DOMAIN ERROR: → in macro ⍎¨
+      ⍎¨'00' (,'→')
+      ^
       →
 
 

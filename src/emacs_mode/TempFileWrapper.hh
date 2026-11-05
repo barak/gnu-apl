@@ -27,27 +27,52 @@
 #include <vector>
 #include <string>
 
+//════════════════════════════════════════════════════════════════════════════
+/// owns an open file descriptor and close()s it on destruction
 class FileWrapper {
 public:
+    /// constructor: take ownership of \b fd_in (must not be -1)
     FileWrapper( int fd_in );
+
+    /// destructor: closes the wrapped descriptor
     ~FileWrapper();
 
 private:
+    /// the wrapped descriptor
     int fd;
 };
 
+/// a uniquely-named temp file created via mkstemp(), removed on
+/// destruction
 class TempFileWrapper {
 public:
+    /// constructor: create a temp file named \b prefix + "XXXXXX"
     TempFileWrapper( const std::string &prefix );
+
+    /// destructor: close()s the file (if not already closed) and
+    /// unlink()s it
     ~TempFileWrapper();
+
+    /// the temp file's actual (mkstemp()-generated) path
     const std::string &get_name() { return name; }
+
+    /// the open file descriptor
     int get_fd() { return fd; }
+
+    /// close the file descriptor (idempotent; the destructor still
+    /// unlinks the file afterwards)
     void close();
 
 private:
+    /// the temp file's actual path
     std::string name;
+
+    /// the open file descriptor
     int fd;
+
+    /// true once close() has been called
     bool closed;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

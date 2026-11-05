@@ -24,39 +24,83 @@
 #ifndef NETWORK_HH
 #define NETWORK_HH
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
 #include "emacs.hh"
+#include <errno.h>
 
 #include <sys/types.h>
+
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
-#include <sys/un.h>
-#include <errno.h>
-#include <netdb.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+# include <ws2tcpip.h>   // getaddrinfo(), freeaddrinfo() on Windows
+#endif // HAVE_WINSOCK2_H
+
+#if HAVE_SYS_UN_H
+# include <sys/un.h>
+#endif // HAVE_SYS_UN_H
+
+#if HAVE_NETDB_H
+# include <netdb.h>   // gethostbyname() etc.
+#endif
 
 class Listener;
 
+//════════════════════════════════════════════════════════════════════════════
+/// owns a getaddrinfo() result and freeaddrinfo()s it on destruction
 class AddrWrapper {
 public:
+    /// constructor: take ownership of \b addr_in
     AddrWrapper(struct addrinfo *addr_in) : addr(addr_in) {}
+
+    /// destructor: freeaddrinfo()s the wrapped result
     virtual ~AddrWrapper() { freeaddrinfo( addr ); }
 
 private:
+    /// the wrapped result
     struct addrinfo *addr;
 };
 
+/// thrown when starting the network listener fails
 class InitProtocolError {
 public:
+    /// constructor
     InitProtocolError( const std::string &message_in ) : message( message_in ) {}
+
+    /// destructor
     virtual ~InitProtocolError() {}
+
+    /// human-readable error description
     std::string get_message( void ) { return message; }
 
 protected:
+    /// human-readable error description
     std::string message;
 };
+//════════════════════════════════════════════════════════════════════════════
 
+/// create a Listener for \b port (or a Unix socket if \b port is negative)
+/// and start a thread running its accept loop
 void start_listener( int port );
+
+/// thread entry point: run one accepted NetworkConnection until it
+/// disconnects or errors, then delete it
+/// @param arg the NetworkConnection*, owned by this call
 void *connection_loop( void *arg );
+
+/// add \b listener to the set closed by close_listeners()
 void register_listener( Listener *listener );
+
+/// remove \b listener from the set closed by close_listeners()
 void unregister_listener( Listener *listener );
+
+/// close_connection() every currently registered Listener
 void close_listeners( void );
 
 #endif

@@ -1,6 +1,8 @@
 ⍝ Relational_functions.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       'TRIAL'='TRAIL'
 1 1 0 0 1
 
@@ -8,6 +10,11 @@
       8 ¯2 6 ¯4 0<0
 0 1 0 1 0
 
+
+      ⍝ 4⎕CR below is GNU APL's own boxed nested-array display extension,
+      ⍝ not a real-APL2 transfer-format number -- see
+      ⍝ project_apl2_and_or_boolean_only.md for the general convention
+      ]FILE_CTL SKIP_APL2
 
       L←('IN' 'OUT') (9 5 6) (⊂2 2ρι4)
       R←('IT' 'BUT') 6       (2 2ρ1 8 5 4)
@@ -26,10 +33,121 @@
 ┃                        ┗ϵ━━━━━━━━━━┛┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      ]FILE_CTL NO_SKIP   ⍝ back to plain relational ops, APL2-safe
+
       ⍝ Regression
       ⍝
       1 > 0J0
 1
 
-⍝ ==================================
+      ⍝ regression (Bugs28 #81): two IntCells used to compare exactly
+      ⍝ (==), while the very same two numbers stored as FloatCells
+      ⍝ compared tolerantly via ⎕CT -- so 1000000000000000 =
+      ⍝ 1000000000000001 (both integers) gave 0, but 1E15 =
+      ⍝ 1000000000000001 (float vs. integer, same values) gave 1. ISO
+      ⍝ 13751 tolerant equality (p. 19) has no integer exception.
+      ⍝ IntCell::equal() now falls back to the same tolerant comparison
+      ⍝ (after an exact-match fast path) instead of a bare ==. ⍳ (which
+      ⍝ also uses Cell::equal()) is fixed the same way.
+      ⍝
+      1000000000000000=1000000000000001
+1
+
+      1E15=1000000000000001
+1
+
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      1000000000000000⍳1000000000000001
+1
+
+      ]FILE_CTL NO_SKIP
+      1000000000000000=1000000000000000
+1
+
+      2=3
+0
+
+      ⍝ regression (Blake McBride, Bugs31 #8/#9): a mixed IntCell/
+      ⍝ FloatCell (or IntCell/zero-imaginary-ComplexCell) pair still
+      ⍝ compared through double at ⎕CT←0, disagreeing with ⍋/⍒'s
+      ⍝ already-exact grading (Bugs30 #4) for the identical pair --
+      ⍝ e.g. 9007199254740993 (2⋆53+1) and 9007199254740992.0 (2⋆53)
+      ⍝ round to the same double, so >,=,≠,⌈,⌊,⍳,∊ all wrongly treated
+      ⍝ them as equal. Fixed via a shared Cell::compare_int_float()
+      ⍝ helper (extracted from Cell.cc's exact_numeric_compare(), used
+      ⍝ by grading) now also used by FloatCell::compare()/equal() and
+      ⍝ ComplexCell::compare()/equal(), and by Int/FloatCell's
+      ⍝ bif_maximum()/bif_minimum() so ⌈/⌊ return the exact winning
+      ⍝ operand rather than a lossily re-converted double.
+      ⍝
+      SAVE_CT←⎕CT ⋄ ⎕CT←0
+      SAVE_PP←⎕PP ⋄ ⎕PP←17
+
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 > 9007199254740992.0
+1
+      ]FILE_CTL NO_SKIP
+      9007199254740993 < 9007199254740992.0
+0
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 = 9007199254740992.0
+0
+      9007199254740993 ≠ 9007199254740992.0
+1
+      9007199254740993 ≤ 9007199254740992.0
+0
+      ]FILE_CTL NO_SKIP
+      9007199254740993 ≥ 9007199254740992.0
+1
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 ⌈ 9007199254740992.0
+9007199254740993
+      ]FILE_CTL NO_SKIP
+      9007199254740993 ⌊ 9007199254740992.0
+9007199254740992
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 ⍳ 9007199254740992.0
+2
+      ]FILE_CTL NO_SKIP
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 ∊ 9007199254740992.0
+0
+      9007199254740992.0 = 9007199254740993
+0
+
+      ⍝ #9: same exactness for a zero-imaginary ComplexCell
+      ⍝
+      9007199254740993 = 9007199254740992J0
+0
+      9007199254740992J0 = 9007199254740993
+0
+      9007199254740993 ∊ 9007199254740992J0
+0
+      ⍋ 9007199254740993 9007199254740992J0
+2 1
+
+      ⍝ Note: 9007199254740993J0 = 9007199254740992J0 is (correctly) 1:
+      ⍝ the real part of a complex number is a double, so the literal
+      ⍝ 9007199254740993J0 is already 9007199254740992J0.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      9007199254740993J0 - 9007199254740992J0
+0
+
+      ⍝ controls: a genuinely equal pair still compares equal
+      ⍝
+      9007199254740992 = 9007199254740992.0
+1
+      9007199254740992 = 9007199254740992J0
+1
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9007199254740993 ⌈ 9007199254740993.0
+9007199254740993
+
+      ]FILE_CTL NO_SKIP
+      ⎕CT←SAVE_CT
+      ⎕PP←SAVE_PP
+      )ERASE SAVE_CT SAVE_PP
+
+      ⍝ ==================================
 

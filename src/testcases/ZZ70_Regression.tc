@@ -1,0 +1,148 @@
+⍝ ZZ70_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ Depth-cache (≡) full-range caching + isolate_deep()-anchored
+      ⍝ invalidation, 2026-09-01 (see plan.txt). Closes the depth≥2
+      ⍝ caching gap left open since the original depth-limit-enforcement
+      ⍝ work: compute_depth() now trusts and caches every depth 0..254,
+      ⍝ with invalidation piggybacked onto the mandatory COW isolate_deep()
+      ⍝ walk that every left-value form (selective specification, Pick,
+      ⍝ member access) performs before mutating. The cases below target
+      ⍝ ancestors *two or more levels above* the actual mutation point --
+      ⍝ the case a naive "invalidate only the directly mutated value"
+      ⍝ scheme misses, since an untouched intermediate ancestor would
+      ⍝ keep trusting its own stale-but-cached depth and re-derive a
+      ⍝ wrong (but now re-cached) answer for everything above it.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      ⍝ Three-level nested array: w contains u contains v. Query ≡ at all
+      ⍝ three levels first (caching each), then mutate v's third element
+      ⍝ from within w's own copy of v, reached via a nested Pick used as
+      ⍝ the base of a bracket selective specification (ZZ49_Regression.tc-
+      ⍝ style) -- two Pick-levels below w. All three cached depths must
+      ⍝ go up by exactly one level each. The right-hand side is
+      ⍝ explicitly enclosed (⊂(3 4)(5 6), not (3 4)(5 6) -- Bugs30
+      ⍝ #13/#16): [3] selects exactly one item, and a 2-item value
+      ⍝ there is no more length-1-exempt than it would be for a plain
+      ⍝ A[3]←(3 4)(5 6), which already correctly gives LENGTH ERROR.
+      ⍝
+      v←1 2 (3 4)
+      u←10 (v) 30
+      w←100 (u) 200
+      ≡v ◊ ≡u ◊ ≡w
+2
+3
+4
+      (2⊃2⊃w)[3]←⊂(3 4)(5 6)
+      ≡w ◊ ≡2⊃w ◊ ≡2⊃2⊃w
+5
+4
+3
+
+      ⍝ v and u themselves are separate copies (ordinary APL value
+      ⍝ semantics) and must be unaffected by mutating w's own copy
+      ⍝
+      ≡v ◊ ≡u
+2
+3
+      )ERASE v u w
+
+      ⍝ Direct member reassignment (A.B.C←V) two dot-levels deep, with
+      ⍝ the enclosing namespace's own depth queried (and cached) both
+      ⍝ before and after.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ structured variables are a GNU APL extension
+      Z.a.b←1 2 (3 4)
+      ≡Z ◊ ≡Z.a ◊ ≡Z.a.b
+4
+3
+2
+      Z.a.b←1 (2 (3 4))
+      ≡Z ◊ ≡Z.a ◊ ≡Z.a.b
+5
+4
+3
+      )ERASE Z
+
+      ⍝ Member reference used as the base of a Pick + bracket selective
+      ⍝ specification (the member-access invalidation gap closed in
+      ⍝ Prefix.cc alongside the array case above).
+      ⍝
+      Y.a←10 (1 2 (3 4)) 30
+      ≡Y.a
+3
+      (2⊃Y.a)[3]←⊂(3 4)(5 6)
+      ≡Y.a
+4
+      )ERASE Y
+
+      ⍝ The final-assignment rules of a selective specification, LRM p.43
+      ⍝ ("Once the selection expression has been evaluated, the following
+      ⍝ rules govern the replacement of values. Apply the first rule that
+      ⍝ holds:"), verified against GNU APL's actual implementation
+      ⍝ (Value::assign_cellrefs()) -- see Bugs30 #13-#17 for the
+      ⍝ conformance work that made all four hold uniformly regardless of
+      ⍝ where the left-value came from (a plain array, a member, Pick, ...).
+      ⍝
+      ⍝ Rule 1: "If the left is a whole array, the right array replaces
+      ⍝ it." -- note the right's LENGTH need not match the left's at all,
+      ⍝ unlike rules 2/3 below; this is a genuine wholesale replacement.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      A←1 2 3
+      (A)←4 5 6 7
+      A
+4 5 6 7
+      )ERASE A
+
+      ⍝ Rule 2: "If the right is a scalar (or an array with empty shape
+      ⍝ when ones are removed), then the right is paired with each item
+      ⍝ from the left and these rules are applied recursively."
+      ⍝
+      A←1 2 3
+      A[1 2]←9
+      A
+9 9 3
+      )ERASE A
+
+      ⍝ Rule 3: "If the left and the right have the same shape (when ones
+      ⍝ in the shapes are ignored), then corresponding items from the
+      ⍝ left and from the right are paired" -- (V[1 2]) has shape 2, the
+      ⍝ right has shape 2 1; only equal once the trailing 1 is ignored,
+      ⍝ per the rule's own explicit "when ones... are ignored" clause.
+      ⍝ See Bugs30 #17 (Shape::conforms_to()).
+      ⍝
+      V←1 2 3
+      (V[1 2])←2 1⍴9 8
+      V
+9 8 3
+      )ERASE V
+
+      ⍝ Restriction, same page: "Pick with an empty left argument is the
+      ⍝ only [selection] function that returns the whole array" -- i.e.
+      ⍝ (⍬⊃A)←B falls under Rule 1 (wholesale replace, right's length
+      ⍝ need not match) even though ⊃ is, in every other case, a genuine
+      ⍝ selection. The LRM's own p.42 example (with ⍳0 in place of ⍬,
+      ⍝ APL2 lacking a Zilde glyph) is reproduced here directly.
+      ⍝
+      A←'ABCD'
+      (⍬⊃A)←10 20 30
+      A
+10 20 30
+      )ERASE A
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )CLEAR
+CLEAR WS
+
+      ]NEXTFILE

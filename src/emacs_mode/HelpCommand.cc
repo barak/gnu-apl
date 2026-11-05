@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2018  Elias Mårtenson, Alexey Veretenniokv
+    Copyright (C) 2018  Elias Mårtenson, Alexey Veretennikov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 namespace {
 // prepare string for sending:
 // quotify, escape " and '\', convert newlines
+//════════════════════════════════════════════════════════════════════════════
 inline std::string prepare_string(const string& string)
 {
     std::string result;
@@ -107,3 +108,4 @@ void HelpCommand::run_command( NetworkConnection &conn, const std::vector<std::s
         
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

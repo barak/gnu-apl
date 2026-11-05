@@ -41,9 +41,9 @@ qf( AF                 , "⎕AF"        , = 0x4101 )   // A...
 qv( AI                 , "⎕AI"        ,          )
 qv( ARG                , "⎕ARG"       ,          )
 sf( F2_AND             , "∧"          ,          )
-pp( APL_VALUE1         , ---          ,          )
-pp( APL_VALUE2         , ---          ,          )
-pp( APL_VALUE3         , ---          ,          )
+pp( APL_VALUE1         , ---          ,          )   // grouped
+pp( APL_VALUE2         , ---          ,          )   // assigned
+pp( APL_VALUE3         , ---          ,          )   // strand
 st( ASSIGN             , "←"          ,          )
 qf( AT                 , "⎕AT"        ,          )
 qv( AV                 , "⎕AV"        ,          )
@@ -51,10 +51,12 @@ st( ALPHA              , "⍺"          ,          )
 st( ALPHA_U            , "⍶"          ,          )
 st( ASSIGN1            , "←"          ,          )
 sf( F2_AND_B           , "⊤∧"          ,         )
-pp( APL_VALUE4         , ---          ,          )
-                                    
+pp( APL_VALUE4         , ---          ,          )   // optimized
+pp( APL_VALUE5         , ---          ,          )   // derived from a label
+
 sf( F12_BINOM          , "!"          , = 0x4201 )   // B...
-st( BRANCH             , "→"          ,          )
+st( BRANCH_INT         , "→"          ,          )   // e.g. → 4
+st( BRANCH_LAB         , "→"          ,          )   // e.g. → L4
                                     
 pp( CHARACTER          , ---          , = 0x4301 )   // C...
 sf( F12_CIRCLE         , "○"          ,          )

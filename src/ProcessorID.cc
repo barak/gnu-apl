@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,16 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <netdb.h>   // gethostbyname() etc.
+
+#include "config.h"   // for HAVE_xxx
+
+#if HAVE_NETDB_H
+# include <netdb.h>   // gethostbyname() etc.
+#endif
+
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif
 
 #include "Common.hh"
 #include "LibPaths.hh"
@@ -31,15 +40,23 @@
 #include "ProcessorID.hh"
 #include "Quad_SVx.hh"
 #include "Svar_signals.hh"
+#include "Sys.hh"
 #include "UserPreferences.hh"
 
 extern const char * prog_name();
+//════════════════════════════════════════════════════════════════════════════
 
 AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
 Network_Profile ProcessorID::network_profile;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+ProcessorID::disconnect()
+{
+   Svar_DB::DB_tcp_error(0, 0, 0);
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 ProcessorID::init(bool log_startup)
 {
@@ -117,95 +134,108 @@ const TCP_socket sock = Svar_DB::get_DB_tcp();
 
    return false;   // no error
 }
-//----------------------------------------------------------------------------
-const char *
-ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
+//════════════════════════════════════════════════════════════════════════════
+int
+ProcessorID::read_network_profile()
 {
+const char * filename = getenv("APL2SVPPRF");
+
+   if (filename)
+      {
+        return read_network_profile(filename);
+      }
+   else
+      {
+        string fname = LibPaths::get_APL_bin_path();
+        fname += "/apl2svp.prf";
+        return read_network_profile(fname.c_str());
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+int
+ProcessorID::read_network_profile(const char * filename)
+{
+FileReader reader(filename);
+int line = 0;
 const char * loc = 0;
 
+   if (!reader)
+      {
+        CERR << "Cannot open network profile '" << filename << "'" << endl;
+        return 1;
+      }
+
+   network_profile.clear();
    for (line = 1;; ++line)
        {
          char buffer[200];
-         const long filepos = ftell(file);   // remember file position
-         char * s = fgets(buffer, sizeof(buffer) - 1, file);
+         const char * s = reader.fgets(buffer, sizeof(buffer) - 1);
 
-         if (s == 0)   break;   // end of file
-
+         if (s == 0)   // end of file
+            {
+              line = 0;
+              break;
+            }
 
          // skip leading whitespaces
          //
          while (*s && *s < ' ')   ++s;
 
-         if (*s == '*')   continue;   // comment line
-         if (*s == 0)     continue;   // empty line
+        if (*s == '*')   continue;   // comment line
+        if (*s == 0)     continue;   // empty line
 
-         if (!strcmp(s, ":processor,"))
-            {
-              int i = NO_AP;
-              int j = AP_NULL;
-              int k = AP_NULL;
+        // was plain strcmp(): s is the whole line (tag plus trailing
+        // data, e.g. ":svopid,123"), so exact-equality strcmp() against
+        // just the tag could only ever match a bare "tag," line with
+        // nothing after it -- never a real, data-bearing line. Every
+        // tag check below has the same bug; all fixed to strncmp() so
+        // only the tag prefix is compared, matching what the sscanf()/
+        // s+=N code right after each check already assumes.
+        if (!strncmp(s, ":svopid,", 8))
+           {
+             SvoPid svopid;
+              if (1 != sscanf(s, ":svopid,%u", &svopid.svopid))
+                 { loc = LOC;   break; }
 
-              const int count = sscanf(s, ":processor,%u,%u,%u", &i, &j, &k);
-              if (count < 1)   { loc = LOC;   break; }
-              if (count > 3)   { loc = LOC;   break; }
+             loc = read_svopid(reader.get_FILE(), svopid, line);
+             if (loc)   break;
 
-              svopid.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
-              continue;
-            }
+             network_profile.svo_pids.push_back(svopid);
+             continue;
+           }
 
-         if (!strcmp(s, ":address,"))
-            {
-              // skip tag and remove trailing whitespaces
-              //
-              s += 9;
-              char * e = s + strlen(s);
-              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
+        if (!strncmp(s, ":procauth,", 10))
+           {
+             ProcAuth procauth;
+             int i = NO_AP;
+             int j = AP_NULL;
+             int k = AP_NULL;
+             const int count = sscanf(s, ":procauth,%u,%u,%u", &i, &j, &k);
+             if (count < 1)   { loc = LOC;   break; }
+             if (count > 3)   { loc = LOC;   break; }
 
-              hostent * host = gethostbyname(s);
-              if (host == 0)
-                 {
-                   CERR << "gethostbyname(" << s << ") failed" << endl;
-                   loc = LOC;
-                   break;
-                 }
+             procauth.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
 
-              unsigned int hh = host->h_addr_list[0][0];
-              unsigned int hl = host->h_addr_list[0][1];
-              unsigned int lh = host->h_addr_list[0][2];
-              unsigned int ll = host->h_addr_list[0][3];
+             loc = read_procauth(reader.get_FILE(), procauth, line);
+             if (loc)   break;
 
-              svopid.ip_addr = hh << 24 | hl << 16 | lh << 8 | ll;
-              continue;
-            }
+             network_profile.proc_auths.push_back(procauth);
+             continue;
+           }
 
-         if (!strcmp(s, ":userid,"))
-            {
-              s += 8;
-              for (unsigned int u = 1; u < sizeof(svopid.user); ++u)
-                  {
-                    if (*s < ' ')   break;
-                    svopid.user[u - 1] = *s++;
-                    svopid.user[u] = 0;
-                  }
-
-              continue;
-            }
-
-         if (!strcmp(s, ":crypt,"))
-            {
-              // ignored
-              continue;
-            }
-
-         // invalid tag (probably next entry). restore file position
-         //
-         fseek(file, filepos, SEEK_SET);
-         break;
+        loc = LOC;
+        break;
        }
 
-   return loc;
+   if (loc)
+      {
+        CERR << "Syntax error in network profile '" << filename
+             << "' line " << line << ", detected at " << loc << endl;
+      }
+
+   return line;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 ProcessorID::read_procauth(FILE * file, ProcAuth & procauth, int & line)
 {
@@ -227,7 +257,7 @@ const char * loc = 0;
          if (*s == '*')   continue;   // comment line
          if (*s == 0)     continue;   // empty line
 
-         if (!strcmp(s, ":rsvopid,"))
+         if (!strncmp(s, ":rsvopid,", 9))
             {
               // skip tag and remove trailing whitespaces
               //
@@ -253,106 +283,92 @@ const char * loc = 0;
 
    return loc;
 }
-//----------------------------------------------------------------------------
-int
-ProcessorID::read_network_profile()
+//────────────────────────────────────────────────────────────────────────────
+const char *
+ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
 {
-const char * filename = getenv("APL2SVPPRF");
-
-   if (filename)
-      {
-        return read_network_profile(filename);
-      }
-   else
-      {
-        string fname = LibPaths::get_APL_bin_path();
-        fname += "/apl2svp.prf";
-        return read_network_profile(fname.c_str());
-      }
-}
-//----------------------------------------------------------------------------
-int
-ProcessorID::read_network_profile(const char * filename)
-{
-FILE * file = fopen(filename, "r");
-int line = 0;
 const char * loc = 0;
 
-   if (file == 0)
-      {
-        CERR << "Cannot open network profile '" << filename << "'" << endl;
-        return 1;
-      }
-
-   network_profile.clear();
    for (line = 1;; ++line)
        {
          char buffer[200];
-         const char * s = fgets(buffer, sizeof(buffer) - 1, file);
+         const long filepos = ftell(file);   // remember file position
+         char * s = fgets(buffer, sizeof(buffer) - 1, file);
 
-         if (s == 0)   // end of file
-            {
-              line = 0;
-              break;
-            }
+         if (s == 0)   break;   // end of file
+
 
          // skip leading whitespaces
          //
          while (*s && *s < ' ')   ++s;
 
-        if (*s == '*')   continue;   // comment line
-        if (*s == 0)     continue;   // empty line
+         if (*s == '*')   continue;   // comment line
+         if (*s == 0)     continue;   // empty line
 
-        if (!strcmp(s, ":svopid,"))
-           {
-             SvoPid svopid;
-              if (1 != sscanf(s, ":svopid,%u", &svopid.svopid))
-                 { loc = LOC;   break; }
+         if (!strncmp(s, ":processor,", 11))
+            {
+              int i = NO_AP;
+              int j = AP_NULL;
+              int k = AP_NULL;
 
-             loc = read_svopid(file, svopid, line);
-             if (loc)   break;
+              const int count = sscanf(s, ":processor,%u,%u,%u", &i, &j, &k);
+              if (count < 1)   { loc = LOC;   break; }
+              if (count > 3)   { loc = LOC;   break; }
 
-             network_profile.svo_pids.push_back(svopid);
-             continue;
-           }
+              svopid.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
+              continue;
+            }
 
-        if (!strcmp(s, ":procauth,"))
-           {
-             ProcAuth procauth;
-             int i = NO_AP;
-             int j = AP_NULL;
-             int k = AP_NULL;
-             const int count = sscanf(s, ":procauth,%u,%u,%u", &i, &j, &k);
-             if (count < 1)   { loc = LOC;   break; }
-             if (count > 3)   { loc = LOC;   break; }
+         if (!strncmp(s, ":address,", 9))
+            {
+              // skip tag and remove trailing whitespaces
+              //
+              s += 9;
+              char * e = s + strlen(s);
+              while (e > s && *e > 0 && *e < ' ')   *--e = 0;
 
-             procauth.id = AP_num3(AP_num(i), AP_num(j), AP_num(k));
+              hostent * host = gethostbyname(s);
+              if (host == 0)
+                 {
+                   CERR << "gethostbyname(" << s << ") failed" << endl;
+                   loc = LOC;
+                   break;
+                 }
 
-             loc = read_procauth(file, procauth, line);
-             if (loc)   break;
+              unsigned int hh = host->h_addr_list[0][0];
+              unsigned int hl = host->h_addr_list[0][1];
+              unsigned int lh = host->h_addr_list[0][2];
+              unsigned int ll = host->h_addr_list[0][3];
 
-             network_profile.proc_auths.push_back(procauth);
-             continue;
-           }
+              svopid.ip_addr = hh << 24 | hl << 16 | lh << 8 | ll;
+              continue;
+            }
 
-        loc = LOC;
-        break;
+         if (!strncmp(s, ":userid,", 8))
+            {
+              s += 8;
+              for (unsigned int u = 1; u < sizeof(svopid.user); ++u)
+                  {
+                    if (*s < ' ')   break;
+                    svopid.user[u - 1] = *s++;
+                    svopid.user[u] = 0;
+                  }
+
+              continue;
+            }
+
+         if (!strncmp(s, ":crypt,", 7))
+            {
+              // ignored
+              continue;
+            }
+
+         // invalid tag (probably next entry). restore file position
+         //
+         fseek(file, filepos, SEEK_SET);
+         break;
        }
 
-   fclose(file);
-
-   if (loc)
-      {
-        CERR << "Syntax error in network profile '" << filename
-             << "' line " << line << ", detected at " << loc << endl;
-      }
-
-   return line;
+   return loc;
 }
-//----------------------------------------------------------------------------
-void
-ProcessorID::disconnect()
-{
-   Svar_DB::DB_tcp_error(0, 0, 0);
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

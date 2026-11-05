@@ -1,6 +1,8 @@
 ⍝ Quad_L.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE F
 ∇Z←F A
  Z←(2×A)+3 4 5
@@ -10,20 +12,22 @@
 15 18 25
 
       F 6 7
-LENGTH ERROR
+LENGTH ERROR+
 F[1]  Z←(2×A)+3 4 5
         ^    ^
 
       ⎕L
 12 14
 
+      ]FILE_CTL SKIP_APL2   ⍝ assigning ⎕L, ⎕R, ⎕PS is a GNU APL extension
       ⎕L←12 14 20
       →ι0
 15 18 25
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       )ERASE FL
+      ]FILE_CTL NO_SKIP
 ∇ Z←FL A
   Z←(A×1 2 3)÷ρA
 ∇
@@ -32,16 +36,17 @@ F[1]  Z←(2×A)+3 4 5
 1.333333333 3.333333333 6
 
       FL 4 5
-LENGTH ERROR
+LENGTH ERROR+
 FL[1]  Z←(A×1 2 3)÷⍴A
-          ^        ^
+          ^^
 
       ⎕L
 4 5
 
+      ]FILE_CTL SKIP_APL2   ⍝ assigning ⎕L, ⎕R, ⎕PS is a GNU APL extension
       ⎕L←4 5 6
       →ι0
 2 5 9
-⍝ ==================================
+      ⍝ ==================================
 
-   )ERASE F
+      )ERASE F

@@ -986,7 +986,7 @@ Notice that every operation above subtracts a multiple of some row from some
 <div class="paragraph"><p>The algorithm above defines the sequence <strong>op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong> above,
 where <strong>n</strong> is the number of columns in <strong>R</strong>. In practice (in LApack and
 consequently also in GNU APL) these operations are not performed on <strong>R</strong> first
-and then on the identity matrix afterwords but rather in parallel:</p></div>
+and then on the identity matrix afterwards but rather in parallel:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -1076,7 +1076,7 @@ make the computation of the transposition <strong>⍉H</strong> essentially a no
 </li>
 <li>
 <p>
-ensures that the composition <strong>H = H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> of several Householder
+ensure that the composition <strong>H = H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> of several Householder
   matrices is also Hermitian (complex case) or orthogonal (real case).
 </p>
 </li>
@@ -1360,7 +1360,7 @@ Due to rounding, <strong>⍺</strong> and <strong>β</strong> only determine two
 </pre>
 </div></div>
 <div class="paragraph"><p>The (usually small) numbers <strong>e₁</strong> and <strong>e₂</strong> define the <em>absolute error</em> of <strong>⍺</strong>
-and <strong>β</strong> while the quotients <strong>e₁÷⍺</strong> and <strong>e₂÷β</strong> define the <em>relative_error</em>
+and <strong>β</strong> while the quotients <strong>e₁÷⍺</strong> and <strong>e₂÷β</strong> define the <em>relative error</em>
 of <strong>⍺</strong> and <strong>β</strong> respectively.</p></div>
 <div class="paragraph"><p>Now, adding or subtracting the inequalities above gives:</p></div>
 <div class="listingblock">
@@ -1402,9 +1402,9 @@ If the input matrices are very large or very small (in terms of their norm)
 <li>
 <p>
 As we have seen above, for any matrix <strong>B</strong> there are actually two reflectors
-  <strong>H1</strong> and <strong>H2</strong> each of which bring the first column off <strong>B</strong> below the
-  diagonal to <strong>0). LA_pack then chooses the one that produces the largest
-  difference *V1</strong> or <strong>V2</strong> above.
+  <strong>H1</strong> and <strong>H2</strong> each of which brings the first column of <strong>B</strong> below the
+  diagonal to <strong>0</strong>. LA_pack then chooses the one that produces the largest
+  difference <strong>V1</strong> or <strong>V2</strong> above.
 </p>
 </li>
 <li>
@@ -1415,8 +1415,8 @@ Some functions, in particular <strong>LA_pack::larfg()</strong> take additional 
 </li>
 <li>
 <p>
-Column pivoting, instead of processing the columns in normal order (different
-  from B[;1], B[;2], &#8230; B[N]) to avoid small coefficients in the subsequent
+Column pivoting processes the columns in an order different
+  from B[;1], B[;2], &#8230; B[N] to avoid small coefficients in the subsequent
   matrices.
 </p>
 </li>
@@ -1473,7 +1473,7 @@ the unblocked FORTRAN functions survived in the GNU APL code.</p></div>
 <h3 id="_in_place_computation">In-place computation</h3>
 <div class="paragraph"><p>Another heavily used trick to reduce memory consumption is in-place
 computation. Instead of passing the argument of a function in one variable and
-storing the result in a another variable, the same variable was used for the
+storing the result in another variable, the same variable was used for the
 largest input variable and the result. For example, function <strong>laqp2()</strong>
 computes the QR factorization of an arbitrary matrix <strong>B</strong> and the result is
 stored at the same memory location. However, the result <strong>QR</strong> is split in two
@@ -1570,8 +1570,8 @@ there are different precisions (like 32-bit <strong>float</strong> and 64-bit <s
 in C++) and each has its own FORTRAN function. That made a lot of sense
 in the FORTRAN days where it made a considerable difference in performance.</p></div>
 <div class="paragraph"><p>A closer look at these functions revealed, however, that the difference
-between data types are actually rather small. The GNU APL version of these
-functions make the data type a template parameter so that every group of
+between data types is actually rather small. The GNU APL version of these
+functions makes the data type a template parameter so that every group of
 FORTRAN functions becomes a single template function in C++. In our example:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1590,7 +1590,7 @@ FORTRAN functions becomes a single template function in C++. In our example:</p>
 </div></div>
 <div class="paragraph"><p>where the template argument <strong>&lt;T&gt;</strong> is either <strong>&lt;DD&gt;</strong> for real or <strong>&lt;ZZ&gt;</strong> for
 complex numbers. The use of C++ templates cuts the number of functions
-needed roughly in half,</p></div>
+needed roughly in half.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_call_tree">Call Tree</h3>
@@ -1693,7 +1693,7 @@ In the QR factorization: for every column of <strong>B</strong>:
 <strong>estimate_rank()</strong> checks that the system <strong>A=B∘X</strong> of linear equations is
    not under-determined and raises a DOMAIN ERROR if it is. In contrast,
    over-determination (more equations than variables) is accepted and
-   produces a least-square solution for <strong>A=X=B∘X</strong>
+   produces a least-squares solution for <strong>A=B∘X</strong>
 </p>
 </li>
 <li>
@@ -1878,7 +1878,7 @@ usually differ between different algorithms. For example,</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Notice the differences between the Helzer and the LAack algorithm
+<div class="paragraph"><p>Notice the differences between the Helzer and the LApack algorithm
 in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
 </div>
 <div class="sect2">
@@ -2016,7 +2016,7 @@ to those of the under-determined cases.</p></div>
 </div></div>
 <div class="paragraph"><p>Note that above <strong>Q</strong> is orthogonal in the Helzer case but not in the LApack
 case. This is most likely caused by the fact that in an over-determined <strong>B</strong>
-the LApack functions compute a least-square solution instead of an exact one.
+the LApack functions compute a least-squares solution instead of an exact one.
 Note also the different <strong>⍴Q</strong> in both cases.</p></div>
 </div>
 </div>
@@ -2059,9 +2059,9 @@ of the LApack functions.</td>
 <strong>LApack::estimate_rank()</strong> to compute the effective rank of the right
 argument <strong>B</strong>. Matrices with fewer rows than columns are <em>under-determined</em>
 and always yield a RANK ERROR. However a matrix can be under-determined even
-if the number of rows is suffiently large. This is the case if the rows are
+if the number of rows is sufficiently large. This is the case if the rows are
 not linearly independent. Put differently, a large number of rows alone
-does not guarantee a sufficient matrix rank because a linear dependent row
+does not guarantee a sufficient matrix rank because a linearly dependent row
 is as good as no row.</p></div>
 <div class="paragraph"><p>Function <strong>estimate_rank()</strong> has no corresponding FORTRAN function in LApack,
 but used to be a somewhat lengthy section of <strong>LApack::gelsy()</strong>. That section
@@ -2094,7 +2094,7 @@ the computation and producing an unreliable result.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-03-15 13:10:20 CET
+ 2026-09-19 18:19:21 CEST
 </div>
 </div>
 </body>

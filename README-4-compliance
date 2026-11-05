@@ -10,8 +10,6 @@ The following features MAY be added (if requested):
 
 * more shared variables / auxiliary processors
 
-* ⎕NA
-
 * more ⎕L and ⎕R testcases
 
 
@@ -20,7 +18,7 @@ The following features are planned or will be investigated:
 
 * Support for SCAR format (to exchange data with Dyalog APL and APL2000).
 
-* operators from NARS2000 (email from Bob Smith, Dec-14-2013)
+* operators from NARS2000
 
 * versioning of .so files
 
@@ -31,6 +29,8 @@ The following issues are known and maybe fixed mid-term:
 
 The following extensions are provided:
 --------------------------------------
+
+* ⎕NA          (Name Association — calling shared libraries from APL)
 
 * various debug commands, see )HELP
 

@@ -367,9 +367,11 @@ help_def(1, "⍳", "Index generator",
          "Vector of the first B integers (starting from ⎕IO)",
          "")
 
-help_def(2, "⍳", "Index of",
-         "The location (index) of B in A if B∈,A, or 1+¯1↑⍳⍴D if 1≥⍴A, or else ⊂⍬",
-         "")
+help_def(2, "⍳", "Index of B in A",
+         "⍴Z is ⍴B and Z is the position of the corresponding item of B "
+         "in A, provided that A contains that item.",
+         "If the item is not found in A, the result item in Z depends on "
+         "the rank of A: for vector A it is ⎕IO+⍴,A and otherwise it is ⍬.")
 
 help_def(1, "⍸", "Where",
          "same as { (,⍵) / ,⍳⍴⍵ }.",
@@ -462,8 +464,13 @@ help_def(2, "⊂", "Partition",
          "")
 
 help_def(1, "⊃", "Disclose",
-         "Produce an array from B",
-         "")
+         "Combine the items of B into one array, using each item's own "
+         "shape for B's new trailing axes; items of different shape are "
+         "padded with fill values.",
+         "Example:\n"
+         "      ⊃(1 2 3) (4 5)\n"
+         "1 2 3\n"
+         "4 5 0")
 
 help_def(2, "⊃", "Pick",
          "Select a value from B based on A",
@@ -579,9 +586,21 @@ help_def(2, "←", "I-Beam",
          "Not used in GNU APL",
          "")
 
-help_def(1, "→", "Goto",
-         "Go to line B",
-         "")
+help_def(-6, "→", "Branch",
+         "\n      →LABEL          Branch to the line of LABEL\n"
+         "      →N              Branch to (absolute (!)) line N\n"
+         "      →(COND)/LABEL   Typical conditional branch\n"
+         "      →(COND)⍴LABEL   Typical conditional branch (⍴ same as /)\n"
+         "\n"
+         "      LABEL→COND      GNU extension: fast dyadic branch,\n"
+         "                      same as monadic →(COND)/LABEL\n"
+         "                      (absolute, faster)\n"
+         "      N→COND          GNU extension: fast dyadic branch,\n"
+         "                      relative (!) to the current line\n"
+         "                      (0→COND retries it)\n",
+         "→ is a branch-arrow (ISO 13751, Delimiter metaclass),\n"
+         "not a primitive function -- it has no assignable\n"
+         "result.")
 
 help_def(-6, "∇", "Defined Function editor",
        "\n      ∇{A} FUN {B}         Create and edit function FUN\n"
@@ -633,7 +652,7 @@ help_def(-3, "⍤",  "Rank",
          "")
 
 help_def(-4, "⍤",  "Rank",
-         "Call GA F GB with each of the corresponing rank-G cells GA of A and GB of B\n",
+         "Call GA F GB with each of the corresponding rank-G cells GA of A and GB of B\n",
          "")
 
 help_def(-3, "⍣",  "Power Operator",

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,28 +34,28 @@
 VH_entry VH_entry::history[VALUEHISTORY_SIZE + 1];
 int VH_entry::idx = 0;
 
-//----------------------------------------------------------------------------
-VH_entry::VH_entry(const Value * _val, VH_event _ev, int _iarg,
+//════════════════════════════════════════════════════════════════════════════
+VH_entry::VH_entry(const cValue * _val, VH_event _ev, int _iarg,
                    const char * _loc)
-  : val(_val),
-    event(_ev),
+  : event(_ev),
     iarg(_iarg),
-    loc(_loc)
+    loc(_loc),
+    val(_val)
 {
    testcase_file = InputFile::current_filename();
    testcase_line = InputFile::current_line_no();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 VH_entry::init()
 {
 void * h = history;
    memset(h, 0, sizeof(history));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// add event \b ev with event argumant \b ia to the history of \b val
 void
-add_event(const Value * val, VH_event ev, int ia, const char * loc)
+add_event(const cValue * val, VH_event ev, int ia, const char * loc)
 {
    Assert(loc);
 
@@ -64,9 +64,9 @@ VH_entry * entry = VH_entry::history + VH_entry::idx++;
 
    new (entry) VH_entry(val, ev, ia, loc);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-VH_entry::print_history(ostream & out, const Value & val, const char * loc)
+VH_entry::print_history(ostream & out, const cValue & val, const char * loc)
 {
    // search backwards for events of val.
    //
@@ -90,7 +90,7 @@ int cidx = VH_entry::idx;
               continue;
             }
 
-          if (entry->val != &val)           continue;   // some other var
+          if (entry->val != static_cast<const cValue *>(&val))   continue;   // some other var
 
           var_events.push_back(entry);
 
@@ -120,27 +120,29 @@ const VH_entry * previous = 0;
       }
    out << endl;
 }
-//----------------------------------------------------------------------------
-/// return the letters of some \b flags set
+//────────────────────────────────────────────────────────────────────────────
+/// return the letters of some \b flags set. flags is flat-encoded the
+/// same way Value::get_flags() packs it (bit 0 complete, bit 1 marked,
+/// bit 3 member) -- these events log that same encoding via iarg, not a
+/// VF_Flags bitfield.
 static UCS_string
-flags_name(ValueFlags flags)
+flags_name(uint32_t flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)     ret << UNI_M;
-  if (flags & VF_complete)   ret << UNI_C;
-  if (flags & VF_packed)     ret << UNI_P;
-  if (flags & VF_member)     ret << UNI_m;
+  if (flags & 0x02)   ret << UNI_M;   // marked
+  if (flags & 0x01)   ret << UNI_C;   // complete
+  if (flags & 0x08)   ret << UNI_m;   // member
 
    while (ret.size() < 4)   ret << UNI_SPACE;
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
-VH_entry::print(int & flags, ostream & out, const Value & val,
+VH_entry::print(int & flags, ostream & out, const cValue & val,
                const VH_entry * previous) const
 {
-const ValueFlags flags_before = ValueFlags(flags);
+const int flags_before = flags;
 
    if (previous == 0                            ||
        previous->testcase_file == 0             ||
@@ -164,27 +166,27 @@ const ValueFlags flags_before = ValueFlags(flags);
              break;
 
         case VHE_Check:
-             flags |= VF_complete;
+             flags |= 0x01;   // complete
              out << "  VHE_Check    " << flags_before << " ";
-             if (flags_before != flags)   out << ValueFlags(flags)
+             if (flags_before != flags)   out << flags
                                               << " ";
              else                         out << "            ";
              break;
 
         case VHE_SetFlag:
              flags |= iarg;
-             out << "  Set " << flags_name(ValueFlags(iarg))
+             out << "  Set " << flags_name(iarg)
                  << "     " << flags_before << " ";
-             if (flags_before != flags)   out << ValueFlags(flags)
+             if (flags_before != flags)   out << flags
                                               << " ";
              else                         out << "            ";
              break;
 
         case VHE_ClearFlag:
              flags &= ~iarg;
-             out << "  Clear " << flags_name(ValueFlags(iarg))
+             out << "  Clear " << flags_name(iarg)
                  << "   " << flags_before << " ";
-             if (flags_before != flags)   out << ValueFlags(flags)
+             if (flags_before != flags)   out << flags
                                               << " ";
              else                         out << "            ";
              break;
@@ -258,5 +260,5 @@ const ValueFlags flags_before = ValueFlags(flags);
 
    out << left << setw(30) << (loc ? loc : "<no-loc>") << endl;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

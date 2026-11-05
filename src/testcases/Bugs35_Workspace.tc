@@ -1,0 +1,647 @@
+⍝ Bugs35_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs35 items about )SAVE, )LOAD, )COPY, )OUT, )PIN, and
+⍝ )CLEAR (#43, #48, #58 - #64). Time stamps are matched by wildcards.
+⍝ The workspaces are created in the testcase libraries and dropped again.
+
+⍝@ test3.
+
+      ⍝ Bugs35 #43: )LOAD of a workspace with an anonymous lambda operator on the
+      ⍝ SI fails cleanly (no assertion) and leaves a CLEAR WS
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      V←⍳5
+
+
+
+
+
+      -{⍶ ÷⍵}0
+DOMAIN ERROR
+λ⁰[1]  λ←⍶÷⍵
+          ^
+
+
+      )SAVE B35_A43
+⁰-³
+
+
+
+
+      )LOAD B35_A43
+)LOAD B35_A43 failed: DOMAIN ERROR
+
+
+
+
+      )MORE
+workspace file ³
+the operator of a derived function on the )SI (e.g. an anonymous lambda operator) cannot be restored
+
+
+
+      V
+VALUE ERROR+
+      V
+      ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #48: a function fixed into a localized name of a suspended function
+      ⍝ does not replace the global function or variable after )LOAD
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←H' 'Z←1'
+H
+
+
+
+
+      ⎕FX 'F;H' '⎕FX ''Z←H'' ''Z←7''' '÷0'
+F
+
+
+
+
+      F
+H
+DOMAIN ERROR
+F[2]  ÷0
+      ^
+
+      )SAVE B35_W7
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B35_W7
+SAVED ³
+
+
+
+
+      →
+
+
+
+
+
+      H
+1
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      H←5
+
+
+
+
+
+      ⎕FX 'F;H' '⎕FX ''Z←H'' ''Z←7''' '÷0'
+F
+
+
+
+
+      F
+H
+DOMAIN ERROR
+F[2]  ÷0
+      ^
+
+      )SAVE B35_W8
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B35_W8
+SAVED ³
+
+
+
+
+      →
+
+
+
+
+
+      H
+5
+
+
+
+
+      ⍝ Bugs35 #58: a suspended function can be resumed after )SAVE and )LOAD
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      X←0
+
+
+
+
+
+      ⎕FX 'Z←F' 'Z←÷X'
+F
+
+
+
+
+      1+F
+DOMAIN ERROR
+F[1]  Z←÷X
+        ^
+
+
+      )SAVE B35_SI
+⁰-³
+
+
+
+
+      )LOAD B35_SI
+SAVED ³
+
+
+
+
+      X←1
+
+
+
+
+
+      →1
+2
+
+
+
+
+      )SI
+
+
+
+
+
+      ⍝ Bugs35 #59: )COPY of a suspended function is refused and keeps it
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F' 'Z←2'
+F
+
+
+
+
+      )SAVE B35_CP1
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F' 'Z←÷0'
+F
+
+
+
+
+      F
+DOMAIN ERROR
+F[1]  Z←÷0
+        ^
+
+
+      )COPY B35_CP1 F
+SAVED ³
+
+
+
+
+      ⎕NC 'F'
+3
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #60: )COPY of a variable over a suspended function is NOT COPIED
+      ⍝ (⎕ET unchanged), and replaces the function if it is not on the SI
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      F←42
+
+
+
+
+
+      )SAVE B35_CV1
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F' 'Z←÷0'
+F
+
+
+
+
+      F
+DOMAIN ERROR
+F[1]  Z←÷0
+        ^
+
+
+      ⎕ET
+5 4
+
+
+
+
+      )COPY B35_CV1 F
+SAVED ³
+
+
+
+
+      ⎕ET
+5 4
+
+
+
+
+      )SIC
+
+
+
+
+
+      )COPY B35_CV1 F
+SAVED ³
+
+
+
+
+      F
+42
+
+
+
+
+      ⍝ Bugs35 #61: )SAVE lib name sets )WSID to lib and name
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      A←1
+
+
+
+
+
+      )SAVE 1 B35_WS1
+⁰-³
+
+
+
+
+      )WSID
+IS 1 B35_WS1
+
+
+
+
+      A←2
+
+
+
+
+
+      )SAVE
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD 1 B35_WS1
+SAVED ³
+
+
+
+
+      A
+2
+
+
+
+
+      ⍝ Bugs35 #62: )SAVE name stores name (not the previous )WSID) in the file
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )WSID B35_AAA
+WAS CLEAR WS
+
+
+
+
+      )SAVE B35_BBB
+⁰-³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B35_BBB
+SAVED ³
+
+
+
+
+      )WSID
+IS B35_BBB
+
+
+
+
+      ⍝ Bugs35 #63: ⎕TZ survives )CLEAR (shifted by 0.25 here, which works for
+      ⍝ every time zone, and shifted back afterwards)
+      ⍝
+
+
+
+
+
+      ⎕TZ←⎕TZ+0.25
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      (1|⎕TZ)∊0.25 0.75
+1
+
+
+
+
+      ⎕TZ←⎕TZ-0.25
+
+
+
+
+
+      ⍝ Bugs35 #64: )PIN does not overwrite existing objects
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      A←1 2 ◊ B←'x' ◊ ⎕FX 'Z←F' 'Z←3'
+F
+
+
+
+
+      )OUT B35_IO2 A B F
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      B←'mine' ◊ A←'mineA'
+
+
+
+
+
+      )PIN B35_IO2
+NOT COPIED: A B
+
+
+
+
+      A
+mineA
+
+
+
+
+      B
+mine
+
+
+
+
+      F
+3
+
+
+
+
+      ⍝ clean up
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )DROP B35_A43
+⁰-³
+
+
+
+
+      )DROP B35_W7
+⁰-³
+
+
+
+
+      )DROP B35_W8
+⁰-³
+
+
+
+
+      )DROP B35_SI
+⁰-³
+
+
+
+
+      )DROP B35_CP1
+⁰-³
+
+
+
+
+      )DROP B35_CV1
+⁰-³
+
+
+
+
+      )DROP 1 B35_WS1
+⁰-³
+
+
+
+
+      )DROP B35_BBB
+⁰-³
+
+
+
+
+      )DROP B35_IO2.atf
+⁰-³
+
+
+
+
+

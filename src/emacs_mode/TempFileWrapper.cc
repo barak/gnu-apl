@@ -28,6 +28,7 @@
 #include <string.h>
 
 #include "emacs.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 FileWrapper::FileWrapper( int fd_in )
     : fd( fd_in )
@@ -70,3 +71,4 @@ void TempFileWrapper::close()
         closed = true;
     }
 }
+//════════════════════════════════════════════════════════════════════════════

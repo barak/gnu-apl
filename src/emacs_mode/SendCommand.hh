@@ -26,10 +26,18 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "send" network command: write a block of lines sent by the client
+/// to a temp file and execute it as APL input, attributed to the given
+/// (name, starting line) for error reporting
 class SendCommand : public NetworkCommand {
 public:
+    /// constructor
     SendCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

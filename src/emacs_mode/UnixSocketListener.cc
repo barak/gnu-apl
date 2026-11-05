@@ -21,6 +21,12 @@
 /** @file
 */
 
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#if HAVE_SYS_UN_H
+
 #include "emacs.hh"
 #include "network.hh"
 #include "UnixSocketListener.hh"
@@ -37,6 +43,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <poll.h>
+//════════════════════════════════════════════════════════════════════════════
 
 UnixSocketListener::~UnixSocketListener()
 {
@@ -59,8 +66,9 @@ std::string UnixSocketListener::start( void )
     unlink( filename.c_str() );
 
     struct sockaddr_un addr;
+    memset( &addr, 0, sizeof( addr ) );
     addr.sun_family = AF_UNIX;
-    strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) );
+    strncpy( addr.sun_path, filename.c_str(), sizeof( addr.sun_path ) - 1 );
     if(::bind(server_socket, reinterpret_cast<sockaddr *>(&addr),
               sizeof(addr)) == -1) {
         stringstream errmsg;
@@ -182,3 +190,6 @@ void UnixSocketListener::close_connection( void )
         }
     }
 }
+//════════════════════════════════════════════════════════════════════════════
+
+#endif // HAVE_SYS_UN_H

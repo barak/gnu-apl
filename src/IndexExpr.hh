@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include "DynamicObject.hh"
 #include "Value.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
      An array of index values.
  */
@@ -37,24 +37,21 @@ class IndexExpr : public DynamicObject
 {
 public:
    /// constructor: empty (0-dimensional) IndexExpr
+   /// @param ass_state whether this index is part of an indexed assignment
+   /// @param loc caller location for diagnostics
    IndexExpr(Assign_state ass_state, const char * loc);
 
    /// destructor
    ~IndexExpr();
 
-   /// The quad-io for this index.
-   uint32_t quad_io;
+   /// return true iff this index is part of indexed assignment ( A[]← )
+   Assign_state get_assign_state() const
+      { return assign_state; }
 
-   /// The values (0 = elided index as in [] or [;].
-   Value_P values[MAX_RANK];
-
-   /// append a value.
-   void add_index(Value_P val)
-      {
-       if (rank >= MAX_RANK)    RANK_ERROR;
-       values[rank++] = val;
-       if (+val)   ++value_count;
-      }
+   /// return axis rk (rk in shape order as opposed to index order)
+   /// @param ax axis number in shape order
+   const cValue * get_axis_value(uAxis ax) const
+      { return values[rank - ax - 1].get(); }
 
    /// return the number of values (= number of semicolons + 1),
    /// including elided indices
@@ -63,40 +60,88 @@ public:
    /// return true iff the number of dimensions is 1 (i.e. no ; and non-empty)
    bool is_axis() const   { return rank == 1; }
 
-   /// Return an axis (from an IndexExpr of rank 1.
-   sAxis get_axis(sRank max_axis) const;
+   /// append a value.
+   /// @param val APL value to append as the next index dimension
+   void add_index(Value_P val)
+      {
+       if (rank >= MAX_RANK)    RANK_ERROR;
+       values[rank++] = val;
+       if (val)   ++value_count;
+      }
 
-   /// return true iff this index is part of indexed assignment ( A[]← )
-   Assign_state get_assign_state() const
-      { return assign_state; }
+   /// check that all indices indices of \b this IndexExpr are valid indices
+   /// for \b shape, raise INDEX_ERROR if not.
+   /// @param shape the APL array shape that bounds the valid index range
+   void check_index_range(const Shape & shape) const;
+
+   /// Return an axis (from an IndexExpr of rank 1.
+   /// @param max_axis upper bound on the valid axis value (exclusive)
+   sAxis get_axis(sRank max_axis) const;
 
    /// return the single axis value and clear it in \b this IndexExpr.
    Value_P extract_axis();
 
-   /// check that all indices indices of \b this IndexExpr are valid indices
-   /// for \b shape, raise INDEX_ERROR if not.
-   void check_index_range(const Shape & shape) const;
+   /// mark all IndexExprs in the ring as (tentatively) stale. Mirrors
+   /// Value::mark_all_dynamic_values(); see print_stale().
+   static void mark_all_dynamic_index_exprs();
 
-   /// return axis rk (rk in shape order as opposed to index order)
-   const Value * get_axis_value(uAxis ax) const
-      { return values[rank - ax - 1].get(); }
+   /// true if this IndexExpr was marked by mark_all_dynamic_index_exprs()
+   /// and not yet unmarked as reachable.
+   bool is_marked() const   { return marked; }
+
+   /// mark this IndexExpr as (tentatively) stale.
+   //
+   // named mark() rather than set_marked(): Value.hh #defines a
+   // function-like macro set_marked() (for Value::SET_marked() call-site
+   // location tracking) that is never #undef'd, so a same-named method
+   // here gets silently rewritten by the preprocessor -- harmlessly in a
+   // release build, but into ill-formed syntax whenever cfg_VF_TRACING_WANTED
+   // or cfg_VALUE_HISTORY_WANTED add a macro argument (i.e. any
+   // --enable-maintainer-mode / DEVELOP_WANTED=yes build, e.g. `make develop`).
+   void mark() const   { marked = true; }
+
+   /// clear the marked flag, i.e. record that this IndexExpr was found
+   /// reachable from a live TOK_PINDEX/TOK_INDEX token (see
+   /// Prefix::unmark_all_values()).
+   void unmark() const   { marked = false; }
 
    /// print stale IndexExprs, and return the number of stale IndexExprs.
+   ///
+   /// Unlike erase_stale() (removed, see IndexExpr.cc), this never
+   /// deletes anything: it independently re-derives reachability (mark
+   /// all, then unmark those reachable from a live SI) rather than
+   /// trusting any bookkeeping, and only reports what is still marked
+   /// afterwards. Actual freeing of IndexExprs stays exactly where it
+   /// already correctly happens (Prefix::clean_up() and the individual
+   /// reduce_*() delete sites) -- deleting something this diagnostic
+   /// merely *suspects* is stale is what caused Bugs8 #1 (Blake
+   /// McBride): deleting a live IndexExpr is (near-)guaranteed to
+   /// segfault later in ~IndexExpr(), since the dangling pointer is
+   /// still sitting in a TOK_PINDEX/TOK_INDEX token on some SI's prefix
+   /// stack, scheduled for a second delete at the next )SIC/)CLEAR/
+   /// )RESET.
+   /// @param out output stream for the diagnostic report
    static int print_stale(ostream & out);
 
-   /// erase stale IndexExprs
-   static void erase_stale(const char * loc);
+   /// The quad-io for this index.
+   uint32_t quad_io;
+
+   /// The values (0 = elided index as in [] or [;].
+   Value_P values[MAX_RANK];
 
 protected:
+   /// true iff this index is part of indexed assignment ( A[]← )
+   const Assign_state assign_state;
+
    /// the number of dimensions (including elided)
    uRank rank;
 
    /// the number of values (excluding elided)
    uRank value_count;
 
-   /// true iff this index is part of indexed assignment ( A[]← )
-   const Assign_state assign_state;
+   /// see is_marked()/set_marked()/unmark()
+   mutable bool marked;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __INDEXEXPR_HH_DEFINED__

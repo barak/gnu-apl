@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #include "UTF8_string.hh"
 
+//════════════════════════════════════════════════════════════════════════════
 /// the header of a CDR record
 struct CDR_header
 {
@@ -50,6 +51,7 @@ struct CDR_header
       { return get_be32(utf8P(&be_nelm)); }
 
    /// convert big endian 32 bit value to 32 bit host value (== ntohl())
+   /// @param data pointer to 4 big-endian bytes
    static uint32_t get_be32(const uint8_t * data)
       {
         uint32_t ret  =  *data++;  ret <<= 8;
@@ -57,6 +59,15 @@ struct CDR_header
                  ret |= *data++;   ret <<= 8;
                  ret |= *data++;
         return ret;
+      }
+
+   /// convert little endian 32 bit value to 32 bit host value. CDR headers
+   /// are big endian, but ravel items are stored little endian.
+   /// @param data pointer to 4 little-endian bytes
+   static uint32_t get_le32(const uint8_t * data)
+      {
+        return uint32_t(data[0])       | uint32_t(data[1]) <<  8
+             | uint32_t(data[2]) << 16 | uint32_t(data[3]) << 24;
       }
 };
 
@@ -69,6 +80,8 @@ public:
    {}
 
    /// Constructor: CDR structure from uint8_t * and length
+   /// @param data pointer to raw CDR bytes
+   /// @param len number of bytes to copy
    CDR_string(const uint8_t * data, int len)
       { loop(l, len)   push_back(*data++); }
 
@@ -110,9 +123,16 @@ public:
    /// return non-zero if this CDR is malformed
    int check() const
       {
+        // validate size (and that the rank's shape words fit within it)
+        // before reading any of them below: get_rank() is a raw uint8_t
+        // (0..255) taken from unvalidated data, so reading them first
+        // could read far past a short buffer.
+        //
+        if (size() < 32)                                    return 2;
+        if (size_t(16 + 4*get_rank()) > size())              return 2;
+
         uint32_t cnt = 1;
         for (int r = 0; r < get_rank(); ++r)   cnt *= get_4(16 + 4*r);
-        if (size() < 32)                          return 2;
         if (get_ptr() != 0x00002020)              return 3;
         if (header().get_nb() != size())          return 4;
         if (header().get_nelm() != cnt)           return 5;
@@ -121,6 +141,8 @@ public:
       }
 
    /// print properties
+   /// @param out output stream to print to
+   /// @param loc optional caller location for diagnostics
    void debug(ostream & out, const char * loc = 0) const
       {
         const int error = check();
@@ -135,8 +157,10 @@ public:
 
 protected:
    /// return 4 bytes of the header (the header is always big endian)
+   /// @param offset byte offset into the CDR record
    uint32_t get_4(unsigned int offset) const
       { return CDR_header::get_be32(utf8P(&(*this)[0] + offset)); }
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __CDR_STRING_HH_DEFINED__

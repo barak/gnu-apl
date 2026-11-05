@@ -1,6 +1,8 @@
 ⍝ Quad_TF.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )ERASE Z
 
       )ERASE ITEMS
@@ -55,16 +57,16 @@ A←2 3⍴2 3 4 5 6 1
 CA 1 7  Don't 
 
       2 ⎕TF 'A'
-A←7⍴' Don''t '
+A←' Don''t '
 
 
       A←.000000000001
 
       1 ⎕TF 'A'
-NA 0 1E¯12
+NA 0 9.9999999999999998E¯13
 
       2 ⎕TF 'A'
-A←1E¯12
+A←9.9999999999999998E¯13
 
 ⍝ APL2 variable (2 ⎕TF) --------------------------
 
@@ -100,9 +102,9 @@ A←1E¯12
        ┃┃┗━┛ ┗━┛┃                            ┃ 
        ┃┗ϵ━━━━━━┛                            ┃ 
        ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ 
- 2⎕TF: VAR←4⍴(2⍴('') (0⍴0)) (2⍴'Q' 3.2000000000000002) (4⍴5 8 11 14) 
-      (5⍴'Don''t') 
-
+ 2⎕TF: VAR←4⍴(2⍴('') (0⍴0)) ('Q' 3.2000000000000002) (5 8 11 14) 'Don''t' 
+      (5⍴'Don''t')
+Don't
       test_2TF ⊂(⊂1 0 1) (2 3ρ4 6 4 6 4 6)
  ≡:    1 (SAME) 
  VAR:  ┏━━━━━━━━━━━━━━━━━━━┓ 
@@ -133,7 +135,7 @@ A←1E¯12
 N⎕TS 1 7 ⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
 
       2 ⎕TF '⎕TS'
-⎕TS←7⍴⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
+⎕TS←⁰ ⁰ ⁰ ⁰ ⁰ ⁰ ⁰
 
 ⍝ system function ----------------------------------
 
@@ -227,7 +229,7 @@ FOO
 [0]   R←A FOO B;C;D
 [1]   C←A ◊ D←B    
 [2]  L2: →99      
-    ∇
+    ∇  ³
 
 ⍝ Inverse 1 ⎕TF, system variable  ----------------------------------
 
@@ -250,7 +252,7 @@ N⎕IO 0 0
       SCORES←  34   18   20
       R←2 ⎕TF 'SCORES'
       R
-SCORES←3⍴34 18 20
+SCORES←34 18 20
 
       ⎕NC 'SCORES'
 2
@@ -324,7 +326,7 @@ FOO
 [0]   R←A FOO B;C;D
 [1]   C←A ◊ D←B
 [2]  L2: →99
-    ∇
+    ∇  ³
 
 ⍝ Inverse 2 ⎕TF, system variable  ----------------------------------
 
@@ -349,7 +351,7 @@ FOO
            2 1 2 
 
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (2 3⍴1 2 1 2 1 2)
+zzzz←3⍴'elan' 77 (2 3⍴1 2 1 2 1 2)
 
       )ERASE zzzz
       ⍎yyyy
@@ -362,7 +364,7 @@ zzzz←3⍴(4⍴'elan') 77 (2 3⍴1 2 1 2 1 2)
  elan 77   0 0 0 
            0 0 0 
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (2 3⍴0 0 0 0 0 0)
+zzzz←3⍴'elan' 77 (2 3⍴0 0 0 0 0 0)
       )ERASE zzzz
       ⍎yyyy
       zzzz
@@ -373,7 +375,7 @@ zzzz←3⍴(4⍴'elan') 77 (2 3⍴0 0 0 0 0 0)
  elan 77  aba 
           bab 
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (2 3⍴'ababab')
+zzzz←3⍴'elan' 77 (2 3⍴'ababab')
       )ERASE zzzz
       ⍎yyyy
       zzzz
@@ -385,9 +387,9 @@ zzzz←3⍴(4⍴'elan') 77 (2 3⍴'ababab')
  elan 77      
               
       2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (2 3⍴'      ')
+zzzz←3⍴'elan' 77 (2 3⍴'      ')
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (2 3⍴'      ')
+zzzz←3⍴'elan' 77 (2 3⍴'      ')
       )ERASE zzzz
       ⍎yyyy
       zzzz
@@ -398,7 +400,7 @@ zzzz←3⍴(4⍴'elan') 77 (2 3⍴'      ')
       ⎕←zzzz←'elan' 77 'abc'
  elan 77 abc 
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 (3⍴'abc')
+zzzz←3⍴'elan' 77 'abc'
       )ERASE zzzz
       ⍎yyyy
       zzzz
@@ -406,13 +408,13 @@ zzzz←3⍴(4⍴'elan') 77 (3⍴'abc')
 
 
       ⎕←zzzz←'elan' 77 ''
- elan 77  
+ elan 77   
       ⎕←yyyy←2⎕TF 'zzzz'
-zzzz←3⍴(4⍴'elan') 77 ('')
+zzzz←3⍴'elan' 77 ('')
       )ERASE zzzz
       ⍎yyyy
       zzzz
- elan 77  
+ elan 77   
 
 ⍝ Regression
 
@@ -424,7 +426,7 @@ zzzz←3⍴(4⍴'elan') 77 ('')
 ┗ϵ━━━━━━━━━━━━━━━━━━━━━━━┛
 
       ⎕ ← tf2 ← 2 ⎕TF 'var'
-var←3⍴(6⍴'kelvin') (1⍴'v') (9⍴'some text')
+var←3⍴'kelvin' (1⍴'v') 'some text'
 
       )ERASE var
 
@@ -452,5 +454,152 @@ M
       55 60
 
 
-⍝ ==================================
+⍝ regression (Bugs28 #74): 1⎕TF of a lambda used to write out
+⍝ canonical() of the lambda under its own header (λ←λ1 ⍵, say) and, on
+⍝ the way back in, "fix" that text under the header's own synthetic
+⍝ name -- redefining λ1 instead of the name the caller assigned to,
+⍝ leaving the original name a VALUE ERROR. 1⎕TF now refuses a lambda
+⍝ outright, matching 2⎕TF's existing refusal (Bugs27 #52). Same for a
+⍝ lambda operator.
+⍝
+      )ERASE L
+      L←{⍵+1}
+      1 ⎕TF 'L'
+DOMAIN ERROR+
+      1 ⎕TF 'L'
+      ^ ^
 
+      )MORE
+⎕TF: 'L' is a lambda (dfn); lambdas cannot be written to a transfer-format (.atf) file or produced by ⎕TF, since other APL systems (and GNU APL's own transfer-format reader) have no way to represent them. Use ⎕FX-style named functions for anything that needs to survive )OUT/)IN or ⎕TF.
+
+      2 ⎕TF 'L'
+DOMAIN ERROR+
+      2 ⎕TF 'L'
+      ^ ^
+
+      )MORE
+)OUT/⎕TF: 'L' is a lambda (dfn); lambdas cannot be written to a transfer-format (.atf) file or produced by ⎕TF, since other APL systems (and GNU APL's own transfer-format reader) have no way to represent them. Use ⎕FX-style named functions for anything that needs to survive )OUT/)IN or ⎕TF.
+
+      )ERASE M
+      M←{⍺⍺ ⍵}
+      1 ⎕TF 'M'
+DOMAIN ERROR+
+      1 ⎕TF 'M'
+      ^ ^
+
+      2 ⎕TF 'M'
+DOMAIN ERROR+
+      2 ⎕TF 'M'
+      ^ ^
+
+      )SIC
+
+      )ERASE L
+      )ERASE M
+
+⍝ regression (Bugs28 #75): )OUT of a workspace containing a lambda used
+⍝ to abort entirely -- Symbol::write_OUT let Quad_TF::tf2_fun_ucs's
+⍝ DOMAIN ERROR propagate uncaught while looping over all symbols,
+⍝ silently truncating the .atf file to whatever had been written before
+⍝ the lambda was reached. )OUT now skips a lambda with a CERR-only
+⍝ warning (like the existing )SAVE warning for a dirty SI) and keeps
+⍝ writing the rest of the workspace.
+⍝
+      )CLEAR
+CLEAR WS
+
+      )DROP dwout75.atf
+³
+
+      F1←{⌽⍵}
+      X75←42
+      )OUT dwout75
+
+      data ← ⎕FIO[26] 'testcases/libroot/workspaces/dwout75.atf'
+      ~∨/'F1' ⍷ data
+1
+      ∨/'X75' ⍷ data
+1
+
+      )DROP dwout75.atf
+³
+
+⍝ regression (Blake McBride, Bugs31 #6): Quad_TF::no_UCS() (the inverse-
+⍝ 2⎕TF/)IN decoder for the encoder's own ',(⎕UCS n)' non-printable-
+⍝ character marker) used to blindly scan for the literal 7-character
+⍝ text ',(⎕UCS, with no way to tell the encoder's genuine marker apart
+⍝ from the SECOND half of an ordinary '' (escaped literal quote) that
+⍝ happens to be followed by literal source text reading the same way --
+⍝ both are lexically identical substrings. A function whose own source
+⍝ re-quotes an embedded quote right before literal ',(⎕UCS' text (e.g.
+⍝ a line that itself calls ⎕UCS after a quoted string) had its escaping
+⍝ misread as the marker, corrupting the function from that point on;
+⍝ a plain character value containing that same literal text needed no
+⍝ escaping at all and was corrupted even more directly. Fixed by
+⍝ tracking real string-boundary state (mirroring
+⍝ Tokenizer::tokenize_string1()'s own one-character-lookahead rule for
+⍝ '' ): a '' is always resolved as one literal quote via lookahead
+⍝ BEFORE ever testing the marker pattern, so the marker is only ever
+⍝ recognized at a quote that is a genuine, unescaped terminator.
+⍝
+      )CLEAR
+CLEAR WS
+
+∇Z←BUGS31_6
+ Z←'a',(⎕UCS 32),'b'
+∇
+      BUGS31_6
+a b
+
+      )OUT bugs31_6
+      )CLEAR
+CLEAR WS
+      )IN bugs31_6.atf
+      2 ⎕CR 'BUGS31_6'
+BUGS31_6
+       Z←'a',(⎕UCS 32),'b'
+
+      BUGS31_6
+a b
+
+      )DROP bugs31_6.atf
+³
+      )ERASE BUGS31_6
+
+⍝ a plain character value containing the trigger text literally, with
+⍝ no ⎕UCS-worthy characters of its own at all (needs zero encoding)
+⍝
+      BUGS31_6V←',(⎕UCS 65)'
+      T←2⎕TF 'BUGS31_6V'
+      ⎕EX 'BUGS31_6V'
+1
+      2⎕TF T
+BUGS31_6V
+      BUGS31_6V
+,(⎕UCS 65)
+      )ERASE BUGS31_6V T
+
+⍝ multiple ⎕UCS runs in one value, and an escaped quote immediately
+⍝ adjacent to a ⎕UCS run (the two escaping mechanisms interacting)
+⍝
+      BUGS31_6W←(⎕UCS 8592),'mid',(⎕UCS 8594)
+      T←2⎕TF 'BUGS31_6W'
+      ⎕EX 'BUGS31_6W'
+1
+      2⎕TF T
+BUGS31_6W
+      ⎕UCS BUGS31_6W
+8592 109 105 100 8594
+
+      BUGS31_6X←'it''s',(⎕UCS 9731),'here'
+      T←2⎕TF 'BUGS31_6X'
+      ⎕EX 'BUGS31_6X'
+1
+      2⎕TF T
+BUGS31_6X
+      BUGS31_6X
+it's☃here
+
+      )ERASE BUGS31_6W BUGS31_6X T
+
+⍝ ==================================

@@ -1,9 +1,12 @@
 ⍝ ZZ37_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
       integrated_by ← { ⍵[;2] +.× ⍶ ⍵[;1] }
       * integrated_by 2 2 ⍴ ¯1 1 1 1
 3.08616127

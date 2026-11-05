@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,39 +22,28 @@
 */
 
 #include "Backtrace.hh"
+#include "Error_macros.hh"
 #include "LvalCell.hh"
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
 #include "Value.hh"
 #include "ValueHistory.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 LvalCell::LvalCell(Cell * target, Value * target_owner)
 {
    value.lval = target;
    value.pval.owner = target_owner;
    check_consistency();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 LvalCell::LvalCell(const LvalCell & other)
 {
    value.lval = other.value.lval;
    value.pval.owner = other.value.pval.owner;
    // check_consistency();   supposedly not needed, since other should be OK.
 }
-//----------------------------------------------------------------------------
-void
-LvalCell::init_other(void * other, Value &, const char * loc) const
-{
-   new (other)  LvalCell(get_lval_value(), get_cell_owner());
-}
-//----------------------------------------------------------------------------
-Cell *
-LvalCell::get_lval_value()  const
-{
-  return value.lval;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 PrintBuffer
 LvalCell::character_representation(const PrintContext & pctx) const
 {
@@ -72,13 +61,48 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_r(Unicode('='), 1);
    return pb;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+Cell *
+LvalCell::get_lval_value()  const
+{
+  return value.lval;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+LvalCell::throw_no_owner()
+{
+   MORE_ERROR() << "selective specification: the selected "
+                   "item has no single array that owns it as a "
+                   "whole (e.g. it was built by disclosing or "
+                   "enlisting more than one differently-shaped "
+                   "item, ⊃/∊/¨) and cannot be used as an "
+                   "assignment target this way";
+   DOMAIN_ERROR;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 LvalCell::check_consistency() const
 {
   if (value.lval)                      // valid owner
      {
-        const Cell * C0 = &value.pval.owner->get_cfirst();
+        // a valid (non-0) target Cell* with a 0 owner means the caller
+        // could not determine a single array owning that target -- e.g.
+        // Blake McBride, Bugs31 #2/#3: (∊⊃V)←9 / (1⊃∊V)←9, where ⊃/∊
+        // disclose/enlist a jagged nested item and the result mixes real
+        // LvalCells (each with its own, individually correct owner) with
+        // plain fill cells added to pad it rectangular -- there is no one
+        // array that owns the whole thing, so callers pass 0. Reject
+        // cleanly here (this invariant -- "a real target implies a real
+        // owner" -- is exactly what the check below assumes) rather than
+        // dereferencing owner==0 a few lines down.
+        //
+        if (value.pval.owner == 0)   throw_no_owner();
+
+        // a value with LvalCells can never be packed (try_pack() bails on
+        // any non-simple cell type), so this fetch never touches cache
+        // and C0 is always the real ravel address.
+        Cell cache;
+        const Cell * C0 = &value.pval.owner->get_cfirst(cache);
         const Cell * CN = C0 + value.pval.owner->nz_element_count();
        if (value.lval < C0 || value.lval >= CN)   // wrong owner
           {
@@ -92,5 +116,11 @@ LvalCell::check_consistency() const
      }
   else Assert(value.pval.owner == 0);   // no owner
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+LvalCell::init_other(void * other, Value &, const char * loc) const
+{
+   new (other)  LvalCell(get_lval_value(), get_cell_owner());
+}
+//════════════════════════════════════════════════════════════════════════════
 

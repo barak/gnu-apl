@@ -1,6 +1,8 @@
 ⍝ Oper_userfun.tc
 ⍝ test Primitive operators with user defined functions.
 ⍝ ----------------------------------
+⍝@ test3.
+
 
       )ERASE PLUS
 ∇Z←A PLUS B
@@ -161,13 +163,13 @@
 1 2 0
 1 2 3
 
-⍝ old GNU APL ⍤[]
-⍝
-⍝
-⍝       INDEX⍤[0] N3
-⍝ 1 0 0
-⍝ 1 2 0
-⍝ 1 2 3
+      ⍝ old GNU APL ⍤[]
+      ⍝
+      ⍝
+      ⍝       INDEX⍤[0] N3
+      ⍝ 1 0 0
+      ⍝ 1 2 0
+      ⍝ 1 2 3
 
       INDEX⍤0 N3
 1 0 0
@@ -191,14 +193,14 @@
 1 0 0
 1 0 1
 
-⍝ old GNU APL ⍤[]
-⍝
-⍝       2 2 2 ENCODE ⍤[1 0] N5
-⍝ 0 0 1
-⍝ 0 1 0
-⍝ 0 1 1
-⍝ 1 0 0
-⍝ 1 0 1
+      ⍝ old GNU APL ⍤[]
+      ⍝
+      ⍝       2 2 2 ENCODE ⍤[1 0] N5
+      ⍝ 0 0 1
+      ⍝ 0 1 0
+      ⍝ 0 1 1
+      ⍝ 1 0 0
+      ⍝ 1 0 1
 
       ⍝ Regression
       ⍝
@@ -212,6 +214,6 @@
 
 
 
-⍝ ==================================
+      ⍝ ==================================
 
 

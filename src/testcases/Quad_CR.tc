@@ -1,6 +1,8 @@
 ⍝ Quad_CR.tc
 ⍝ monadic ----------------------------------
 
+⍝@ test3.
+
       )ERASE TOTAL
 ∇Z←TOTAL R
 Z←+/R
@@ -34,7 +36,7 @@ TOTAL
 
       )ERASE TOTAL
 
-⍝ dyadic ----------------------------------
+      ⍝ dyadic ----------------------------------
 
       B←'A' 'AB' 1 (1 2) (1 2 (3 4))
 
@@ -200,6 +202,42 @@ f
 
       ¯16 ⎕CR 16 ⎕CR ''
 
+      ⍝ regression (Blake McBride, Bugs12.md #8, 2026-08-06): 17 ⎕CR
+      ⍝ (base64 -> byte vector) used to silently mis-decode malformed
+      ⍝ input instead of rejecting it: '=' (RFC 4648's pad character)
+      ⍝ was only ever checked at cols-2/cols-1 to derive the missing-byte
+      ⍝ count, never validated as *invalid* everywhere else -- so a '='
+      ⍝ as b1/b2 produced an out-of-range "byte" 256 (masked bits were
+      ⍝ dropped for b3/b4 but not b1/b2), embedded padding ('QQ==QQ==')
+      ⍝ silently decoded as zero bytes, and a stray '=' at cols-2 with a
+      ⍝ non-'=' at cols-1 (e.g. 'AA=A') silently derived the wrong
+      ⍝ output length. All four are DOMAIN ERROR now; well-formed input
+      ⍝ (tested throughout this file) is unaffected.
+      ⍝
+      ⎕UCS 17 ⎕CR '=AAA'
+DOMAIN ERROR
+      ⎕UCS 17 ⎕CR '=AAA'
+           ^  ^
+      )SIC
+
+      ⎕UCS 17 ⎕CR '===='
+DOMAIN ERROR
+      ⎕UCS 17 ⎕CR '===='
+           ^  ^
+      )SIC
+
+      ⎕UCS 17 ⎕CR 'QQ==QQ=='
+DOMAIN ERROR
+      ⎕UCS 17 ⎕CR 'QQ==QQ=='
+           ^  ^
+      )SIC
+
+      ⎕UCS 17 ⎕CR 'AA=A'
+DOMAIN ERROR
+      ⎕UCS 17 ⎕CR 'AA=A'
+           ^  ^
+      )SIC
+
       5 ⎕CR 18 ⎕CR '123∆⎕'
 313233E28886E28E95
 
@@ -297,7 +335,7 @@ A ┌2─┐ 1 ┌2──┐ ┌3────────┐
 ┗ϵ━━━━━━━━━━┛
 
 
-   30 ⎕CR 1 (2 3) (2 3⍴10+⍳6) (3 2⍴20+⍳6)
+      30 ⎕CR 1 (2 3) (2 3⍴10+⍳6) (3 2⍴20+⍳6)
  1  0  0
  0  0  0
  0  0  0
@@ -357,9 +395,9 @@ A ┌2─┐ 1 ┌2──┐ ┌3────────┐
       ¯1 ⎕CR B
 DOMAIN ERROR+
       ¯1 ⎕CR B
-      ^      ^
+      ^  ^
       )more
-A ⎕CR B with invalid A < 0
+A ⎕CR B with invalid subfunction A < 0
       →
 
       4 ⎕CR 35 ⎕CR "Hello\nWorld\n"
@@ -373,7 +411,7 @@ A ⎕CR B with invalid A < 0
 Hello
 World
 
-)erase foo
+      )erase foo
 ∇foo
 1
  2
@@ -394,7 +432,7 @@ foo
 
       )erase foo
 
-     ⍴38 ⎕CR 50
+      ⍴38 ⎕CR 50
 64 2
 
       QP←40 ⎕CR Q ← Q←40⍴0 1
@@ -407,18 +445,18 @@ foo
 Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized statement
-       1294     Z 
- 1091043329   0   
- 1224933917   2   
- 1224933917   2   
- 1376651527     ⍴ 
- 1224933917   5   
- 1376191261 6.6   
- 1124533277   7J8 
+       1294   Z 
+ 1091371009 0   
+ 1224933917 2   
+ 1224933917 2   
+ 1376651527   ⍴ 
+ 1224933917 5   
+ 1376191261 6.6 
+ 1124533277 7J8 
 
       ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
       1294
-1091043329
+1091371009
 1224933917
 1224933917
 1376651527
@@ -427,18 +465,18 @@ Z←2 2⍴5 6.6 7J8
 1124533277
 
       ⊢VALs←⍪0 1↓(⊃TOKs)           ⍝ the token values (if any)
-     Z 
-   0   
-   2   
-   2   
-     ⍴ 
-   5   
- 6.6   
-   7J8 
+   Z 
+ 0   
+ 2   
+ 2   
+   ⍴ 
+ 5   
+ 6.6 
+ 7J8 
 
       ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
  00 00 05 0E 
- 41 08 00 01 
+ 41 0D 00 01 
  49 03 02 1D 
  49 03 02 1D 
  52 0E 09 07 
@@ -448,7 +486,7 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex sigits)
 0000050E
-41080001
+410D0001
 4903021D
 4903021D
 520E0907
@@ -456,13 +494,13 @@ Z←2 2⍴5 6.6 7J8
 5207031D
 4307041D
 
-⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
-⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
-⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
-⍝     │ │ │ │   │ │   │ │
+      ⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
+      ⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
+      ⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
+      ⍝     │ │ │ │   │ │   │ │
       1 1 1 1 0 1 1 0 1 1 \ B32
 0000 05 0E
-4108 00 01
+410D 00 01
 4903 02 1D
 4903 02 1D
 520E 09 07
@@ -476,14 +514,14 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
       66830         Z 
- 1091043329         0 
+ 1091371009         0 
 
  1091503887   5   6.6 
               7J8 5   
 
       ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
      66830
-1091043329
+1091371009
 1091503887
 
       ⊢VALs←⍪0 1↓(⊃TOKs)           ⍝ the token values (if any)
@@ -495,21 +533,21 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
  00 01 05 0E 
- 41 08 00 01 
+ 41 0D 00 01 
  41 0F 07 0F 
 
       ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex digits)
 0001050E
-41080001
+410D0001
 410F070F
 
-⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
-⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
-⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
-⍝     │ │ │ │   │ │   │ │
+      ⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
+      ⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
+      ⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
+      ⍝     │ │ │ │   │ │   │ │
       1 1 1 1 0 1 1 0 1 1 \ B32
 0001 05 0E
-4108 00 01
+410D 00 01
 410F 07 0F
 
 
@@ -517,23 +555,23 @@ Z←2 2⍴5 6.6 7J8
 Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized statement
-       1294     Z 
- 1091043329   0   
- 1224933917   2   
- 1224933917   2   
- 1376651527     ⍴ 
- 1224933917   5   
- 1376191261 6.6   
- 1124533277   7J8 
+       1294   Z 
+ 1091371009 0   
+ 1224933917 2   
+ 1224933917 2   
+ 1376651527   ⍴ 
+ 1224933917 5   
+ 1376191261 6.6 
+ 1124533277 7J8 
 
       ⊢TAGs←↑¨TOKs                ⍝ the token tags (decimal)
-1294 1091043329 1224933917 1224933917 1376651527 1224933917 1376191261
+1294 1091371009 1224933917 1224933917 1376651527 1224933917 1376191261
       1124533277
 
 
-   ⍪44 ⎕CR TAGs
+      ⍪44 ⎕CR TAGs
  TOK_SYMBOL(TC_SYMBOL, TV_SYM)    
- TOK_ASSIGN(TC_ASSIGN, TV_NONE)   
+ TOK_ASSIGN1(TC_ASSIGN, TV_NONE)  
  TOK_INTEGER(TC_LIT_ITEM, TV_INT) 
  TOK_INTEGER(TC_LIT_ITEM, TV_INT) 
  TOK_F12_RHO(TC_FUN12, TV_FUN)    
@@ -542,15 +580,15 @@ Z←2 2⍴5 6.6 7J8
  TOK_COMPLEX(TC_LIT_ITEM, TV_CPX) 
 
 
-   ⍪44 ⎕CR TOKs
- TOK_SYMBOL( Z )    
- TOK_ASSIGN( ← )    
- TOK_INTEGER( 2 )   
- TOK_INTEGER( 2 )   
- TOK_F12_RHO( ⍴ )   
- TOK_INTEGER( 5 )   
- TOK_REAL( 6.6 )    
- TOK_COMPLEX( 7J8 ) 
+      ⍪44 ⎕CR TOKs
+ TOK_SYMBOL( Z )                
+ TOK_ASSIGN1( ← )               
+ TOK_INTEGER( 2 )               
+ TOK_INTEGER( 2 )               
+ TOK_F12_RHO( ⍴ )               
+ TOK_INTEGER( 5 )               
+ TOK_REAL( 6.5999999999999996 ) 
+ TOK_COMPLEX( 7J8 )             
 
 
       ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
@@ -559,23 +597,23 @@ Z←2 2⍴5 6.6 7J8
 
       ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
       66830         Z 
- 1091043329         0 
+ 1091371009         0 
 
  1091503887   5   6.6 
               7J8 5   
 
 
-     ⍪44 ⎕CR TOKs
- TOK_LSYMB( Z )                    
- TOK_ASSIGN( ← )                   
- TOK_APL_VALUE4( 2 2⍴5 6.6 7J8 5 ) 
+      ⍪44 ⎕CR TOKs
+ TOK_LSYMB( Z )                                   
+ TOK_ASSIGN1( ← )                                 
+ TOK_APL_VALUE4( 2 2⍴5 6.5999999999999996 7J8 5 ) 
 
       ⊢TAGs←↑¨TOKs                 ⍝ the token tags (decimal)
-66830 1091043329 1091503887
+66830 1091371009 1091503887
 
          ⍪44 ⎕CR TAGs
  TOK_LSYMB(TC_SYMBOL, TV_SYM)     
- TOK_ASSIGN(TC_ASSIGN, TV_NONE)   
+ TOK_ASSIGN1(TC_ASSIGN, TV_NONE)  
  TOK_APL_VALUE4(TC_VALUE, TV_VAL) 
 
 
@@ -599,23 +637,360 @@ Z←2 2⍴5 6.6 7J8
 ┃               ┗━━━━━━━━━┛┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      48 ⎕CR +⍳20
+4100
+
+      'packet_type' ⎕CR +⍳20
+4100
+
+      49 ⎕CR B
+12
+
+      'pack_threshold' ⎕CR B
+12
+
+      50 ⎕CR 0 1 15 16 255 4096
+ 0 1 F 10 FF 1000 
+
+      51 ⎕CR 0 1 15 16 255 4096
+ 0 1 f 10 ff 1000 
+
+      50 ⎕CR (⊂1 2 3),⊂10 200
+  1 2 3    A C8  
+
+      50 ⎕CR 200
+C8
+
+      50 ⎕CR 0
+0
+
+      50 ⎕CR ¯1
+FF
+
+      51 ⎕CR ¯1
+ff
+
+      50 ⎕CR ¯16
+F0
+
+      50 ⎕CR ¯200
+FF38
+
+      50 ⎕CR ¯32768
+8000
+
+      50 ⎕CR ¯1J1
+DOMAIN ERROR+
+      50 ⎕CR ¯1J1
+      ^  ^
+
+      )MORE
+50/51 ⎕CR B : B is not an integer
+      →
+
+      50 ⎕CR 1.5
+DOMAIN ERROR+
+      50 ⎕CR 1.5
+      ^  ^
+
+      )MORE
+50/51 ⎕CR B : B is not an integer
+      →
 
       ⍝ trigger a domain error if new left arguments were implemented
       ⍝ without adding a testcase for them above
       ⍝
-      48 ⎕CR B
+      54 ⎕CR B
 DOMAIN ERROR+
-      48 ⎕CR B
-      ^      ^
+      54 ⎕CR B
+      ^  ^
 
       )MORE
-A ⎕CR B with invalid A (=48)
+A ⎕CR B with invalid subfunction A (=54)
       →
+
+      ⍝ 52 ⎕CR B: byte vector -> CRC32
+      ⍝ 53 ⎕CR B: byte vector -> CRC32 as 8 uppercase hex digits
+      ⍝
+      52 ⎕CR 49 50 51 52 53 54 55 56 57
+3421780262
+
+      'crc32' ⎕CR 49 50 51 52 53 54 55 56 57
+3421780262
+
+      53 ⎕CR 49 50 51 52 53 54 55 56 57
+CBF43926
+
+      'crc32_hex' ⎕CR 49 50 51 52 53 54 55 56 57
+CBF43926
+
+      52 ⎕CR ⍬
+0
+
+      53 ⎕CR ⍬
+00000000
+
+      52 ⎕CR 256
+DOMAIN ERROR+
+      52 ⎕CR 256
+      ^  ^
+
+      )MORE
+integer 256 is too large (> 255) for a byte value
 
       ⍝ regression
       5 ⎕CR '1'
 31
 
+      ⍝ regression (Blake McBride, Bugs12.md #5, 2026-08-06): 43 ⎕CR B used
+      ⍝ to abort (Assertion failed: !value->is_simple_scalar() in
+      ⍝ next_ravel_Pointer, Value.icc:172) whenever B's parse folded to a
+      ⍝ single simple-scalar TOK_APL_VALUE token (e.g. '2', '1+2', 'A←1');
+      ⍝ next_ravel_Value() (which already handles both the simple-scalar
+      ⍝ and nested cases) is used now instead of next_ravel_Pointer().
+      ⍝
+      ⊃43 ⎕CR '2'
+1090848527 2
+
+      ⊃43 ⎕CR '1+2'
+ 1090848527 1 
+ 1342376199 + 
+ 1090848527 2 
+
+      ⊃43 ⎕CR 'A←1'
+      66830 A 
+ 1091371009 0 
+ 1090848527 1 
+
+      ⍴⊃43 ⎕CR '(2 3⍴⍳6)'
+6 2
+
+      ⍝ regression (Blake McBride, LanguageVariances.md #23, 2026-08-11):
+      ⍝ GNU APL never emits CDR type 6 (arithmetic progression vector,
+      ⍝ IBM's "APV") itself -- 11⎕CR always uses the plain per-item
+      ⍝ integer encoding, one byte cost, no wire-format surprises for
+      ⍝ other CDR consumers (confirmed against a real AP210 shared-
+      ⍝ variable round trip, which broke when GNU APL briefly did emit
+      ⍝ type 6). But GNU APL still understands type 6 on input: a hand-
+      ⍝ crafted top-level CDR record (rank 1, nelm 3, type 6, body =
+      ⍝ first=10/increment=10, i.e. IBM's "10|10דIO|⍳3") decodes to
+      ⍝ 10 20 30, not the old placeholder's wrong ⎕IO,⎕IO+1,⎕IO+2. Same
+      ⍝ check nested inside a general array (type 7), the only place a
+      ⍝ real APV sub-item could previously appear at all.
+      ⍝
+      RAW←⎕UCS 0 0 32 32 0 0 0 32 0 0 0 3 6 1 0 0 0 0 0 3 10 0 0 0 10 0 0 0 0 0 0 0
+      12 ⎕CR RAW
+10 20 30
+
+      NRAW←⎕UCS 0 0 32 32 0 0 0 64 0 0 0 1 7 1 0 0 0 0 0 1 32 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 6 1 0 0 0 0 0 3 10 0 0 0 10 0 0 0 0 0 0 0
+      ⊃12 ⎕CR NRAW
+10 20 30
+
+      )SIC
+
+
+      ⍝ regression (Bugs28 #100(h)): 43 ⎕CR (parse) of unparsable text
+      ⍝ printed its DOMAIN ERROR twice and )MORE showed a raw numeric
+      ⍝ ErrorCode. Source: the DOMAIN_ERROR inside the "if (ec)" branch
+      ⍝ of do_CR42_43's parse path used to sit INSIDE the try block
+      ⍝ that catches parser.parse()'s own exceptions, so its own throw
+      ⍝ was immediately caught by that same catch clause, which then
+      ⍝ built and threw a second DOMAIN ERROR describing the first.
+      ⍝
+      43 ⎕CR '(('
+DOMAIN ERROR+
+      43 ⎕CR '(('
+      ^  ^
+
+      )MORE
+the parser returned error code: Unbalanced left parenthesis
+      )SIC
+
+      ⍝ A ⎕CR[X] B: user-defined boxing styles ----------------------------
+      ⍝
+      ⍝ A ⎕CR[⍬] B returns the 89 frame characters of boxing style A, and
+      ⍝ A ⎕CR[X] B formats B like A ⎕CR B, but with the leading frame
+      ⍝ characters of style A replaced by X. With X←A ⎕CR[⍬] B, both must
+      ⍝ give the same result (this also caught 20-22 mapped to the wrong
+      ⍝ styles).
+      ⍝
+      V←1 'ab' (2 2⍴⍳4)
+      {(⍵ ⎕CR V)≡⍵ ⎕CR[⍵ ⎕CR[⍬] 0] V}¨0 1 2 3 4 7 8 9 20 21 22 23 24 25 46 47
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+
+
+      F←8 ⎕CR[⍬] 0
+      ⍴F
+89
+
+
+
+      ⍝ the line-drawing character with legs N E S W is at 1+3⊥N E S W
+      ⍝
+      F[1+3⊥⍉4 4⍴0 1 1 0  0 0 1 1  1 1 0 0  1 0 0 1]
+┌┐└┘
+
+
+
+      7↑81↓F
+↓→∼+ϵ⊖⌽
+
+
+
+      7↑81↓20 ⎕CR[⍬] 0
+##∼+ϵ⊖⌽
+
+
+
+      (21 ⎕CR[⍬] 0)[13]
+┌
+
+
+
+      (22 ⎕CR[⍬] 0)[13 25]
+┏╔
+
+
+
+      (0 ⎕CR[⍬] 0)≡89⍴' '
+1
+
+
+
+      ⍝ the 12 positions used for boxing (corners and lines of style 1 and 2)
+      ⍝
+      (7 ⎕CR[⍬] 0)[13 5 37 29 11 31]
+┌┐└┘─│
+
+
+
+      (9 ⎕CR[⍬] 0)[25 9 73 57 21 61]
+╔╗╚╝═║
+
+
+
+      ⍝ rounded corners
+      ⍝
+      F[1+3⊥⍉4 4⍴0 1 1 0  0 0 1 1  1 1 0 0  1 0 0 1]←'╭╮╰╯'
+      8 ⎕CR[F] V
+╭→───────────╮
+│1 ╭→─╮ ╭→──╮│
+│  │ab│ ↓1 2││
+│  ╰──╯ │3 4││
+│       ╰∼──╯│
+╰ϵ───────────╯
+
+
+
+      ⍝ style 29 quotes strings instead of framing them: no axis form
+      ⍝ (Bugs37 #58)
+      ⍝
+      29 ⎕CR[F] V
+DOMAIN ERROR+
+      29 ⎕CR[F]V
+      ^  ^
+
+
+
+      )MORE
+A ⎕CR[X] B: style 29 (quoted strings) has no user-defined frame characters
+
+
+
+      )SIC
+
+
+
+      ⍝ no decorators
+      ⍝
+      F[81+⍳7]←' '      ⍝ positions 82 ... 88
+      8 ⎕CR[F] V
+╭────────────╮
+│1 ╭──╮ ╭───╮│
+│  │ab│ │1 2││
+│  ╰──╯ │3 4││
+│       ╰───╯│
+╰────────────╯
+
+
+
+      ⍝ axis lengths instead of ↓ and →
+      ⍝
+      F[82 83]←'#'
+      8 ⎕CR[F] V
+╭3───────────╮
+│1 ╭2─╮ ╭2──╮│
+│  │ab│ 21 2││
+│  ╰──╯ │3 4││
+│       ╰───╯│
+╰────────────╯
+
+
+
+      ⍝ parentheses instead of frames
+      ⍝
+      F[89]←'('
+      8 ⎕CR[F] V
+⎛1 (ab) ⎛1 2⎞⎞
+⎝       ⎝3 4⎠⎠
+
+
+
+      ⍝ the double outer frame of 9 ⎕CR for 3 ⎕CR
+      ⍝
+      3 ⎕CR[9 ⎕CR[⍬] 0] V
+╔════════════╗
+║1 ┏→━┓ ┏→━━┓║
+║  ┃ab┃ ↓1 2┃║
+║  ┗━━┛ ┃3 4┃║
+║       ┗∼━━┛║
+╚════════════╝
+
+
+
+      ⍝ errors
+      ⍝
+      5 ⎕CR[⍬] V
+DOMAIN ERROR+
+      5 ⎕CR[⍬]V
+      ^ ^
+
+      )MORE
+A ⎕CR[X] B with invalid subfunction A (=5)
+      )SIC
+
+
+
+      4 ⎕CR[2 2⍴' '] V
+RANK ERROR+
+      4 ⎕CR[2 2⍴' ']V
+      ^ ^
+
+      )MORE
+A ⎕CR[X] B with non-vector X
+      )SIC
+
+
+
+      4 ⎕CR[90⍴' '] V
+LENGTH ERROR+
+      4 ⎕CR[90⍴' ']V
+      ^ ^
+
+      )MORE
+A ⎕CR[X] B with too long X (max. is 89)
+      )SIC
+
+
+
+      4 ⎕CR[1 2] V
+DOMAIN ERROR+
+      4 ⎕CR[1 2]V
+      ^ ^
+
+      )MORE
+Bad cell type 16 aka. INTEGER when expecting a CHARACTER cell
       )SIC
 
 
@@ -625,5 +1000,5 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-⍝ ==================================
+      ⍝ ==================================
 

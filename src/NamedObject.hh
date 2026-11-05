@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,10 +32,12 @@ class Symbol;
 class UCS_string;
 class Value;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The possible values returned by \b ⎕NC.
 enum NameClass
 {
+  // NC atoms...
+  //
   NC_INVALID          =  0x0100,   ///< invalid name class.
   NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
   NC_LABEL            =  0x0401,   ///< Label.
@@ -47,15 +49,18 @@ enum NameClass
   NC_case_mask        =  0x00FF,   ///< almost ⎕NC
   NC_bool_mask        =  0xFF00,   ///< for fast selection
 
-  /// name of a function or operator
-  NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
+  // NC class bitmaps...
 
-   // NC class bitmaps...
+  /// name of a function or operator
+  NC_FUN_OPER         = NC_bool_mask & (NC_FUNCTION | NC_OPERATOR),
+
+  /// name that can become a defined function
+  NC_DEFINABLE        = NC_bool_mask & (NC_UNUSED_USER_NAME | NC_FUN_OPER),
 
   /// name allowed left of ←
   NC_left             = (NC_VARIABLE         |
-                         NC_UNUSED_USER_NAME |
                          NC_SYSTEM_VAR       |
+                         NC_UNUSED_USER_NAME |
                          NC_INVALID          //  ⎕, ⍞, ⎕xx
                         ) & NC_bool_mask,
 
@@ -71,7 +76,7 @@ enum NameClass
   /// name whose class may be changed
   NC_unknown          = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
  A named object is something with a name.
  The name can be user defined or system defined.
@@ -90,33 +95,34 @@ class NamedObject
 {
 public:
    /// constructor from Id
+   /// @param i the Id to assign to this named object
    NamedObject(Id i)
    : id(i)
    {}
-
-   /// return the name of the named object
-   virtual UCS_string get_name() const
-      { return ID::get_name_UCS(id); }
-
-   /// return the function for this Id (if any) or 0 if this Id does
-   /// (currently) represent a function.
-   virtual const Function * get_function() const  { return 0; }
-
-   /// return the symbol for this user defined symbol (if any) or 0 if this Id
-   /// refers to a system name
-   virtual Symbol * get_symbol()   { return 0; }
-
-   /// return the symbol for this user defined symbol (if any) or 0 if this Id
-   /// refers to a system name
-   virtual const Symbol * get_symbol() const  { return 0; }
 
    /// return the Id of this object (ID_USER_SYMBOL for user defined objects)
    Id get_Id() const
       { return id; }
 
+   /// return the function for this Id (if any) or 0 if this Id does
+   /// (currently) represent a function.
+   virtual const Function * get_function() const  { return 0; }
+
+   /// return the name of the named object
+   virtual UCS_string get_name() const
+      { return ID::get_name_UCS(id); }
+
+   /// return the symbol for this user defined symbol (if any) or 0 if this Id
+   /// refers to a system name
+   virtual const Symbol * get_symbol() const  { return 0; }
+
    /// return true, iff this object is user-defined
    bool is_user_defined() const
       { return id == ID_USER_SYMBOL; }
+
+   /// return the symbol for this user defined symbol (if any) or 0 if this Id
+   /// refers to a system name
+   virtual Symbol * get_symbol()   { return 0; }
 
    /// Get current \b NameClass of \b this name.
    NameClass get_NC() const;
@@ -124,5 +130,6 @@ public:
    /// the object's id
    const Id id;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __NAMED_OBJECT_HH_DEFINED__

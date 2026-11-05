@@ -47,6 +47,45 @@
 140
 320
 
-   )ERASE cA cB mA mB
-   )CHECK BRIEF
+      ⍝ shape mismatch (Roy Tobin TR, Savannah SVN 2116 regression fix):
+      ⍝ A∘B has no requirement that cols A = rows B; unlike A +.× B, the
+      ⍝ longer side is implicitly truncated to len←cols_A⌊rows_B, which
+      ⍝ is the same as 0-padding the shorter side before A +.× B.
+      ⊢nA←(2 2⍴⍳4)
+1 2
+3 4
+
+      ⊢nB←(3 4⍴⍳12)
+1  2  3  4
+5  6  7  8
+9 10 11 12
+
+      ⍝ cols nA (2) < rows nB (3): nB's 3rd row is implicitly dropped
+      nA∘nB
+11 14 17 20
+23 30 37 44
+
+      (nA∘nB) = ((2 2⍴1 2 3 4) +.× (2↑[1]nB))
+1 1 1 1
+1 1 1 1
+
+      ⊢pA←(2 3⍴⍳6)
+1 2 3
+4 5 6
+
+      ⊢pB←(2 4⍴⍳8)
+1 2 3 4
+5 6 7 8
+
+      ⍝ cols pA (3) > rows pB (2): pA's 3rd column is implicitly dropped
+      pA∘pB
+11 14 17 20
+29 38 47 56
+
+      (pA∘pB) = ((2↑[2]pA) +.× pB)
+1 1 1 1
+1 1 1 1
+
+      )ERASE cA cB mA mB nA nB pA pB
+      )CHECK BRIEF
 

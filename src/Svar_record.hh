@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -60,9 +60,9 @@ enum Svar_Control
    NO_SVAR_CONTROL    = 0,      ///< 0 0 0 0: everything allowed
    ALL_SVAR_CONTROLS  = SET_BY_OFF | SET_BY_ACC | USE_BY_OFF | USE_BY_ACC,
    SET_BY_1           = SET_BY_OFF,   ///< if 1 is the offering partner
-   SET_BY_2           = SET_BY_ACC,   ///< if 1 is the offering partner
+   SET_BY_2           = SET_BY_ACC,   ///< if 2 is the accepting partner
    USE_BY_1           = USE_BY_OFF,   ///< if 1 is the offering partner
-   USE_BY_2           = USE_BY_ACC,   ///< if 1 is the offering partner
+   USE_BY_2           = USE_BY_ACC,   ///< if 2 is the accepting partner
 };
 
 /// the state of the shared variable
@@ -95,6 +95,7 @@ enum Svar_event
 };
 
 /// return the name for event \b ev
+/// @param ev the shared-variable event
 extern const char * event_name(Svar_event ev);
 
 /// SV_key uniquely identifies a shared variable. It is created when the
@@ -103,12 +104,12 @@ extern const char * event_name(Svar_event ev);
 /// of the partner.
 typedef uint64_t SV_key;
 
-//----------------------------------------------------------------------------
-enum TCP_socket
+//────────────────────────────────────────────────────────────────────────────
+enum TCP_socket : int
 {
    NO_TCP_SOCKET = -1
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// one of the two partners of a shared vaiable
 struct Svar_partner
 {
@@ -122,6 +123,8 @@ struct Svar_partner
    {}
 
    /// constructor: specific share partner
+   /// @param _id processor identification triple
+   /// @param _tcp_fd TCP socket towards this partner
    Svar_partner(const AP_num3 _id, TCP_socket _tcp_fd)
    : id(_id),
      tcp_fd(_tcp_fd),
@@ -131,6 +134,7 @@ struct Svar_partner
    {}
 
    /// copy other to \n this
+   /// @param other partner to copy from
    void operator =(const Svar_partner & other)
       {
         id      = other.id;
@@ -149,6 +153,7 @@ struct Svar_partner
       { return active; }
 
    /// set the control bits of this partner (as seen by the offering partner)
+   /// @param ctl control value to set
    void set_control(Svar_Control ctl)
       { flags = ctl; }
 
@@ -158,6 +163,7 @@ struct Svar_partner
       { return Svar_Control(flags); }
 
    /// print this partner
+   /// @param out output stream
    ostream & print(ostream & out) const;
 
    /// the processor
@@ -177,20 +183,32 @@ protected:
    /// true if this is a valid (connected) partner
    bool active;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 extern TCP_socket get_TCP_for_key(SV_key key);
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 /// one  shared variable.
 struct Svar_record
 {
-   /// a key that uniquely identifies this variable
-   SV_key key;
-
    /// true if this is a valid entry.
    bool valid() const   { return get_coupling() != NO_COUPLING; }
+
+   /// return the coupling of the variable
+   SV_Coupling get_coupling() const
+       { int ret = 0;   if (offering.is_active())    ++ret;
+                        if (accepting.is_active())   ++ret;
+         return SV_Coupling(ret); }
+
+   /// return the name of the variable, or 0 if fetching it has failed
+   const uint32_t * get_svar_name() const
+      { return *varname ? varname : 0; }
+
+   /// print the name of this variable
+   /// @param out output stream
+   ostream & print_name(ostream & out) const
+      { return print_name(out, varname, 0); }
 
    /// invalidate this entry
    void clear()
@@ -216,50 +234,50 @@ struct Svar_record
    bool is_ws_to_ws() const;
 
    /// complain about \b proc
+   /// @param function name of the calling function
+   /// @param ap processor identification that caused the complaint
    void bad_proc(const char * function, const AP_num3 & ap) const;
 
    /// return true if UCS_other matches varname (could be a wildcard match)
+   /// @param UCS_other UCS name to match against varname
    bool match_name(const uint32_t * UCS_other) const;
-
-   /// return the coupling of the variable
-   SV_Coupling get_coupling() const
-       { int ret = 0;   if (offering.is_active())    ++ret;
-                        if (accepting.is_active())   ++ret;
-         return SV_Coupling(ret); }
-
 
    /// return the control bits of this variable
    Svar_Control get_control() const;
 
    /// set the control bits of this variable
+   /// @param ctl new control value
    void set_control(Svar_Control ctl);
 
    /// return the state of this variable
    Svar_state get_state() const;
 
-   /// return the name of the variable, or 0 if fetching it has failed
-   const uint32_t * get_svar_name() const
-      { return *varname ? varname : 0; }
-
    /// update the state when using or setting this variable, and clear events
+   /// @param used true if the variable is being used (read), false if set (written)
+   /// @param loc caller location for diagnostics
    void set_state(bool used, const char * loc);
 
    /// return true iff the calling partner may use the current value
+   /// @param attempt retry count for contention handling
    bool may_use(int attempt);
 
    /// return true iff the calling partner may set the current value
+   /// @param attempt retry count for contention handling
    bool may_set(int attempt);
 
    /// print the variable
+   /// @param out output stream
    void print(ostream & out) const;
 
    /// print a name
+   /// @param out output stream
+   /// @param name UCS name to print
+   /// @param len maximum characters to print
    static ostream & print_name(ostream & out, const uint32_t * name,
                                int len = MAX_SVAR_NAMELEN);
 
-   /// print the name of this variable
-   ostream & print_name(ostream & out) const
-      { return print_name(out, varname, 0); }
+   /// a key that uniquely identifies this variable
+   SV_key key;
 
    /// name of the offered variable (UCS), 0-terminated
    uint32_t varname[MAX_SVAR_NAMELEN + 1];
@@ -273,7 +291,7 @@ struct Svar_record
    /// state of this variable
    Svar_state state;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #if cfg_APSERVER_TRANSPORT == 1
    enum {  ABSTRACT_OFFSET = 1 };

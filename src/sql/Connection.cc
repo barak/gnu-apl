@@ -22,6 +22,7 @@
 */
 
 #include "Connection.hh"
+//════════════════════════════════════════════════════════════════════════════
 
 const string Connection::replace_bind_args( const string &sql )
 {
@@ -38,3 +39,4 @@ const string Connection::replace_bind_args( const string &sql )
     }
     return out.str();
 }
+//════════════════════════════════════════════════════════════════════════════

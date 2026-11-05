@@ -21,9 +21,7 @@
 /** @file
 */
 
-#ifndef _GNU_SOURCE
-# define _GNU_SOURCE
-#endif
+#include "config.h"
 
 #include <pthread.h>
 
@@ -31,18 +29,45 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <signal.h>
+#include <stdlib.h>   // for atexit(), see below
 #include <string.h>
-#include <termios.h>
-
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <sys/resource.h>
 #include <sys/stat.h>
+
+#ifdef __linux__
+# include <sys/prctl.h>   // for PR_SET_PTRACER, see main() below
+#endif
+
+#if HAVE_EXECINFO_H
+# include <execinfo.h>    // for backtrace() warm-up call, see below
+#endif
+
+#ifndef SIGHUP   // MINGW
+# define SIGHUP 1
+#endif
+
+#if HAVE_TERMIOS_H
+# include <termios.h>
+#endif // HAVE_TERMIOS_H
+
+#if HAVE_NETINET_IN_H
+# include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
 #include <sys/types.h>
 
-#include "Backtrace.hh"   // for init_DWARF()
+#if HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
+
+
+#include "Sys.hh"
+#include "Backtrace.hh"
+#include "Cmd_DIAG.hh"
 #include "Command.hh"
+#include "CrashDump.hh"
 #include "Common.hh"      // #includes config.h
 #include "IO_Files.hh"
 #include "LibPaths.hh"
@@ -61,6 +86,33 @@
 # include <libelfin/elf/elf++.hh>
 #endif
 
+#if MINGW_SRC
+typedef int socklen_t;
+#define sigaction(x,y,z)
+#define setenv(x,y,z)
+#define fork() pid_t(1);
+struct sigaction
+{
+void (*sa_handler)(int);
+};
+#else  // ! MINGW_SRC
+static struct sigaction old_control_C_action;     // new ^C handler
+static struct sigaction old_HUP_action;           // new HUP  handler
+static struct sigaction old_TERM_action;          // new TERM handler
+static struct sigaction old_USR1_action;          // new USR1 handler
+static struct sigaction old_WINCH_action;         // new WINCH handler
+#endif
+
+static struct sigaction new_control_C_action;   // new ^C handler
+static struct sigaction new_HUP_action;         // new HUP handler
+static struct sigaction new_TERM_action;        // new TERM handler
+static struct sigaction new_USR1_action;        // new USR1 handler
+static struct sigaction new_WINCH_action;       // new WINCH handler
+
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 /** \mainpage GNU APL
 
    GNU APL is a free interpreter for the programming language APL.
@@ -76,52 +128,7 @@
 /// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
-//----------------------------------------------------------------------------
-
-/// old sigaction argument for ^C
-static struct sigaction old_control_C_action;
-
-/// new sigaction argument for ^C
-static struct sigaction new_control_C_action;
-
-//----------------------------------------------------------------------------
-/// old sigaction argument for segfaults
-static struct sigaction old_SEGV_action;
-
-/// new sigaction argument for segfaults
-static struct sigaction new_SEGV_action;
-
-/// signal handler for segfaults
-static void
-signal_SEGV_handler(int)
-{
-   CERR << "\n\n===================================================\n"
-           "SEGMENTATION FAULT" << endl;
-
-#if PARALLEL_ENABLED
-   CERR << "thread: " << reinterpret_cast<const void *>(pthread_self()) << endl;
-   Thread_context::print_all(CERR);
-#endif // PARALLEL_ENABLED
-
-   BACKTRACE
-
-   CERR << "====================================================\n";
-
-   // count errors
-   IO_Files::assert_error();
-
-   // restore terminal setting and
-   LineInput::restore_termios();
-
-   Command::cmd_OFF(3);
-}
-//----------------------------------------------------------------------------
-/// old sigaction argument for SIGWINCH
-static struct sigaction old_WINCH_action;
-
-/// new sigaction argument for SIGWINCH
-static struct sigaction new_WINCH_action;
-
+//════════════════════════════════════════════════════════════════════════════
 /// signal handler for SIGWINCH
 static void
 signal_WINCH_handler(int)
@@ -158,26 +165,14 @@ struct winsize wsize;
    // just return if we don't have ioctl TIOCGWINSZ
    return;
 }
-//----------------------------------------------------------------------------
-/// old sigaction argument for SIGUSR1
-static struct sigaction old_USR1_action;
-
-/// new sigaction argument for SIGUSR1
-static struct sigaction new_USR1_action;
-
+//════════════════════════════════════════════════════════════════════════════
 /// signal handler for SIGUSR1
 static void
 signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-//----------------------------------------------------------------------------
-/// old sigaction argument for SIGTERM
-static struct sigaction old_TERM_action;
-
-/// new sigaction argument for SIGTERM
-static struct sigaction new_TERM_action;
-
+//════════════════════════════════════════════════════════════════════════════
 /// signal handler for SIGTERM
 static void
 signal_TERM_handler(int)
@@ -186,7 +181,7 @@ signal_TERM_handler(int)
    sigaction(SIGTERM, &old_TERM_action, 0);
    raise(SIGTERM);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 #if PARALLEL_ENABLED
 /// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
@@ -202,13 +197,7 @@ control_BSL(int sig)
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
-//----------------------------------------------------------------------------
-/// old sigaction argument for SIGHUP
-static struct sigaction old_HUP_action;
-
-/// new sigaction argument for SIGHUP
-static struct sigaction new_HUP_action;
-
+//════════════════════════════════════════════════════════════════════════════
 /// new signal handler for SIGHUP
 static void
 signal_HUP_handler(int)
@@ -217,15 +206,27 @@ signal_HUP_handler(int)
    sigaction(SIGHUP, &old_HUP_action, 0);
    raise(SIGHUP);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0, Silence silence)
 {
    if (silence == NO_BANNER)   return;
+
+   // Apply the configured output color (e.g. black-on-white) to the banner.
+   // We deliberately do NOT write the banner through COUT: COUT also drives
+   // the .tc testcase comparison machinery (DiffOut), which is not yet
+   // initialized this early at startup (no testcase report file is open
+   // yet), and routing the banner through it corrupts test-mode output
+   // comparison for the rest of the run.
+   //
+   Output::set_color_mode(Output::COLM_OUTPUT);
+
    if (silence == BRIEF_BANNER)
       {
-        out << "GNU APL version " << build_tag[1] << endl;
+        out << "GNU APL version " << build_tag[1];
+        if (Output::color_enabled())   out << Output::clear_EOL;
+        out << endl;
         return;
       }
 
@@ -253,7 +254,7 @@ const char * lines[] =
   c2                                                                      ,
   ""                                                                      ,
   "This program is free software, and you are welcome to redistribute it" ,
-  "according to the GNU Public License (GPL) version 3 or later."         ,
+  "according to the GNU General Public License (GPL) version 3 or later."         ,
   ""                                                                      ,
 };
 
@@ -278,10 +279,16 @@ const int left_pad = (80 - len)/2;
               loop(p, pad)   out << " ";
               out << cl;
             }
-         out<< endl;
+         // extend the background color to the end of the line. Without it,
+         // only the characters written get the color, unless the terminal
+         // scrolls (Linux terminals then fill the new line with the current
+         // background, macOS Terminal does not).
+         if (Output::color_enabled())   out << Output::clear_EOL;
+         out << endl;
        }
+
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
 /// port UserPreferences::uprefs.tcp_port on localhost
 void
@@ -305,8 +312,8 @@ sockaddr_in local;
    // fix bind() error when listening socket is openend too quickly
    {
      const int yes = 1;
-     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
-                     &yes, sizeof(yes)) < 0)
+     if (sys_setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
+                        &yes, sizeof(yes)) < 0)
         {
           perror("setsockopt(SO_REUSEADDR) failed");
         }
@@ -363,6 +370,7 @@ sockaddr_in local;
 
          if (fork_result)   // parent (server)
             {
+              sys_auto_reap(fork_result);   // nobody waits for the client
               close(connection);
               continue;
             }
@@ -377,7 +385,7 @@ sockaddr_in local;
          return;
        }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// initialize the interpreter
 int
 init_apl(const std::vector<const char *> & args)
@@ -404,29 +412,49 @@ const bool log_startup =
    memset(&new_control_C_action, 0, sizeof(struct sigaction));
    memset(&new_WINCH_action,     0, sizeof(struct sigaction));
    memset(&new_USR1_action,      0, sizeof(struct sigaction));
-   memset(&new_SEGV_action,      0, sizeof(struct sigaction));
    memset(&new_TERM_action,      0, sizeof(struct sigaction));
    memset(&new_HUP_action,       0, sizeof(struct sigaction));
 
    new_control_C_action.sa_handler = &InterruptContext::control_C;
    new_WINCH_action    .sa_handler = &signal_WINCH_handler;
    new_USR1_action     .sa_handler = &signal_USR1_handler;
-   new_SEGV_action     .sa_handler = &signal_SEGV_handler;
    new_TERM_action     .sa_handler = &signal_TERM_handler;
    new_HUP_action      .sa_handler = &signal_HUP_handler;
 
+#if HAVE_EXECINFO_H
+   // prime backtrace(): its very first call ever may itself allocate
+   // (unwind tables etc.); doing that once here, in normal startup code,
+   // means CrashDump::crash_handler()'s later call (via
+   // Backtrace::show_signal_safe()) never has to.
+   { void * warmup[1]; backtrace(warmup, 1); }
+#endif
+
+   // Output::mark_CERR_unsafe() must run before any static (global)
+   // destructor does -- including CERR's own -- or get_CERR() can still
+   // believe CERR is safe to use after it no longer is (see Output.hh for
+   // the exact destruction-order gap this closes). atexit() functions
+   // registered here, after every global's constructor has already run,
+   // are guaranteed by the standard to run before any of those globals'
+   // destructors, regardless of the (otherwise unspecified) order those
+   // destructors run in -- exactly the guarantee this needs.
+   atexit(&Output::mark_CERR_unsafe);
+
    sigaction(SIGINT,   &new_control_C_action, &old_control_C_action);
    sigaction(SIGUSR1,  &new_USR1_action,      &old_USR1_action);
-   sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
+   CrashDump::init();   // SIGSEGV, SIGBUS, SIGFPE, SIGILL, and SIGABRT
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
-   signal(SIGCHLD, SIG_IGN);   // do not create zombies
 
+#if ! MINGW_SRC
+   sys_init_SIGCHLD();   // reap registered children (see Sys.hh)
+   signal(SIGPIPE, SIG_IGN);   // APserver TCP socket may close before APL writes to it
+#endif // ! MINGW_SRC
+
+const UserPreferences & uprefs = UserPreferences::uprefs;    
 #if HAVE_IOCTL_TIOCGWINSZ
    // Enable the ability to change ⎕PW on window resize only if the
    // platform supports ioctl TIOCGWINSZ
    //
-const UserPreferences & uprefs = UserPreferences::uprefs;    
    if (uprefs.WINCH_sets_pw)
       {
         // IF WINCH_sets_pw preference is enabled, set up a handler for the
@@ -464,10 +492,12 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    if (uprefs.CPU_limit_secs)
       {
+#if ! MINGW_SRC
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
         rl.rlim_cur = UserPreferences::uprefs.CPU_limit_secs;
         setrlimit(RLIMIT_CPU, &rl);
+#endif // ! MINGW_SRC
       }
 
    if (UserPreferences::uprefs.emacs_mode)
@@ -537,6 +567,22 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    init_modules2(log_startup);
 
+   // --status: show the optional features (after the attempt to
+   // connect to APserver above) and exit
+   //
+   if (uprefs.show_status)
+      {
+        Cmd_DIAG::cmd_STATUS(cout);
+        cleanup(true);
+        exit(0);   // (returning 0 from init_apl() would start a session)
+      }
+
+   // enable colors (if wanted) before show_welcome() so that the banner
+   // below is colored too, instead of falling back to the console's
+   // native/default colors.
+   //
+   if (uprefs.do_Color)   Output::toggle_color(U"ON");
+
    show_welcome(cout, args[0], uprefs.silence);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
@@ -548,8 +594,6 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
         cleanup(true);
         return 8;
       }
-
-   if (uprefs.do_Color)   Output::toggle_color(U"ON");
 
    if (uprefs.latent_expression.size())
       {
@@ -613,18 +657,48 @@ const UserPreferences & uprefs = UserPreferences::uprefs;
 
    Quad_TZ::compute_offset();
 
-   // we allocate a mmap'ed dwarf object beforhand so that we do not need
-   // to create one when, as often, a WS_FULL is thrown.
-   //
-   init_DWARF(LibPaths::get_APL_bin_path(), LibPaths::get_APL_bin_name());
-
    return 0;   // OK.
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// dito.
 int
 main(int argc, const char *argv[])
 {
+#if MINGW_SRC
+   // Tell the Windows console to interpret our output bytes as UTF-8.
+   // The source file is saved as UTF-8, therefore e.g. the character literals
+   // "∇" is emitted as the byte sequence E2 88 87 by the compiler;
+   // CP_UTF8 makes cmd.exe render it correctly (given a Unicode-capable font).
+   //
+   SetConsoleOutputCP(CP_UTF8);
+   SetConsoleCP(CP_UTF8);         // input: deliver AltGr/keyboard-layout chars as UTF-8
+
+   // Winsock must be initialised before any socket() call.  Without this,
+   // socket() returns WSANOTINITIALISED and Svar_DB prints a spurious
+   // "socket(AF_INET...) failed" error before the banner.
+   //
+   { WSADATA wsa; WSAStartup(MAKEWORD(2, 2), &wsa); }
+#endif
+//════════════════════════════════════════════════════════════════════════════
+
+#ifdef __linux__
+   // Allow any OTHER process owned by this user to ptrace-attach to this
+   // one (e.g. 'gdb -p <pid>'), overriding the Yama LSM's ptrace_scope=1
+   // default (Ubuntu/Debian since ~10.10), which otherwise only allows a
+   // real parent to attach to its own child -- confirmed empirically to
+   // block a plain 'gdb -p <pid>' from an unrelated sibling process
+   // outright ("Could not attach to process") without this. Needed so
+   // Automated_Test_Report.sh's run_apl_hang_safe() can get a live
+   // backtrace of a genuinely hung run without ever sending it a signal
+   // (^C/SIGINT included) that this process's own signal handlers would
+   // see and act on -- exactly the kind of unrelated interference a
+   // hang investigation should avoid. Harmless if nothing ever tries to
+   // attach; a no-op under a stricter ptrace_scope (2 or 3) or as
+   // non-root there, and this whole block does not exist on non-Linux
+   // builds.
+   prctl(PR_SET_PTRACER, PR_SET_PTRACER_ANY, 0, 0, 0);
+#endif
+
 std::vector<const char *> args(argc);
    loop(a, argc)   args[a] = argv[a];
    if (const int ret = init_apl(args))   return ret;
@@ -637,12 +711,37 @@ std::vector<const char *> args(argc);
               const UTF8_string expr_utf(expr);
               UCS_string expr_ucs(expr_utf);
               try
-                 { Command::process_line(expr_ucs, 0); }
-              catch (...)
+                 {
+                   Command::process_line(expr_ucs, 0);
+                   // process_line() does not throw for an ordinary APL
+                   // error (SYNTAX ERROR, VALUE ERROR, a user ⎕ES, ...):
+                   // parse errors are caught and printed inside
+                   // Command::do_APL_expression() itself, and run-time
+                   // errors are settled by the SI as a TOK_ERROR result
+                   // there too, so this try/catch alone only ever saw
+                   // errors thrown from OUTSIDE process_line() (e.g. the
+                   // ∇ editor) -- letting --eval exit 0 after a failed
+                   // expression, indistinguishable from success to a
+                   // calling script. See Bugs27 #55.
+                   //
+                   if (Command::last_expression_failed())
+                      {
+                        CERR << "*** --eval '" << expr << "' failed.";
+                        Command::cmd_OFF(6);
+                      }
+                 }
+              catch (Error &)
                  {
                    CERR << "*** --eval '" << expr << "' failed.";
                    Command::cmd_OFF(6);
                  }
+              catch (std::bad_alloc &)
+                 {
+                   CERR << "*** --eval '" << expr << "' failed.";
+                   Command::cmd_OFF(6);
+                 }
+              catch (...)
+                 { FIXME; }
             }
         Command::cmd_OFF(0);
         return 0;
@@ -654,6 +753,11 @@ std::vector<const char *> args(argc);
 
    for (const bool exit_on_error = IO_Files::exit_on_error();;)
        {
+         // a crash (see CrashDump.hh) continues here
+         if (const int sig = sigsetjmp(CrashDump::recovery_point, 1))
+            CrashDump::recover(sig);
+         CrashDump::recovery_point_valid = 1;
+
          const Token tok = Workspace::immediate_execution(exit_on_error);
          if (tok.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
        }
@@ -666,4 +770,4 @@ int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

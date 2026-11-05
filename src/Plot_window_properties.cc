@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 /// a shared buffer for SPRINTF of various error texts.
 static char tmp_error[80];
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
@@ -67,10 +67,15 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
       terminal_rows = value;
    if (const int value = UserPreferences::uprefs.plot_ASCII_columns)
       terminal_cols = value;
-   {
-     const int value = UserPreferences::uprefs.plot_ASCII_background;
-     if (value != -1)   canvas_color = value;
-   }
+
+   // plot_ASCII_background is deliberately NOT applied to canvas_color
+   // here: canvas_color is shared by every driver (GTK, XCB, ASCII), but
+   // this preference is documented as -- and named for -- the ASCII
+   // driver only. Applying it unconditionally at construction time made
+   // it leak into GTK/XCB plots too, turning their background blue for
+   // anyone who had it set (e.g. in ~/.config/gnu-apl/preferences) for
+   // ASCII plots alone. Plot_ascii.cc's own ascii_canvas_color() applies
+   // it instead, at the one place it is actually documented to apply.
 
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl
@@ -94,7 +99,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 
    update(verbosity);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Plot_window_properties::~Plot_window_properties()
 
 {
@@ -102,18 +107,14 @@ Plot_window_properties::~Plot_window_properties()
       CERR << "~Plot_window_properties(): deleting plot_data" << endl;
 
    delete &plot_data;
+
+   // line_properties (and every Plot_line_properties it points to) was
+   // never freed here -- a leak growing by one array + line_count objects
+   // on every ⎕PLOT. The 0-terminated iteration mirrors print() above.
+   for (Plot_line_properties ** lp = line_properties; *lp; ++lp)   delete *lp;
+   delete[] line_properties;
 }
-//----------------------------------------------------------------------------
-void
-Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
-{
-   // pa_width and pa_height are the size of the plot area (without borders).
-   //
-   pa_width  = width  - pa_border_L - origin_X - pa_border_R;
-   pa_height = height - pa_border_T - origin_Y - pa_border_B;
-   update(0);
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 bool
 Plot_window_properties::update(int verbosity)
@@ -181,6 +182,15 @@ Plot_window_properties::update(int verbosity)
 double delta_X = max_X - min_X;
 double delta_Y = max_Y - min_Y;
 double delta_Z = max_Z - min_Z;
+
+   if (!isfinite(delta_X) || !isfinite(delta_Y) || !isfinite(delta_Z))
+      {
+        MORE_ERROR() << "non-finite X/Y/Z range in data B of A ⎕PLOT B "
+                        "(delta_X=" << delta_X << " delta_Y=" << delta_Y
+                     << " delta_Z=" << delta_Z << ")";
+        return true;   // error
+      }
+
 const double orig_len = sqrt(origin_X*origin_X + origin_Y*origin_Y);
 
    // first approximation for value → pixel factor
@@ -272,7 +282,28 @@ const int max_Zi = ceil(max_Z / tile_Z);
 
    return false;   // OK
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
+{
+   // pa_width and pa_height are the size of the plot area (without borders).
+   //
+   pa_width  = width  - pa_border_L - origin_X - pa_border_R;
+   pa_height = height - pa_border_T - origin_Y - pa_border_B;
+   update(0);
+}
+//────────────────────────────────────────────────────────────────────────────
+Pixel_XY
+Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
+{
+const double phi = atan2(get_origin_Y(), get_origin_X());
+const Pixel_Z pz = valZ2pixel(Z - get_min_Z());
+const Pixel_X px = valX2pixel(X - get_min_X()) + get_origin_X() - pz*cos(phi);
+const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
+
+   return Pixel_XY(px, py);
+}
+//────────────────────────────────────────────────────────────────────────────
 int
 Plot_window_properties::print(ostream & out) const
 {
@@ -296,7 +327,7 @@ Plot_window_properties::print(ostream & out) const
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
@@ -411,7 +442,8 @@ int line_number = -1;
             }
 
 # define gdef(ty,  na,  _val, _descr) \
-         if (!strncmp(#na, att_and_val, colon - att_and_val))         \
+         if (strlen(#na) == size_t(colon - att_and_val)              \
+             && !strncmp(#na, att_and_val, colon - att_and_val))      \
             { const char * error = 0;                                 \
               set_ ## na(Plot_data::ty ## _from_str(value, error));   \
               na ## _provided = true;                                 \
@@ -422,18 +454,7 @@ int line_number = -1;
    SPRINTF(tmp_error, "Unknown attribute A.%s", att_and_val);
    return tmp_error;
 }
-//----------------------------------------------------------------------------
-bool
-Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
-{
-   loop(ps, properties_set.size())
-       {
-         if (properties_set[ps] == (line << 8 | propnum))   return false;
-       }
-
-   return true;
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 Plot_window_properties::set_attribute(const UCS_string & att, const Cell & val)
 {
@@ -479,114 +500,7 @@ const char * attname_cp = attname_utf.c_str();
         return "Bad attribute value type";
       }
 }
-//----------------------------------------------------------------------------
-double
-Plot_window_properties::round_up_1_2_5(double val)
-{
-int expo = 0;
-   while (val >= 10)    { val /= 10;   ++expo; }
-   while (val <  1)     { val *= 10;   --expo; }
-
-   // at this point 1 ≤ val < 10.
-   //
-   if (expo > -18 && expo < 18)   // use integer arithmetic for 10^expo
-      {
-        const int abs_expo = expo < 0 ? -expo : expo;
-        uint64_t expo_val = 1;
-        loop(a, abs_expo)   expo_val *= 10;
-
-        if (val <= 2.0)   return  expo < 0 ? 2.0/expo_val : 2.0*expo_val;
-        if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
-        return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
-      }
-   else                           // use float arithmetic for 10^expo
-      {
-        const double expo_val = pow(10, expo);
-        if (val <= 2.0)   return  expo < 0 ? 2.0/expo_val : 2.0*expo_val;
-        if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
-        return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
-      }
-}
-//----------------------------------------------------------------------------
-int
-Plot_window_properties::round_up_24(int val)
-{
-   if (val <  5)   return val;   //  1..4 evenly divide 24
-   if (val <  6)   return 6;     //  6 evenly divides 24
-   if (val <  8)   return 8;     //  8 evenly divides 24
-   if (val < 12)   return 12;    // 12 evenly divides 24
-   return 24;
-}
-//----------------------------------------------------------------------------
-int
-Plot_window_properties::round_up_60(int val)
-{
-   if (val <  7)   return val;   //  1..6 evenly divide 60
-   if (val < 10)   return 10;    // 10 evenly divides 60
-   if (val < 12)   return 12;    // 12 evenly divides 60
-   if (val < 15)   return 15;    // 15 evenly divides 60
-   if (val < 20)   return 20;    // 20 evenly divides 60
-   if (val < 30)   return 30;    // 30 evenly divides 60
-   return 60;
-}
-//----------------------------------------------------------------------------
-double
-Plot_window_properties::round_up_seconds(double val)
-{
-const time_t seconds(val);
-const tm * tile = localtime(&seconds);
-   if (tile == 0)   return round_up_1_2_5(val);   // localtime() failed
-
-   // call broken-down 'tm tile' odd if more than one of its primary units
-   // (year/month/day/hour/minute/second) is set
-   //
-int nz = 0;
-   if (tile->tm_year)   ++nz;
-   if (tile->tm_mon)    ++nz;
-   if (tile->tm_mday)   ++nz;
-   if (tile->tm_hour)   ++nz;
-   if (tile->tm_min)    ++nz;
-   if (tile->tm_sec)    ++nz;
-const int odd = nz > 1 ? 1 : 0;
-
-tm rounded;   // tile rounded up
-   memset(&rounded, 0, sizeof(rounded));
-
-   /* NOTE (man mktime):
-
-       The mktime() function modifies the fields of the tm structure  as  fol‐
-       lows:  tm_wday  and  tm_yday are set to values determined from the con‐
-       tents of the other fields; if structure members are outside their valid
-       interval,  they will be normalized (so that, for example, 40 October is
-       changed into 9 November); tm_isdst is set (regardless  of  its  initial
-
-      We therefore need not care for overflows caused by + inc.
-    */
-
-   if (int year = tile->tm_year)         // round up to full year
-      {
-        rounded.tm_year = round_up_1_2_5(year + odd);
-      }
-   else if (int month = tile->tm_mon)     // round up to full month
-      {
-        rounded.tm_mon  = month + odd;
-      }
-   else if (int mday = tile->tm_mday)     // round up to full day
-      {
-        rounded.tm_mday = mday + odd;
-      }
-   else if (int hour = tile->tm_hour)     // round up to full hour
-      {
-        rounded.tm_hour = round_up_24(hour + odd);
-      }
-   else if (int minute = tile->tm_min)   // round up to full minute
-      {
-        rounded.tm_min = round_up_60(minute + odd);
-      }
-
-   return mktime(&rounded);   // back to seconds
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint32_t
 Plot_window_properties::get_color(double alpha) const
 {
@@ -632,16 +546,142 @@ Plot_window_properties::get_color(double alpha) const
    //
    return gradient.back().rgb;
 }
-//----------------------------------------------------------------------------
-Pixel_XY
-Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
+//────────────────────────────────────────────────────────────────────────────
+double
+Plot_window_properties::round_up_1_2_5(double val)
 {
-const double phi = atan2(get_origin_Y(), get_origin_X());
-const Pixel_Z pz = valZ2pixel(Z - get_min_Z());
-const Pixel_X px = valX2pixel(X - get_min_X()) + get_origin_X() - pz*cos(phi);
-const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
+   // A non-finite val (an overflowed range, e.g. 1E308 - ¯1E308 → inf)
+   // never satisfies `val >= 10`, and a denormal-underflowing-to-0 val
+   // (a tiny range × 10 repeatedly) never satisfies `val < 1` becoming
+   // false, so either loop below runs forever. update() validates the
+   // range that feeds this before calling it (see the isfinite() check
+   // there), but round_up_1_2_5() is a small, separately reusable
+   // utility (also called for a computed tile size, not just directly
+   // from a user range), so it guards itself too rather than trusting
+   // every caller to have validated first.
+   //
+   if (!isfinite(val) || val <= 0)   return 1.0;
 
-   return Pixel_XY(px, py);
+int expo = 0;
+   while (val >= 10)    { val /= 10;   ++expo; }
+   while (val <  1)     { val *= 10;   --expo; }
+
+   // at this point 1 ≤ val < 10.
+   //
+   if (expo > -18 && expo < 18)   // use integer arithmetic for 10^expo
+      {
+        const int abs_expo = expo < 0 ? -expo : expo;
+        uint64_t expo_val = 1;
+        loop(a, abs_expo)   expo_val *= 10;
+
+        if (val <= 2.0)   return  expo < 0 ? 2.0/expo_val : 2.0*expo_val;
+        if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
+        return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
+      }
+   else                           // use float arithmetic for 10^expo
+      {
+        const double expo_val = pow(10, expo);
+        if (val <= 2.0)   return  expo < 0 ? 2.0/expo_val : 2.0*expo_val;
+        if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
+        return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
+      }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+int
+Plot_window_properties::round_up_24(int val)
+{
+   if (val <  5)   return val;   //  1..4 evenly divide 24
+   if (val <  6)   return 6;     //  6 evenly divides 24
+   if (val <  8)   return 8;     //  8 evenly divides 24
+   if (val < 12)   return 12;    // 12 evenly divides 24
+   return 24;
+}
+//────────────────────────────────────────────────────────────────────────────
+int
+Plot_window_properties::round_up_60(int val)
+{
+   if (val <  7)   return val;   //  1..6 evenly divide 60
+   if (val < 10)   return 10;    // 10 evenly divides 60
+   if (val < 12)   return 12;    // 12 evenly divides 60
+   if (val < 15)   return 15;    // 15 evenly divides 60
+   if (val < 20)   return 20;    // 20 evenly divides 60
+   if (val < 30)   return 30;    // 30 evenly divides 60
+   return 60;
+}
+//────────────────────────────────────────────────────────────────────────────
+double
+Plot_window_properties::round_up_seconds(double val)
+{
+const time_t seconds(val);
+const tm * tile = localtime(&seconds);
+   if (tile == 0)   return round_up_1_2_5(val);   // localtime() failed
+
+   // call broken-down 'tm tile' odd if more than one of its primary units
+   // (year/month/day/hour/minute/second) is set
+   //
+int nz = 0;
+   if (tile->tm_year)   ++nz;
+   if (tile->tm_mon)    ++nz;
+   if (tile->tm_mday)   ++nz;
+   if (tile->tm_hour)   ++nz;
+   if (tile->tm_min)    ++nz;
+   if (tile->tm_sec)    ++nz;
+const int odd = nz > 1 ? 1 : 0;
+
+tm rounded;   // tile rounded up
+   memset(&rounded, 0, sizeof(rounded));
+   rounded.tm_mday = 1;   // 0 is not a valid day-of-month for mktime()
+                          // below: the hour/minute branches leave
+                          // tm_mday at the memset()'d 0, which mktime()
+                          // normalizes to the LAST day of the PREVIOUS
+                          // month instead of the intended day (Blake
+                          // McBride, Bugs16 minor); the day/month/year
+                          // branches overwrite this default as before.
+
+   /* NOTE (man mktime):
+
+       The mktime() function modifies the fields of the tm structure  as  fol‐
+       lows:  tm_wday  and  tm_yday are set to values determined from the con‐
+       tents of the other fields; if structure members are outside their valid
+       interval,  they will be normalized (so that, for example, 40 October is
+       changed into 9 November); tm_isdst is set (regardless  of  its  initial
+
+      We therefore need not care for overflows caused by + inc.
+    */
+
+   if (int year = tile->tm_year)         // round up to full year
+      {
+        rounded.tm_year = round_up_1_2_5(year + odd);
+      }
+   else if (int month = tile->tm_mon)     // round up to full month
+      {
+        rounded.tm_mon  = month + odd;
+      }
+   else if (int mday = tile->tm_mday)     // round up to full day
+      {
+        rounded.tm_mday = mday + odd;
+      }
+   else if (int hour = tile->tm_hour)     // round up to full hour
+      {
+        rounded.tm_hour = round_up_24(hour + odd);
+      }
+   else if (int minute = tile->tm_min)   // round up to full minute
+      {
+        rounded.tm_min = round_up_60(minute + odd);
+      }
+
+   return mktime(&rounded);   // back to seconds
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
+{
+   loop(ps, properties_set.size())
+       {
+         if (properties_set[ps] == (line << 8 | propnum))   return false;
+       }
+
+   return true;
+}
+//════════════════════════════════════════════════════════════════════════════
 

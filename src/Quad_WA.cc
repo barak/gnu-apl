@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,35 +21,57 @@
 /** @file
 */
 
+#include "config.h"
+
+#if HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
-#include "UserPreferences.hh"
+#endif // HAVE_SYS_RESOURCE_H
+
 #include "Quad_WA.hh"
+#include "Sys.hh"
+#include "UserPreferences.hh"
 
-extern uint64_t top_of_memory();
-
-rlim_t Quad_WA::initial_rlimit = RLIM_INFINITY;
 uint64_t Quad_WA::total_memory = 0x40000000;   // a little more than 1 Gig
+bool Quad_WA::total_memory_by_user = false;
+
 int64_t  Quad_WA::WA_margin = 0;  // 100000000;
 int      Quad_WA::WA_scale = 90;   // percent
-unsigned long long Quad_WA::initial_sbrk = 0;
 
 Quad_WA::_mem_info Quad_WA::meminfo;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 Quad_WA::Quad_WA()
    : RO_SystemVariable(ID_Quad_WA)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
-//----------------------------------------------------------------------------
-Value_P
-Quad_WA::get_apl_value() const
+//────────────────────────────────────────────────────────────────────────────
+#if MINGW_SRC
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_WA::init(bool log_startup)
 {
-   return IntScalar(total_memory -
-                    (Value::total_ravel_count * sizeof(Cell)
-                    + Value::value_count * sizeof(Value)), LOC);
 }
-//----------------------------------------------------------------------------
+
+int
+Quad_WA::read_meminfo()
+{
+   return 0;   // error
+}
+//────────────────────────────────────────────────────────────────────────────
+int64_t
+Quad_WA::read_procfile(const char * filename)
+{
+   return -1;   // something went wrong
+}
+#else // ! MINGW_SRC
+
+extern uint64_t top_of_memory();
+
+rlim_t Quad_WA::initial_rlimit = RLIM_INFINITY;
+unsigned long long Quad_WA::initial_sbrk = 0;
+
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_WA::init(bool log_startup)
 {
@@ -90,7 +112,11 @@ rlimit rl;
         if (total_memory < 0x8000000)
            {
              rl.rlim_cur = total_memory;
-             setrlimit(rl.rlim_cur, &rl);
+             setrlimit(RLIMIT_AS, &rl);   // was rl.rlim_cur (a byte count,
+                                           // not a resource number) -- the
+                                           // call failed with EINVAL, so
+                                           // this low-memory backstop was
+                                           // silently never installed
              getrlimit(RLIMIT_AS, &rl);
              if (log_startup)
                 CERR << "decreasing RLIMIT_AS to: " << rl.rlim_cur
@@ -109,65 +135,7 @@ rlimit rl;
 << " This could cause improper WS FULL handling." << endl;
       }
 }
-//----------------------------------------------------------------------------
-int
-Quad_WA::read_meminfo()
-{
-int ret = 0;
-
-   meminfo.Available = 0;
-   meminfo.Cached    = 0;
-   meminfo.MemFree   = 0;
-
-FILE * pm = fopen("/proc/meminfo", "r");
-   if (pm == 0)   return 0;   // error
-
-const struct _tag
-   {
-     const char * name;
-     uint64_t   & value;
-   } tags[] = { { "MemAvailable:", meminfo.Available },
-                { "Cached:"      , meminfo.Cached    },
-                { "MemFree:"     , meminfo.MemFree   }
-              };
-
-   for (;;)   // read all lines of /proc.meminfo
-       {
-         char buffer[2000];
-         if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
-         buffer[sizeof(buffer) - 1] = 0;   // to allow strncmp()
-
-         for (size_t t = 0; t < sizeof(tags) / sizeof(*tags); ++t)
-             {
-               const _tag & tag = tags[t];
-               const size_t name_len = strlen(tag.name);
-               if (!strncmp(buffer, tag.name, name_len))
-                  {
-                    // proc/meminfo valuesa re in kbytes, so we * 1024
-                    tag.value =  1024 * strtoll(buffer + name_len, 0, 10);
-                    ++ret;
-                  }
-             }
-       }
-   fclose(pm);
-
-   return ret;   // success
-}
-//----------------------------------------------------------------------------
-int64_t
-Quad_WA::read_procfile(const char * filename)
-{
-   if (FILE * pm = fopen(filename, "r"))
-      {
-        long long ret = -1;
-        const int count = fscanf(pm, "%lld", &ret);
-        fclose(pm);
-        if (count == 1) return ret;
-      }
-
-   return -1;   // something went wrong
-}
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint64_t
 Quad_WA::get_free_memory()
 {
@@ -184,42 +152,115 @@ uint64_t result = 0xC0000000;   // assume ~3 GB on error
 
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+int
+Quad_WA::read_meminfo()
+{
+int ret = 0;
+
+   meminfo.Available = 0;
+   meminfo.Cached    = 0;
+   meminfo.MemFree   = 0;
+
+FileReader reader("/proc/meminfo");
+   if (!reader)   return 0;   // error
+
+const struct _tag
+   {
+     const char * name;
+     uint64_t   & value;
+   } tags[] = { { "MemAvailable:", meminfo.Available },
+                { "Cached:"      , meminfo.Cached    },
+                { "MemFree:"     , meminfo.MemFree   }
+              };
+
+   for (;;)   // read all lines of /proc.meminfo
+       {
+         char buffer[4096];
+         if (reader.fgets(buffer, sizeof(buffer) - 1) == 0)   break;
+         buffer[sizeof(buffer) - 1] = 0;   // to allow strncmp()
+
+         for (size_t t = 0; t < sizeof(tags) / sizeof(*tags); ++t)
+             {
+               const _tag & tag = tags[t];
+               const size_t name_len = strlen(tag.name);
+               if (!strncmp(buffer, tag.name, name_len))
+                  {
+                    // proc/meminfo valuesa re in kbytes, so we * 1024
+                    tag.value =  1024 * strtoll(buffer + name_len, 0, 10);
+                    ++ret;
+                  }
+             }
+       }
+
+   return ret;   // success
+}
+//────────────────────────────────────────────────────────────────────────────
+int64_t
+Quad_WA::read_procfile(const char * filename)
+{
+#if !MINGW_SRC   // no /proc in Windows
+FileReader reader(filename);
+   if (+reader)
+      {
+        long long ret = -1;
+        const int count = fscanf(reader.get_FILE(), "%lld", &ret);
+        if (count == 1)    return ret;
+      }
+#endif // !MINGW_SRC
+
+   return -1;   // something went wrong
+}
+#endif // ! MINGW_SRC
+//────────────────────────────────────────────────────────────────────────────
 void
-Quad_WA::parse_mem(bool log_startup)
+Quad_WA::parse_mem(bool log_startup, const char * opt_name)
 {
 const char * mem_arg = UserPreferences::uprefs.mem_arg;
+   Assert(mem_arg);
 
-   if (mem_arg == 0)   // no --mem option given
+   if (log_startup)
       {
-        if (log_startup)
-           CERR << "--mem option not used" << endl;
-        return;
-     }
-
-   if (*mem_arg == 0)   // -mem option without rgument
-      {
-        if (log_startup)
-           CERR << "using --mem with default value: 50%" << endl;
-
-        mem_arg = "50%";
-      }
-   else
-      {
-        if (log_startup)
-           CERR << "using --mem with user's value " << mem_arg << endl;
+        CERR << "using " << opt_name << " with user's value "
+             << mem_arg << endl;
       }
 
-   if (3 != read_meminfo())
+const size_t mem_arg_len = strlen(mem_arg);
+   // Assert(mem_arg) above guarantees non-null but not non-empty; an
+   // empty (or, for the -2 access below, single-character) --mem value
+   // made strlen(mem_arg) - N underflow to (size_t)-1, reading
+   // mem_arg[-1].
+   if (mem_arg_len == 0)
       {
-        CERR << "problem with the --mem option: "
-                "no readable /proc/meminfo: " << strerror(errno) << endl;
+        CERR << "*** " << opt_name
+             << " \"\" (empty) is not a valid memory size" << endl;
         exit(3);
       }
 
-char mem_unit = mem_arg[strlen(mem_arg) -1];
-   if (mem_unit == 'b' || mem_unit == 'B')   // optional trailing B
-      mem_unit = mem_arg[strlen(mem_arg) -2];
+char mem_unit = mem_arg[mem_arg_len - 1];
+   if ((mem_unit == 'b' || mem_unit == 'B') && mem_arg_len >= 2)
+      mem_unit = mem_arg[mem_arg_len - 2];
+
+#if MINGW_SRC
+   if (mem_unit == '%')
+      {
+        CERR <<
+"This GNU APL interpreter was cross-compiled to Windows. In this case (which\n"
+"is different from compiling under windows in a CYGWIN or WSL!) there is no\n"
+"/proc/memory file to determine the available free memory available. As a\n"
+"consequence, the total memory available for the interpreter can only be\n"
+"specified ansolutely (i.e. using units like k, M, G, kB, MB, or G) but not\n"
+"as a percentage.";
+        exit(3);
+      }
+#endif // MINGW_SRC
+
+   if (3 != read_meminfo())
+      {
+        CERR << "problem with the " << opt_name << " option: "
+                "no readable /proc/meminfo: " << strerror(errno) << endl;
+        exit(3);
+      }
 
 uint64_t mem_number = strtoll(mem_arg, 0, 0);
 uint64_t mem_val = 0;
@@ -227,15 +268,15 @@ uint64_t mem_val = 0;
       {
         if (mem_number < 5)
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too small (minimum is: 5%)" << endl;
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too small (minimum is: 5%)" << endl;
              exit(3);
            }
 
         if (mem_number > 95)
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too large (maximum is 95%)" << endl;
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too large (maximum is 95%)" << endl;
              exit(3);
            }
 
@@ -246,15 +287,16 @@ uint64_t mem_val = 0;
         mem_val = mem_number*1000;
         if (mem_val < 100000000)
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too small (minimum is: 100,000k)" << endl;
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too small (minimum is: 100,000k)"
+                  << endl;
              exit(3);
            }
 
         if (mem_number*1000 > meminfo.MemFree)   // more than we have
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too large (max. is MemFree = "
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too large (max. is MemFree = "
                   << meminfo.MemFree/1000 << " kB)" << endl;
              exit(3);
            }
@@ -265,15 +307,15 @@ uint64_t mem_val = 0;
         mem_val = mem_number*1000000;
         if (mem_val < 100000000)
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too small (minimum is: 100M)" << endl;
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too small (minimum is: 100M)" << endl;
              exit(3);
            }
 
         if (mem_number*1000*1000 > meminfo.MemFree)   // more than we have
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too large (max. is MemFree = "
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too large (max. is MemFree = "
                   << meminfo.MemFree/1000/1000 << " MB)" << endl;
              exit(3);
            }
@@ -283,23 +325,24 @@ uint64_t mem_val = 0;
         mem_val = mem_number*1000000000;
         if (mem_val < 100000000)
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too small (minimum is: 100M)" << endl;
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too small (minimum is: 100M)" << endl;
              exit(3);
            }
 
         if (mem_number*1000*1000*1000 > meminfo.MemFree)   // more than we have
            {
-             CERR << "*** FATAL ERROR: the --mem value '" << mem_arg
-                  << "' is too large (max. is MemFree = "
+             CERR << "*** FATAL ERROR: the " << opt_name << " value '"
+                  << mem_arg << "' is too large (max. is MemFree = "
                   << meminfo.MemFree/1000/1000/1000 << " GB)" << endl;
              exit(3);
            }
       }
    else
       {
-        CERR << "*** FATAL ERROR: invalid unit in --mem value '" << mem_arg
-             << "' (not k, M, G, kB, MB, or GB)" << endl;
+        CERR << "*** FATAL ERROR: invalid unit in " << opt_name
+             << " value '" << mem_arg
+             << "' (not %, k, M, G, kB, MB, or GB)" << endl;
         exit(3);
       }
 
@@ -308,17 +351,17 @@ uint64_t mem_val = 0;
 const int64_t overcommit = read_procfile("/proc/sys/vm/overcommit_memory");
    if (overcommit == -1)
       {
-        CERR << "*** FATAL ERROR: --mem option used, "
+        CERR << "*** FATAL ERROR: " << opt_name << " option used, "
                 "but /proc/sys/vm/overcommit_memory is not readable" << endl;
          exit(3);
       }
 
    if (overcommit != 2)
       {
-        CERR << "*** FATAL ERROR: the --mem option used with "
+        CERR << "*** FATAL ERROR: the " << opt_name << " option used with "
                 "memory overcommit enabled." << endl
              <<   "    I.e. /proc/sys/vm/overcommit_memory says '" << overcommit
-             <<"' while --mem requires '2'" << endl;
+             << "' while " << opt_name << " requires '2'" << endl;
          exit(3);
       }
 
@@ -328,9 +371,25 @@ const int64_t overcommit = read_procfile("/proc/sys/vm/overcommit_memory");
         << "!!!  was overridden with " << mem_val/1000 << "kB"
            " = " << mem_val/1000000 << "MB"
            " = " << mem_val/1000000000 << "GB"
-               " by the --mem option !!!" << endl;
+               " by the " << opt_name << " option !!!" << endl;
 
    total_memory = mem_val;
+   total_memory_by_user = true;
 }
-//============================================================================
+//────────────────────────────────────────────────────────────────────────────
 
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Quad_WA::get_apl_value() const
+{
+   // total_memory is uint64_t; if the (approximate) used-bytes estimate
+   // ever exceeds it, the subtraction underflows and wraps to ~1.8E19
+   // instead of reporting (near-)zero free memory -- exactly when memory
+   // is tightest and an accurate ⎕WA matters most. Compute in a signed
+   // type and clamp instead.
+const int64_t used = Value::total_ravel_count * sizeof(Cell)
+                    + Value::value_count * sizeof(Value);
+const int64_t free = int64_t(total_memory) - used;
+   return IntScalar(free < 0 ? 0 : free, LOC);
+}
+//════════════════════════════════════════════════════════════════════════════

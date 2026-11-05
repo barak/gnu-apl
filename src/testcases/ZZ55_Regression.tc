@@ -1,6 +1,8 @@
 ⍝ ZZ55_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
@@ -47,5 +49,5 @@ c
  ac bc 
 
       (1 0 1)(0 1 1) /¨¨ ⊂'abc'
-  a  c     b c  
+  a   c      b c  
 

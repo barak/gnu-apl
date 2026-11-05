@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 #ifndef __SYSTEM_LIMITS_HH_DEFINED__
 #define __SYSTEM_LIMITS_HH_DEFINED__
+
+#include <cfloat>
 
 ///  System limits and default values defined for this interpreter.
 
@@ -50,6 +52,11 @@ enum
 #define INTEGER_TOLERANCE (1.0e-10)   // system tolerance, lrm p. 59
 
 #define BIG_INT64_F 9223372036854775807.0
-#define BIG_FLOAT   1.7976e308
+
+// the identity item for ⌊/ and ⌈/: was a 5-significant-digit constant
+// (1.7976e308), well below the true largest finite double
+// (~1.7976931348623157e308), so ⌊/⍬ / ⌈/⍬ were not actual identities
+// (X⌊⌊/⍬ ≠ X for X between the two). See Bugs27 #40.
+#define BIG_FLOAT   DBL_MAX
 
 #endif // __SYSTEM_LIMITS_HH_DEFINED__

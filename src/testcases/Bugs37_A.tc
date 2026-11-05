@@ -1,0 +1,362 @@
+⍝ Bugs37_A.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs37 severity A items (#1 - #6): crashes, assertions,
+⍝ and session loss.
+
+⍝@ test3.
+
+
+
+
+
+      ⍝ Bugs37 #1: 30 ⎕CR B must not reshape the (shared) items of B
+      ⍝
+
+
+
+
+
+      T←1 2 3
+
+
+
+
+
+      U←T (2 2⍴⍳4)
+
+
+
+
+
+      ⍴30 ⎕CR U
+2 2 3
+
+
+
+
+      ⍴T
+3
+
+
+
+
+      ⍴¨U
+ 3  2 2 
+
+
+
+
+      ∇Z←B37_T3
+[1] Z←(2 2⍴3)(4 5)
+[2] ∇
+
+
+
+
+
+      ⍴30 ⎕CR B37_T3
+2 2 2
+
+
+
+
+      ⍴¨B37_T3
+ 2 2  2 
+
+
+
+
+      )ERASE B37_T3
+
+
+
+
+
+      S←⍬
+
+
+
+
+
+      )ERASE S
+
+
+
+
+
+      S.c.d←5
+
+
+
+
+
+      X←30 ⎕CR S
+
+
+
+
+
+      S.c.d
+5
+
+
+
+
+      S
+.c: □
+.c.d: 5
+
+
+
+      (+/⍤1) 2 3⍴⍳6
+6 15
+
+
+
+
+      ⍝ Bugs37 #2: S[i;j]←B into a structured variable is a DOMAIN ERROR
+      ⍝
+
+
+
+
+
+      )ERASE S
+
+
+
+
+
+      S.a←1
+
+
+
+
+
+      S[1;1]←'q'
+DOMAIN ERROR+
+      S[1;1]←'q'
+      ^     ^
+
+
+      )MORE
+A[B;C]←D: member access: the member table of structured variable S cannot be assigned.
+      Use S.member←D or S['member']←D instead.
+
+
+
+      S[;]←0
+DOMAIN ERROR+
+      S[;]←0
+      ^   ^
+
+
+      S[;1]←'x'
+DOMAIN ERROR+
+      S[;1]←'x'
+      ^    ^
+
+
+      S[;1]
+ a 
+
+
+
+
+      S.a
+1
+
+
+
+
+      S['a']←7
+
+
+
+
+
+      S.a
+7
+
+
+
+
+      M←2 2⍴⍳4
+
+
+
+
+
+      M[1;1]←9
+
+
+
+
+
+      M
+9 2
+3 4
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #3: 3 ⎕TF and 10 ⎕CR of ⎕SYL (fresh value on each read)
+      ⍝
+
+
+
+
+
+      ⍴⍴3 ⎕TF '⎕SYL'
+1
+
+
+
+
+      0<⍴3 ⎕TF '⎕SYL'
+1
+
+
+
+
+      ⍴⍴10 ⎕CR '⎕SYL'
+1
+
+
+
+
+      ⍝ Bugs37 #4: ((⊂T1) T2)←B with a packed T1: SYNTAX ERROR, no crash
+      ⍝
+
+
+
+
+
+      T1←⍳6 ⋄ T2←1
+
+
+
+
+
+      ((⊂T1) T2)←1
+SYNTAX ERROR+
+      ((⊂T1)T2)←1
+      ^         ^
+
+
+      ((2↑T1) T2)←1 2
+SYNTAX ERROR+
+      ((2↑T1)T2)←1 2
+      ^          ^
+
+
+      (T1 (⊂T2))←1 2
+SYNTAX ERROR+
+      (T1(⊂T2))←1 2
+      ^         ^
+
+
+      T1
+1 2 3 4 5 6
+
+
+
+
+      T2
+1
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #5: a ⎕WA margin or scale that leaves no free memory is
+      ⍝ rejected, so that the session is not lost.
+      ⍝
+
+
+
+
+
+      Q←⎕SYL[33;2]
+
+
+
+
+
+      ⎕SYL[32;2]←2*60
+DOMAIN ERROR+
+      ⎕SYL[32;2]←2⋆60
+      ^         ^
+
+
+      1+1
+2
+
+
+
+
+      ⎕SYL[32;2]←999999
+DOMAIN ERROR+
+      ⎕SYL[32;2]←999999
+      ^         ^
+
+
+      ⎕SYL[33;2]←45
+
+
+
+
+
+      ⎕SYL[33;2]←Q
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #6: dyadic ⎕SVO with a surrogate name: no assertion
+      ⍝
+
+
+
+
+
+      ⍴⍴1001 ⎕SVO 'x37 y37'
+0
+
+
+
+
+      ⍴1001 ⎕SVO 2 7⍴'a37 b37c37 d37'
+2
+
+
+
+
+      0 0⍴⎕SVR ⊃'x37' 'a37' 'c37'
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

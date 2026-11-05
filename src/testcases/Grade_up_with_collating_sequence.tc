@@ -1,6 +1,8 @@
 ⍝ Grade_up_with_collating_sequence.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕IO←1
       'ABCDE'⍋'BEAD'
 3 1 4 2
@@ -51,7 +53,7 @@ deal
 Deal
 DEED
 
-⍝ DCS ----------------------------------
+      ⍝ DCS ----------------------------------
 
       DCS←10 2 28⍴' '
       DCS[1;1;1+⍳26]←⎕UCS  64+⍳26
@@ -158,12 +160,12 @@ X10
 X11
 X21
 
-⍝ identical subarrays ----------------------------------
+      ⍝ identical subarrays ----------------------------------
 
       'ABCDE'⍋'DABBED'
 2 3 4 1 6 5
 
-⍝ items not in collating sequence ----------------------------------
+      ⍝ items not in collating sequence ----------------------------------
 
       W←'ABCDE'⍋'EXACT'
       W

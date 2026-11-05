@@ -1,0 +1,48 @@
+| Text ⎕GTK[H_ID] "entry"
+| NOTE
+| set the text in e.g. a text entry
+| Text ← ⎕GTK[H_ID] "entry"
+| NOTE
+| return the text in e.g. a text entry
+| Text ⎕GTK[H_ID] "label"
+| NOTE
+| set the text of e.g. a label
+| Fraction ⎕GTK[H_ID] "progress_bar"
+| NOTE
+| set the progress shown by a progress bar
+| Fraction ← ⎕GTK[H_ID] "progress_bar"
+| NOTE
+| return the progress shown by a progress bar
+| Level ⎕GTK[H_ID] "level_bar"
+| NOTE
+| set the level shown by a level bar
+| Level ← ⎕GTK[H_ID] "level_bar"
+| NOTE
+| return the level shown by level bar
+| Selected ⎕GTK[H_ID] "combo_box"
+| NOTE
+| set the selected item of a combo box (-1 for none)
+| Selected ← ⎕GTK[H_ID] "combo_box"
+| NOTE
+| return the selected item of a combo box (-1 = none)
+| DrawCmd ⎕GTK[H_ID] "drawingarea"
+| NOTE
+| set the commands needed to draw a drawing area
+| SX_SY ⎕GTK[H_ID] "drawingarea"
+| NOTE
+| set the area size to SX_SY >> 16 : SX_SY & 0xFFFF
+| Origin ⎕GTK[H_ID] "drawingarea"
+| NOTE
+| set the Y-origin to the top (1) or the bottom (0)
+| Selected ← ⎕GTK[H_ID] "combo_box_text"
+| NOTE
+| return the selected text in a combo box text
+| Selected ← ⎕GTK[H_ID] "spin_button"
+| NOTE
+| return the current value
+| Selected ← ⎕GTK[H_ID] "spin_button"
+| NOTE
+| return the current value
+| Text ⎕GTK[H_ID] "text_view"
+| NOTE
+| add a row to a text view

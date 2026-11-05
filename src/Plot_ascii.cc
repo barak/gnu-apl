@@ -1,10 +1,12 @@
 
 #include <stdio.h>
 
+#include "Error_macros.hh"
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 #include "Unicode.hh"
+#include "UserPreferences.hh"
 
 /// basic colors (1 bit RGB)
 enum VT100_color
@@ -35,7 +37,7 @@ enum VT100_color
   VT100_bright_cyan    =  66,
   VT100_bright_white   =  67,
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// convert a 32-bit rgb value to its nearest VT100 color
 
 const struct
@@ -92,7 +94,23 @@ uint32_t best_sq = 0x40000;   // > 3*FF*FF
 
    return VT100_RGB[best_idx].vt100;
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+/// the ASCII driver's own background color: canvas_color, unless the user
+/// left it at its default (i.e. did not write "canvas_color: ..." into A)
+/// AND set the ASCII-only "plot-ASCII-background" preference -- in which
+/// case that preference wins, but only for the ASCII driver.
+static uint32_t
+ascii_canvas_color(const Plot_window_properties & w_props)
+{
+   if (!w_props.get_canvas_color_provided())
+      {
+        const int pref = UserPreferences::uprefs.plot_ASCII_background;
+        if (pref != -1)   return pref;
+      }
+
+   return w_props.get_canvas_color();
+}
+//════════════════════════════════════════════════════════════════════════════
 struct ASCII_Point
 {
    ASCII_Point()
@@ -103,7 +121,7 @@ struct ASCII_Point
    Unicode uni;
    VT100_color color;   /// foreground color index
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 class ASCII_canvas
 {
 public:
@@ -147,7 +165,7 @@ protected:
    const ASCII_Point & get_point(int x, int y) const
       { return points[x + y * W]; }
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 ASCII_canvas::draw_horizontal_grid(const Plot_window_properties & w_props)
 {
@@ -172,7 +190,7 @@ const int H1 = H - 1;
          for (int x = 1; x < W1; ++x)   set_point(x, y, u1, color);
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_vertical_grid(const Plot_window_properties & w_props)
 {
@@ -204,7 +222,7 @@ const int H1 = H - 1;
              }
        }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_grid(const Plot_window_properties & w_props)
 {
@@ -231,12 +249,12 @@ const VT100_color color = VT100_dark_black;
    draw_horizontal_grid(w_props);
    draw_vertical_grid(w_props);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::draw_plot_line(const Plot_window_properties & w_props,
                              int row, const Plot_data & data)
 {
-Plot_line_properties const * const * l_props = w_props.get_line_properties();
+const Plot_line_properties * const * l_props = w_props.get_line_properties();
 const Plot_line_properties & lp = *l_props[row];
 
 const double max_X = w_props.get_max_X();
@@ -294,11 +312,11 @@ const VT100_color color = round_color(lp.get_point_color());
         set_point(X, H1 - Y, POINT, color);
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 ASCII_canvas::emit(ostream & out, const Plot_window_properties & w_props)
 {
-VT100_color bg_color = round_color(w_props.get_canvas_color());
+VT100_color bg_color = round_color(ascii_canvas_color(w_props));
 
    // reset all character attributes and set the background color
    cerr << "\x1B[0;" << (40 + bg_color) << 'm';
@@ -326,7 +344,7 @@ VT100_color color = VT100_NONE;   // to force an initial color change
 
    cerr << Output::color_CIN << Output::clear_EOL << "\n";
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 ASCII_canvas::emit_value(const Plot_window_properties & w_props)
 {
@@ -353,7 +371,7 @@ Value_P Z(shape_Z, LOC);
 
    // vt100 background color plane
    //
-const VT100_color color = round_color(w_props.get_canvas_color());
+const VT100_color color = round_color(ascii_canvas_color(w_props));
    loop(h, H)
    loop(w, W)
        {
@@ -363,7 +381,7 @@ const VT100_color color = round_color(w_props.get_canvas_color());
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Value_P
 do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
 {
@@ -371,6 +389,19 @@ do_plot_ASCII(const Plot_window_properties & w_props, const Plot_data & data)
    //
 const int H = w_props.get_terminal_rows();
 const int W = w_props.get_terminal_cols();
+
+   // H2 = H - 2 and W2 = W - 2 (the space inside the frame, see
+   // draw_plot_line() below) must be >= 1 for a data point to fit;
+   // terminal_rows/terminal_cols are uint32_t (Quad_PLOT.def) and
+   // unvalidated at every source (the ⎕PLOT attribute, and the
+   // plot-ASCII-rows/plot-ASCII-columns preferences, where a negative
+   // value wraps to a huge unsigned value that then wraps again, sign-
+   // reversing, in the int cast above) -- reject anything too small (or,
+   // via that double wrap, negative) here, the one place both drivers'
+   // worth of values converge before the canvas is built.
+   //
+   if (H < 3 || W < 3)   DOMAIN_ERROR;
+
 ASCII_canvas ctx(H, W);
 
    ctx.draw_grid(w_props);
@@ -385,4 +416,4 @@ ASCII_canvas ctx(H, W);
    ctx.emit(cerr, w_props);
    return ctx.emit_value(w_props);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

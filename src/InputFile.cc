@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,40 +21,232 @@
 /** @file
 */
 
+#include "config.h"
+
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
 
+#include "Bif_F1_EXECUTE.hh"
 #include "Common.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"
-#include "PrimitiveFunction.hh"
 #include "PrintOperator.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
+#include "Workspace.hh"
 
 vector<InputFile> InputFile::files_todo;
 vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 int64_t InputFile::next_file_seq = 0;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
-InputFile::open_current_file()
+InputFile::COPY_filter::replace_variable(const UCS_string & fun_name)
 {
-   if (files_todo.size() && files_todo[0].file == 0)
-      {
-        if (!strcmp(current_filename(), "-"))
-           files_todo[0].file = stdin;
-        else if (!strcmp(current_filename(), "stdin"))
-           files_todo[0].file = stdin;
-        else
-             files_todo[0].file = fopen(current_filename(), "r");
-
-        files_todo[0].line_no = 0;
-      }
+   // )COPY of a function F over a variable F: the function replaces the
+   // variable (LRM p. 423), as for )COPY of a .xml workspace (Bugs37 #26).
+   // Otherwise the ∇-editor refuses the header (Bugs37 #27).
+   //
+   if (Symbol * sym = Workspace::lookup_existing_symbol(fun_name))
+      if (sym->get_NC() == NC_VARIABLE)   sym->expunge();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+bool
+InputFile::COPY_filter::check_filter(const UTF8_string & line)
+{
+UCS_string ucs_line(line);
+   ucs_line.remove_leading_and_trailing_whitespaces();
+
+static const UCS_string struct_start(UTF8_string("⍝ structured variable "));
+static const UCS_string struct_end(UTF8_string("⍝ end of structured variable "));
+
+   // a plain )COPY (no object filter, no )PCOPY protection): every line is
+   // copied, but an existing variable S is replaced as a whole by the
+   // structured variable S of the file (see below).
+   //
+   if (!has_object_filter() && !protection)
+      {
+        if (ucs_line.size() > 1 && ucs_line.front() == UNI_NABLA)
+           {
+             const UserFunction_header uh(ucs_line.drop(1), false);
+             replace_variable(uh.get_name());   // function header
+           }
+        else if (ucs_line.starts_with(struct_start))
+           {
+             UCS_string var_name(ucs_line, struct_start.size(),
+                                 ucs_line.size() - struct_start.size());
+             var_name.remove_leading_and_trailing_whitespaces();
+             if (Symbol * sym = Workspace::lookup_existing_symbol(var_name))
+                if (sym->get_NC() == NC_VARIABLE)   sym->expunge();
+           }
+        return true;
+      }
+
+   /* if we are in a function or in a variable (matched or not) then look for
+      the end of the function or variable and return the current state (aka.
+      in_matched)...
+    */
+   if (where == WH_in_function)
+      {
+        bool ret = in_matched;   // state of the current line
+        if (ucs_line.size() && ucs_line[0] == UNI_NABLA)   // end of a function
+           {
+             where = WH_outside;
+             in_matched  = false;
+           }
+        return ret;
+      }
+
+   if (where == WH_in_variable)
+      {
+        bool ret = in_matched;   // state of the current line
+        if (ucs_line.size() == 0)                          // end of a vriable
+           {
+             where = WH_outside;
+             in_matched  = false;
+           }
+        return ret;
+      }
+
+   // a structured variable S, written by Symbol::dump() as a block:
+   //
+   // ⍝ structured variable S
+   //   S.b←2
+   //   S.a←1
+   // ⍝ end of structured variable S
+   //
+   // The block (as a whole) belongs to S, not to the names of its member
+   // lines (Blake McBride, Bugs32 #8).
+   //
+   if (where == WH_in_struct)
+      {
+        if (ucs_line.starts_with(struct_end))   // end of the block
+           {
+             where = WH_outside;
+             const bool ret = in_matched;
+             in_matched  = false;
+             return ret;
+           }
+        return in_matched;
+      }
+
+   /* at this point we are outside any function or variable.
+      Look for the start of a new function or variable...
+    */
+   if (ucs_line.starts_with(struct_start))   // new structured variable
+      {
+        where = WH_in_struct;
+        UCS_string var_name(ucs_line, struct_start.size(),
+                            ucs_line.size() - struct_start.size());
+        var_name.remove_leading_and_trailing_whitespaces();
+
+        bool selected = object_filter.size() == 0;   // no filter: all names
+        loop(n, object_filter.size())
+           {
+             if (var_name == object_filter[n])   { selected = true;   break; }
+           }
+
+        if (selected)
+           if (Symbol * sym = Workspace::lookup_existing_symbol(var_name))
+              {
+                // )PCOPY: do not overwrite an already existing object.
+                // )COPY: replace an existing variable S as a whole, so
+                // that neither a plain variable S (whose member lines
+                // would fail) nor old members of S survive.
+                //
+                if (protection)                         selected = false;
+                else if (sym->get_NC() == NC_VARIABLE)  sym->expunge();
+              }
+
+        return in_matched = selected;
+      }
+
+   if (ucs_line.size() && (ucs_line.front() == UNI_NABLA))   // new function
+      {
+        where = WH_in_function;
+        in_matched  = false;
+        ucs_line = ucs_line.drop(1);
+        UserFunction_header uh(ucs_line, false);
+        const UCS_string & fun_name = uh.get_name();
+
+        bool selected = object_filter.size() == 0;   // no filter: all names
+        loop(n, object_filter.size())
+           {
+             if (fun_name == object_filter[n])   { selected = true;   break; }
+           }
+
+        // )PCOPY: do not overwrite an already existing function/variable
+        //
+        if (selected && protection && Workspace::lookup_existing_symbol(fun_name))
+           selected = false;
+
+        if (selected && !protection)   replace_variable(fun_name);
+
+        return in_matched = selected;
+      }
+
+   /* maybe (the start of) a new variable.
+      There are two cases (see Symbol::dump()):
+
+      1. multiple lines, for example:   ... ⍝ VAR←
+      2. single line, for example:      VAR←1 2 3
+
+      Note that case 2. also matches case 1., therefore case 1.
+           needs to be checked first.
+
+      Strip off any garbage from ucs_line so that only the symbol name
+      remains (or ucs_line is empty)
+    */
+const Unicode u0 = ucs_line.size() ? ucs_line.front() : Invalid_Unicode;
+const Unicode u1 = ucs_line.size() ? ucs_line.back()  : Invalid_Unicode;
+   if (u1 == UNI_LEFT_ARROW)                             // case 1.
+      {
+        ShapeItem pos = ucs_line.size() - 1;
+        while (pos && Avec::is_symbol_char(ucs_line[pos - 1]))   --pos;
+        ucs_line = UCS_string(ucs_line, pos, ucs_line.size() - pos - 1);
+      }
+   else if (Avec::is_quad(u0) || Avec::is_first_symbol_char(u0))   // case 2.
+      {
+        loop(u, ucs_line.size())
+           {
+             if (ucs_line[u] != UNI_LEFT_ARROW)   continue;   // not ←
+
+             ucs_line.resize(u);
+             ucs_line.remove_leading_and_trailing_whitespaces();
+             break;
+           }
+      }
+   else                                                       // something else
+      {
+        return false;   // since where = WH_outside
+      }
+
+   where = WH_in_variable;   // start of a new variable
+bool selected = object_filter.size() == 0;   // no filter: all names selected
+   loop(of, object_filter.size())
+       {
+         if (ucs_line == object_filter[of])   { selected = true;   break; }
+       }
+
+   // )PCOPY: do not overwrite an already existing function/variable
+   //
+   if (selected && protection && Workspace::lookup_existing_symbol(ucs_line))
+      selected = false;
+
+   return in_matched = selected;
+}
+//────────────────────────────────────────────────────────────────────────────
+
+bool
+InputFile::echo_current_file()
+{
+   if (files_todo.size()) return files_todo[0].echo;
+   return UserPreferences::uprefs.echo_CIN ||
+          ! UserPreferences::uprefs.do_not_echo;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 InputFile::close_current_file()
 {
@@ -68,6 +260,16 @@ InputFile::close_current_file()
 
         if (files_todo[0].file)   // and the first file is open
            {
+             // restore the ]FILE_CTL skip mode of the input source that
+             // opened this file, saved at the first read of this file (see
+             // IO_Files::read_file_line()). This is the end of the file in
+             // every case: EOF, ]NEXTFILE, or a testcase file aborted after
+             // an error.
+             //
+             if (files_todo[0].bom_checked)   // i.e. the mode was saved
+                IO_Files::skip_mode =
+                          IO_Files::Skip_mode(files_todo[0].saved_skip_mode);
+
              if (files_todo[0].file != stdin)
                 {
                   fclose(files_todo[0].file);
@@ -77,10 +279,28 @@ InputFile::close_current_file()
            }
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+void
+InputFile::open_current_file()
+{
+   if (files_todo.size() && files_todo[0].file == 0)
+      {
+        if (!strcmp(current_filename(), "-"))
+           files_todo[0].file = stdin;
+        else if (!strcmp(current_filename(), "stdin"))
+           files_todo[0].file = stdin;
+        else
+             files_todo[0].file = fopen(current_filename(), "r");
+
+        files_todo[0].line_no = 0;
+        files_todo[0].bom_checked = false;
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 InputFile::randomize_files()
 {
+#if ! MINGW_SRC
    {
      timeval now;
      gettimeofday(&now, 0);
@@ -126,106 +346,6 @@ InputFile::randomize_files()
          files_todo[n2] = f1;
          ++done;
        }
+#endif // ! MINGW_SRC
 }
-//----------------------------------------------------------------------------
-bool
-InputFile::echo_current_file()
-{
-   if (files_todo.size()) return files_todo[0].echo;
-   return UserPreferences::uprefs.echo_CIN ||
-          ! UserPreferences::uprefs.do_not_echo;
-}
-//----------------------------------------------------------------------------
-bool
-InputFile::COPY_filter::check_filter(const UTF8_string & line)
-{
-UCS_string ucs_line(line);
-   ucs_line.remove_leading_and_trailing_whitespaces();
-
-   /* if we are in a function or in a variable (matched or not) then look for
-      the end of the function or variable and return the current state (aka.
-      in_matched)...
-    */
-   if (where == WH_in_function)
-      {
-        bool ret = in_matched;   // state of the current line
-        if (ucs_line.size() && ucs_line[0] == UNI_NABLA)   // end of a function
-           {
-             where = WH_outside;
-             in_matched  = false;
-           }
-        return ret;
-      }
-
-   if (where == WH_in_variable)
-      {
-        bool ret = in_matched;   // state of the current line
-        if (ucs_line.size() == 0)                          // end of a vriable
-           {
-             where = WH_outside;
-             in_matched  = false;
-           }
-        return ret;
-      }
-
-   /* at this point we are outside any function or variable.
-      Look for the start of a new function or variable...
-    */
-   if (ucs_line.size() && (ucs_line.front() == UNI_NABLA))   // new function
-      {
-        where = WH_in_function;
-        in_matched  = false;
-        ucs_line = ucs_line.drop(1);
-        UserFunction_header uh(ucs_line, false);
-        const UCS_string & fun_name = uh.get_name();
-        loop(n, object_filter.size())
-           {
-             if (fun_name == object_filter[n])   return in_matched = true;
-           }
-        return false;
-      }
-
-   /* maybe (the start of) a new variable.
-      There are two cases (see Symbol::dump()):
-
-      1. multiple lines, for example:   ... ⍝ VAR←
-      2. single line, for example:      VAR←1 2 3
-
-      Note that case 2. also matches case 1., therefore case 1.
-           needs to be checked first.
-
-      Strip off any garbage from ucs_line so that only the symbol name
-      remains (or ucs_line is empty)
-    */
-const Unicode u0 = ucs_line.size() ? ucs_line.front() : Invalid_Unicode;
-const Unicode u1 = ucs_line.size() ? ucs_line.back()  : Invalid_Unicode;
-   if (u1 == UNI_LEFT_ARROW)                             // case 1.
-      {
-        ShapeItem pos = ucs_line.size() - 1;
-        while (pos && Avec::is_symbol_char(ucs_line[pos - 1]))   --pos;
-        ucs_line = UCS_string(ucs_line, pos, ucs_line.size() - pos - 1);
-      }
-   else if (Avec::is_quad(u0) || Avec::is_first_symbol_char(u0))   // case 2.
-      {
-        loop(u, ucs_line.size())
-           {
-             if (ucs_line[u] != UNI_LEFT_ARROW)   continue;   // not ←
-
-             ucs_line.resize(u);
-             ucs_line.remove_leading_and_trailing_whitespaces();
-           }
-      }
-   else                                                       // something else
-      {
-        return false;   // since where = WH_outside
-      }
-
-   where = WH_in_variable;   // start of a new variable
-   loop(of, object_filter.size())
-       {
-         if (ucs_line == object_filter[of])   return in_matched = true;
-       }
-   return in_matched = false;
-}
-//----------------------------------------------------------------------------
-
+//════════════════════════════════════════════════════════════════════════════

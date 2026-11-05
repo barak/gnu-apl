@@ -1,0 +1,1904 @@
+⍝ ZZ71_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ Blake McBride's Bugs27 report (59 items, 11 sub-items under #59),
+      ⍝ fixed 2026-09-02 (see bugs27_progress.md). One representative,
+      ⍝ live-verified case per confirmed, behaviorally-significant fix;
+      ⍝ purely message-text/cosmetic fixes are not covered here.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      ⍝ #43 IntCell::bif_power_ii: squaring-overflow guard was 1E8, far
+      ⍝ below the real bound (⌊√INT64_MAX⌋+1 = 3037000500), so an exact
+      ⍝ integer power whose intermediate squares exceed 1E8 silently fell
+      ⍝ back to imprecise float computation. 2*62 exercises exactly that
+      ⍝ range (intermediate squares reach ~2^31).
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      2*62
+4611686018427387904
+
+      ⍝ #44 ⍕ (UCS_string float-to-text): an exact rounding tie at ⎕PP
+      ⍝ digits must round half-away-from-zero, matching glibc's own %e
+      ⍝ tie-breaking rather than silently truncating.
+      ⍝
+      ⍝ 9.5 rounds up to 10, which has more integer digits than ⎕PP and is
+      ⍝ therefore shown in scaled form (LRM p. 12, "Display in Scaled
+      ⍝ Form": the number of digits in the integer portion exceeds ⎕PP;
+      ⍝ 9.5 is not stored as an integer). 2.5 and 0.125 are exact ties
+      ⍝ that stay unscaled.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ⎕PP←1
+      ⍕9.5
+1E1
+      ⍕2.5
+3
+      ⎕PP←2
+      ⍕0.125
+0.13
+      ⎕PP←10
+
+      ⍝ #47 Bif_F12_COMMA catenate_or_laminate(): laminating two scalars
+      ⍝ used to RANK_ERROR (the both-scalar guard was shared with plain
+      ⍝ catenate, which genuinely needs it); now only catenate() enforces
+      ⍝ it, laminate()'s own handling is used.
+      ⍝
+      1,[0.5]2
+1 2
+
+      ⍝ #46 Symbol::assign_indexed(IndexExpr): a 1-element vector RHS
+      ⍝ used to fail the shape-match gate before ever reaching the
+      ⍝ broadcast-capable assignment loop, when assigned into a
+      ⍝ higher-rank slice (not just a scalar RHS).
+      ⍝
+      M←2 2⍴⍳4
+      M[1;]←,9
+      M
+9 9
+3 4
+      )ERASE M
+
+      ⍝ #52 (revised 2026-09-03) Quad_TF::tf2_fun_ucs(): 2⎕TF of a named
+      ⍝ lambda used to ⎕FX-wrap the headerless body, losing the real
+      ⍝ name (reconstructs as anonymous λ). An interim fix emitted
+      ⍝ literal "name←{body}" text instead -- round-trips through GNU
+      ⍝ APL itself, but )OUT/⎕TF exist for interchange with OTHER APL
+      ⍝ systems, none of which have lambdas, so that was never a real
+      ⍝ requirement, and 2⎕TF's inverse direction genuinely cannot
+      ⍝ parse "{...}" back in without a synchronous {...}-block
+      ⍝ compiler it doesn't have. Refuse outright instead.
+      ⍝
+      F1←{⌽⍵}
+      2⎕TF 'F1'
+DOMAIN ERROR+
+      2 ⎕TF 'F1'
+      ^ ^
+      )ERASE F1
+
+      ⍝ #58 QuadFunction.cc Quad_EX::expunge(): ⎕EX of a name that was
+      ⍝ never defined now returns 1 ("name is now available", ISO/APL2),
+      ⍝ not 0 -- except for a system ⎕-name, which is never "available".
+      ⍝
+      ⎕EX 'ZZ71NOTDEFINED'
+1
+      ⎕EX '⎕NC'
+0
+
+      ⍝ #59(a) ComplexCell::bif_power_ci(): a moderate positive integer
+      ⍝ exponent is now computed via exact binary exponentiation by
+      ⍝ squaring (native complex multiplication), bypassing this build's
+      ⍝ noisy pow(complex,complex) entirely.
+      ⍝
+      (3J4*2)=¯7J24
+1
+      0J1*3
+0J¯1
+
+      ⍝ #59(b) RealCell::do_bif_circle_fun() case -6: for real B in
+      ⍝ [¯1,1], ¯6○B is exactly pure imaginary (0J(acos B)) -- now
+      ⍝ computed directly via acos() instead of the general complex
+      ⍝ formula, which carried ~1E¯17 noise on what should be an exact
+      ⍝ zero real part.
+      ⍝
+      0=9○¯6○0.5
+1
+
+      ⍝ #59(c) SystemVariable.cc Quad_PW::assign(): an out-of-range ⎕PW
+      ⍝ used to be silently ignored; too-small values now DOMAIN_ERROR
+      ⍝ (too-large clamps), mirroring ⎕PP's own existing convention.
+      ⍝
+      ⎕PW←0
+DOMAIN ERROR
+      ⎕PW←0
+      ^  ^
+
+      ⍝ #59(g) Cmd_HOST.cc cmd_HOST(): pclose()'s raw wait status was
+      ⍝ printed unconverted (768 for "exit 3" instead of 3); now decoded
+      ⍝ via WEXITSTATUS()/WIFEXITED().
+      ⍝
+      )HOST exit 3
+
+3 
+
+      ⍝ #59(h) Quad_JSON.cc skip_string(): a lone UTF-16 low surrogate
+      ⍝ (no preceding high surrogate) now DOMAIN_ERRORs, mirroring the
+      ⍝ pre-existing lone-high-surrogate check.
+      ⍝
+      ⍝ this exact line, embedded in an outer STMTS array and )OUT/)IN
+      ⍝ round-tripped, was found to trigger a genuine Quad_TF::tf2_inverse()
+      ⍝ bug: direct parsing of the identical text works fine, but the
+      ⍝ inverse-⎕TF re-tokenizer fails on it (multiple separate ''-escaped
+      ⍝ runs within one string literal) -- flagged separately, not fixed
+      ⍝ here. ⎕JSON is GNU/ISO-only anyway (no real-APL2 equivalent), so
+      ⍝ SKIP is the right call regardless -- see
+      ⍝ project_apl2_and_or_boolean_only.md
+      ]FILE_CTL SKIP_APL2
+      ⎕JSON '"',(⎕UCS 92 117 100 101 48 48),'"'
+DOMAIN ERROR+
+      ⎕JSON '"',(⎕UCS 92 117 100 101 48 48),'"'
+      ^
+
+      ]FILE_CTL NO_SKIP
+
+      ⍝ #59(i) residual (fixed 2026-09-02): a ⎕FX function line that is
+      ⍝ neither a character vector nor a character scalar used to dump
+      ⍝ the offending value boxed to CERR before erroring; now reports
+      ⍝ its shape via )MORE instead. ⎕STOP on an undefined name used to
+      ⍝ print "symbol ... not found" straight to CERR before its
+      ⍝ DOMAIN ERROR; now routed through )MORE too.
+      ⍝
+      B←('Z←F B') (2 3⍴⍳6)
+      ⎕FX B
+DOMAIN ERROR+
+      ⎕FX B
+      ^
+      ⎕STOP 'NONEX'
+DOMAIN ERROR+
+      ⎕STOP 'NONEX'
+      ^
+      )ERASE B
+
+      ⍝ #57 (fixed 2026-09-02): ⎕EC's SI unwind (Command.cc) popped the
+      ⍝ frame(s) pushed to evaluate its B argument without preserving
+      ⍝ their error, so Quad_EC::eoc() read whatever stale error was
+      ⍝ already on the surviving frame -- showing the generic error-code
+      ⍝ name instead of a ⎕ES'd string (or A's override text for
+      ⍝ A ⎕ES B), and losing ⎕EM[2;]/[3;] whenever B pushed an
+      ⍝ intermediate SI frame. Now the innermost frame's error is
+      ⍝ captured before the pop loop and restored after, mirroring the
+      ⍝ nonsuspendable-unwind case just below it in the same function.
+      ⍝
+      ⎕EC '⎕ES ''hello'''
+ 0  0 1  hello             
+               ⎕ES 'hello' 
+               ^           
+      ⎕EC '''msg'' ⎕ES 5 5'
+ 0  5 5  msg                 
+               'msg' ⎕ES 5 5 
+               ^     ^       
+      ∇Z←F
+      ⎕ES 'inside F'
+      Z←0
+      ∇
+      ⎕EC 'F'
+ 0  0 1  inside F 
+               F  
+               ^  
+      )ERASE F
+
+      ⍝ #27 (fixed 2026-09-03): apl2lrm.txt's Figure 28 (p.212) literally
+      ⍝ gives the identity FUNCTION for ⊃ and ∼ as ⍳0, with the table's
+      ⍝ own Z←SR⍴⊂.... header applying -- one enclosed ⍳0 per remaining
+      ⍝ frame position (SR), the same broadcast ⍴/,/⍉/↑/⌹ already use.
+      ⍝ ⊃/∼'s own eval_identity_fun() used to return B entirely
+      ⍝ unchanged instead, based on conflating this table entry with a
+      ⍝ different LRM fact (p.42: dyadic ⍳0⊃B ≡ B).
+      ⍝
+      ⍴⊃/3 0⍴0
+3
+      ⍴∼/3 0⍴0
+3
+
+      ⍝ #27 residual (fixed 2026-09-04): the fix above only covered
+      ⍝ ⊃/∼. The N-wise REDUCE identity path (n_wise==0, e.g. 0⌽/⍳5)
+      ⍝ is a separate code path (Bif_OPER1_REDUCE.cc's reduce_n_wise())
+      ⍝ that built its own placeholder empty B for eval_identity_fun()
+      ⍝ to derive an identity from, seeding its "prototype" cell via
+      ⍝ B->get_cproto() -- correct only when B is genuinely empty; for
+      ⍝ a real (non-empty) B, get_cproto()/get_cravel(0,...) returns
+      ⍝ B's actual FIRST ELEMENT instead of a type-correct default (so
+      ⍝ 0⌽/⍳5 wrongly seeded the identity with ⍳5's first element, 1,
+      ⍝ under ⎕IO←1). Fixed by using Value::set_default() instead (as
+      ⍝ the sibling "some OTHER axis is empty" branch a few lines down
+      ⍝ already correctly did) -- it derives a type-correct default
+      ⍝ cell (0 for numeric, space for char, ...) from B via
+      ⍝ Cell::init_type_at(), ignoring B's actual value entirely. Fixed
+      ⍝ in all 3 sites sharing this pattern (scalar-B n_wise==0,
+      ⍝ non-scalar-B n_wise==0, and the "n_wise==(1+len), empty result"
+      ⍝ case).
+      ⍝
+      0⌽/⍳5
+0 0 0 0 0 0
+      0⌽/5
+0 0
+      Z←6⌽/⍳5 ⋄ 2⎕TF 'Z'
+Z←0⍴0
+      )ERASE Z
+
+      ⍝ #28 (2 of 3 sub-cases fixed 2026-09-03) Bif_OPER2_RANK.cc:
+      ⍝ do_ALyXB's empty-frame DOMAIN_ERROR wrongly required a
+      ⍝ broadcast operand (its own frame empty, e.g. A=1 2 3 here) to
+      ⍝ be a scalar; do_LyXB's empty-frame branch forced Z's shape to
+      ⍝ B's whole original shape and fed eval_fill_B() a collapsed
+      ⍝ scalar instead of a properly chunk-shaped placeholder.
+      ⍝
+      ⍝ Revised 2026-09-22 (Blake McBride, Bugs30 #11/#12): Rank's
+      ⍝ empty-frame handling no longer routes through eval_fill_AB(),
+      ⍝ whose generic scalar-function default only derived a type-
+      ⍝ correct zero/space prototype, ignoring the broadcast operand's
+      ⍝ actual value -- it now genuinely evaluates LO (here 1+0, since
+      ⍝ A's broadcast chunk is 1 and B's synthetic chunk is B's own
+      ⍝ prototype 0), matching real Rank-operator implementations
+      ⍝ (confirmed against Dyalog APL) and giving Z the shape +
+      ⍝ would actually produce, not a generic default. The prototype
+      ⍝ is the TYPE of that result (Blake McBride, Bugs32 #18).
+      ⍝
+      Z←(1 2 3)(+⍤1)0 3⍴0 ⋄ 2⎕TF 'Z'
+Z←0 3⍴0
+      )ERASE Z
+      Z←(⍴⍤1)0 3⍴0 ⋄ 2⎕TF 'Z'
+Z←0 1⍴0
+      )ERASE Z
+      Z←(,⍤2)0 3 4⍴0 ⋄ 2⎕TF 'Z'
+Z←0 12⍴0
+      )ERASE Z
+
+      ⍝ #38 residual (fixed 2026-09-03) Parser.cc fix_RANK_syntax()/
+      ⍝ fix_POWER_syntax(): the auto-inserted disambiguating parens used
+      ⍝ to wrap the WHOLE "LO⍤y"/"LO⍣N" phrase, e.g. (⌽[1]⍤2) -- fine
+      ⍝ for a derived LO like +/[1]⍤2, but a plain primitive LO with a
+      ⍝ trailing literal axis (⌽[1]⍤2) hit a separate, deeper parser bug
+      ⍝ for that exact wide-wrapped shape, confirmed pre-existing even
+      ⍝ when hand-typed. Narrowed the closing paren to right before ⍤/⍣
+      ⍝ instead of after y/N -- (LO)⍤y / (LO)⍣N -- semantically
+      ⍝ identical and sidesteps the bug entirely (confirmed working by
+      ⍝ hand for both the derived and primitive LO cases).
+      ⍝
+      +/[1]⍤2⊢2 3⍴⍳6
+5 7 9
+      ⌽[1]⍤2⊢2 3⍴⍳6
+4 5 6
+1 2 3
+      +/[1]⍣2⊢2 3⍴⍳6
+21
+
+      ⍝ #21 residual (fixed 2026-09-03) Prefix::is_value_parenthesis():
+      ⍝ body is walked right-to-left, so for source "))" (e.g. the RO's
+      ⍝ own parenthesized subexpression flush against the LO's closing
+      ⍝ paren, as in (⍴⍤(2-1))) the rightmost token still inside the
+      ⍝ outer parens is itself a ')' (TC_R_PARENT) -- the check here
+      ⍝ tested TC_L_PARENT instead, a class that can never occur in
+      ⍝ that position (array order reverses, token identities don't),
+      ⍝ so it silently never matched. A prior attempt just swapping the
+      ⍝ class also added a spurious pc advance before recursing, which
+      ⍝ skipped past the valid ')' onto an unrelated token and hit this
+      ⍝ same function's own Assert1 on the next call -- fixed by fixing
+      ⍝ both: correct class, no extra advance.
+      ⍝
+      (⍴⍤(2-1))2 3⍴⍳6
+3
+3
+      1 2 3(+⍤1)2 3⍴⍳6
+2 4 6
+5 7 9
+      ({⍵×2}⍣1)2 3⍴⍳6
+2  4  6
+8 10 12
+
+      ⍝ #50 (main repro fixed 2026-09-03) DerivedFunction.cc's
+      ⍝ Derived_LO_M::eval_B()/eval_AB()/eval_XB() (and the
+      ⍝ Derived_LO_M_X siblings) special-cased a value-typed left
+      ⍝ operand by calling oper->eval_AB()/eval_AXB() -- treating the
+      ⍝ OPERATOR ITSELF as a plain dyadic function called with (LO, B),
+      ⍝ discarding LO entirely (always SYNTAX_ERROR) -- instead of
+      ⍝ oper->eval_LB()/eval_LXB(), which already correctly push a
+      ⍝ value OR function LO (the same mechanism the dyadic-operator
+      ⍝ case already used unconditionally, with no such branch).
+      ⍝ Prefix::reduce_A_M_B_()/reduce_A_M_C_B() themselves also needed
+      ⍝ implementing -- the "A M B" phrase already existed in the
+      ⍝ grammar table but only ever handled `/`/`\` and syntax_error()'d
+      ⍝ everything else.
+      ⍝
+      ⎕FX 'Z←(LO OP1) B' 'Z←(⎕NC ''LO'') LO'
+OP1
+      5 OP1 1
+2 5
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      5 {⍶ ⍵} 1
+5 1
+
+      ⍝ #50 residual (fixed 2026-09-03): the direct-application form
+      ⍝ above (5 OP1 1) worked, but the parenthesized, build-then-apply
+      ⍝ form (5 OP1) 1 still SYNTAX_ERROR'd. Root cause: the "A M B"
+      ⍝ phrase (value LO, monadic operator, B all on the stack at
+      ⍝ once) already existed and was fixed above, but the shift-reduce
+      ⍝ grammar table (tools/phrase_gen.def) had no "A M" phrase (value
+      ⍝ LO, monadic operator, no B yet) -- only "F M" (function LO,
+      ⍝ e.g. +/) existed for that 2-token case. Added the missing
+      ⍝ phrase and Prefix::reduce_A_M__(), mirroring reduce_F_M__()'s
+      ⍝ build-only (no eager eval) logic.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      (5 OP1) 1
+2 5
+      )ERASE OP1
+
+      ⍝ non-regression: the new "A M" phrase must not start reducing
+      ⍝ standalone "(A /)" / "(A \)" -- value A followed by the /
+      ⍝ or \ glyph has no derived-function semantics of its own (it
+      ⍝ only means something once a B arrives, as compress/replicate).
+      ⍝ reduce_A_M__() explicitly shifts instead of reducing in that
+      ⍝ case, leaving this a SYNTAX ERROR exactly as before #50.
+      ⍝
+      (5/)3 4
+SYNTAX ERROR+
+      (5/)3 4
+        ^^
+
+      ⍝ #33 (fixed 2026-09-03) Bif_F12_FORMAT.cc's format_one_col_by_spec():
+      ⍝ the exponential-format (negative precision) branch computed its
+      ⍝ formatted string and handed it straight to add_row(), with no
+      ⍝ overflow check at all -- confirmed total, not just off-by-one:
+      ⍝ even a width of 1 produced the full unclamped/untruncated result,
+      ⍝ no error. The sibling fixed-format (precision >= 0) branch, a few
+      ⍝ lines above, already had the correct
+      ⍝ `if (width && data.ssize() > width) ... DOMAIN_ERROR` check;
+      ⍝ mirrored the same block into the exponential branch. ISO/IEC
+      ⍝ 13751's Dyadic Format evaluation sequence (15.4.2) states the
+      ⍝ width-overflow check unconditionally for scalar B, with no
+      ⍝ format-specific exception -- confirming this was a real gap, not
+      ⍝ a threshold dispute. ZZ60_Regression.tc's prior expectation that
+      ⍝ `7 ¯3⍕5.267033354E¯14` (width 7, needs 8 for "5.27E¯14") must
+      ⍝ NOT overflow was itself just capturing this missing-check
+      ⍝ behavior, not independently verified -- updated to the correct
+      ⍝ DOMAIN ERROR along with the other statements sharing that
+      ⍝ column spec.
+      ⍝
+      2 ¯1⍕5
+DOMAIN ERROR+
+      2 ¯1⍕5
+      ^   ^
+      8 ¯3⍕5.267033354E¯14
+5.27E¯14
+      )SIC
+
+      ⍝ #56 (fixed 2026-09-03, three sub-fixes):
+      ⍝ 1. Macro.def's Z__A_LO_INNER_RO_B (the general/matrix-rank
+      ⍝    inner product macro) used to localize ⎕IO←1 "harmlessly, to
+      ⍝    shorten the branch and index arithmetic" -- but LO/RO are
+      ⍝    user-supplied and get CALLED from inside the macro body, so
+      ⍝    the localized ⎕IO leaked into them too. Fixed by never
+      ⍝    touching ⎕IO at all, using ⎕IO-relative axis expressions
+      ⍝    instead (⊂[⎕IO+(⍴⍴μ2)-1]μ2 / ⊂[⎕IO]μ6).
+      ⍝ 2. SymbolTable::find_lambda_name() used to also match a macro's
+      ⍝    own internal parameter symbols (μ1, μ2, ...) when looking for
+      ⍝    a "nicer" name for a currently-executing lambda -- so an
+      ⍝    anonymous {...} operand to a macro-implemented operator
+      ⍝    (EACH, POWER, ...) showed as e.g. "μ3[1]" in error messages
+      ⍝    instead of its own λN identity (the same lambda called
+      ⍝    directly, outside any macro, already correctly showed λN).
+      ⍝    Fixed by skipping μ-prefixed symbols in that search, same
+      ⍝    "hide macros" convention already used by list() ()VARS/
+      ⍝    )FNS/)SYMBOLS) just above it in the same file.
+      ⍝ 3. StateIndicator::list() used to show a macro's own internal
+      ⍝    frame (e.g. "Z__LO_EACH_B[15]") in )SI/)SIS/)SINL -- GNU
+      ⍝    APL implementation detail the user never wrote, not
+      ⍝    something meaningful to debug against. Hidden from the
+      ⍝    non-debug )SI family; ]SI/]SIS (SIM_debug) still show it.
+      ⍝
+      ⎕IO←0
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      F71L←{⍺+⍵+1000×⎕IO}
+      ]FILE_CTL NO_SKIP
+      (2 2⍴1 2 3 4) +.F71L (2 2⍴5 6 7 8)
+15 17
+19 21
+      ⎕IO←1
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      {1÷⍵}¨2 1 0
+DOMAIN ERROR
+λ1[1]  λ←1÷⍵
+         ^^
+      )SI
+λ1[1]
+*
+
+      )SIC
+
+      ⍝ #56 residual, 2 more sub-cases (fixed 2026-09-04): the 3
+      ⍝ symptoms above didn't cover the full "errors inside a
+      ⍝ macro-implemented operator" bug.
+      ⍝ 1. Error::update_error_info() built the error's displayed
+      ⍝    statement (⎕EM[2;]/[3;]) directly from the frame that threw
+      ⍝    -- fine normally, but wrong for a MACRO frame: even a
+      ⍝    PRIMITIVE LO can end up running through the macro (e.g.
+      ⍝    ⍤ with a frame rank ≥1), and the displayed text was then
+      ⍝    the macro's own raw internal bookkeeping statement (μ-named
+      ⍝    variables), not anything the user wrote -- the exact case
+      ⍝    the original #56 fix's own comment flagged as "not covered
+      ⍝    by r2103". Fixed by walking up past any macro frame(s) to
+      ⍝    the nearest real caller before building the displayed
+      ⍝    statement AND its caret range (both were needed -- the
+      ⍝    caret range is only meaningful within the SAME frame the
+      ⍝    statement text came from), mirroring the existing )SI-
+      ⍝    hiding and λ-renaming fixes above but for the error
+      ⍝    message's own statement line. The underlying stored Error
+      ⍝    (used by ⎕EC/⎕EA and safe-execution bookkeeping) still
+      ⍝    correctly reflects the frame that actually threw --
+      ⍝    only the DISPLAY is redirected.
+      ⍝ 2. Z__LO_EACH_B (the EACH macro) indexed B/Z with its raw loop
+      ⍝    counter directly under an implicit assumption that ⎕IO
+      ⍝    stays fixed for the whole loop -- but ⎕IO is a normal
+      ⍝    global system variable, not auto-localized in a lambda, so
+      ⍝    ({⎕IO←0 ⋄ ...}¨)B genuinely and correctly changes it
+      ⍝    partway through, breaking every subsequent iteration's
+      ⍝    indexing. Fixed by recomputing the current-⎕IO-relative
+      ⍝    position fresh at each read/write from a fixed,
+      ⍝    ⎕IO-independent 0-based offset, instead of ⎕IO-resetting
+      ⍝    (which would have incorrectly discarded LO's own, real,
+      ⍝    intended ⎕IO change once the loop completes).
+      ⍝
+      ⍝ Bugs28 #100(g): the walked-up-to caller's own Prefix range, at
+      ⍝ the moment it dispatched into the macro, was a degenerate
+      ⍝ single point (both carets on the derived function's own '(')
+      ⍝ regardless of which operand cell actually failed -- widened to
+      ⍝ the whole statement containing that point when this happens
+      ⍝ (detected via low==high), which for a short one-liner like this
+      ⍝ now brackets the derived-function application itself.
+      ⍝
+      (÷⍤0)0 0
+DOMAIN ERROR
+      (÷⍤0)0 0
+      ^    ^
+      )SIC
+      ]FILE_CTL NO_SKIP
+      ⎕IO←1
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      ({⎕IO←0 ⋄ ⍳⍵}¨)2 3
+ 0 1  0 1 2 
+      ]FILE_CTL NO_SKIP
+      ⎕IO←1
+
+      ⍝ #28 residual (fixed 2026-09-03) DerivedFunction had no
+      ⍝ eval_fill_AB()/eval_fill_B() override at all, inheriting
+      ⍝ Function's hard DOMAIN_ERROR default -- so a derived function
+      ⍝ (+/, +\, ⌽¨, +⍨, ...) used as the LO of an empty-frame LO⍤y
+      ⍝ (Bif_OPER2_RANK.cc's do_LyXB()/do_ALyXB(), fixed for plain
+      ⍝ PrimitiveFunction LO earlier this round) always DOMAIN_ERRORed,
+      ⍝ e.g. (+/⍤1)0 3⍴0. Those callers only need the SHAPE of one
+      ⍝ chunk's result (they reshape or take a prototype cell from it
+      ⍝ afterward, discarding the actual values), so simply evaluating
+      ⍝ normally is safe and correct here, mirroring PrimitiveFunction's
+      ⍝ own eval_fill_AB/eval_fill_B. But NOT unconditionally: a
+      ⍝ derived function whose chain may_push_SI() (e.g. {⍵+1}⍣2 -- LO
+      ⍝ is a lambda) can, when actually evaluated from inside this
+      ⍝ nested C++ call, end up invoking a macro-implemented operator
+      ⍝ from deep inside this same call in a context its own error-
+      ⍝ reporting does not expect -- confirmed to hit an internal
+      ⍝ Assert (Executable.cc:443) rather than a clean DOMAIN_ERROR.
+      ⍝ Guarded with may_push_SI(): falls back to the same hard
+      ⍝ DOMAIN_ERROR as before (not worse than pre-fix) for that shape,
+      ⍝ evaluates normally otherwise.
+      ⍝
+      ⍝ Superseded 2026-09-22 (Blake McBride, Bugs30 #11/#12): Rank's
+      ⍝ empty-frame handling no longer calls eval_fill_AB()/eval_fill_B()
+      ⍝ at all (that pair stays reserved for Each/Outer Product, where
+      ⍝ APL2's LRM documents identity as a *defined* function's fill --
+      ⍝ a convention Rank, absent from APL2 entirely, never had). It
+      ⍝ now calls new eval_rank_fill_AB()/eval_rank_fill_B() methods
+      ⍝ instead, whose default genuinely evaluates LO and, unlike the
+      ⍝ old direct call this guard once protected against, properly
+      ⍝ drives any pushed SI frame to completion (Bif_OPER2_RANK.cc's
+      ⍝ own eval_LO_on_fill_chunk() helper) -- so
+      ⍝ ({⍵+1}⍣2⍤1)0 3⍴0 below no longer needs the may_push_SI() escape
+      ⍝ hatch at all: it now genuinely computes the (empty) result
+      ⍝ instead of falling back to DOMAIN_ERROR.
+      ⍝
+      (+/⍤1)0 3⍴0
+
+      ⍴(+/⍤1)0 3⍴0
+0
+      ⍴(+\⍤1)0 3⍴0
+0 3
+      ⍴(⌽¨⍤1)0 3⍴0
+0 3
+      ⍴(+⍨⍤1)0 3⍴0
+0 3
+      ({⍵+1}⍣2⍤1)0 3⍴0
+
+
+      ⍝ #36 (fixed 2026-09-03) ⎕EA never set ⎕ET/⎕EM after falling back
+      ⍝ to A. Root cause: Prefix::execute_EA_fallback() only recorded
+      ⍝ B's failure onto the caller's SI error slot in its fallthrough
+      ⍝ branch (neither a plain-value A nor a pushed-SI A) -- but that
+      ⍝ branch turned out to be unreachable under normal execution
+      ⍝ (Bif_F1_EXECUTE::execute_statement() only ever returns a value
+      ⍝ or TOK_SI_PUSHED; A itself failing to PARSE is a real C++
+      ⍝ exception instead, bypassing this function entirely). Fixed by
+      ⍝ recording unconditionally, timed AFTER execute_statement()
+      ⍝ returns (not before: it calls ExecuteList::fix() first, which
+      ⍝ unconditionally clears this same slot). Quad_EM/Quad_ET walk
+      ⍝ the current SI frame then parents, stopping at the first
+      ⍝ nonzero error code -- so if A's own (later, async) execution
+      ⍝ also errors, A's nearer frame naturally wins that search for
+      ⍝ free, giving "if both A and B fail, the visible error is A's"
+      ⍝ with no extra logic. A failing to parse similarly falls out
+      ⍝ for free (a real exception, unrelated to this function).
+      ⍝ B's own specific parser diagnostic (e.g. UNBALANCED_R_PARENT,
+      ⍝ major 2 minor 6658 for an unparseable B) is collapsed to the
+      ⍝ generic SYNTAX_ERROR (2 2) for ⎕ET/⎕EM -- not part of the
+      ⍝ stable, documented ⎕ET code space -- but preserved in )MORE
+      ⍝ since that collapse loses real information; a non-syntax-class
+      ⍝ failure (e.g. DOMAIN_ERROR) already says everything via its own
+      ⍝ code, so )MORE is left alone for it, matching Quad_EA.tc's
+      ⍝ pre-existing '⍳3.3' ⎕EA '⍳4.5' case (A also fails, plain
+      ⍝ DOMAIN_ERROR, no )MORE). ⎕EB was checked and does NOT share
+      ⍝ this bug -- it routes B's failure through a plain ⎕ES (normal
+      ⍝ error signalling), not this fallback machinery.
+      ⍝
+      '⎕ET' ⎕EA '1÷0'
+5 4
+      '⍴⎕EM' ⎕EA '1÷0'
+3 12
+      ∇FN36
+       ⎕ES 0 0
+       ⎕ET
+       '2+3' ⎕EA 'A←B)←2)'
+       ⎕ET
+       ⎕ES 0 0
+      ∇
+      FN36
+0 0
+5
+2 2
+      )ERASE FN36
+      '⍳3.3' ⎕EA '⍳4.5'
+DOMAIN ERROR
+      ⍳3.3
+      ^
+
+      ⍝ #36 (also fixed 2026-09-03) A B that fails to PARSE (not just
+      ⍝ fails at runtime) inside ⎕EC used to print straight to the
+      ⍝ console immediately, bypassing ⎕EC's own catch and violating
+      ⍝ its contract that a failed B is caught and returned as a value,
+      ⍝ never surfaced directly -- confirmed independent of ⎕EA/⎕EB
+      ⍝ (bare ⎕EC on an unparseable B, no macro involved, already showed
+      ⍝ it). Root cause: Error::update_error_info() (called from inside
+      ⍝ throw_apl_error(), before any catch runs) only suppresses
+      ⍝ printing when it finds a safe-execution frame walking up from
+      ⍝ where the error occurred -- Quad_EC::eval_B() only marked that
+      ⍝ flag AFTER a successful ExecuteList::fix(), on the newly pushed
+      ⍝ child frame for B's own execution, leaving a B that fails to
+      ⍝ even parse (throwing from deep inside fix() itself, before any
+      ⍝ such frame exists) with no protection at all. Fixed by marking
+      ⍝ the CURRENT frame safe before attempting to parse B, and
+      ⍝ unconditionally restoring it right after (regardless of
+      ⍝ outcome, before doing anything else with it, so the unchanged
+      ⍝ success path's own child-frame depth computation isn't thrown
+      ⍝ off by a leftover temporary bump). Verified nested ⎕EC calls
+      ⍝ and a later, genuinely uncaught error both still behave
+      ⍝ correctly (no over-suppression).
+      ⍝
+      Z←⎕EC 'A←B)←2)'
+      Z
+ 0  2 6658  Unbalanced right parenthesis 
+                  A←B)←2)                
+                     ^                   
+      1÷0
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      ⍝ #59(k) (fixed 2026-09-03) an AXIS ERROR raised to the right of
+      ⍝ a still-pending (not yet reduced into a value) bracket index
+      ⍝ leaked the IndexExpr and its index values, e.g. Z[1;1]⌷[¯1]1:
+      ⍝ )SIC/)CHECK afterwards reported "2 stale values"/"1 stale
+      ⍝ indices". Root cause: the shift-reduce grammar's "MISC F C B"
+      ⍝ phrase (monadic F with an axis, e.g. ⌷[¯1]) pops whatever token
+      ⍝ immediately precedes F off the main stack into a side-channel
+      ⍝ member (saved_MISC) to check a shift/reduce ambiguity -- here
+      ⍝ that popped token was Z[1;1]'s own still-pending index (a
+      ⍝ genuine value's index, not F's axis), which Prefix::
+      ⍝ reduce_MISC_F_C_B() correctly detects and pushes back onto the
+      ⍝ main stack (via value_expected()) so a later, proper "A F C B"
+      ⍝ dyadic reduce can consume it. But that check ran AFTER
+      ⍝ Token::get_function_axis() had already extracted/validated F's
+      ⍝ own axis -- and get_function_axis() itself can throw (AXIS
+      ⍝ ERROR, for ⌷[¯1] applied to a scalar). The throw unwound out of
+      ⍝ reduce_MISC_F_C_B() before the push-back ever ran, abandoning
+      ⍝ saved_MISC (and the IndexExpr it held) with nothing left
+      ⍝ pointing at it -- nothing outside this function inspects
+      ⍝ saved_MISC on an error unwind (unlike the main stack, which the
+      ⍝ individual reduce_*() functions, e.g. reduce_A_C__(), already
+      ⍝ free correctly via their own try/catch). Fixed by moving the
+      ⍝ saved_MISC / value_expected() check to the top of
+      ⍝ reduce_MISC_F_C_B(), before get_function_axis() is called --
+      ⍝ neither depends on F, C or B, so the reorder changes nothing
+      ⍝ for the non-throwing case, but ensures Z[1;1] is always safely
+      ⍝ back on the main stack before anything that can throw runs.
+      ⍝ Z[1;1]+1÷0 and Z[1;1]+[3]1 (no MISC-popping involved, since the
+      ⍝ index resolves via the plain "A C" phrase immediately) never
+      ⍝ leaked and still don't.
+      ⍝
+      Z←2 2⍴⍳4
+      Z[1;1] ⌷[¯1] 1
+AXIS ERROR+
+      Z[1;1]⌷[¯1]1
+      ^     ^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      Z[1;1]+1÷0
+DOMAIN ERROR
+      Z[1;1]+1÷0
+             ^^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ #35 residual (fixed 2026-09-04): the "generate-then-call"
+      ⍝ headline repro was still broken even after the earlier fix
+      ⍝ (which only added a )MORE explanation, not a behavior change).
+      ⍝ StateIndicator::uses_function()'s case 3 blocked ⎕FX redefining
+      ⍝ a function whenever its name was merely TEXTUALLY MENTIONED in
+      ⍝ any SI frame's compiled body -- including a normal, currently
+      ⍝ (and successfully) executing caller, not just a genuinely
+      ⍝ suspended/pendent one. Blake's own cited rule (APL2: "protects
+      ⍝ only functions that are themselves pendent/suspended") and
+      ⍝ case 3's own original justification (preventing a )SAVE crash
+      ⍝ from a stale reference in a FROZEN/suspended frame) both point
+      ⍝ the same way: a live, normally-executing frame's mention isn't
+      ⍝ a )SAVE hazard at all (GNU APL's late symbol binding re-
+      ⍝ resolves it on the next call, unlike a suspended frame that
+      ⍝ may never run again) and shouldn't block. Fixed by gating case
+      ⍝ 3 on the mentioning frame actually being suspended (nonzero
+      ⍝ recorded error), leaving cases 1/2 (ufun itself executing or
+      ⍝ on the parser stack) untouched. Verified both directions:
+      ⍝ RUN 43 below now redefines and calls the NEW GEN (no longer
+      ⍝ runs the stale one); a genuinely suspended function (BAD)
+      ⍝ merely mentioning GEN5 still correctly blocks redefinition
+      ⍝ until )SIC, matching APL2.
+      ⍝
+      ∇Z←RUN N
+      Z←⎕FX 'Z←GEN' ('Z←',⍕N)
+      Z←Z,GEN
+      ∇
+      RUN 42
+GEN 42
+      RUN 43
+GEN 43
+      )ERASE RUN GEN
+      ⎕FX 'Z←GEN5' 'Z←99'
+GEN5
+      ∇Z←BAD
+      Z←GEN5
+      Z←1÷0
+      ∇
+      BAD
+DOMAIN ERROR
+BAD[2]  Z←1÷0
+          ^^
+      ⎕FX 'Z←GEN5' 'Z←2'
+1
+      )SIC
+      ⎕FX 'Z←GEN5' 'Z←2'
+GEN5
+      GEN5
+2
+      )ERASE BAD GEN5
+
+      ⍝ Regression: Bugs28 #26 (Blake McBride). Two operators with
+      ⍝ literal right operands in one expression (e.g. a stranded
+      ⍝ f⍣N combined with a further ⍤y/⍣N) used to trip
+      ⍝ Assert(!has_MISC()) in Prefix::reduce_body() -- a second MISC
+      ⍝ phrase matching while the first one's saved_MISC was still
+      ⍝ pending. That assert was already replaced by a plain
+      ⍝ SYNTAX_ERROR at some point, but via the raw throw_apl_error()
+      ⍝ macro, not this class's own syntax_error() member function --
+      ⍝ so the FIFO-cleanup sweep syntax_error() does (destroy_derived()
+      ⍝ on any already-built DerivedFunction still sitting in the FIFO,
+      ⍝ e.g. "+⍣1" built from the FIRST, otherwise-valid MISC phrase)
+      ⍝ never ran, leaking the DerivedFunctionCache slot -- and the
+      ⍝ Value_P it owns (POWER's literal N, from unstrand_RO_B()) --
+      ⍝ confirmed via )CHECK: "ERROR - 1 stale values"
+      ⍝ (Bif_OPER2_POWER.cc:74). The same gap existed for the sibling
+      ⍝ "missing mandatory right argument" VALENCE_ERROR in
+      ⍝ Prefix::push_END_error() (hit by the no-trailing-B form,
+      ⍝ "+⍣1 1⍤1" alone). Fixed by factoring the sweep out of
+      ⍝ syntax_error() into Prefix::destroy_derived_in_FIFO() and
+      ⍝ calling it from both throw sites. Files: Prefix.cc/.hh.
+      ⍝
+      +⍣1 1⍤1 + 1
+SYNTAX ERROR
+      +⍣1 1⍤1+1
+       ^      ^
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      +⍣1 1⍤1
+VALENCE ERROR+
+      +⍣1 1⍤1
+      ^
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⌊⍣1 2⍤1 = 1
+SYNTAX ERROR
+      ⌊⍣1 2⍤1=1
+       ^      ^
+
+      )SIC
+      ⌊⍣1 2⍣1 = 1
+SYNTAX ERROR+
+      ⌊⍣1 2⍣1=1
+        ^  ^
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ control: single-MISC-phrase forms are unaffected
+      ⍝
+      +⍤1 1⍤1 + 1
+1
+      +⍣1 1 + 1
+2
+      +⍣1 1∘.+ 1
+2
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ Regression: Bugs28 #90 (Blake McBride). Assigning the (missing)
+      ⍝ result of a chain ending in a VOID-returning defined function
+      ⍝ (e.g. X←⍴F1, where F returns no value) used to reach
+      ⍝ Prefix::reduce_V_ASS_F_() -- the "V ← {lambda}" named-lambda-
+      ⍝ assignment phrase -- once "F1" reduced away, leaving "X ← ⍴"
+      ⍝ looking like "V ← {a lambda}" one token later. Since ⍴ (the F
+      ⍝ here) is not actually a lambda, this raised a raw, unexplained
+      ⍝ SYNTAX ERROR via the SYNTAX_ERROR macro directly, bypassing this
+      ⍝ class's own syntax_error() member function and its "was this
+      ⍝ caused by a function producing no value?" check -- so the
+      ⍝ correct VALUE ERROR (which the same expression WITHOUT the
+      ⍝ assignment, bare ⍴F1, already correctly gives) was lost. Fixed
+      ⍝ by calling syntax_error(LOC) instead of the raw macro.
+      ⍝
+      ⎕FX 'ZZ90F B' 'Q←B'
+ZZ90F
+
+      ⍴ZZ90F 1
+VALUE ERROR+
+      ⍴ZZ90F 1
+       ^
+
+      )MORE
+No assignment to result variable Z in e.g. ∇Z←... ?
+      )SIC
+
+      X←⍴ZZ90F 1
+VALUE ERROR+
+      X←⍴ZZ90F 1
+         ^
+
+      )MORE
+No assignment to result variable Z in e.g. ∇Z←... ?
+      )SIC
+
+      ⎕←⍴ZZ90F 1
+VALUE ERROR+
+      ⎕←⍴ZZ90F 1
+         ^
+
+      )MORE
+No assignment to result variable Z in e.g. ∇Z←... ?
+      )SIC
+
+      X←⍴⍎'  '
+VALUE ERROR+
+      X←⍴⍎'  '
+         ^
+
+      )MORE
+No assignment to result variable Z in e.g. ∇Z←... ?
+      )SIC
+
+      ⍝ control: X←F1 (no function between ← and F) already correctly
+      ⍝ gave VALUE ERROR before this fix and still does; a genuine named-
+      ⍝ lambda assignment is unaffected either way
+      ⍝
+      X←ZZ90F 1
+VALUE ERROR+
+      X←ZZ90F 1
+        ^
+      )SIC
+
+      f←{⍵+1}
+      f 5
+6
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      (g←{⍵}) 5
+5
+      1+(h←{⍵})5
+6
+
+      )ERASE ZZ90F f g h
+
+      ⍝ Regression: Bugs28 #60 (Blake McBride). A parenthesized
+      ⍝ replicate/expand inside a selective-specification target
+      ⍝ (e.g. (1↑(2/A))←7) was SYNTAX ERROR, while the same thing
+      ⍝ without the inner (purely grouping, semantically meaningless)
+      ⍝ parens -- (1↑2/A)←7 -- worked fine. This parser shifts right-
+      ⍝ to-left, so by the time A (the underlying variable) is reached,
+      ⍝ the extra ')' from the inner group is ALREADY on the stack on
+      ⍝ top of the one closing the whole target -- and
+      ⍝ Prefix::reduce_V_RPAR_ASS_B() (phrase "V RPAR ASS B", the code
+      ⍝ that resolves A to an lvalue) only ever matches when EXACTLY
+      ⍝ one ')' separates A from the real "← B". With two (or more)
+      ⍝ ')' in the way, that phrase never fires, A is left as a bare,
+      ⍝ unresolved symbol, and once "/" tries to use it as an argument
+      ⍝ the parser -- unable to match "A F B" (which needs a VALUE, not
+      ⍝ a SYMBOL) -- silently misreads "2/" alone as a deferred
+      ⍝ derived-function build instead, and the whole statement gets
+      ⍝ stuck in an unexplained SYNTAX ERROR. Fixed in
+      ⍝ Prefix::push_Symbol(): when at least two ')' are already on the
+      ⍝ stack and the next token isn't itself a symbol (ruling out a
+      ⍝ vector assignment "(T U V)←..." still being collected, and the
+      ⍝ sibling "(F V)←..." form already handled by the generic "F V"
+      ⍝ phrase), resolve the symbol to its lvalue right away -- the
+      ⍝ extra ')' then strip away transparently via ordinary "(value)"
+      ⍝ grouping, and the already-generic "A ASS B" phrase
+      ⍝ (Prefix::reduce_A_ASS_B_()) finishes the write, exactly as it
+      ⍝ already does for e.g. (⊃E)[]←0.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ZZ60A←10 20 30 40 50
+      (1↑2/ZZ60A)←7
+      ZZ60A
+7 20 30 40 50
+
+      ⍝ same target, now with the inner grouping parens that used to
+      ⍝ break it -- must give the identical result
+      ⍝
+      ZZ60A←10 20 30 40 50
+      (1↑(2/ZZ60A))←7
+      ZZ60A
+7 20 30 40 50
+
+      ⍝ control: arbitrarily deeper (here: 3-level) nesting works too,
+      ⍝ not just the specific 2-')' case found by Blake
+      ⍝
+      ZZ60A←10 20 30 40 50
+      ((1↑(2/ZZ60A)))←7
+      ZZ60A
+7 20 30 40 50
+
+      ⍝ control: vector assignment (a sibling "V RPAR ASS B" case that
+      ⍝ must NOT be treated as a selective specification) is unaffected
+      ⍝
+      (ZZ60T ZZ60U)←5 6
+      ZZ60T
+5
+      ZZ60U
+6
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE ZZ60A ZZ60T ZZ60U
+
+      ⍝ Blake McBride's Bugs30 #11/#12: (F⍤k)B and A∘.F B with a *defined*
+      ⍝ F, on an empty frame. See Bif_OPER2_RANK.cc (eval_rank_fill_AB()/
+      ⍝ eval_rank_fill_B(), eval_LO_on_fill_chunk()) for the #11 fix.
+      ⍝
+      ⍝ #11 (⍤, not part of APL2 at all -- ISO 13751 9.3.4/9.3.5 never
+      ⍝ addresses the empty-frame case either) was a real bug: a defined
+      ⍝ LO used to get APL2's Each/Outer-Product-only "identity" fill
+      ⍝ (LRM Figure 20), simply returning the chunk argument unevaluated,
+      ⍝ e.g. ({⍴⍵}⍤1)0 3⍴0 wrongly gave shape 0 3 (B's own chunk shape)
+      ⍝ instead of 0 1 (the shape ⍴ actually produces on one chunk),
+      ⍝ disagreeing with the primitive control (⍴⍤1), which already
+      ⍝ computed the real shape. LO is now genuinely evaluated on a
+      ⍝ synthetic chunk instead, matching real Rank-operator
+      ⍝ implementations -- confirmed against both Dyalog APL and IBM
+      ⍝ APL2 itself (⍤ is a widely adopted extension there too).
+      ⍝
+      ⍴(⍴⍤1)0 3⍴0
+0 1
+      ⍴({⍴⍵}⍤1)0 3⍴0
+0 1
+      ⍴({2↑⍵}⍤1)1 3⍴0
+1 2
+      ⍴({2↑⍵}⍤1)0 3⍴0
+0 2
+      ⍴({⍵,⍵}⍤1)1 3⍴5
+1 6
+      ⍴({⍵,⍵}⍤1)0 3⍴5
+0 6
+
+      ⍝ #12 (∘., genuinely part of APL2): Blake's report expected the
+      ⍝ same treatment as #11 (genuine evaluation of a defined RO), but
+      ⍝ ∘. IS covered by APL2's LRM (Figure 20), which documents identity
+      ⍝ -- not evaluation -- as a defined operation's fill, and real APL2
+      ⍝ confirmed that directly (≡Z, ⍴↑Z, and 2⎕TF all matched GNU APL's
+      ⍝ existing, UNCHANGED output on both cases below). So unlike #11,
+      ⍝ this is NOT a bug: these are regression controls confirming that
+      ⍝ UserFunction::eval_fill_AB()'s plain identity is already correct
+      ⍝ here and must stay that way -- genuinely evaluating a defined RO
+      ⍝ (as #11 now does for LO) would make this WRONG relative to real
+      ⍝ APL2, not right.
+      ⍝
+      Z←⍬∘.,1 2 3 ⋄ ≡Z ⋄ ⍴↑Z ⋄ 2 ⎕TF 'Z'
+2
+2
+Z←0 3⍴(⊂2⍴0 0)
+      )ERASE Z
+      Z←⍬∘.{⍺,⍵}1 2 3 ⋄ ≡Z ⋄ ⍴↑Z ⋄ 2 ⎕TF 'Z'
+1
+
+Z←0 3⍴0
+      )ERASE Z
+      Z←3∘.,0⍴⊂1 2 ⋄ 2 ⎕TF 'Z'
+Z←0⍴(⊂3⍴0 0 0)
+      )ERASE Z
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      Z←3∘.{⍺,⍵}0⍴⊂1 2 ⋄ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+      )ERASE Z
+
+      ⍝ regression (Blake McBride, Bugs31 #29): a selective specification
+      ⍝ rejected by one of the r2121 selectivity guards -- Prefix.cc's
+      ⍝ reduce_MISC_F_B_()/reduce_A_F_B_() (the "F does not genuinely
+      ⍝ select/overtake B" checks) and Bif_OPER1_EACH.cc's matching
+      ⍝ monadic/dyadic guards -- raised SYNTAX_ERROR/let the non-
+      ⍝ selecting function run to its natural VALENCE_ERROR without ever
+      ⍝ calling Value::neutralize_lval_cells() on the rejected lvalue/
+      ⍝ cellrefs array first. Bugs30 #28's fix only covered the
+      ⍝ LENGTH_ERROR branches *inside* assign_cellrefs() itself, one step
+      ⍝ later -- these guards run BEFORE assign_cellrefs() is ever
+      ⍝ reached, so the array (and its live LvalCells) stayed on this
+      ⍝ (unpopped, until )SIC) Prefix's operand stack, a leak (not a
+      ⍝ use-after-free) that )CHECK's "value has N Lval Cells" warning
+      ⍝ then reported. Every one of these must leave )CHECK clean.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      V←1 2 3
+      (+¨V)←9
+SYNTAX ERROR
+      (+¨V)←9
+       ^    ^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      V←1 2 3
+      (↓V)←9 9
+VALENCE ERROR+
+      (↓V)←9 9
+       ^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      A←1 ⋄ B←2
+      (A∊B)←1 2
+SYNTAX ERROR
+      (AϵB)←1 2
+       ^    ^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      A←1 ⋄ B←2
+      (A B[1])←1 2
+RANK ERROR+
+      (A B[1])←1 2
+         ^^
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE V A B
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ regression (Blake McBride, Bugs31 #1): ↑ of a disclosed, enlisted,
+      ⍝ or each'ed lvalue as a selective-specification target segfaulted
+      ⍝ (NULL owner in Value::assign_cellrefs()). It now assigns through
+      ⍝ the selected cell, like the plain control V←1 2 3 ◊ (↑⊃V)←9.
+      ⍝
+      V←(1 2)(3 4) ◊ (↑⊃V)←9 ◊ V
+ 9 2  3 4 
+
+      V←(1 2)(3 4) ◊ (↑∊V)←9 ◊ V
+ 9 2  3 4 
+
+      V←(1 2)(3 4) ◊ (↑↑¨V)←9 ◊ V
+ 9 2  3 4 
+
+      V←2 2⍴(1 2)(3 4)(5 6)(7 8) ◊ (↑⊃V)←9 ◊ V
+ 9 2  3 4 
+ 5 6  7 8 
+
+      V←1 2 3 ◊ (↑⊃V)←9 ◊ V
+9 2 3
+
+      ⍝ ↑ selects one cell, so more values than that is a LENGTH ERROR
+      ⍝
+      V←(1 2)(3 4) ◊ (↑⊃V)←9 9
+LENGTH ERROR+
+      (↑⊃V)←9 9
+      ^    ^
+
+      )SIC
+      V
+ 1 2  3 4 
+
+      ⍝ regression (Blake McBride, Bugs31 #2): ∊ of a disclosed lvalue as
+      ⍝ a selective-specification target segfaulted (the right-value
+      ⍝ enlist path was taken for a mix of LvalCells and fill cells).
+      ⍝ ⊃V is a 3×3 matrix here, so ∊⊃V selects 9 cells, only 6 of which
+      ⍝ are real items of V (the other 3 are fill).
+      ⍝
+      V←(1 2 3)(4 5)(6) ◊ (∊⊃V)←9 ◊ V
+ 9 9 9  9 9  9 
+
+      V←(1 2 3)(4 5)(6) ◊ (∊⊃V)←9 9 9 9 9
+LENGTH ERROR+
+      (ϵ⊃V)←9 9 9 9 9
+      ^    ^
+
+      )SIC
+
+      ⍝ regression (Blake McBride, Bugs31 #3): ⊃ (pick) of an enlisted
+      ⍝ (or ravelled/reversed enlisted, or ravelled disclosed) nested
+      ⍝ lvalue as a selective-specification target segfaulted (NULL cell
+      ⍝ owner in LvalCell::check_consistency()). It is now a clean
+      ⍝ DOMAIN ERROR and V is unchanged.
+      ⍝
+      V←(1 2)(3 4)
+      1⊃∊V
+1
+
+      (1⊃∊V)←9
+DOMAIN ERROR+
+      (1⊃ϵV)←9
+       ^^
+
+      )SIC
+      (1⊃,∊V)←9
+DOMAIN ERROR+
+      (1⊃,ϵV)←9
+       ^^
+
+      )SIC
+      (1⊃⌽∊V)←9
+DOMAIN ERROR+
+      (1⊃⌽ϵV)←9
+       ^^
+
+      )SIC
+      (1⊃,⊃V)←9
+DOMAIN ERROR+
+      (1⊃,⊃V)←9
+       ^^
+
+      )SIC
+      V
+ 1 2  3 4 
+
+      )ERASE V
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝ Blake McBride's Bugs32 report (r2131), group A
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝
+      ⍝ regression (Bugs32 #1): Pick of an enlisted each/disclose of a
+      ⍝ depth-3 variable segfaulted (Pick marker with a 0 owner).
+      ⍝
+      N←((1 2)(3 4))((5 6)(7 8))
+      (1⊃∊⌽¨N)←9
+SYNTAX ERROR+
+      (1⊃ϵ⌽¨N)←9
+      ^        ^
+
+
+
+      )SIC
+      (1⊃∊⊃N)←9
+SYNTAX ERROR+
+      (1⊃ϵ⊃N)←9
+      ^       ^
+
+
+
+      )SIC
+      ⍝ regression (Bugs32 #3): a selector applied to ∊⊃N failed the
+      ⍝ Cell::init_other() assertion (∊ wrote fewer cells than it counted)
+      ⍝
+      (⊂∊⊃N)←9
+SYNTAX ERROR+
+      (⊂ϵ⊃N)←9
+      ^      ^
+
+
+
+      )SIC
+      (⌽∊⊃N)←9
+SYNTAX ERROR+
+      (⌽ϵ⊃N)←9
+      ^      ^
+
+
+
+      )SIC
+      N
+  1 2  3 4    5 6  7 8  
+
+
+      )ERASE N
+      ⍝ regression (Bugs32 #2): →N in B of ⎕EA/⎕EB inside an operator
+      ⍝ hung (→1) or returned garbage (→0)
+      ⍝
+      (⊂'5') ⎕EA¨ ⊂'→1'
+5
+
+
+      (⊂'5') ⎕EA¨ ⊂'→0'
+5
+
+
+      (⊂'5') ∘.⎕EA ⊂'→1'
+5
+
+
+      (⊂'5') ⎕EB¨ ⊂'→2'
+SYNTAX ERROR+
+      (⊂'5')⎕EB¨⊂'→2'
+      ^         ^
+
+
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝ Blake McBride's Bugs32 report (r2131), group B
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝
+      ⍝ regression (Bugs32 #5): the near-real ¯4○ shortcut negated the real
+      ⍝ part for |Re B| ≥ 1, and had the wrong imaginary sign at Re B = 0.
+      ⍝ Since Bugs35 #26 (LRM Figure 18), Re B ≤ ¯1 is negative again, but
+      ⍝ for complex and real B alike
+      ⍝
+      (9○¯4○2J0 ¯2J0 2J¯1E¯11) = ¯4○2 ¯2 2   ⍝ the real parts (Im since #27)
+1 1 1
+
+
+      ×11○¯4○0J1E¯11 0J¯1E¯11 0J1E¯9 0J¯1E¯9
+1 ¯1 1 ¯1
+
+
+      ⍝ regression (Bugs32 #6): A÷B silently gave 0 when |Re B|+|Im B|
+      ⍝ overflowed
+      ⍝
+      ×9 11∘.○1÷1E308J1E308
+1 ¯1
+
+
+      ×9 11∘.○1J1÷1E308J1E308
+1 0
+
+
+      ⍝ regression (Bugs32 #7): (⍬⌷[⍬]V)←B replaced V wholesale
+      ⍝
+      V←1 2 3 ◊ (⍬⌷[⍬]V)←9 ◊ V
+9 9 9
+
+
+      V←1 2 3 ◊ (⍬⌷[⍬]V)←9 8
+LENGTH ERROR+
+      (⍬⌷[⍬]V)←9 8
+      ^       ^
+      )SIC
+
+
+
+      V
+1 2 3
+
+
+      ⍝ regression (Bugs32 #9): 2⎕TF deleted empty function lines
+      ⍝
+      ⊣⎕FX 'Z←FD' 'Z←0' '' '→5' 'Z←1' 'Z←2'
+
+
+
+      T←2 ⎕TF 'FD' ◊ ⊣⎕EX 'FD' ◊ ⊣2 ⎕TF T ◊ T
+⎕FX 'Z←FD' 'Z←0' '' '→5' 'Z←1' 'Z←2'
+
+
+      FD
+2
+
+
+      )ERASE FD T
+
+
+
+      ⍝ regression (Bugs32 #12): ¯1○/¯2○ overflowed above 1.34E154 and
+      ⍝ cancelled catastrophically for large Re B with a small Im B > 0
+      ⍝
+      ⎕PP←10
+
+
+
+      ¯1○1E155
+1.570796327J¯357.5938366
+
+
+      ¯2○1E155
+0J357.5938366
+
+
+      9 11∘.○¯1○1E9J1E¯11
+1.570796327 21.41641302
+
+
+      ⍝ regression (Bugs32 #13): the fixed 1E¯10 near-real band dropped a
+      ⍝ representable imaginary part even at the maximum ⎕PP, and 1 ⎕TF
+      ⍝ lost it for good
+      ⍝
+      ⎕PP←17
+
+
+
+      9007199254740992J1000
+9007199254740992J1000
+
+
+      V←2⍴9007199254740992J1000
+
+
+
+      T←1 ⎕TF 'V' ◊ ⊣⎕EX 'V' ◊ ⊣1 ⎕TF T ◊ 11○V
+1000 1000
+
+
+      ⍝ regression (Bugs32 #14/#15): ⌈ ⌊ | of a large integer and a
+      ⍝ complex number with imaginary part 0, or an integral float, were
+      ⍝ computed through double at ⎕CT←0
+      ⍝
+      ⎕CT←0
+
+
+
+      9007199254740993⌈9007199254740992J0
+9007199254740993
+
+
+      9007199254740995⌊9007199254740996J0
+9007199254740995
+
+
+      9007199254740993|9007199254740992J0
+9007199254740992
+
+
+      9007199254740993|9007199254740994.0
+1
+
+
+      ⎕CT←1E¯13
+
+
+
+      ⎕PP←10
+
+
+
+      ⍝ regression (Bugs32 #16): K!N snapped a tiny nonzero K to 0
+      ⍝
+      1<1E¯11!2
+1
+
+
+      (1E¯11!1E20) > 1
+1
+
+
+      ⍝ regression (Bugs32 #17): scalar member targets were no left values;
+      ⍝ an empty selection of a scalar variable was a SYNTAX ERROR
+      ⍝
+      S.a←5 ◊ (1↓S.a)←9 ◊ S.a
+5
+
+
+      V←5 ◊ (∊¨0↑V)←9 ◊ V
+5
+
+
+      S.a←5 ◊ (⍳S.a)←9
+SYNTAX ERROR
+      (⍳S.a)←9
+       ^     ^
+      )SIC
+
+
+
+      )ERASE S V
+
+
+
+      ⍝ regression (Bugs32 #19): vector assignment was not atomic
+      ⍝
+      X←5 ◊ (X ⎕IO Y)←1 99 2
+DOMAIN ERROR
+      (X ⎕IO Y)←1 99 2
+             ^ ^
+      )SIC
+
+
+
+      X (⎕NC 'Y') ⎕IO
+5 0 1
+
+
+      )ERASE X T
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝ Blake McBride's Bugs32 report (r2131), group B (files)
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝
+      ⍝ WRITE (name lines): write a small .apl file (a )DUMP file only
+      ⍝ needs to start with #!). )COPY prints the file's modification
+      ⍝ time (DUMPED ...), matched by ³ below.
+      ⍝
+∇WRITE B;H;N;T
+ (N T)←B
+ H←'w' ⎕FIO[3] N
+ ⊣(∊T,¨⊂⎕UCS 10) ⎕FIO[23] H
+ ⊣⎕FIO[4] H
+∇
+
+
+
+      ⍝ regression (Bugs32 #8): )PCOPY/)COPY of a structured variable took
+      ⍝ the names of its member lines (S.b) instead of S
+      ⍝
+      F8←'/tmp/ZZ71_Bugs32_8.apl'
+
+
+
+      WRITE F8 ('#!./apl --script' '⍝ structured variable S' '  S.b←2' '  S.a←1' '⍝ end of structured variable S' 'X←7')
+
+
+
+      S.a←99
+
+
+
+      )PCOPY /tmp/ZZ71_Bugs32_8.apl
+DUMPED ³
+
+
+
+      S.a (⎕NC 'X')            ⍝ )PCOPY did not overwrite S
+99 2
+
+
+
+      )ERASE S X
+
+
+
+      S←5
+
+
+
+      )COPY /tmp/ZZ71_Bugs32_8.apl S
+DUMPED ³
+
+
+
+      S.a S.b (⎕NC 'X')        ⍝ S replaced as a whole, only S copied
+1 2 0
+
+
+
+      )ERASE S
+
+
+
+      ⍝ regression (Bugs32 #10): a )COPY'd file that ended while ]FILE_CTL
+      ⍝ skipping swallowed the rest of the calling file (this one)
+      ⍝
+      F10←'/tmp/ZZ71_Bugs32_10.apl'
+
+
+
+      WRITE F10 ('#!./apl --script' 'Z1←1' ']FILE_CTL SKIP_ALL' 'Z2←2')
+
+
+
+      )COPY /tmp/ZZ71_Bugs32_10.apl
+DUMPED ³
+
+
+
+      Z1 (⎕NC 'Z2')
+1 0
+
+
+
+      )ERASE Z1
+
+
+
+      ⍝ the skip mode of the input source that )COPYs a file is restored at
+      ⍝ the end of that file, at any depth of nested )COPYs: F (this file)
+      ⍝ copies G, G copies H, and each file ends in a different skip mode.
+      ⍝ After the )COPY, this file must continue normally, while HX and GX
+      ⍝ (after SKIP_ALL in H and SKIP_GNU in G) must not be defined.
+      ⍝ (]FILE_CTL without an argument shows the current skip mode, but
+      ⍝ like all ] commands it writes to CERR, which is not compared here.)
+      ⍝
+      FG←'/tmp/ZZ71_Bugs32_G.apl' ◊ FH←'/tmp/ZZ71_Bugs32_H.apl'
+
+
+
+      WRITE FH ('#!./apl --script' ']FILE_CTL SKIP_ALL' 'HX←1')
+
+
+
+      WRITE FG ('#!./apl --script' ']FILE_CTL SKIP_APL2' (')COPY ',FH) 'G2←2' ']FILE_CTL SKIP_GNU' 'GX←1')
+
+
+
+      ]FILE_CTL SKIP_APL2
+
+
+
+      )COPY /tmp/ZZ71_Bugs32_G.apl
+DUMPED ³
+
+
+
+      ]FILE_CTL NO_SKIP
+
+
+
+      (⎕NC 'HX') (⎕NC 'GX') G2
+0 0 2
+
+
+
+      ⍝ only the exact mode words are accepted (Bugs32 #29): SKIP_GNUXX
+      ⍝ used to be taken as SKIP_GNU, which skipped the next line
+      ⍝
+      ]FILE_CTL SKIP_GNUXX
+
+
+
+      ⎕←'not skipped'
+not skipped
+
+
+
+      ⊣⎕FIO[19] FG ◊ ⊣⎕FIO[19] FH
+
+
+
+      )ERASE FG FH G2
+
+
+
+      ⍝ regression (Bugs32 #28): ⎕FIO[25] (pclose) of a ⎕FIO[57] handle
+      ⍝ returned 9 and left the handle open
+      ⍝
+      E←⎕FIO[57] '/bin/sh'
+
+
+
+      ⎕FIO[25] E
+DOMAIN ERROR+
+      ⎕FIO[25]E
+      ^
+
+
+
+      )SIC
+
+
+
+      ⎕FIO[4] E
+0
+
+
+
+      ⊣⎕FIO[19] F8 ◊ ⊣⎕FIO[19] F10
+
+
+
+      )ERASE WRITE E F8 F10
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝ Blake McBride's Bugs32 report (r2131), group C
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝
+      ⍝ regression (Bugs32 #20): the parser's constant folding of A⍴B with a
+      ⍝ shape whose volume wraps around 2⋆64 made ⎕FX fail with WS FULL
+      ⍝
+      ⎕FX 'Z←F' 'Z←3 6148914691236517206⍴0'
+F
+
+
+
+
+      )ERASE F
+
+
+
+
+
+      ⍝ regression (Bugs32 #21): using the result of A ⎕EB '→' or A ⎕EA '→'
+      ⍝ was a SYNTAX ERROR; like Z←⍎'→' it abandons the statement silently
+      ⍝
+      Z←'5' ⎕EB '→'
+
+
+
+
+
+      1+'2+2' ⎕EA '→'
+
+
+
+
+
+      ⎕NC 'Z'
+0
+
+
+
+
+      ⍝ regression (Bugs32 #22/#23/#24): ⎕EB reports B's own error message,
+      ⍝ and )MORE names B's failure even if A uses ⎕EC, B does not parse,
+      ⍝ or B is a refused command
+      ⍝
+      '⊣⎕EC "1÷0"' ⎕EB '3÷0'
+DOMAIN ERROR+
+      '⊣⎕EC "1÷0"' ⎕EB '3÷0'
+      ^
+
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: 3÷0
+
+
+
+
+      '' ⎕EB '⎕ES "MY SPECIAL ERROR"'
+MY SPECIAL ERROR+
+      '' ⎕EB '⎕ES "MY SPECIAL ERROR"'
+      ^
+
+
+      '' ⎕EB '((('
+Unbalanced left parenthesis+
+      '' ⎕EB '((('
+      ^
+
+
+      )MORE
+A ⎕EB B: B failed with Unbalanced left parenthesis in: (((
+
+
+
+
+      '' ⎕EB ')CLEAR'
+DOMAIN ERROR+
+      '' ⎕EB ')CLEAR'
+      ^
+
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR: the SI-modifying command ')CLEAR' cannot be executed from within ⎕EC/⎕EA
+
+
+
+
+      '1÷0' ⎕EB '2÷0'        ⍝ A's error wins, )MORE names B's failure
+DOMAIN ERROR+
+      1÷0
+      ^^
+
+
+      )MORE
+A ⎕EB B: B failed with DOMAIN ERROR in: 2÷0
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ regression (Bugs32 #32): a branch in A that swallows B's error left
+      ⍝ the "B failed" )MORE text behind after a successful call
+      ⍝
+∇Z←FOO3
+ Z←'→3' ⎕EB '1÷0'
+ Z←100
+ Z←999
+∇
+
+
+
+
+
+      FOO3
+999
+
+
+
+
+      )MORE
+NO )MORE ERROR INFO
+
+
+
+
+      )ERASE FOO3
+
+
+
+
+
+      ⍝ regression (Bugs32 #25): a rejected selective specification left
+      ⍝ LvalCells in the suspended statement until )SIC
+      ⍝
+      V←1 2 3
+
+
+
+
+
+      (1 0/V)←9
+LENGTH ERROR+
+      (1 0/V)←9
+       ^  ^
+
+
+      (⊂V)←9 9
+LENGTH ERROR+
+      (⊂V)←9 9
+      ^   ^
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )SIC
+
+
+
+
+
+      )ERASE V
+
+
+
+
+
+      ⍝ regression (Bugs32 #27): near-real shortcuts of ¯4○ 0○ ¯5○ ¯7○
+      ⍝ returned 0 where a tiny imaginary part dominates the result
+      ⍝
+      ⎕PP←10
+
+
+
+
+
+      9 11○¯5○0J1E¯11
+0 1E¯11
+
+
+
+
+      9 11○¯7○0J1E¯11
+0 1E¯11
+
+
+
+
+      (×9 11○¯4○1J1E¯11) , 1E¯6<|9○¯4○1J1E¯11
+1 1 1
+
+
+
+
+      (×9 11○0○1J1E¯11) , 1E¯6<|9○0○1J1E¯11
+1 ¯1 1
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝ Blake McBride's Bugs32 report (r2131), group D
+      ⍝ ═══════════════════════════════════════════════════════════════
+      ⍝
+      ⍝ regression (Bugs32 #30): the (⎕UCS n) marker decoder of the inverse
+      ⍝ 2 ⎕TF overflowed into a garbage character for a huge n
+      ⍝
+      2 ⎕TF 'S←''a'',(⎕UCS 99999999999999999),'''''
+DOMAIN ERROR+
+      2 ⎕TF 'S←''a'',(⎕UCS 99999999999999999),'''''
+      ^ ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⎕NC 'S'
+0
+
+
+
+
+
+      ⍝ related: ⎕UCS treats a negative B (¯128 ≤ B < 0) as the byte B+256
+      ⍝ (it used to create the non-encodable character #xFFFFFFFF for ¯1)
+      ⍝
+      ⎕UCS ⎕UCS ¯1 ¯128 255 2147483647
+255 128 255 2147483647
+
+
+
+
+
+      ⎕UCS ¯129
+DOMAIN ERROR
+      ⎕UCS ¯129
+      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ regression (Bugs32 #31): a $ at the end of a line lost the statement
+      ⍝ and the carets of its error message
+      ⍝
+      2+$
+Bad number+
+      $
+      ^^
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+      ]NEXTFILE

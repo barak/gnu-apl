@@ -1,0 +1,1225 @@
+⍝ Bugs37_CD.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs37 severity C and D items that need no files or
+⍝ libraries.
+
+⍝@ test3.
+
+
+
+
+
+      ⍝ Bugs37 #33: ⎕PS←N is ⎕PS←0 N
+      ⍝
+
+
+
+
+
+      ⎕PS←4
+
+
+
+
+
+      ⎕←⎕PS
+0 4
+
+
+      ⎕PS←0 0
+
+
+
+
+
+      ⍝ Bugs37 #34: a function or operator at the right end of a statement is
+      ⍝ a SYNTAX ERROR before anything left of it is executed
+      ⍝
+
+
+
+
+
+      ∇Z←F34 B
+      'F34 called'
+      Z←B
+      ∇
+
+
+
+
+
+      ∇Z←N34
+      'N34 called'
+      Z←3
+      ∇
+
+
+
+
+
+      B←0
+
+
+
+
+
+      (B←7) +
+SYNTAX ERROR+
+      (B←7)+
+           ^
+
+
+      B
+0
+
+
+
+
+      A←5 + (B←6) +
+SYNTAX ERROR+
+      A←5+(B←6)+
+               ^
+
+
+      B
+0
+
+
+
+
+      →(B←8) +
+SYNTAX ERROR+
+      →(B←8)+
+            ^
+
+
+      B
+0
+
+
+
+
+      F34 5 +
+SYNTAX ERROR+
+      F34 5+
+           ^
+
+
+      R←N34 +
+SYNTAX ERROR+
+      R←N34+
+           ^
+
+
+      (B←7) ,[1]
+SYNTAX ERROR+
+      (B←7),[1]
+            ^
+
+
+      B
+0
+
+
+
+
+      2 F34¨
+SYNTAX ERROR+
+      2 F34¨
+           ^
+
+
+      +/2 3
+5
+
+
+
+
+      R←N34
+N34 called
+
+
+
+
+      R
+3
+
+
+
+
+      )SIC
+
+
+
+
+
+      )ERASE F34 N34 R B
+
+
+
+
+
+      ⍝ Bugs37 #36: A!B is 0 for a pole of Γ in the denominator
+      ⍝
+
+
+
+
+
+      0.5!¯0.5
+0
+
+
+
+
+      ¯1!0.5
+0
+
+
+
+
+      1.5!¯1.5
+0
+
+
+
+
+      ¯1.5!0.5
+¯0.125
+
+
+
+
+      0.5!¯1
+DOMAIN ERROR
+      0.5!¯1
+      ^  ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #37/#38: format by example
+      ⍝
+
+
+
+
+
+      ⍴'9,999'⍕0
+5
+
+
+
+
+      '9,999'⍕0 1 1000
+     0,0011,000
+
+
+
+
+      ⍴'555'⍕⍬
+0
+
+
+
+
+      ⍴'555'⍕2 0⍴0
+2 0
+
+
+
+
+      ⍝ Bugs37 #39: selective specification with an axis function
+      ⍝
+
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+
+      (M,[1]M)←0
+SYNTAX ERROR
+      (M,[1]M)←0
+       ^       ^
+
+
+      (M+[1]1 2)←0
+SYNTAX ERROR
+      (M+[1]1 2)←0
+      ^          ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #40: character, fractional, or nested index
+      ⍝
+
+
+
+
+
+      V←1 2 3
+
+
+
+
+
+      V['a']
+DOMAIN ERROR+
+      V['a']
+      ^^
+
+
+      V[1.5]
+DOMAIN ERROR+
+      V[1.5]
+      ^^
+
+
+      V[⊂1 2]
+DOMAIN ERROR+
+      V[⊂1 2]
+      ^^
+
+
+      V[4]
+INDEX ERROR+
+      V[4]
+      ^^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #41: duplicate member names
+      ⍝
+
+
+
+
+
+      X←38 ⎕CR 2 2⍴(⊂'a') 5 (⊂'a') 6
+DOMAIN ERROR+
+      X←38 ⎕CR 2 2⍴(⊂'a')5(⊂'a')6
+        ^  ^
+
+
+      )MORE
+38 ⎕CR B: duplicate member name a in B
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #42: line 2 of a mal-formed selective specification
+      ⍝
+
+
+
+
+
+      ∇Z←A FB37_H2 B
+[1] Z←A+B
+[2] ∇
+
+
+
+
+
+      1÷0
+DOMAIN ERROR
+      1÷0
+      ^^
+
+
+      (2 FB37_H2 V)←9
+SYNTAX ERROR+
+      (2 FB37_H2 V)←9
+      ^            ^
+
+
+      )SIC
+
+
+
+
+
+      )ERASE FB37_H2
+
+
+
+
+
+      ⍝ Bugs37 #43/#46: ⍎ gives the same errors as immediate execution
+      ⍝
+
+
+
+
+
+      ⍎'+/'
+SYNTAX ERROR+
+      +/
+       ^
+
+
+      ⎕ET
+2 2
+
+
+
+
+      ∇FB37_N
+[1] 'in N'
+[2] ∇
+
+
+
+
+
+      ⍎'FB37_N 0'
+in N
+VALUE ERROR+
+      FB37_N 0
+      ^
+
+      ⎕ET
+3 1
+
+
+
+
+      )SIC
+
+
+
+
+
+      )ERASE FB37_N
+
+
+
+
+
+      ⍝ Bugs37 #44: ∇ inside a line closes the definition
+      ⍝
+
+
+
+
+
+      ∇FB37_C
+X←1∇Y
+
+
+
+
+
+      ⎕CR 'FB37_C'
+FB37_C
+X←1   
+
+
+
+      )ERASE FB37_C
+
+
+
+
+
+      ⍝ Bugs37 #45: empty lambda statements
+      ⍝
+
+
+
+
+
+      {⋄⍵+1}5
+6
+
+
+
+
+      {X←⍵⋄⋄X+1}5
+6
+
+
+
+
+      ⍝ Bugs37 #47/#56: subfunction numbers
+      ⍝
+
+
+
+
+
+      65541 ⎕CR ⎕UCS 65 66
+DOMAIN ERROR+
+      65541 ⎕CR ⎕UCS 65 66
+      ^     ^
+
+
+      ⍴⍴⎕FIO[0.5+0.5] 2
+0
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #48/#75: inverse 2 ⎕TF of an invalid assignment is ''
+      ⍝
+
+
+
+
+
+      ⍴2 ⎕TF '⎕IO←7'
+0
+
+
+
+
+      ⎕IO
+1
+
+
+
+
+      ⍴2 ⎕TF '⎕TS←0'
+0
+
+
+
+
+      ⍝ Bugs37 #50: 33 ⎕CR tag range
+      ⍝
+
+
+
+
+
+      34 ⎕CR 33 ⎕CR ¯1 65
+¯1 A
+
+
+
+
+      34 ⎕CR 33 ⎕CR 4294967295 65
+DOMAIN ERROR+
+      34 ⎕CR 33 ⎕CR 4294967295 65
+             ^  ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #52/#55: ⎕FIO[55] and ⎕FIO[61]
+      ⍝
+
+
+
+
+
+      '%f' ⎕FIO[55] 'e'
+
+
+
+
+
+      ⎕FIO[61] 2017 4294967297
+DOMAIN ERROR+
+      ⎕FIO[61]2017 4294967297
+      ^
+
+
+      ⍝ ⎕FIO[61] uses the local time zone, so compare with an integer B
+      ⍝ rather than with a fixed number of seconds (Bill Heagy)
+      ⍝
+      (⎕FIO[61] 2017 1.0 1) = ⎕FIO[61] 2017 1 1
+1
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #53: ⎕FIO[55] fields have no length limit, numeric conversions
+      ⍝ and %s skip leading white space (like C), and a number that does not
+      ⍝ fit is a DOMAIN ERROR
+      ⍝
+
+
+
+
+
+      '%f' ⎕FIO[55] '0.',(40⍴'0'),'5'
+5E¯41
+
+
+
+
+      '%f' ⎕FIO[55] 45⍴'1'
+1.111111111E44
+
+
+
+
+      '%d%d' ⎕FIO[55] '1 2'
+1 2
+
+
+
+
+      '%d' ⎕FIO[55] ' 42'
+42
+
+
+
+
+      '%s%s' ⎕FIO[55] '  ab   cd'
+ ab cd 
+
+
+
+
+      '%c' ⎕FIO[55] ' x'
+ 
+
+
+
+
+      '%f' ⎕FIO[55] 500⍴'1'
+DOMAIN ERROR+
+      '%f' ⎕FIO[55]500⍴'1'
+      ^    ^
+
+
+      )MORE
+⎕FIO scanf: the number 11111111111111111111…1111111111 (500 characters) in B is out of range
+
+
+
+
+      '%d' ⎕FIO[55] 30⍴'9'
+DOMAIN ERROR+
+      '%d' ⎕FIO[55]30⍴'9'
+      ^    ^
+
+
+      '%f' ⎕FIO[55] '1E¯400'
+0
+
+
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs37 #59: NARS styles show an axis length that just fits
+      ⍝
+
+
+
+
+
+      20 ⎕CR ⊂1 1⍴5
+┏1┓
+15┃
+┗∼┛
+
+
+      ⍝ Bugs37 #61/#62: line 2 of an Unbalanced … error
+      ⍝
+
+
+
+
+
+      5∘.×]
+Unbalanced right square bracket+
+      5∘.×]
+          ^
+
+
+      ⎕EC '(1 2'
+ 0  2 2562  Unbalanced left parenthesis 
+                  (1 2                  
+                  ^                     
+
+
+      ⍝ Bugs37 #63: a trailing . after a value or a defined function
+      ⍝
+
+
+
+
+
+      1 2 3 .
+SYNTAX ERROR+
+      1 2 3 .
+            ^
+
+
+      {⍵}.
+SYNTAX ERROR+
+      {⍵}.
+         ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #66: dyadic each extends any 1-element argument (like the scalar
+      ⍝ functions), for every LO, and the shape of Z does not depend on LO
+      ⍝
+
+
+
+
+
+      L66←{⍺+⍵}
+
+
+
+
+
+      (1 1⍴5)+¨2 2⍴⍳4
+6 7
+8 9
+
+
+
+      (1 1⍴5)L66¨2 2⍴⍳4
+6 7
+8 9
+
+
+
+      (1 1⍴5)+¨1 2 3
+6 7 8
+
+
+
+
+      (1 1⍴5)L66¨1 2 3
+6 7 8
+
+
+
+
+      ⍴(,5)+¨,3
+1
+
+
+
+
+      ⍴(,5)L66¨,3
+1
+
+
+
+
+      ⍴(1 1⍴5)L66¨1 1 1⍴3
+1 1 1
+
+
+
+
+      ⍴(1 1⍴5)L66¨3
+1 1
+
+
+
+
+      ⍝ rotate: any 1-element L rotates all vectors (LRM: scalar or one-item
+      ⍝ vector L)
+      ⍝
+
+
+
+
+
+      (1 1⍴1)⌽3 4⍴⍳12
+ 2  3  4 1
+ 6  7  8 5
+10 11 12 9
+
+
+
+
+      (1 1 1⍴¯1)⊖3 4⍴⍳12
+9 10 11 12
+1  2  3  4
+5  6  7  8
+
+
+
+
+      ⍝ replicate and partition: any 1-element A is extended along the axis
+      ⍝ (LRM: scalar or one-item vector A is extended)
+      ⍝
+
+
+
+
+
+      (1 1⍴2)/1 2 3
+1 1 2 2 3 3
+
+
+
+
+      (1 1⍴2)⌿2 3⍴⍳6
+1 2 3
+1 2 3
+4 5 6
+4 5 6
+
+
+
+
+      (1 1⍴1)⊂2 3⍴⍳6
+ 1 2 3 
+ 4 5 6 
+
+
+
+
+      (2 2⍴1)/1 2 3
+RANK ERROR+
+      (2 2⍴1)/1 2 3
+      ^      ^
+
+
+
+
+      (2 2⍴1)L66¨1 2 3
+RANK ERROR+
+      (2 2⍴1)L66¨1 2 3
+      ^      ^
+
+
+      )SIC
+
+
+
+
+
+      )ERASE L66
+
+
+
+
+
+      ⍝ Bugs37 #67: an operand with the wrong valence is a VALENCE ERROR
+      ⍝
+
+
+
+
+
+      ∇Z←FB37_M B
+[1] Z←B
+[2] ∇
+
+
+
+
+
+      FB37_M/1 2 3
+VALENCE ERROR+
+      FB37_M/1 2 3
+      ^
+
+
+      1 2 FB37_M.× 3 4
+VALENCE ERROR+
+      1 2 FB37_M.×3 4
+      ^   ^
+
+
+      )SIC
+
+
+
+
+
+      )ERASE FB37_M
+
+
+
+
+
+      ⍝ Bugs37 #72/#73: 36 ⎕CR and 15 ⎕CR
+      ⍝
+
+
+
+
+
+      36 ⎕CR 'ab' 'c'
+ab
+c
+
+
+
+      15 ⎕CR (14 ⎕CR 1 2 3),'f'
+LENGTH ERROR
+      15 ⎕CR(14 ⎕CR 1 2 3),'f'
+      ^  ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #76: )SYMBOLS takes no count
+      ⍝
+
+
+
+
+
+      )SYMBOLS 100
+BAD COMMAND+
+
+
+
+
+      ⍝ Bugs37 #77/#78: ⎕SYL, ⎕PP, and ⎕TZ assignments
+      ⍝
+
+
+
+
+
+      ⎕SYL[1;2]←3
+DOMAIN ERROR+
+      ⎕SYL[1;2]←3
+      ^        ^
+
+
+      )MORE
+Bad SI depth limit 3 in ⎕SYL[1;2] (expecting 0 for no limit or at least 5)
+
+
+
+
+      ⎕SYL[;2]←34⍴0
+INDEX ERROR+
+      ⎕SYL[;2]←34⍴0
+      ^       ^
+
+
+      ⎕PP←1 1⍴5
+RANK ERROR
+      ⎕PP←1 1⍴5
+      ^  ^
+
+
+      Q←⎕TZ
+
+
+
+
+
+      ⎕TZ←,Q
+
+
+
+
+
+      ⎕TZ←Q
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs37 #81/#83: ⎕FIO nits
+      ⍝
+
+
+
+
+
+      0 ⎕FIO[60] 9
+LENGTH ERROR
+      0 ⎕FIO[60]9
+      ^ ^
+
+
+      ⎕FIO[4] 5 6
+LENGTH ERROR
+      ⎕FIO[4]5 6
+      ^
+
+
+      ⎕FIO[4] 1
+DOMAIN ERROR+
+      ⎕FIO[4]1
+      ^
+
+
+      )MORE
+Attempt to close fd 1 (stdin, stdout, or stderr)
+
+
+
+
+      'ab%' ⎕FIO[58] 1 2 3
+LENGTH ERROR+
+      'ab%' ⎕FIO[58]1 2 3
+      ^     ^
+
+
+      ⎕FIO[29] '/etc',(⎕UCS 0),'x'
+DOMAIN ERROR+
+      ⎕FIO[29]'/etc',(⎕UCS 0),'x'
+      ^
+
+
+      ⎕FIO[2] 2147483648
+DOMAIN ERROR+
+      ⎕FIO[2]2147483648
+      ^
+
+
+      ⍝ Bugs37 #69: a label is a local constant: ⎕EX returns 0 and the label
+      ⍝ stays (⎕NC, →L, and L← all still see a label)
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←Bugs37_EX1' 'Z←⎕NC ''L''' 'Z←Z,⎕EX ''L''' 'Z←Z,⎕NC ''L''' 'L:Z←Z,99'
+Bugs37_EX1
+
+
+
+
+      Bugs37_EX1
+1 0 1 99
+
+
+
+
+      ⎕FX 'Z←Bugs37_EX2' 'Z←⎕EX ''L''' '→L' 'Z←Z,1' 'L:Z←Z,2'
+Bugs37_EX2
+
+
+
+
+      Bugs37_EX2
+0 2
+
+
+
+
+      ⎕FX 'Z←Bugs37_EX3 B' 'Z←⎕EX ''L''' 'L←7' 'Z←L' 'L:'
+Bugs37_EX3
+
+
+
+
+      Bugs37_EX3 5
+SYNTAX ERROR+
+Bugs37_EX3[1]  L←7
+                ^^
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs37 #70: assigning ⍺ ⍵ ⍶ ⍹ χ λ outside a lambda was silently
+      ⍝ ignored; now SYNTAX ERROR (+ MORE), but still allowed while a lambda
+      ⍝ is suspended
+      ⍝
+
+
+
+
+
+      ⍺←1
+SYNTAX ERROR+
+      ⍺←1
+      ^ ^
+
+
+
+
+      )MORE
+⍺ can only be assigned inside a lambda (or while a lambda is suspended)
+
+
+
+
+      ⎕FX 'Z←Bugs37_W B' '⍵←1' 'Z←⍵'
+Bugs37_W
+
+
+
+
+      Bugs37_W 5
+SYNTAX ERROR+
+Bugs37_W[1]  ⍵←1
+             ^ ^
+
+
+
+
+      )SIC
+
+
+
+
+      {⍵←⍵+1 ⋄ ⍵}3
+4
+
+
+
+
+      {÷⍵}0
+DOMAIN ERROR
+λ1[1]  λ←÷⍵
+         ^
+
+
+
+
+      ⍵←9 ⋄ ⍵
+9
+
+
+
+
+      ⍝ Bugs37 #83(f): integer printf conversions need a near-int B
+      ⍝ (rounded), not a C-style truncation
+      ⍝
+
+
+
+
+
+      '%d' ⎕FIO[58] 2.99999999999999
+3
+
+
+
+
+      '%d %x' ⎕FIO[58] 1 2.5
+DOMAIN ERROR+
+      '%d %x' ⎕FIO[58]1 2.5
+      ^       ^
+
+
+
+
+      )MORE
+B[2] (= 2.5) is not an integer, as required by format '%x' in A ⎕FIO.snprintf B
+
+
+
+
+      ⍝ Bugs37 #68: a ( or [ left open before ◊ gets line 2 and a caret
+      ⍝
+
+
+
+
+
+      B68←1 2 3
+
+
+
+
+      B68[1⋄2]
+Unbalanced left square bracket+
+      B68[1◊2]
+         ^
+
+
+
+
+      1+(2⋄3)+4
+Unbalanced left parenthesis+
+      1+(2◊3)+4
+        ^
+
+
+
+
+      B68[1]⋄(2)
+1
+2
+
+
+
+
+      )SIC
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

@@ -61,7 +61,8 @@ static void escape_char( ostream &out, Unicode unicode )
 
 void scalar_value_to_el( ostream &out, Value_P value )
 {
-    const Cell & cell = value->get_cravel( 0 );
+    Cell cache;
+    const Cell & cell = value->get_cravel( 0, cache );
     if (cell.is_integer_cell())       out << cell.get_int_value();
     else if(cell.is_real_cell())      out << cell.get_real_value();
     else if(cell.is_complex_cell())   out << "(:complex "
@@ -74,7 +75,7 @@ void scalar_value_to_el( ostream &out, Value_P value )
 
 static void apl_value_to_el( ostream &out, Value_P value );
 
-//---------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static void
 output_onelevel(ostream &out, Value_P value, int level, int start, int end)
 {
@@ -93,7 +94,8 @@ output_onelevel(ostream &out, Value_P value, int level, int start, int end)
     else {
         for( int i = start ; i < end ; i++ ) {
             if( i > start ) out << " ";
-            apl_value_to_el( out, value->get_cravel( i ).to_value( LOC ) );
+            Cell cache;
+            apl_value_to_el( out, value->get_cravel( i, cache ).to_value( LOC ) );
         }
     }
     out << ")\n";
@@ -117,7 +119,8 @@ static void apl_value_to_el( ostream &out, Value_P value )
         out << "\"";
         int size = shape.get_cols();
         for( int i = 0 ; i < size ; i++ ) {
-            escape_char( out, value->get_cravel( i ).get_char_value() );
+            Cell cache;
+            escape_char( out, value->get_cravel( i, cache ).get_char_value() );
         }
         out << "\"";
     }
@@ -126,7 +129,8 @@ static void apl_value_to_el( ostream &out, Value_P value )
         int size = shape.get_cols();
         for( int i = 0 ; i < size ; i++ ) {
             if( i > 0 ) out << " ";
-            apl_value_to_el( out, value->get_cravel( i ).to_value( LOC ) );
+            Cell cache;
+            apl_value_to_el( out, value->get_cravel( i, cache ).to_value( LOC ) );
         }
         out << ")\n";
     }
@@ -145,6 +149,7 @@ static void apl_value_to_el( ostream &out, Value_P value )
         throw InvalidSymbolContent( "unknown value" );
     }
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -176,3 +181,4 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
         conn.send_reply( exception.get_message() );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

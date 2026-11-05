@@ -28,6 +28,7 @@
 #include "../UserFunction.hh"
 
 #include <sstream>
+//════════════════════════════════════════════════════════════════════════════
 
 void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::string> &args )
 {
@@ -66,3 +67,4 @@ void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::
 
     conn.write_string_to_fd( out.str() );
 }
+//════════════════════════════════════════════════════════════════════════════

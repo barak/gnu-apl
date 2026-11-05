@@ -1,11 +1,13 @@
 ⍝ SaveLoad
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
       +
-VALENCE ERROR+
+SYNTAX ERROR+
       +
       ^
 
@@ -19,7 +21,7 @@ VALENCE ERROR+
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       )SI
-⋆
+*
 
       )SIC
 
@@ -76,16 +78,22 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
       )DROP test.xml
 ³
 
-⍝ Davd Alden 8. Nov. 2025 bugapl@gnu.org
+      ⍝ Davd Alden 8. Nov. 2025 bugapl@gnu.org
 
       )CLEAR
 CLEAR WS
 
       ⍝ Note that { ... } notation does not allow s this
-
-      ⎕FX'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'
+      ⍝
+      ⍝ the argument is named W, not ⍵ as in David Alden's original
+      ⍝ report: ⍵ is now itself rejected as an argument name (Bugs28
+      ⍝ #89, see UserFunction_header.tc), which would trip *that* check
+      ⍝ before ever reaching the "attempt to create a lambda" one this
+      ⍝ test is actually about.
+      ⍝
+      ⎕FX'λ←Test W ;C;D ⍝⍝ π times ΣW' 'λ←○+/W'
 DEFN ERROR+
-      ⎕FX 'λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵' 'λ←○+/⍵'
+      ⎕FX 'λ←Test W ;C;D ⍝⍝ π times ΣW' 'λ←○+/W'
       ^
 
       )MORE
@@ -94,8 +102,8 @@ Attempt (of ⎕FX) to create or edit a lambda. Use { ... } instead.
       ⍝ Test was created despite of the DEFN ERROR
       ⍝
       ⎕CR 'Test'
-λ←Test ⍵ ;C;D ⍝⍝ π times Ʃ⍵
-λ←○+/⍵                     
+λ←Test W ;C;D ⍝⍝ π times ΣW
+λ←○+/W                     
 
       )DROP test.xml
 ³
@@ -108,13 +116,314 @@ Attempt (of ⎕FX) to create or edit a lambda. Use { ... } instead.
 ³
 
       ⎕CR 'Test'
-λ←λ0 ⍵;C;D          
-λ←○+/⍵ ⍝⍝ π times Ʃ⍵
+λ←λ0;C;D            
+λ←○+/W ⍝⍝ π times ΣW
 
       ⎕EX 'Test'
 1
 
+      ⍝ )LOAD above restored the )SI as it was when )SAVE test ran
+      ⍝ (still suspended on the DEFN ERROR, before the )SIC below it),
+      ⍝ so ⎕EX's deferred deletion (Bugs28 #15/#17) is correctly queued
+      ⍝ but not yet safe to actually erase.
+      ⍝
       )CHECK BRIEF
+WARNING - 1 stale functions (not erased)
 
-⍝ ==================================
+      ⍝ )SAVE/)LOAD workspace checksum (see plan.txt): )SAVE appends a
+      ⍝ CRC32 comment after </Workspace>; )LOAD verifies it and warns
+      ⍝ (but still loads) on a mismatch.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )DROP checksum_test.xml
+³
+
+      )WSID checksum_test
+WAS CLEAR WS
+
+      X←'hello'
+
+      ⍝ case 1: unmodified round-trip -- no WARNING. checksum_test.xml
+      ⍝ resolves (via --libroot) to testcases/libroot/workspaces/checksum_test.xml
+      ⍝ -- the raw ⎕FIO calls below use that same resolved path so they edit
+      ⍝ the exact same file that )SAVE/)LOAD operate on.
+      ⍝
+      )SAVE checksum_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+
+      )LOAD checksum_test.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      X
+hello
+
+      ⍝ case 2: edit a decorative XML comment inside <Workspace> (changes
+      ⍝ the checksummed bytes but not the loadability -- comments carry
+      ⍝ no meaning) using raw ⎕FIO, then )LOAD again: expect a WARNING
+      ⍝ but the workspace shall still load correctly
+      ⍝
+      data ← ⎕FIO[26] 'testcases/libroot/workspaces/checksum_test.xml'
+      needle ← '<!-- Symbol Table -->'
+      pos ← (needle ⍷ data) ⍳ 1
+      replacement ← '<!-- Symbol Table (edited) -->'
+      new_data ← ((pos-1)↑data) , replacement , (((pos-1)+≢needle)↓data)
+      Handle ← 'w' ⎕FIO[3] 'testcases/libroot/workspaces/checksum_test.xml'
+      Wcount ← (⎕UCS new_data) ⎕FIO[7] Handle
+
+      ⎕FIO[4] Handle
+0
+
+      ⍝ note: the WARNING itself goes to plain CERR (like the pre-existing
+      ⍝ "this workspace was )SAVEd with a VERY..." warning below), which is
+      ⍝ not DiffOut-instrumented and therefore not part of the reference
+      ⍝ comparison -- only the still-successful )LOAD is verified here.
+      ⍝
+      )LOAD checksum_test.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      X
+hello
+
+      ⍝ )CHECK_WS: check the on-disk checksum(s) without loading. The
+      ⍝ absolute path in the message is not deterministic across checkouts,
+      ⍝ so it is swallowed by ³; checksum_test.xml still has the mismatch
+      ⍝ from case 2 above (the )LOAD WARNING is CERR-only and doesn't fix
+      ⍝ the file on disk). checksum_test.apl doesn't exist, so only one
+      ⍝ line (for the .xml) is reported.
+      ⍝
+      )CHECK_WS checksum_test
+WARNING - ³
+
+      )SAVE checksum_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+
+      )CHECK_WS checksum_test
+OK      - ³
+
+      )CHECK_WS no_such_checksum_test_ws
+no_such_checksum_test_ws: no such workspace file(s)+
+
+      )DROP checksum_test.xml
+³
+
+      ⍝ regression (plan.txt, 2026-09-05): )LOAD/)COPY of a .xml file
+      ⍝ whose trailing 4 NUL bytes (written by )SAVE "so that string
+      ⍝ functions can be used if the file should be mmap()ed") are
+      ⍝ missing -- e.g. a corrupted or truncated file -- used to be
+      ⍝ handled ad-hoc, one call site at a time, by a family of
+      ⍝ specially-bounded bounded_strstr()/bounded_strtoll()/
+      ⍝ bounded_strtod() helpers. Replaced by a single up-front check
+      ⍝ (has_trailing_NUL(), Archive.hh) in both read_Workspace() and
+      ⍝ check_checksum(): every ordinary (unbounded) libc-style scan used
+      ⍝ elsewhere in the reader can then safely assume a real NUL exists
+      ⍝ within the mapped file. A file failing that check is refused
+      ⍝ cleanly instead of being parsed at all.
+      ⍝
+      ⍝ note: like the checksum-mismatch WARNING above, the "is corrupt
+      ⍝ or truncated" message itself goes to plain CERR and is not part
+      ⍝ of the reference comparison -- verify the safe-refusal behavior
+      ⍝ instead: TRUNCTEST must still be undefined afterwards, proving
+      ⍝ )LOAD returned early rather than crashing or partially loading.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )WSID trunc_test
+WAS CLEAR WS
+
+      TRUNCTEST←42
+      )SAVE trunc_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+
+      data ← ⎕FIO[26] 'testcases/libroot/workspaces/trunc_test.xml'
+      new_data ← ¯5↓data
+      Handle ← 'w' ⎕FIO[3] 'testcases/libroot/workspaces/trunc_test.xml'
+      Wcount ← (⎕UCS new_data) ⎕FIO[7] Handle
+
+      ⎕FIO[4] Handle
+0
+
+      )LOAD trunc_test
+      ⎕NC 'TRUNCTEST'
+0
+
+      )DROP trunc_test.xml
+³
+
+      ⍝ Bugs28 #29 regression: a derived function with a value/lambda
+      ⍝ operand (F⍤y, y a value not a function) suspended on the )SI
+      ⍝ used to throw SYNTAX ERROR half-way through )SAVE
+      ⍝ (DerivedFunction::get_RO() calling Token::get_function()
+      ⍝ unconditionally), truncating whatever workspace file already
+      ⍝ existed under that name. )SAVE now encodes a value-bound
+      ⍝ operand as a "*-vid" reference instead of crashing, and writes
+      ⍝ to a temporary file renamed onto the target only on success, so
+      ⍝ a still-imperfect save/reload of this documented-unsupported
+      ⍝ )SI state (see the WARNING, CERR-only and not checked here)
+      ⍝ can no longer destroy a good file.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )DROP dws29.xml
+³
+
+      Z←(⌽⍤1⊢1 2)÷0
+DOMAIN ERROR
+      Z←(⌽⍤1⊢1 2)÷0
+        ^        ^
+
+      )WSID dws29
+WAS CLEAR WS
+
+      )SAVE
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰)  dws29
+
+      )CLEAR
+CLEAR WS
+
+      )LOAD dws29.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      )DROP dws29.xml
+³
+
+      ⍝ regression (Bugs28 #99): )LOAD of a workspace whose <SI-entry
+      ⍝ level="..."> attribute disagrees with the entry's actual
+      ⍝ position in the )SI stack (e.g. a hand-edited or otherwise
+      ⍝ corrupt file) used to hit a raw Assert(lev == level) in
+      ⍝ XML_Loading_Archive::read_SI_entry(), taking down the whole
+      ⍝ session with a C++ assertion backtrace. Thrown as DOMAIN_ERROR
+      ⍝ instead -- and, per explicit direction (stricter than the
+      ⍝ report's own "want" of a partial-recovery diagnostic), no
+      ⍝ longer caught inside read_StateIndicator() at all: the whole
+      ⍝ )LOAD is refused instead of silently accepting a workspace with
+      ⍝ a partially-reconstructed )SI. Workspace::load_WS() clears the
+      ⍝ workspace back out (symbols/functions are read before the
+      ⍝ trailing <StateIndicator>, so F below is already defined by the
+      ⍝ time the corrupt entry is reached) and reports failure, so F is
+      ⍝ gone and )SI is empty afterward, exactly as if the )LOAD had
+      ⍝ never been attempted.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )WSID silevel_test
+WAS CLEAR WS
+
+      ⎕FX 'Z←F B' 'Z←1÷B'
+F
+
+      F 0
+DOMAIN ERROR
+F[1]  Z←1÷B
+        ^^
+
+      )SAVE silevel_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+
+      data ← ⎕FIO[26] 'testcases/libroot/workspaces/silevel_test.xml'
+      needle ← '<SI-entry level="1"'
+      pos ← (needle ⍷ data) ⍳ 1
+      replacement ← '<SI-entry level="5"'
+      new_data ← ((pos-1)↑data) , replacement , (((pos-1)+≢needle)↓data)
+      Handle ← 'w' ⎕FIO[3] 'testcases/libroot/workspaces/silevel_test.xml'
+      Wcount ← (⎕UCS new_data) ⎕FIO[7] Handle
+
+      ⎕FIO[4] Handle
+0
+
+      ⍝ note: the checksum-mismatch WARNING (from the raw ⎕FIO edit
+      ⍝ above) goes to plain CERR, like the other WARNINGs in this
+      ⍝ file, and is not part of the reference comparison. The
+      ⍝ "DOMAIN ERROR+ / F 0" pair below is the level=0 entry's own
+      ⍝ restoration display, which happens (as it would for any
+      ⍝ genuinely suspended function) before the corrupt level=1 entry
+      ⍝ is even reached; the )LOAD is still refused as a whole once it
+      ⍝ is.
+      ⍝
+      )LOAD silevel_test.xml
+DOMAIN ERROR+
+      F 0
+      ^
+)LOAD silevel_test.xml failed: DOMAIN ERROR
+      )SI
+      ⎕NC 'F'
+0
+
+      )DROP silevel_test.xml
+³
+
+      ⍝ regression (plan.txt, 2026-09-07): )COPY of a workspace whose
+      ⍝ file has a corrupted vid="..." for one variable (e.g. hand-
+      ⍝ edited) used to hit a raw Assert() deep inside
+      ⍝ XML_Loading_Archive::read_Variable() and propagate uncaught out
+      ⍝ of Workspace::copy_WS() -- unlike )LOAD, )COPY mutates the
+      ⍝ *live* workspace's Symbols one <Symbol> at a time with no
+      ⍝ CLEAR WS to fall back to, so any symbols already copied before
+      ⍝ the corrupt one (CPA below) stayed overwritten while CPB never
+      ⍝ got a value at all, silently mixing old and new bindings.
+      ⍝ Workspace::copy_WS() now catches the exception, and
+      ⍝ Archive.cc's copy_snapshot_symbol()/copy_restore_snapshots()
+      ⍝ restore every Symbol already touched by this )COPY, so CPA and
+      ⍝ CPB below end up exactly as they were before the )COPY was
+      ⍝ attempted, not the file's 111/222 or a half-copied mix.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      )WSID copy_test
+WAS CLEAR WS
+
+      CPA←111
+      CPB←222
+      )SAVE copy_test
+20⁰-⁰-⁰  ⁰:⁰:⁰ (GMT⁵⁰) 
+
+      data ← ⎕FIO[26] 'testcases/libroot/workspaces/copy_test.xml'
+      posB ← ('"CPB"' ⍷ data) ⍳ 1
+      needleOpen ← 'vid="'
+      relOpen ← (needleOpen ⍷ (posB ↓ data)) ⍳ 1
+      posOpen ← posB + relOpen
+      digitStart ← posOpen + ≢needleOpen
+      afterDigits ← digitStart ↓ data
+      relQuote ← ('"' ⍷ afterDigits) ⍳ 1
+      dropCount ← digitStart + relQuote - 1
+      new_data ← ((digitStart - 1) ↑ data) , '99999' , (dropCount ↓ data)
+      Handle ← 'w' ⎕FIO[3] 'testcases/libroot/workspaces/copy_test.xml'
+      Wcount ← (⎕UCS new_data) ⎕FIO[7] Handle
+
+      ⎕FIO[4] Handle
+0
+
+      ⍝ note: the checksum-mismatch WARNING and the Assert() backtrace
+      ⍝ (from the raw ⎕FIO edit above) go to plain CERR, like the other
+      ⍝ WARNINGs in this file, and are not part of the reference
+      ⍝ comparison -- verify the restore behavior instead: CPA and CPB
+      ⍝ must still be 999/888 (their pre-)COPY values) afterward, and
+      ⍝ still ⎕NC 2 (ordinary variables), proving the )COPY was cleanly
+      ⍝ undone rather than leaving CPA already-overwritten (111) or CPB
+      ⍝ half-defined.
+      ⍝
+      )CLEAR
+CLEAR WS
+
+      CPA←999
+      CPB←888
+      )COPY 0 copy_test
+      ⎕NC 'CPA' 'CPB'
+2 2
+
+      CPA
+999
+
+      CPB
+888
+
+      )DROP copy_test.xml
+³
+
+      ⍝ ==================================
 

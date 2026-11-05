@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "si" network command: report the function name of every frame on
+/// the SI stack, top to bottom (like `)SI`)
 class SiCommand : public NetworkCommand {
 public:
+    /// constructor
     SiCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

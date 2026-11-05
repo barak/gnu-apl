@@ -527,3 +527,4 @@
  Z←,⊂'http://www.gnu.org/software/apl/Library-Guidelines.html'
 ∇
 
+⍝ checksum: crc32=AC87EE88

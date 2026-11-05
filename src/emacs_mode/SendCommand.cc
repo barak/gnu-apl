@@ -51,6 +51,7 @@ ssize_t ret = write( fd, line.c_str(), line.size() );
     else if(ret != ssize_t(line.size()))
         throw ConnectionError( "Incomplete write of buffer" );
 }
+//════════════════════════════════════════════════════════════════════════════
 
 void SendCommand::run_command(NetworkConnection &conn,
                               const vector<string> &args )
@@ -73,7 +74,15 @@ void SendCommand::run_command(NetworkConnection &conn,
         }
     }
 
+#if MINGW_SRC
+    const char * tmp_dir = getenv( "TEMP" );
+    if (!tmp_dir) tmp_dir = getenv( "TMP" );
+    if (!tmp_dir) tmp_dir = "C:/tmp";
+    std::string tmp_prefix = std::string( tmp_dir ) + "/apl_content";
+    TempFileWrapper fd( tmp_prefix );
+#else
     TempFileWrapper fd( "/tmp/apl_content" );
+#endif
     for( vector<string>::iterator i = content.begin() ; i != content.end() ; i++ ) {
         stringstream s;
         s << *i << "\n";
@@ -103,3 +112,4 @@ void SendCommand::run_command(NetworkConnection &conn,
         conn.write_string_to_fd( out.str() );
     }
 }
+//════════════════════════════════════════════════════════════════════════════

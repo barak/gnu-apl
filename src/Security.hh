@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,27 +27,28 @@
 #include "Common.hh"
 #include "UserPreferences.hh"
 
+/// @param what name of the disallowed operation
 extern void not_allowed(const char * what);
 
 #ifndef cfg_SECURITY_LEVEL_WANTED
 
-#error "cfg_SECURITY_LEVEL_WANTED not defined"
+#  error "cfg_SECURITY_LEVEL_WANTED not defined"
 
 #elif cfg_SECURITY_LEVEL_WANTED == 0
 
-#define CHECK_SECURITY(X)
+#  define CHECK_SECURITY(X)
 
 #elif cfg_SECURITY_LEVEL_WANTED == 1
 
-#define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
+#  define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
 
 #elif cfg_SECURITY_LEVEL_WANTED == 2
 
-#define CHECK_SECURITY(X)  not_allowed(#X);
+#  define CHECK_SECURITY(X)  not_allowed(#X);
 
 #else 
 
-#error "Bad SECURITY_LEVEL_WANTED"
+#  error "Bad SECURITY_LEVEL_WANTED"
 
 #endif
 
@@ -59,7 +60,7 @@ extern void not_allowed(const char * what);
 
 /// assertion being fatal if wrong
 #define Assert_fatal(x) if (!(x)) {\
-   cerr << endl << endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
+   get_CERR() << endl << endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
         << endl;   exit(2); }
 
 #endif // __SECURITY_HH_DEFINED__

@@ -26,10 +26,18 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "vars" network command: report the names of workspace symbols,
+/// optionally restricted to variables, functions, or user-defined
+/// ("tagged") ones by an optional argument
 class VariablesCommand : public NetworkCommand {
 public:
+    /// constructor
     VariablesCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

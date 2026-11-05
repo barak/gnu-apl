@@ -2,7 +2,7 @@
    This file is part of GNU APL, a free implementation of the
    ISO/IEC Standard 13751, "Programming Language APL, Extended"
  
-   Copyright (C) 2008-2014  Dr. Jürgen Sauermann
+   Copyright (C) 2008-2026  Dr. Jürgen Sauermann
  
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -74,32 +74,83 @@ and then:
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 
-#include <string>
+#if HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+#endif // HAVE_SYS_SELECT_H
+
+#if HAVE_SYS_SOCKET_H
+#  include <sys/socket.h>
+#endif // HAVE_SYS_SOCKET_H
+
+#include <sys/types.h>
+
+#if HAVE_NETINET_IN_H
+#  include <netinet/in.h>
+#endif // HAVE_NETINET_IN_H
+
+#if HAVE_WINSOCK2_H
+#  include <winsock2.h>
+#endif // HAVE_WINSOCK2_H
+
+#if ! MINGW_SRC
+#  define SOCKET(x) x
+#endif // ! MINGW_SRC
+
+#ifndef MSG_NOSIGNAL
+   // Windows sockets never raise SIGPIPE in the first place (a failed
+   // send() just reports an error), so the flag has nothing to do there;
+   // define it as a harmless no-op bit for platforms (Windows included)
+   // that don't have it.
+#  define MSG_NOSIGNAL 0
+#endif // MSG_NOSIGNAL
+
 #include <iostream>
 #include <iomanip>
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+/// the end of the buffer currently being deserialized by the Sig_item_*
+/// constructors below (set by Signal_base::recv_TCP() before it dispatches
+/// to a signal subclass constructor); used by Sig_item_int (and, through
+/// it, Sig_item_string's own length-prefix read) to bound otherwise
+/// attacker-controlled reads against what was actually received, instead
+/// of trusting a declared length unconditionally.
+static const uint8_t * sig_buffer_end = 0;
+
+//────────────────────────────────────────────────────────────────────────────
 /// an integer signal item of size \b bytes
 template<typename T, int bytes>
+//════════════════════════════════════════════════════════════════════════════
 class Sig_item_int
 {
 public:
    /// construct an item with value \b v
+   /// @param v initial integer value
    Sig_item_int(T v) : value(v & get_mask()) {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_int(const uint8_t * & buffer)
       {
         value = 0;
-        for (int b = 0; b < bytes; ++b)
-            value = value << 8 | *buffer++;
+
+        // sig_buffer_end (declared above) bounds how many bytes were
+        // actually received. Without this check, a
+        // truncated/short signal -- e.g. a MATCH_OR_MAKE whose declared
+        // varname length consumes all remaining bytes -- makes every
+        // following Sig_item_int field (the six u32 to_proc..from_grand
+        // fields, or even Sig_item_string's own u16 length-prefix read,
+        // which itself is a Sig_item_int) walk past the end of the
+        // buffer. Read only what's actually available and zero-pad the
+        // rest instead.
+        const ptrdiff_t remaining =
+           sig_buffer_end ? (sig_buffer_end - buffer) : ptrdiff_t(bytes);
+        const int avail = remaining <= 0 ? 0
+                         : remaining < bytes ? int(remaining) : bytes;
+
+        for (int b = 0; b < avail; ++b)    value = value << 8 | *buffer++;
+        for (int b = avail; b < bytes; ++b)   value = value << 8;
 
         if (bytes == 6 && (value & 0x000080000000000ULL))
            value |= 0xFFFF000000000000ULL;
@@ -109,12 +160,14 @@ public:
    T get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a string
+   /// @param buffer destination string to append the serialised bytes to
    void store(string & buffer) const
       {
         for (int b = bytes; b > 0;)   buffer += char(value >> (8*--b));
       }
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         return out << value;
@@ -130,19 +183,22 @@ public:
    /// the value of the item
    T value;
 };
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a hexadecimal integer signal item of size \b bytes
 template<typename T, int bytes>
 class Sig_item_xint : public Sig_item_int<T, bytes>
 {
 public:
    /// construct an item with value \b v
+   /// @param v initial integer value
    Sig_item_xint(T v) : Sig_item_int<T, bytes>(v) {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_xint(const uint8_t * & buffer) : Sig_item_int<T, bytes>(buffer) {}
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         return out << "0x" << hex << setfill('0') << setw(bytes)
@@ -150,7 +206,7 @@ public:
                    << setfill(' ') << dec;
       }
 };
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 typedef Sig_item_int < int16_t, 1> Sig_item_i8;   ///<   8-bit signed integer
 typedef Sig_item_int <uint16_t, 1> Sig_item_u8;   ///<   8-bit unsigned integer
 typedef Sig_item_xint<uint16_t, 1> Sig_item_x8;   ///<   8-bit hex integer
@@ -175,22 +231,33 @@ class Sig_item_string
 {
 public:
    /// construct an item with value \b v
+   /// @param str initial string value
    Sig_item_string(const string & str)
    : value(str)
    {}
 
    /// construct (deserialize) this item from a (received) buffer
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    Sig_item_string(const uint8_t * & buffer)
       {
         Sig_item_u16 len (buffer);
-        value.reserve(len.get_value() + 2);
-        for (int b = 0; b < len.get_value(); ++b)   value += *buffer++;
+        int len_val = len.get_value();
+        if (sig_buffer_end && buffer + len_val > sig_buffer_end)
+           {
+             // declared length runs past the bytes actually received --
+             // clamp instead of reading adjacent heap/stack memory
+             len_val = sig_buffer_end > buffer ? int(sig_buffer_end - buffer)
+                                               : 0;
+           }
+        value.reserve(len_val + 2);
+        for (int b = 0; b < len_val; ++b)   value += *buffer++;
       }
 
    /// return the value of the item
    const string get_value() const   { return value; }
 
    /// store (aka. serialize) this item into a buffer
+   /// @param buffer destination string to append the serialised bytes to
    void store(string & buffer) const
       {
         const Sig_item_u16 len (value.size());
@@ -199,6 +266,7 @@ public:
       }
 
    /// print the item
+   /// @param out output stream to write to
    ostream & print(ostream & out) const
       {
         bool printable = true;
@@ -223,8 +291,7 @@ protected:
    /// the value of the item
    string value;
 };
-//-----------------------------------------------------------------------------
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// a number identifying the signal
 enum Signal_id
 {
@@ -265,8 +332,8 @@ enum Signal_id
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
    sid_READ_SVAR_RECORD,
 /// APserver result (record) for: read SVAR database record from APserver
@@ -340,7 +407,7 @@ enum Signal_id
 
    sid_MAX,
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// the base class for all signal classes
 class Signal_base
 {
@@ -349,9 +416,11 @@ public:
    virtual ~Signal_base() {}
 
    /// store (encode) the signal into buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const = 0;
 
    /// print the signal
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const = 0;
 
    /// return the ID of the signal
@@ -361,6 +430,8 @@ public:
    virtual const char * get_sigName() const = 0;
 
    /// get function for an item that is not defined for the signal
+   /// @param signal name of the signal class that was queried
+   /// @param member name of the member that does not exist for this signal
    void bad_get(const char * signal, const char * member) const
       {
         cerr << endl << "*** called function get_" << signal << "__" << member
@@ -399,7 +470,7 @@ public:
    virtual uint8_t get__SET_STATE__new_state() const   ///< dito
       { bad_get("SET_STATE", "new_state"); return 0; }
    virtual string get__SET_STATE__sloc() const   ///< dito
-      { bad_get("SET_STATE", "sloc"); return 0; }
+      { bad_get("SET_STATE", "sloc"); return string(); }
 
 
 /// APserver request: set control of shared var \b key
@@ -423,9 +494,9 @@ public:
    virtual uint32_t get__VALUE_IS__error() const   ///< dito
       { bad_get("VALUE_IS", "error"); return 0; }
    virtual string get__VALUE_IS__error_loc() const   ///< dito
-      { bad_get("VALUE_IS", "error_loc"); return 0; }
+      { bad_get("VALUE_IS", "error_loc"); return string(); }
    virtual string get__VALUE_IS__cdr_value() const   ///< dito
-      { bad_get("VALUE_IS", "cdr_value"); return 0; }
+      { bad_get("VALUE_IS", "cdr_value"); return string(); }
 
 
 /// APserver request: SVAR←X
@@ -433,7 +504,7 @@ public:
    virtual uint64_t get__ASSIGN_VALUE__key() const   ///< dito
       { bad_get("ASSIGN_VALUE", "key"); return 0; }
    virtual string get__ASSIGN_VALUE__cdr_value() const   ///< dito
-      { bad_get("ASSIGN_VALUE", "cdr_value"); return 0; }
+      { bad_get("ASSIGN_VALUE", "cdr_value"); return string(); }
 
 /// APserver result for: SVAR←X
    /// access functions for signal SVAR_ASSIGNED...
@@ -442,7 +513,7 @@ public:
    virtual uint32_t get__SVAR_ASSIGNED__error() const   ///< dito
       { bad_get("SVAR_ASSIGNED", "error"); return 0; }
    virtual string get__SVAR_ASSIGNED__error_loc() const   ///< dito
-      { bad_get("SVAR_ASSIGNED", "error_loc"); return 0; }
+      { bad_get("SVAR_ASSIGNED", "error_loc"); return string(); }
 
 
 /// APserver request: Can svar key be referenced ?
@@ -463,8 +534,8 @@ public:
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
    /// access functions for signal READ_SVAR_RECORD...
    virtual uint64_t get__READ_SVAR_RECORD__key() const   ///< dito
@@ -473,7 +544,7 @@ public:
 /// APserver result (record) for: read SVAR database record from APserver
    /// access functions for signal SVAR_RECORD_IS...
    virtual string get__SVAR_RECORD_IS__record() const   ///< dito
-      { bad_get("SVAR_RECORD_IS", "record"); return 0; }
+      { bad_get("SVAR_RECORD_IS", "record"); return string(); }
 
 
 /// APserver request: is ID registered ?
@@ -503,13 +574,13 @@ public:
    virtual uint8_t get__REGISTER_PROCESSOR__evconn() const   ///< dito
       { bad_get("REGISTER_PROCESSOR", "evconn"); return 0; }
    virtual string get__REGISTER_PROCESSOR__progname() const   ///< dito
-      { bad_get("REGISTER_PROCESSOR", "progname"); return 0; }
+      { bad_get("REGISTER_PROCESSOR", "progname"); return string(); }
 
 
 /// APserver request: match offered shared variable or make a new offer
    /// access functions for signal MATCH_OR_MAKE...
    virtual string get__MATCH_OR_MAKE__varname() const   ///< dito
-      { bad_get("MATCH_OR_MAKE", "varname"); return 0; }
+      { bad_get("MATCH_OR_MAKE", "varname"); return string(); }
    virtual uint32_t get__MATCH_OR_MAKE__to_proc() const   ///< dito
       { bad_get("MATCH_OR_MAKE", "to_proc"); return 0; }
    virtual uint32_t get__MATCH_OR_MAKE__to_parent() const   ///< dito
@@ -556,7 +627,7 @@ public:
 /// APserver result for: get offering processors  (⎕SVQ)
    /// access functions for signal OFFERING_PROCS_ARE...
    virtual string get__OFFERING_PROCS_ARE__offering_procs() const   ///< dito
-      { bad_get("OFFERING_PROCS_ARE", "offering_procs"); return 0; }
+      { bad_get("OFFERING_PROCS_ARE", "offering_procs"); return string(); }
 
 
 /// APserver request: get offered variables  (⎕SVQ)
@@ -570,7 +641,7 @@ public:
 /// APserver result for: get offered variables  (⎕SVQ)
    /// access functions for signal OFFERED_VARS_ARE...
    virtual string get__OFFERED_VARS_ARE__offered_vars() const   ///< dito
-      { bad_get("OFFERED_VARS_ARE", "offered_vars"); return 0; }
+      { bad_get("OFFERED_VARS_ARE", "offered_vars"); return string(); }
 
 
 /// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
@@ -634,7 +705,7 @@ public:
    virtual uint64_t get__ASSIGN_WSWS_VAR__key() const   ///< dito
       { bad_get("ASSIGN_WSWS_VAR", "key"); return 0; }
    virtual string get__ASSIGN_WSWS_VAR__cdr_value() const   ///< dito
-      { bad_get("ASSIGN_WSWS_VAR", "cdr_value"); return 0; }
+      { bad_get("ASSIGN_WSWS_VAR", "cdr_value"); return string(); }
 
 /// APserver request: X←ws-ws SVAR
    /// access functions for signal READ_WSWS_VAR...
@@ -644,7 +715,7 @@ public:
 /// APserver result for: X←ws-ws SVAR
    /// access functions for signal WSWS_VALUE_IS...
    virtual string get__WSWS_VALUE_IS__cdr_value() const   ///< dito
-      { bad_get("WSWS_VALUE_IS", "cdr_value"); return 0; }
+      { bad_get("WSWS_VALUE_IS", "cdr_value"); return string(); }
 
 
 /// APserver request: print the entire database (for command ]SVARS)
@@ -653,11 +724,17 @@ public:
 /// APserver result for: print the entire database
    /// access functions for signal SVAR_DB_PRINTED...
    virtual string get__SVAR_DB_PRINTED__printout() const   ///< dito
-      { bad_get("SVAR_DB_PRINTED", "printout"); return 0; }
+      { bad_get("SVAR_DB_PRINTED", "printout"); return string(); }
 
 
 
    /// receive a signal (TCP)
+   /// @param tcp_sock TCP (or AF_UNIX) socket file descriptor to read from
+   /// @param buffer caller-supplied working buffer for receiving data
+   /// @param bufsize size in bytes of buffer
+   /// @param del set to a heap-allocated buffer if buffer was too small; caller must delete[]
+   /// @param debug optional stream for debug output; nullptr suppresses output
+   /// @param loc set to the source location where the function returned
    inline static Signal_base * recv_TCP(int tcp_sock, char * buffer,
                                         int bufsize, char * & del,
                                         ostream * debug, const char ** loc);
@@ -665,14 +742,26 @@ public:
 protected:
 
    /// send this signal on TCP (or AF_UNIX) socket tcp_sock
+   /// @param tcp_sock socket file descriptor to send on
    int send_TCP(int tcp_sock) const
        {
          string buffer;
          store(buffer);
 
+         // MSG_NOSIGNAL: without it, send() on a socket whose peer has
+         // already disconnected raises SIGPIPE, whose default action is
+         // to terminate the process -- one misbehaving/disconnecting
+         // client killed the whole APserver (and every other client's
+         // shared variables with it) instead of this send() merely
+         // reporting an error via its return value/errno=EPIPE.
          uint32_t ll = htonl(buffer.size());
-         send(tcp_sock, reinterpret_cast<const char *>(&ll), 4, 0);
-         ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(), 0);
+         const ssize_t sent_len = send(tcp_sock,
+                                       reinterpret_cast<const char *>(&ll),
+                                       4, MSG_NOSIGNAL);
+         if (sent_len != 4)   return -1;   // short/failed send of length
+         const ssize_t sent = send(tcp_sock, buffer.data(), buffer.size(),
+                                   MSG_NOSIGNAL);
+         if (sent != ssize_t(buffer.size()))   return -1;   // short/failed
          return sent;
        }
 };
@@ -682,13 +771,15 @@ protected:
 
 
 /// APserver request: ⎕SVO
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAKE_OFFER
 class MAKE_OFFER_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    MAKE_OFFER_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -696,11 +787,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAKE_OFFER_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAKE_OFFER);
@@ -709,6 +802,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAKE_OFFER(";
@@ -730,13 +824,15 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver request: ⎕SVR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal RETRACT_OFFER
 class RETRACT_OFFER_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    RETRACT_OFFER_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -744,11 +840,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    RETRACT_OFFER_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_OFFER);
@@ -757,6 +855,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_OFFER(";
@@ -778,13 +877,15 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver request: ⎕SVR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal RETRACT_VAR
 class RETRACT_VAR_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    RETRACT_VAR_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -792,11 +893,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    RETRACT_VAR_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_RETRACT_VAR);
@@ -805,6 +908,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "RETRACT_VAR(";
@@ -825,13 +929,15 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal DISCONNECT
 class DISCONNECT_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    DISCONNECT_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -839,11 +945,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    DISCONNECT_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_DISCONNECT);
@@ -852,6 +960,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "DISCONNECT(";
@@ -874,13 +983,17 @@ protected:
 };
 
 /// APserver request: set state of shared var \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SET_STATE
 class SET_STATE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _new_state new state value to set
+   /// @param _sloc source location string for diagnostics
    SET_STATE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_state,
@@ -892,6 +1005,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SET_STATE_c(const uint8_t * & buffer)
    : key(buffer),
      new_state(buffer),
@@ -899,6 +1013,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_STATE);
@@ -909,6 +1024,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SET_STATE(";
@@ -941,13 +1057,16 @@ protected:
 };
 
 /// APserver request: set control of shared var \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SET_CONTROL
 class SET_CONTROL_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _new_control new control value to set
    SET_CONTROL_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u8 _new_control)
@@ -957,12 +1076,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SET_CONTROL_c(const uint8_t * & buffer)
    : key(buffer),
      new_control(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SET_CONTROL);
@@ -972,6 +1093,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SET_CONTROL(";
@@ -999,13 +1121,15 @@ protected:
 };
 
 /// APserver request: X←SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_VALUE
 class GET_VALUE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
    GET_VALUE_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1013,11 +1137,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_VALUE_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_VALUE);
@@ -1026,6 +1152,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_VALUE(";
@@ -1048,13 +1175,18 @@ protected:
 };
 
 /// APserver result for: X←SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal VALUE_IS
 class VALUE_IS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _error error code from the get operation
+   /// @param _error_loc source location where the error occurred
+   /// @param _cdr_value CDR-encoded value of the shared variable
    VALUE_IS_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _error,
@@ -1068,6 +1200,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    VALUE_IS_c(const uint8_t * & buffer)
    : key(buffer),
      error(buffer),
@@ -1076,6 +1209,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_VALUE_IS);
@@ -1087,6 +1221,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "VALUE_IS(";
@@ -1124,13 +1259,16 @@ protected:
 };
 
 /// APserver request: SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ASSIGN_VALUE
 class ASSIGN_VALUE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _cdr_value CDR-encoded value to assign to the shared variable
    ASSIGN_VALUE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_string _cdr_value)
@@ -1140,12 +1278,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ASSIGN_VALUE_c(const uint8_t * & buffer)
    : key(buffer),
      cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_VALUE);
@@ -1155,6 +1295,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_VALUE(";
@@ -1181,13 +1322,17 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 /// APserver result for: SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_ASSIGNED
 class SVAR_ASSIGNED_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _error error code from the assign operation
+   /// @param _error_loc source location where the error occurred
    SVAR_ASSIGNED_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _error,
@@ -1199,6 +1344,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_ASSIGNED_c(const uint8_t * & buffer)
    : key(buffer),
      error(buffer),
@@ -1206,6 +1352,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_ASSIGNED);
@@ -1216,6 +1363,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_ASSIGNED(";
@@ -1248,13 +1396,16 @@ protected:
 };
 
 /// APserver request: Can svar key be referenced ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAY_USE
 class MAY_USE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _attempt use-attempt counter
    MAY_USE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_i32 _attempt)
@@ -1264,12 +1415,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAY_USE_c(const uint8_t * & buffer)
    : key(buffer),
      attempt(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_USE);
@@ -1279,6 +1432,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAY_USE(";
@@ -1306,13 +1460,16 @@ protected:
 };
 
 /// APserver request: Can svar key be assigned ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MAY_SET
 class MAY_SET_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key
+   /// @param _attempt set-attempt counter
    MAY_SET_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_i32 _attempt)
@@ -1322,12 +1479,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MAY_SET_c(const uint8_t * & buffer)
    : key(buffer),
      attempt(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MAY_SET);
@@ -1337,6 +1496,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MAY_SET(";
@@ -1365,16 +1525,18 @@ protected:
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal READ_SVAR_RECORD
 class READ_SVAR_RECORD_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key whose record is requested
    READ_SVAR_RECORD_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1382,11 +1544,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    READ_SVAR_RECORD_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_SVAR_RECORD);
@@ -1395,6 +1559,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "READ_SVAR_RECORD(";
@@ -1416,13 +1581,15 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver result (record) for: read SVAR database record from APserver
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_RECORD_IS
 class SVAR_RECORD_IS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _record serialised SVAR database record
    SVAR_RECORD_IS_c(int s,
                 Sig_item_string _record)
    : record(_record)
@@ -1430,11 +1597,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_RECORD_IS_c(const uint8_t * & buffer)
    : record(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_RECORD_IS);
@@ -1443,6 +1612,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_RECORD_IS(";
@@ -1465,13 +1635,17 @@ protected:
 };
 
 /// APserver request: is ID registered ?
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal IS_REGISTERED_ID
 class IS_REGISTERED_ID_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID to query
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    IS_REGISTERED_ID_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1483,6 +1657,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    IS_REGISTERED_ID_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1490,6 +1665,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_IS_REGISTERED_ID);
@@ -1500,6 +1676,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "IS_REGISTERED_ID(";
@@ -1532,13 +1709,15 @@ protected:
 };
 
 /// APserver result: yes (1) or no (0)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal YES_NO
 class YES_NO_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _yes boolean result: 1 for yes, 0 for no
    YES_NO_c(int s,
                 Sig_item_u8 _yes)
    : yes(_yes)
@@ -1546,11 +1725,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    YES_NO_c(const uint8_t * & buffer)
    : yes(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_YES_NO);
@@ -1559,6 +1740,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "YES_NO(";
@@ -1581,13 +1763,19 @@ protected:
 };
 
 /// APserver request: register processor proc in APserver
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal REGISTER_PROCESSOR
 class REGISTER_PROCESSOR_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID to register
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
+   /// @param _evconn event-connection flag
+   /// @param _progname program name of the registering process
    REGISTER_PROCESSOR_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1603,6 +1791,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    REGISTER_PROCESSOR_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1612,6 +1801,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_REGISTER_PROCESSOR);
@@ -1624,6 +1814,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "REGISTER_PROCESSOR(";
@@ -1666,13 +1857,21 @@ protected:
 };
 
 /// APserver request: match offered shared variable or make a new offer
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MATCH_OR_MAKE
 class MATCH_OR_MAKE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _varname name of the shared variable
+   /// @param _to_proc target processor ID
+   /// @param _to_parent target parent processor ID
+   /// @param _to_grand target grandparent processor ID
+   /// @param _from_proc offering processor ID
+   /// @param _from_parent offering parent processor ID
+   /// @param _from_grand offering grandparent processor ID
    MATCH_OR_MAKE_c(int s,
                 Sig_item_string _varname,
                 Sig_item_u32 _to_proc,
@@ -1692,6 +1891,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MATCH_OR_MAKE_c(const uint8_t * & buffer)
    : varname(buffer),
      to_proc(buffer),
@@ -1703,6 +1903,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE);
@@ -1717,6 +1918,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE(";
@@ -1769,13 +1971,15 @@ protected:
 };
 
 /// APserver result for: match or make
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal MATCH_OR_MAKE_RESULT
 class MATCH_OR_MAKE_RESULT_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key resulting shared variable key
    MATCH_OR_MAKE_RESULT_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1783,11 +1987,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    MATCH_OR_MAKE_RESULT_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_MATCH_OR_MAKE_RESULT);
@@ -1796,6 +2002,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "MATCH_OR_MAKE_RESULT(";
@@ -1819,13 +2026,15 @@ protected:
 
 
 /// APserver request: find processor ID that offers \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal FIND_OFFERING_ID
 class FIND_OFFERING_ID_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key to look up
    FIND_OFFERING_ID_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -1833,11 +2042,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    FIND_OFFERING_ID_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_OFFERING_ID);
@@ -1846,6 +2057,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "FIND_OFFERING_ID(";
@@ -1868,13 +2080,17 @@ protected:
 };
 
 /// APserver result for: find processor ID that offers \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERING_ID_IS
 class OFFERING_ID_IS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID that offers the variable
+   /// @param _parent parent processor ID of the offering processor
+   /// @param _grand grandparent processor ID of the offering processor
    OFFERING_ID_IS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -1886,6 +2102,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERING_ID_IS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -1893,6 +2110,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_ID_IS);
@@ -1903,6 +2121,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_ID_IS(";
@@ -1935,13 +2154,15 @@ protected:
 };
 
 /// APserver request: get offering processors  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_OFFERING_PROCS
 class GET_OFFERING_PROCS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_to_proc processor ID that received the offers
    GET_OFFERING_PROCS_c(int s,
                 Sig_item_u32 _offered_to_proc)
    : offered_to_proc(_offered_to_proc)
@@ -1949,11 +2170,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_OFFERING_PROCS_c(const uint8_t * & buffer)
    : offered_to_proc(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERING_PROCS);
@@ -1962,6 +2185,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERING_PROCS(";
@@ -1984,13 +2208,15 @@ protected:
 };
 
 /// APserver result for: get offering processors  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERING_PROCS_ARE
 class OFFERING_PROCS_ARE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offering_procs serialised list of offering processor IDs
    OFFERING_PROCS_ARE_c(int s,
                 Sig_item_string _offering_procs)
    : offering_procs(_offering_procs)
@@ -1998,11 +2224,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERING_PROCS_ARE_c(const uint8_t * & buffer)
    : offering_procs(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERING_PROCS_ARE);
@@ -2011,6 +2239,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERING_PROCS_ARE(";
@@ -2033,13 +2262,16 @@ protected:
 };
 
 /// APserver request: get offered variables  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_OFFERED_VARS
 class GET_OFFERED_VARS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_to_proc processor ID that received the offers
+   /// @param _accepted_by_proc processor ID that accepted the offers
    GET_OFFERED_VARS_c(int s,
                 Sig_item_u32 _offered_to_proc,
                 Sig_item_u32 _accepted_by_proc)
@@ -2049,12 +2281,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_OFFERED_VARS_c(const uint8_t * & buffer)
    : offered_to_proc(buffer),
      accepted_by_proc(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_OFFERED_VARS);
@@ -2064,6 +2298,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_OFFERED_VARS(";
@@ -2091,13 +2326,15 @@ protected:
 };
 
 /// APserver result for: get offered variables  (⎕SVQ)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal OFFERED_VARS_ARE
 class OFFERED_VARS_ARE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _offered_vars serialised list of offered variable names/keys
    OFFERED_VARS_ARE_c(int s,
                 Sig_item_string _offered_vars)
    : offered_vars(_offered_vars)
@@ -2105,11 +2342,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    OFFERED_VARS_ARE_c(const uint8_t * & buffer)
    : offered_vars(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_OFFERED_VARS_ARE);
@@ -2118,6 +2357,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "OFFERED_VARS_ARE(";
@@ -2140,13 +2380,15 @@ protected:
 };
 
 /// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal FIND_PAIRING_KEY
 class FIND_PAIRING_KEY_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key to find the pairing partner for
    FIND_PAIRING_KEY_c(int s,
                 Sig_item_x64 _key)
    : key(_key)
@@ -2154,11 +2396,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    FIND_PAIRING_KEY_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_FIND_PAIRING_KEY);
@@ -2167,6 +2411,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "FIND_PAIRING_KEY(";
@@ -2189,13 +2434,15 @@ protected:
 };
 
 /// APserver result for: find pairing key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal PAIRING_KEY_IS
 class PAIRING_KEY_IS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _pairing_key the paired variable key (CTL/DAT counterpart)
    PAIRING_KEY_IS_c(int s,
                 Sig_item_x64 _pairing_key)
    : pairing_key(_pairing_key)
@@ -2203,11 +2450,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    PAIRING_KEY_IS_c(const uint8_t * & buffer)
    : pairing_key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PAIRING_KEY_IS);
@@ -2216,6 +2465,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "PAIRING_KEY_IS(";
@@ -2239,13 +2489,17 @@ protected:
 
 /// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal GET_EVENTS
 class GET_EVENTS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID whose events are requested
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    GET_EVENTS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -2257,6 +2511,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    GET_EVENTS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -2264,6 +2519,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_GET_EVENTS);
@@ -2274,6 +2530,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "GET_EVENTS(";
@@ -2306,13 +2563,17 @@ protected:
 };
 
 /// APserver request: clear all events for one processor
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal CLEAR_ALL_EVENTS
 class CLEAR_ALL_EVENTS_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _proc processor ID whose events are to be cleared
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
    CLEAR_ALL_EVENTS_c(int s,
                 Sig_item_u32 _proc,
                 Sig_item_u32 _parent,
@@ -2324,6 +2585,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    CLEAR_ALL_EVENTS_c(const uint8_t * & buffer)
    : proc(buffer),
      parent(buffer),
@@ -2331,6 +2593,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_CLEAR_ALL_EVENTS);
@@ -2341,6 +2604,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "CLEAR_ALL_EVENTS(";
@@ -2374,13 +2638,16 @@ protected:
 
 
 /// APserver result for: clear all events for one processor (first cleared svar
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal EVENTS_ARE
 class EVENTS_ARE_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key that has the event
+   /// @param _events bitmask of pending events for the variable
    EVENTS_ARE_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _events)
@@ -2390,12 +2657,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    EVENTS_ARE_c(const uint8_t * & buffer)
    : key(buffer),
      events(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_EVENTS_ARE);
@@ -2405,6 +2674,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "EVENTS_ARE(";
@@ -2432,13 +2702,19 @@ protected:
 };
 
 /// APserver request: add an event for \b key
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ADD_EVENT
 class ADD_EVENT_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key for which the event is added
+   /// @param _proc processor ID to notify
+   /// @param _parent parent processor ID
+   /// @param _grand grandparent processor ID
+   /// @param _event event code to add
    ADD_EVENT_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_u32 _proc,
@@ -2454,6 +2730,7 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ADD_EVENT_c(const uint8_t * & buffer)
    : key(buffer),
      proc(buffer),
@@ -2463,6 +2740,7 @@ public:
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ADD_EVENT);
@@ -2475,6 +2753,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ADD_EVENT(";
@@ -2517,13 +2796,16 @@ protected:
 };
 
 /// APserver request: ws-ws SVAR←X
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal ASSIGN_WSWS_VAR
 class ASSIGN_WSWS_VAR_c : public Signal_base
 {
 public:
 
    /// contructor that creates the signal and sends it on TCP socket s
+   /// @param s TCP socket to send the signal on
+   /// @param _key shared variable key for the ws-ws variable
+   /// @param _cdr_value CDR-encoded value to assign
    ASSIGN_WSWS_VAR_c(int s,
                 Sig_item_x64 _key,
                 Sig_item_string _cdr_value)
@@ -2533,12 +2815,14 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    ASSIGN_WSWS_VAR_c(const uint8_t * & buffer)
    : key(buffer),
      cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_ASSIGN_WSWS_VAR);
@@ -2548,6 +2832,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "ASSIGN_WSWS_VAR(";
@@ -2574,7 +2859,7 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 /// APserver request: X←ws-ws SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal READ_WSWS_VAR
 class READ_WSWS_VAR_c : public Signal_base
 {
@@ -2588,11 +2873,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    READ_WSWS_VAR_c(const uint8_t * & buffer)
    : key(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_READ_WSWS_VAR);
@@ -2601,6 +2888,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "READ_WSWS_VAR(";
@@ -2622,7 +2910,7 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 /// APserver result for: X←ws-ws SVAR
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal WSWS_VALUE_IS
 class WSWS_VALUE_IS_c : public Signal_base
 {
@@ -2636,11 +2924,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    WSWS_VALUE_IS_c(const uint8_t * & buffer)
    : cdr_value(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_WSWS_VALUE_IS);
@@ -2649,6 +2939,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "WSWS_VALUE_IS(";
@@ -2671,7 +2962,7 @@ protected:
 };
 
 /// APserver request: print the entire database (for command ]SVARS)
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal PRINT_SVAR_DB
 class PRINT_SVAR_DB_c : public Signal_base
 {
@@ -2683,10 +2974,12 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    PRINT_SVAR_DB_c(const uint8_t * & buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_PRINT_SVAR_DB);
@@ -2694,6 +2987,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "PRINT_SVAR_DB(";
@@ -2711,7 +3005,7 @@ public:
 protected:
 };
 /// APserver result for: print the entire database
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The class for signal SVAR_DB_PRINTED
 class SVAR_DB_PRINTED_c : public Signal_base
 {
@@ -2725,11 +3019,13 @@ public:
 
    /// construct (deserialize) this item from a (received) buffer
    /// id has already been load()ed.
+   /// @param buffer serialised byte stream; advanced past the consumed bytes
    SVAR_DB_PRINTED_c(const uint8_t * & buffer)
    : printout(buffer)
    {}
 
    /// store (aka. serialize) this signal into a buffer
+   /// @param buffer destination string to append the encoded signal to
    virtual void store(string & buffer) const
        {
          const Sig_item_u16 signal_id(sid_SVAR_DB_PRINTED);
@@ -2738,6 +3034,7 @@ public:
        }
 
    /// print this signal on out.
+   /// @param out output stream to write to
    virtual ostream & print(ostream & out) const
       {
         out << "SVAR_DB_PRINTED(";
@@ -2758,8 +3055,7 @@ public:
 protected:
    Sig_item_string printout;   ///< printout
 };
-
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 /// a union big enough for all signal classes
 struct _all_signal_classes_
@@ -2802,8 +3098,8 @@ struct _all_signal_classes_
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
         char u_READ_SVAR_RECORD[sizeof(READ_SVAR_RECORD_c)];
 /// APserver result (record) for: read SVAR database record from APserver
@@ -2876,10 +3172,11 @@ struct _all_signal_classes_
         char u_SVAR_DB_PRINTED[sizeof(SVAR_DB_PRINTED_c)];
 
 };
+//════════════════════════════════════════════════════════════════════════════
 
 enum { MAX_SIGNAL_CLASS_SIZE = sizeof(_all_signal_classes_) };
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Signal_base *
 Signal_base::recv_TCP(int tcp_sock, char * buffer, int bufsize,
                       char * & del, ostream * debug,
@@ -2901,7 +3198,7 @@ ssize_t siglen = 0;
        {
          fd_set readfds;
          FD_ZERO(&readfds);
-         FD_SET(tcp_sock, &readfds);
+         FD_SET(SOCKET(tcp_sock), &readfds);
 
          errno = 0;
          const int select__result = select(tcp_sock + 1, &readfds, 0, 0, 0);
@@ -2913,7 +3210,7 @@ ssize_t siglen = 0;
               return 0;   // most likely: connection was closed by the peer
             }
 
-         if (!FD_ISSET(tcp_sock, &readfds))
+         if (!FD_ISSET(SOCKET(tcp_sock), &readfds))
             {
               *loc = LOC;
               return 0;   // never happens
@@ -2941,6 +3238,24 @@ ssize_t siglen = 0;
       {
         *loc = LOC;
         return 0;   // close
+      }
+
+   // siglen is a raw 4-byte length taken directly off the (unauthenticated,
+   // local TCP) wire, with no upper bound: an oversized value would size a
+   // heap allocation up to 4 GiB below (del = new char[siglen]) -- a
+   // resource-exhaustion DoS at best, or (on a 32-bit build, where ssize_t
+   // is 32 bits) a value >= 0x80000000 turns siglen negative here, bypasses
+   // the siglen > bufsize check below, and reaches recv() as a huge size_t
+   // -- a stack-buffer write overflow. Reject anything past a sane maximum
+   // up front; no legitimate signal (fixed header + one shared-variable
+   // value) is anywhere near this large.
+   //
+   enum { MAX_TCP_SIGNAL_SIZE = 64 << 20 };   // 64 MiB
+   if (siglen < 0 || siglen > MAX_TCP_SIGNAL_SIZE)
+      {
+        cerr << "*** bad siglen " << siglen << " in recv_TCP()" << endl;
+        *loc = LOC;
+        return 0;
       }
 
 // debug && *debug << "signal length is " << siglen << " in recv_TCP()" << endl;
@@ -2987,6 +3302,7 @@ char * rx_buf = buffer + MAX_SIGNAL_CLASS_SIZE;
 // debug && *debug << "rx_bytes is " << rx_bytes << " in recv_TCP()" << endl;
 
 const uint8_t * b = reinterpret_cast<const uint8_t *>(rx_buf);
+   sig_buffer_end = b + siglen;   // bounds Sig_item_int/Sig_item_string, see their comments
 Sig_item_u16 signal_id(b);
 
 Signal_base * ret = 0;
@@ -3030,8 +3346,8 @@ Signal_base * ret = 0;
 
 /// APserver request: read SVAR database record from APserver
 ///
-///		apl/APnnn	--> READ_SVAR_RECORD		APserver
-///				<-- SVAR_RECORD_IS
+///             apl/APnnn       --> READ_SVAR_RECORD            APserver
+///                             <-- SVAR_RECORD_IS
 ///
         case sid_READ_SVAR_RECORD: ret = new READ_SVAR_RECORD_c(b);   break;
 /// APserver result (record) for: read SVAR database record from APserver
@@ -3115,4 +3431,4 @@ Signal_base * ret = 0;
    *loc = LOC;
    return ret;   // invalid id
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────

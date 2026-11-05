@@ -1,11 +1,18 @@
 ⍝ AP210.tc
 ⍝ ----------------------------------
 
+      ⍝ this testcase requires shared variables, which --noSV or
+      ⍝ SharedVars Disabled (or a failed connection to APserver) turn off
+      ⍝
+      ]NEXTFILE NO-SVARS
+
+
+
       )CLEAR
 CLEAR WS
 
-⍝      ⎕DL 1
-⍝²
+      ⍝      ⎕DL 1
+      ⍝²
 
       VARS←2 4⍴'C210D210'
 
@@ -151,6 +158,6 @@ CLEAR WS
 
       ]SVARS
 
-⍝ ==================================
+      ⍝ ==================================
 
 

@@ -1,0 +1,16 @@
+⍝ Pick.tc
+⍝ ═══════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A scalar/vector depth≤2 int or empty; implicit ⎕IO
+      ⍝ inv: A⊃B ←→ B   when A is empty (picks whole array)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      ((⍳0)⊃B) ≡ B
+1
+      ⍝ inv: ↑B ←→ (⊂(⍴⍴B)⍴1)⊃B   (first item)
+      B ← (⎕RVAL 1 (,3) (,0 1 0 0 0))(⎕RVAL 1 (,3) (,0 1 0 0 0))
+      (↑B) ≡ (⊂(⍴⍴B)⍴1)⊃B
+1

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "Function.hh"
 #include "Error.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
     A defined function written in C++.
  */
@@ -49,6 +49,8 @@ public:
       { return valid; }
 
    /// ⎕FX a native funtion from a shared library (dlopen) handle
+   /// @param so_name path to the shared library (.so) file
+   /// @param apl_name APL name to assign to the loaded function
    static NativeFunction * fix(const UCS_string & so_name,
                                const UCS_string & apl_name);
 
@@ -65,20 +67,30 @@ public:
       };
 
    /// load shared lib for emacs mode, return error info on failure
+   /// @param emacs_arg argument string passed from emacs mode initialisation
    static UCS_string load_emacs_library(const char * emacs_arg);
 
 protected:
    /// constructor (only fix() may call it)
+   /// @param so_name path to the shared library (.so) file
+   /// @param apl_name APL name to assign to this function
    NativeFunction(const UCS_string & so_name, const UCS_string & apl_name);
 
    /// destructor: close so_handle
    ~NativeFunction();
 
-   /// open .so file in one of several directories. On success set handle 
+   UCS_string get_name() const
+      { return name; }
+
+   /// open .so file in one of several directories. On success set handle
    /// and update so_path.
+   /// @param t4 error/diagnostic text accumulator (updated on failure)
+   /// @param so_path resolved library path (updated on success)
    static void * open_so_file(UCS_string & t4, UCS_string & so_path);
 
    /// try to open one .so file
+   /// @param filename candidate path for the shared library
+   /// @param t4 error/diagnostic text accumulator (updated on failure)
    static void * try_one_file(const char * filename, UCS_string & t4);
 
    /// overloaded Function::is_defined()
@@ -94,68 +106,110 @@ protected:
    virtual bool is_operator() const;
 
    /// Overloaded Function::print_properties()
+   /// @param out output stream for the property listing
+   /// @param indent indentation level for formatting
    virtual void print_properties(ostream & out, int indent) const;
 
    /// Overloaded Function::print()
+   /// @param out output stream to print the function name to
    virtual ostream & print(std::ostream&) const;
 
    /// Overloaded Function::canonical()
+   /// @param with_lines true to include line numbers in the canonical form
    virtual UCS_string canonical(bool with_lines) const;
 
    /// Overloaded Function::eval_()
    virtual Token eval_() const;
 
    /// Overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   /// @param B right APL argument value
+   virtual Token eval_B(cValue_R B) const;
 
    /// Overloaded Function::eval_AB()
-   virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param B right APL argument value
+   virtual Token eval_AB(cValue_R A, cValue_R B) const;
 
    /// Overloaded Function::eval_LB()
-   virtual Token eval_LB(Token & LO, Value_P B) const;
+   /// @param LO left operand token
+   /// @param B right APL argument value
+   virtual Token eval_LB(Token & LO, cValue_R B) const;
 
    /// Overloaded Function::eval_ALB()
-   virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param B right APL argument value
+   virtual Token eval_ALB(cValue_R A, Token & LO, cValue_R B) const;
 
    /// Overloaded Function::eval_LRB()
-   virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right APL argument value
+   virtual Token eval_LRB(Token & LO, Token & RO, cValue_R B) const;
 
    /// Overloaded Function::eval_ALRB()
-   virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param B right APL argument value
+   virtual Token eval_ALRB(cValue_R A, Token & LO, Token & RO, cValue_R B) const;
 
    /// Overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B) const;
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_XB(cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_AXB(cValue_R A, cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_LXB()
-   virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
+   /// @param LO left operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_LXB(Token & LO, cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_ALXB()
-   virtual Token eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_ALXB(cValue_R A, Token & LO, cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_LRXB()
-   virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_LRXB(Token & LO, Token & RO, cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
-                            Value_P X, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param LO left operand token
+   /// @param RO right operand token
+   /// @param X axis specification value
+   /// @param B right APL argument value
+   virtual Token eval_ALRXB(cValue_R A, Token & LO, Token & RO,
+                            cValue_R X, cValue_R B) const;
 
    /// Overloaded Function::eval_fill_B()
-   virtual Token eval_fill_B(Value_P B) const;
+   /// @param B right APL argument value
+   virtual Token eval_fill_B(cValue_R B) const;
 
    /// Overloaded Function::eval_fill_AB()
-   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
+   /// @param A left APL argument value
+   /// @param B right APL argument value
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const;
 
    /// Overloaded Function::eval_identity_fun()
-   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+   /// @param B right APL argument value
+   /// @param axis the axis along which the identity element applies
+   virtual Token eval_identity_fun(cValue_R B, sAxis axis) const;
 
    /// Overloaded Function::destroy()
    virtual void destroy();
-
-   UCS_string get_name() const
-      { return name; }
 
    /// dl_open() handle of shared library
    void * handle;
@@ -178,7 +232,7 @@ protected:
    /// all native functions currently active
    static std::vector<NativeFunction *> valid_functions;
 
-   typedef Value_P Vr;   ///< shortcut for Value_P
+   typedef const cValue * Vr;   ///< shortcut for const cValue *
 
    typedef const Function & Fr;   ///< shortcut for const Function &
 
@@ -237,6 +291,6 @@ protected:
    /// callback before library is closed
    bool (*close_fun)(Cause cause, const NativeFunction * caller);
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __NATIVE_FUNCTION_HH_DEFINED__

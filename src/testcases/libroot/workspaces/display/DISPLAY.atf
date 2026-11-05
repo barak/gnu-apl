@@ -1,0 +1,130 @@
+XNPP 0 10                                                                     ø
+XNIO 0 1                                                                      ø
+XNCT 0 1Eı13                                                                  ø
+XCFC 1 6 .,*0_ı                                                               ø
+XNRL 0 16807                                                                  ø
+XCPR 1 1                                                                      ø
+XCLX 1 5 COIBM                                                                ø
+ CABSTRACT 2 1 59 DISPLAY contains functions to show the structure of ar       ø
+Xrays.                                                                         ø
+XCCHANGE_ACTIVITY 2 0 0                                                        ø
+ CCOIBM 2 2 36 Licensed Materials - Property of IBM(c) Copyright IBM Cor       ø
+Xp. 1984, 1997.                                                                ø
+ CDESCRIBE 2 26 62 The DISPLAY workspace contains three functions:             ø
+                                                                               ø
+ Z½DISPLAY  X   Z is a character array which pictorially                       ø
+       represents the array X.  DISPLAY uses                         box       ø
+  drawing characters.                                                          ø
+                                    Z½DISPLAYC X   Z is a character arra       ø
+ y which pictorially                      represents the array X.  DISPL       ø
+ AYC uses                        characters from the APL2 character set.       ø
+                                                                       Z       ø
+ ½DISPLAYG X   Equivalent to DISPLAY.  Supplied for                            ø
+      compatibility with other APL2 platforms.                                 ø
+                                            The following characters are       ø
+  used to convey shape information:    ¸ or Ç indicates a dimension of a       ø
+ t least one,                 é or è indicates a dimension of zero,            ø
+                     (none of the above) indicates no dimension.               ø
+                                                                      Th       ø
+ e following characters are used to convey type information:     ~ indic       ø
+ ates numeric,                                          + indicates mixe       ø
+ d,                                            î indicates nested,             ø
+                                      _ indicates a scalar character whi       ø
+ ch is at the same depth       as non-scalar arrays.                           ø
+                    (none of the above) indicates a character array whic       ø
+Xh is        not a simple scalar.                                              ø
+*(1991 6 29 15 0 0 244)                                                        ø
+ FDISPLAY FX 'D½S DISPLAY A;IO;R;C;HL;HC;HT;HB;VL;VB;V;W;N;B'                ø
+  'ä Display a general array in pictorial form'                                ø
+  'ä  Normal call is monadic.  Dyadic call used only in'                       ø
+  'ä    recursion to specify display rank, shape, and depth.' 'IO½0'          ø
+  '¯(0=NC ''S'')/''S½æA''' 'R½Ææ,S                   ä Pseudo rank'           ø
+  'C½''¿ÚÀÙ''                 ä UR, UL, LL, and LR corners'                    ø
+  'HL½''Ä''                   ä Horizontal line'                               ø
+  'HC½HL,''é¸'',HL,''~+î''      ä Horizontal borders'                          ø
+  'HT½HC[(0<R)õ1+0<Æı1Æ,S]' 'äW½,0ÏşÆ0æâ(1©æA)ÆA'                              ø
+  'HB½HC[3+3¾(''2õ~AÏ®A'' EA ''1+Æî0õ(1©õ/æA)Æ,A'')+3õ1<ææS]'                 ø
+  'VL½''³''                   ä Vertical line'                                 ø
+  'VB½VL,''èÇ''               ä Vertical border'                               ø
+  'V½VB[(1<R)õ1+0<ı1Æı1Ç,S]'                                                   ø
+  '¯(0îæA)/''A½(1©æA)æâÆA''   ä Show prototype of empties'                     ø
+  '¸(1<ÏA)/GEN' '¸(2<ææA)/D3'                                                  ø
+  'D½®A                     ä Simple arrays' 'W½1ÆæD½(ı2Æ1 1,æD)æD'            ø
+  'N½ı1+1ÇæD' '¸(0=ææA)/SS'                                                    ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' '¸0' 'SS:HB½((0 '' '')=Æ0æâA)/'' -'''                                     ø
+  'D½'' '',('' '',[0]D,[0]HB,Næ'' ''),'' ''' '¸0'                              ø
+  'GEN:D½®DISPLAYşA          ä Enclosed arrays' 'N½Dë.ô'' '''                  ø
+  'D½(Në~1èN)ğD' 'D½(ëğ~''  ''ÑD)/D' 'D½((1,æS)æS)DISPLAY D'                   ø
+  '¸(2òæ,S)ÇD3E,0'                                                             ø
+  'D3:D½0 ı1Ç0 1Ç®âA         ä Multi-dimensional arrays' 'W½1ÆæD'              ø
+  'N½ı1+1ÇæD'                                                                  ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' 'D3E:N½ı2+æ,S'                                                            ø
+  'V½C[Næ1],[0]VB[1+0<ı2Ç,S],[0](((ı3+ÆæD),N)æVL),[0]C[Næ2]' 'D½V,D'           ø
+  'äÕä APL2/6000 FKEY verification tag - DO NOT REMOVE, MUST BE LAST LIN       ø
+XE'                                                                            ø
+*(1991 6 29 15 0 0 244)                                                        ø
+ FDISPLAYC FX 'D½S DISPLAYC A;IO;R;C;HL;HC;HT;HB;VL;VB;V;W;N;B'              ø
+  'ä Display a general array in pictorial form'                                ø
+  'ä  Normal call is monadic.  Dyadic call used only in'                       ø
+  'ä    recursion to specify display rank, shape, and depth.' 'IO½0'          ø
+  '¯(0=NC ''S'')/''S½æA''' 'R½Ææ,S                   ä Pseudo rank'           ø
+  'C½''..''''''''''               ä UR, UL, LL, and LR corners'                ø
+  'HL½''-''                   ä Horizontal line'                               ø
+  'HC½HL,''é¸'',HL,''~+î''      ä Horizontal borders'                          ø
+  'HT½HC[(0<R)õ1+0<Æı1Æ,S]' 'äW½,0ÏşÆ0æâ(1©æA)ÆA'                              ø
+  'HB½HC[3+3¾(''2õ~AÏ®A'' EA ''1+Æî0õ(1©õ/æA)Æ,A'')+3õ1<ææS]'                 ø
+  'VL½''|''                   ä Vertical line'                                 ø
+  'VB½VL,''èÇ''               ä Vertical border'                               ø
+  'V½VB[(1<R)õ1+0<ı1Æı1Ç,S]'                                                   ø
+  '¯(0îæA)/''A½(1©æA)æâÆA''   ä Show prototype of empties'                     ø
+  '¸(1<ÏA)/GEN' '¸(2<ææA)/D3'                                                  ø
+  'D½®A                     ä Simple arrays' 'W½1ÆæD½(ı2Æ1 1,æD)æD'            ø
+  'N½ı1+1ÇæD' '¸(0=ææA)/SS'                                                    ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' '¸0' 'SS:HB½((0 '' '')=Æ0æâA)/'' -'''                                     ø
+  'D½'' '',('' '',[0]D,[0]HB,Næ'' ''),'' ''' '¸0'                              ø
+  'GEN:D½®DISPLAYCşA          ä Enclosed arrays' 'N½Dë.ô'' '''                 ø
+  'D½(Në~1èN)ğD' 'D½(ëğ~''  ''ÑD)/D' 'D½((1,æS)æS)DISPLAYC D'                  ø
+  '¸(2òæ,S)ÇD3E,0'                                                             ø
+  'D3:D½0 ı1Ç0 1Ç®âA         ä Multi-dimensional arrays' 'W½1ÆæD'              ø
+  'N½ı1+1ÇæD'                                                                  ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' 'D3E:N½ı2+æ,S'                                                            ø
+X 'V½C[Næ1],[0]VB[1+0<ı2Ç,S],[0](((ı3+ÆæD),N)æVL),[0]C[Næ2]' 'D½V,D'           ø
+*(1991 6 29 15 0 0 244)                                                        ø
+ FDISPLAYG FX 'D½S DISPLAYG A;IO;R;C;HL;HC;HT;HB;VL;VB;V;W;N;B'              ø
+  'ä Display a general array in pictorial form'                                ø
+  'ä  Normal call is monadic.  Dyadic call used only in'                       ø
+  'ä    recursion to specify display rank, shape, and depth.' 'IO½0'          ø
+  '¯(0=NC ''S'')/''S½æA''' 'R½Ææ,S                   ä Pseudo rank'           ø
+  'C½''¿ÚÀÙ''                 ä UR, UL, LL, and LR corners'                    ø
+  'HL½''Ä''                   ä Horizontal line'                               ø
+  'HC½HL,''é¸'',HL,''~+î''      ä Horizontal borders'                          ø
+  'HT½HC[(0<R)õ1+0<Æı1Æ,S]' 'äW½,0ÏşÆ0æâ(1©æA)ÆA'                              ø
+  'HB½HC[3+3¾(''2õ~AÏ®A'' EA ''1+Æî0õ(1©õ/æA)Æ,A'')+3õ1<ææS]'                 ø
+  'VL½''³''                   ä Vertical line'                                 ø
+  'VB½VL,''èÇ''               ä Vertical border'                               ø
+  'V½VB[(1<R)õ1+0<ı1Æı1Ç,S]'                                                   ø
+  '¯(0îæA)/''A½(1©æA)æâÆA''   ä Show prototype of empties'                     ø
+  '¸(1<ÏA)/GEN' '¸(2<ææA)/D3'                                                  ø
+  'D½®A                     ä Simple arrays' 'W½1ÆæD½(ı2Æ1 1,æD)æD'            ø
+  'N½ı1+1ÇæD' '¸(0=ææA)/SS'                                                    ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' '¸0' 'SS:HB½((0 '' '')=Æ0æâA)/'' -'''                                     ø
+  'D½'' '',('' '',[0]D,[0]HB,Næ'' ''),'' ''' '¸0'                              ø
+  'GEN:D½®DISPLAYGşA         ä Enclosed arrays' 'N½Dë.ô'' '''                  ø
+  'D½(Në~1èN)ğD' 'D½(ëğ~''  ''ÑD)/D' 'D½((1,æS)æS)DISPLAYG D'                  ø
+  '¸(2òæ,S)ÇD3E,0'                                                             ø
+  'D3:D½0 ı1Ç0 1Ç®âA         ä Multi-dimensional arrays' 'W½1ÆæD'              ø
+  'N½ı1+1ÇæD'                                                                  ø
+  'D½(C[1],V,((W-1)æVL),C[2]),((HT,NæHL),[0]D,[0]HB,NæHL),C[0],(WæVL),C[       ø
+ 3]' 'D3E:N½ı2+æ,S'                                                            ø
+  'V½C[Næ1],[0]VB[1+0<ı2Ç,S],[0](((ı3+ÆæD),N)æVL),[0]C[Næ2]' 'D½V,D'           ø
+  'äÕä APL2/6000 FKEY verification tag - DO NOT REMOVE, MUST BE LAST LIN       ø
+XE'                                                                            ø
+XCGPDESC 2 4 8 GPDESC  ABSTRACTDESCRIBEHOW                                     ø
+ CHOW 2 3 64 The normal method of using the functions in this workspace        ø
+ is tocopy one of them into your active workspace and then use it to  di       ø
+Xsplay objects.                                                                ø

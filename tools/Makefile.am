@@ -1,19 +1,20 @@
 
 # noinst_PROGRAMS will be compiled (in this subdirectory 'tools')
 # but will not be installed (in e.g. /usr/bin or /usr/local/bin).
+# None of these tools are needed when cross-compiling for Windows.
 #
+if !apl_TARGET_MINGW
 noinst_PROGRAMS = APL_keyboard       \
                   APL_keyboard_learn \
                   APL_keyboard_show  \
                   apl2html           \
                   check_command_def  \
-                  filter_apl_lines   \
-                  filter_apl_lines2  \
                   lines              \
-                  ncurses_emul       \
                   phrase_gen         \
-                  sockconst          \
-                  TLV_server
+                  TLV_server         \
+                  unicodes_used
+
+endif
 
 
 # fails on cygwin, therefore moved to dist_noinst_SCRIPTS
@@ -34,19 +35,12 @@ APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES  = APL_keyboard_show.cc
 apl2html_SOURCES           = apl2html.cc
 check_command_def_SOURCES  = check_command_def.cc
-filter_apl_lines_SOURCES   = filter_apl_lines.cc
-filter_apl_lines2_SOURCES  = filter_apl_lines2.cc
 lines_SOURCES              = lines.cc
-ncurses_emul_SOURCES       = ncurses_emul.cc
-ncurses_emul_LIBS          = -lncurses -ltinfo
 TLV_server_SOURCES         = TLV_server.c
-unicodes_used_DOURCES      = unicodes_used.cc
+unicodes_used_SOURCES      = unicodes_used.cc
 
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 
 gen: phrase_gen
 	./phrase_gen > ../src/Prefix.def
-
-gen2: phrase_gen
-	./phrase_gen -t > ../src/Prefix.def
 

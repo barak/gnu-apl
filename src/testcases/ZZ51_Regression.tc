@@ -1,6 +1,8 @@
 ⍝ ZZ51_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       )SIC
       )ERASE A C
 
@@ -16,9 +18,9 @@
 
       )ERASE A C
 
-)SI
+      )SI
 
-)CHECK
+      )CHECK
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices

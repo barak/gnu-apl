@@ -1,6 +1,8 @@
 
       ⍝ problems encountered (remove if solved) ...
       ⍝
+⍝@ test3.
+
       ]XTERM off
 
       )ERASE ∆N
@@ -9,7 +11,7 @@
       ∆N B
       ∇
 
-⍝      ∆N 52
+      ⍝      ∆N 52
 
 
       )ERASE QQ

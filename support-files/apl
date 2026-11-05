@@ -1,0 +1,115 @@
+# bash completion for GNU APL                              -*- shell-script -*-
+#
+# This file is part of GNU APL. It provides command-line completion (TAB) for
+# the "apl" command's own options -- it has nothing to do with completion
+# *inside* a running APL session (e.g. of )commands or APL symbol names),
+# which is a separate, unrelated mechanism (readline inside apl itself).
+#
+# Unlike e.g. "make" (which asks the make binary itself, via "make -npq", to
+# print its own target database), GNU APL's command-line options are a small,
+# fixed, compile-time-known set, so this completion is a plain static list
+# rather than a call into the apl binary.
+#
+# IMPORTANT: this list must be kept in sync BY HAND with the IFOPT()/IFOPT2()
+# entries in src/UserPreferences.cc (the authoritative option parser) --
+# there is no automatic mechanism tying the two together. New command-line
+# options are rare, but when one is added (or removed, or its argument-taking
+# behaviour changes), update _apl_options/_apl_options_with_arg below and,
+# ideally, doc/apl.1 and doc/apl.texi in the same commit.
+#
+# Deliberately excluded: --cc (only compiled in when configured with
+# cfg_CORE_COUNT_WANTED == -2, an exotic build option not documented in
+# doc/apl.1 either -- this list intentionally tracks apl.1's public scope,
+# not literally every #ifdef-gated IFOPT() in UserPreferences.cc).
+
+# options that take no argument
+_apl_options="
+--cfg
+--Color --noColor
+-d
+--echoCIN
+--emacs
+--gpl
+-h --help
+--noCIN --to_COUT
+--noCONT
+--SV --noSV
+--OFF
+--rawCIN
+--safe
+-s --script
+--show_bin_dir --show_doc_dir --show_etc_dir --show_lib_dir --show_src_dir --show_all_dirs
+-q --silent
+--TR
+--TS
+--tcp_websocket
+-v --version
+--
+"
+
+# options that take one argument (no special completion offered for the
+# argument itself, other than falling back to filename completion -- most
+# of these take a number, a processor ID, or a short APL/shell expression,
+# none of which lend themselves to a useful static completion list)
+_apl_options_with_arg="
+-C
+--CPU_limit_secs
+--emacs_arg
+--eval
+-f
+--id
+-L
+--LX
+-l
+--mem
+-p
+--par
+--pack_min
+--PW
+-T
+--TM
+--tcp_port
+-u
+-w
+"
+
+_apl()
+{
+    local cur prev words cword
+    _init_completion || return
+
+    case $prev in
+        -f|-L|-T)
+            # filenames (workspaces/testcases); apl resolves plain names
+            # against the )LIBS library directories itself, so ordinary
+            # filename completion (relative to $PWD) is only an approximation
+            _filedir
+            return
+            ;;
+        --TM)
+            COMPREPLY=($(compgen -W "0 1 2 3 4 5 6" -- "$cur"))
+            return
+            ;;
+    esac
+
+    # any other value-taking option: nothing useful to offer for its argument
+    # (the newline-separated list is normalised to spaces first -- a plain
+    # "== *\" $prev \"*" glob against the raw newline-separated form would
+    # never match, since a literal newline in the pattern isn't a space)
+    #
+    local with_arg=" ${_apl_options_with_arg//$'\n'/ } "
+    if [[ "$with_arg" == *" $prev "* ]]; then
+        return
+    fi
+
+    # unlike e.g. "make FILE", a bare positional word is never valid apl
+    # syntax on its own (it would be rejected as "unknown option") -- every
+    # real argument is either an option (-x/--x) or the value of one (which
+    # is handled by the "case $prev" above), so always offer the option
+    # list here, regardless of whether "$cur" already starts with a dash.
+    #
+    COMPREPLY=($(compgen -W "${_apl_options} ${_apl_options_with_arg}" -- "$cur"))
+} &&
+    complete -F _apl apl
+
+# ex: filetype=sh

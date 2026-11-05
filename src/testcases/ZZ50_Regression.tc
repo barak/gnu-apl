@@ -1,58 +1,72 @@
 ⍝ ZZ50_Regression.tc
 ⍝ ------------------
 
+⍝@ test3.
+
       ⍝ Kacpar Gutowski, Jan. 2020
       ⍝
       )CLEAR
 CLEAR WS
 
-∪'abbbbbbbbbbbaaaaaaa'
+      ]FILE_CTL SKIP_APL2   ⍝ ∪ ∩ ⍬ are GNU APL extensions
+      ∪'abbbbbbbbbbbaaaaaaa'
 ab
 
-∪'abbbbbbbbbbbaaaaaaaa'
+      ∪'abbbbbbbbbbbaaaaaaaa'
 ab
 
-⎕←(A B C)←1+¯1 0 1×(⎕CT←1E¯9)÷2
+      ]FILE_CTL NO_SKIP
+      ⎕←(A B C)←1+¯1 0 1×(⎕CT←1E¯9)÷2
 0.9999999995 1 1.000000001
 
-⍝ NOTE: A=B B=C but A≠C !!!
-∪A B C
+      ⍝ NOTE: A=B B=C but A≠C !!!
+      ]FILE_CTL SKIP_APL2   ⍝ ∪ ∩ ⍬ are GNU APL extensions
+      ∪A B C
 0.9999999995 1.000000001
 
-∪19↑B A B C
+      ∪19↑B A B C
 1 0
 
-∪19⍴B A B C
+      ∪19⍴B A B C
 1
 
-∪20↑B A B C
+      ∪20↑B A B C
 1 0
 
-∪20⍴B A B C
+      ∪20⍴B A B C
 1
 
-⍝ a case with many close items...
-⍝
-⎕PP←12 ◊ ⎕RL←42 ◊ N←500
-X←⍳N                   ⍝ 1 2 3 ...
-X←X, 1+X×⎕CT÷NN←2×N    ⍝ 1 2 3 ... 1.000...00001 1.000...00002 1.000...00003 
-X←X[NN?NN]             ⍝ in random order
-U←∪X                   ⍝ U is unique X (the function under test)
+      ⍝ a case with many close items...
+      ⍝
+      ]FILE_CTL NO_SKIP
+      ⎕PP←12 ◊ ⎕RL←42 ◊ N←500
+      X←⍳N                   ⍝ 1 2 3 ...
+      X←X, 1+X×⎕CT÷NN←2×N    ⍝ 1 2 3 ... 1.000...00001 1.000...00002 1.000...00003 
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters; ∪ ∩ ⍬ are GNU APL extensions
+      X←X[NN?NN]             ⍝ in random order
+      U←∪X                   ⍝ U is unique X (the function under test)
 
 
-0ϵ+⌿U∘.=X              ⍝ check that every item in X is also in U
+      ]FILE_CTL NO_SKIP
+      0ϵ+⌿U∘.=X              ⍝ check that every item in X is also in U
 0
 
-UU←U∘.=U               ⍝ check that all items in U are different
-(1 1⍉UU)←0             ⍝ outside the diagonal
-1ϵ,UU
+      UU←U∘.=U               ⍝ check that all items in U are different
+      (1 1⍉UU)←0             ⍝ outside the diagonal
+      1ϵ,UU
 0
 
-)SI
+      )SI
 
-)CHECK
+      )CHECK
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
+
+
+      ⍝ restore the default for the testcases that follow (see --TR)
+      ⍝
+      ⎕PP←10 ◊ ⎕CT←1E¯13
+
 

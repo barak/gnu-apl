@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2020  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,20 +29,22 @@
 #include <string>
 #include <Workspace.hh>
 
-//=============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// properties of a single plot line. The properties, their type, and their
 /// default values are defined in file Quad_PLOT.def.
 
+//════════════════════════════════════════════════════════════════════════════
 class Plot_line_properties
 {
 public:
    /** constructor. Set all property values to the defaults that are
        defined in Quad_PLOT.def, and then override those property that
        have different defaults for different lines.
+       @param lnum  0-based plot line number
    **/
    Plot_line_properties(int lnum) :
-# define ldef(_ty,  na,  val, _descr) na(val),
-# include "Quad_PLOT.def"
+#define ldef(_ty,  na,  val, _descr) na(val),
+#include "Quad_PLOT.def"
    line_number(lnum)
    {
      snprintf(legend_name_buffer, sizeof(legend_name_buffer),
@@ -53,29 +55,32 @@ public:
    // define the get_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
-# define ldef(ty,  na,  _val, _descr)     \
+#define ldef(ty,  na,  _val, _descr)     \
    /** return the value of na **/         \
    ty get_ ## na() const   { return na; }
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    // define the set_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
-# define ldef(ty,  na,  _val, _descr)     \
+#define ldef(ty,  na,  _val, _descr)     \
    /** set the  value of na **/           \
    void set_ ## na(ty val)   { na = val; }
-# include "Quad_PLOT.def"
+#include "Quad_PLOT.def"
 
    /// print the line properties
+   /// @param out  output stream
    int print(std::ostream & out) const;
 
    /// return true if \b  matches \b attribute. For a match attribute is
    /// prefix, followed by optional whitespace, terminated by :, -, or space.
+   /// @param prefix     expected property name prefix
+   /// @param attribute  full attribute string to test
    static bool is_line_property(const char * prefix, const char * attribute);
 
 protected:
-# define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
-# include "Quad_PLOT.def"
+#define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
+#include "Quad_PLOT.def"
 
   /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO
@@ -83,7 +88,7 @@ protected:
   /// a buffer for creating a (default) legend name from a macro
   char legend_name_buffer[50];
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __PLOT_LINE_PROPERTIES_HH_DEFINED__
 

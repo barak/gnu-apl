@@ -1,6 +1,8 @@
 ⍝ Inner_product.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       M←4 4ρ1 1 1 1 0 1 1 1 0 0 1 1 0 0 0 1
       M
 1 1 1 1
@@ -39,31 +41,25 @@ JULY 4
 0.3 0.4
 
       J,.+P
-  1.1 2.3   1.2 2.4  
-  3.1 4.3   3.2 4.4  
-  5.1 6.3   5.2 6.4  
+ 1.1 2.3  1.2 2.4 
+ 3.1 4.3  3.2 4.4 
+ 5.1 6.3  5.2 6.4 
 
       ≡J,.+P
-3
+2
 
       4 ⎕CR J,.+P
-┏→━━━━━━━━━━━━━━━━━━━━━━┓
-↓┏━━━━━━━━━┓ ┏━━━━━━━━━┓┃
-┃┃┏→━━━━━━┓┃ ┃┏→━━━━━━┓┃┃
-┃┃┃1.1 2.3┃┃ ┃┃1.2 2.4┃┃┃
-┃┃┗∼━━━━━━┛┃ ┃┗∼━━━━━━┛┃┃
-┃┗ϵ━━━━━━━━┛ ┗ϵ━━━━━━━━┛┃
-┃┏━━━━━━━━━┓ ┏━━━━━━━━━┓┃
-┃┃┏→━━━━━━┓┃ ┃┏→━━━━━━┓┃┃
-┃┃┃3.1 4.3┃┃ ┃┃3.2 4.4┃┃┃
-┃┃┗∼━━━━━━┛┃ ┃┗∼━━━━━━┛┃┃
-┃┗ϵ━━━━━━━━┛ ┗ϵ━━━━━━━━┛┃
-┃┏━━━━━━━━━┓ ┏━━━━━━━━━┓┃
-┃┃┏→━━━━━━┓┃ ┃┏→━━━━━━┓┃┃
-┃┃┃5.1 6.3┃┃ ┃┃5.2 6.4┃┃┃
-┃┃┗∼━━━━━━┛┃ ┃┗∼━━━━━━┛┃┃
-┃┗ϵ━━━━━━━━┛ ┗ϵ━━━━━━━━┛┃
-┗ϵϵ━━━━━━━━━━━━━━━━━━━━━┛
+┏→━━━━━━━━━━━━━━━━━━┓
+↓┏→━━━━━━┓ ┏→━━━━━━┓┃
+┃┃1.1 2.3┃ ┃1.2 2.4┃┃
+┃┗∼━━━━━━┛ ┗∼━━━━━━┛┃
+┃┏→━━━━━━┓ ┏→━━━━━━┓┃
+┃┃3.1 4.3┃ ┃3.2 4.4┃┃
+┃┗∼━━━━━━┛ ┗∼━━━━━━┛┃
+┃┏→━━━━━━┓ ┏→━━━━━━┓┃
+┃┃5.1 6.3┃ ┃5.2 6.4┃┃
+┃┗∼━━━━━━┛ ┗∼━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━┛
 
       S←3 5ρ'SANDYBETTYGRACE'
       S
@@ -74,7 +70,7 @@ GRACE
       S∧.='SANDY'
 1 0 0
 
-⍝ empty argument ----------------------------------
+      ⍝ empty argument ----------------------------------
 
       U←(0 2ρ0)+.×2 0 ⍴0
       ρU
@@ -115,7 +111,7 @@ GRACE
 ┗ϵ━━━━━━┛
 
 
-   ⍴/¨ LR
+      ⍴/¨ LR
   6 6 6 6  6 6 6 6  
 
 
@@ -130,13 +126,72 @@ GRACE
 
 
 
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
       2 3 {⍺+⍵}.{⍺×⍵} 2 3
 13
 
+      ]FILE_CTL NO_SKIP
       2 3 5 6 -.= 4 5 5 6
 0
 
       ⍝ Regression
-      1 ∧.≡ 1 1  
+      1 ∧.≡ 1 1
 0
+
+      ⍝ Bugs28 #34 regression: A LO.RO B with a non-scalar LO (e.g. ,)
+      ⍝ whose per-item reduction yields a nested scalar was wrongly
+      ⍝ enclosed one level too deep (Bif_OPER2_INNER.cc used
+      ⍝ V2->is_simple_scalar() -- rank 0 AND depth 0 -- to decide
+      ⍝ between copying V2's cell directly vs. wrapping it in a new
+      ⍝ PointerCell; that test is false for an already-nested scalar,
+      ⍝ so V2 got wrapped *again*). Fixed by testing V2->is_scalar()
+      ⍝ (rank 0, any depth) instead: any scalar's sole cell, simple or
+      ⍝ itself a PointerCell, is copied as-is; only a genuine
+      ⍝ (rank > 0) array needs a fresh wrapping PointerCell. See also
+      ⍝ the J,.+P/≡J,.+P/4⎕CR J,.+P case earlier in this file, whose
+      ⍝ expected output changed for the same reason.
+      ⍝
+      Z←1 2 3,.,4 5 6 ⋄ 2 ⎕TF 'Z'
+Z←⊂6⍴1 2 3 4 5 6
+
+      ⍝ control: a user-defined (lambda) LO was already correct
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      Z←1 2 3{⍺,⍵}.,4 5 6 ⋄ 2 ⎕TF 'Z'
+Z←⊂6⍴1 2 3 4 5 6
+
+      ]FILE_CTL NO_SKIP
+      ≡(1 2)(3 4)+.×(5 6)(7 8)
+2
+
+      ⍝ control: scalar RO (×) with non-scalar A/B was already correct
+      Z←(2 2⍴1 2 3 4),.×2 2⍴5 6 7 8 ⋄ 2 ⎕TF 'Z'
+Z←2 2⍴(5 14) (6 16) (15 28) (18 32)
+
+      ⍝ empty argument control
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension; ∪ ∩ ⍬ are GNU APL extensions
+      Z←⍬,.,⍬ ⋄ 2 ⎕TF 'Z'
+Z←⊂0⍴0
+
+      ⍝ Bugs28 #38 regression: A f.g B with an empty frame built the
+      ⍝ fill result's structure (shape/nesting) correctly via RO's own
+      ⍝ eval_fill_AB(), but never converted its actual cell VALUES to
+      ⍝ a type-correct default -- e.g. 5 (RO's real result on the
+      ⍝ actual fill args) leaked into the prototype instead of 0, and
+      ⍝ 'a' 'b' (real characters) leaked in instead of spaces one
+      ⍝ level down inside a nested fill result. Fixed in
+      ⍝ Bif_OPER2_INNER::fill(): set_ravel_Value() + to_type(false)
+      ⍝ (recurses through any nested PointerCell; false because a fill
+      ⍝ result can legitimately be character and must stay character),
+      ⍝ mirroring the OUTER product fix for the same class of bug.
+      ⍝
+      Z←(0 3⍴0)+.{⍺+⍵}3 2⍴5 ⋄ 2 ⎕TF 'Z'
+Z←0 2⍴0
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      ((0 3⍴0)+.{⍺+⍵}3 2⍴5)≡0 2⍴0
+1
+
+      ]FILE_CTL NO_SKIP
+      Z←(0 3⍴0),.,3 2⍴⊂'ab' ⋄ 2 ⎕TF 'Z'
+Z←0 2⍴(⊂3⍴0 ' ' ' ')
 

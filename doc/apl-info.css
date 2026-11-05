@@ -9,4 +9,7 @@ pre.example { font-family: "Courier New", monospace;
 code { font-family: "Courier New", monospace;
        font-size: 16 px; font-weight: bold; }
 
+table { border-collapse: collapse; }
+th, td { border: 1px solid #999; padding: 0.3em 0.6em; }
+
 

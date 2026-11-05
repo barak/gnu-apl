@@ -26,16 +26,33 @@
 
 #include "apl-sqlite.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// abstract base for binding a prepared SQL statement's arguments (by
+/// 0-based position) and running it
 class ArgListBuilder
 {
 public:
+    /// destructor
     virtual ~ArgListBuilder() {}
+
+    /// bind a string argument at 0-based position \b pos
     virtual void append_string(const string &arg, int pos) = 0;
+
+    /// bind an integer argument at 0-based position \b pos
     virtual void append_long(long arg, int pos)            = 0;
+
+    /// bind a floating-point argument at 0-based position \b pos
     virtual void append_double(double arg, int pos)        = 0;
+
+    /// bind a SQL NULL at 0-based position \b pos
     virtual void append_null(int pos)                      = 0;
+
+    /// execute the prepared statement and return its result as an APL value
     virtual Value_P run_query()                            = 0;
+
+    /// discard all bound arguments and reset the statement for reuse
     virtual void clear_args()                              = 0;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

@@ -24,21 +24,18 @@ terminal. For example, in xterm you need enable UTF-8 encoding and
 UTF-8 Fonts in xterm's VT menu (Ctrl + right mouse). It may be possible
 to set this permanently in your terminal's configuration file(s).
 
-Freebsd 8.4
+FreeBSD (older versions, e.g. 8.4 / 9)
 -------------------------------------------------------------------------------
 
-Many thanks to Sam Sirlin for providing this!
-
-for configure:
---------------
+On older FreeBSD releases (contributed by Sam Sirlin) the following
+environment variables were needed before running ./configure:
 
 setenv CC gcc46
 setenv CXX g++46
 setenv LDFLAGS '-L/usr/local/lib -L/usr/local/lib/gcc46 -R/usr/local/lib -R/usr/local/lib/gcc46'
-setenv LIBS ' -lexecinfo ' 
+setenv LIBS ' -lexecinfo '
 
-Freebsd 9
--------------------------------------------------------------------------------
+On FreeBSD 9 the following was sufficient:
 
 setenv LDFLAGS '-L/usr/local/lib'
 
@@ -77,14 +74,34 @@ GNU APL compiles on CYGWIN, see README-5-WINDOWS for details
 
 ===============================================================================
 ====									   ====
-====			    OS-X					   ====
+====			    macOS					   ====
 ====									   ====
 ===============================================================================
 
-The latest version (SVN) of GNU APL was reported to compile and run on OS-X
+The latest version (SVN) of GNU APL was reported to compile and run on macOS
 without special measures.
 
 For Macintosh users, Peter Teeson has contributed very nice installation
 instructions that can be found in the doc/ subdirectory (file:
 APL-on-Macintosh.pdf).
+
+
+===============================================================================
+====									   ====
+====			    Byte order (endianness)			   ====
+====									   ====
+===============================================================================
+
+GNU APL's bit-packed boolean ravels (values whose ravel is stored as one
+bit per element rather than one Cell per element) require a little-endian
+target. The same bit array is written and read as whole uint64_t words in
+some places (e.g. Value.cc's try_implode(), Bif_F12_RHO.cc, Quad_CR.cc,
+Bif_F12_INTERVAL_INDEX.cc) and as individual uint8_t bytes in others (e.g.
+Ravel.hh's bool_fetcher(), Value.cc's explode_to_INT64()); bit i of the
+array lands at word i>>6 / bit i&63 under the first view and at byte i>>3
+/ bit i&7 under the second, and the two agree only on a little-endian
+machine (confirmed by Blake McBride, Bugs14 #14f). GNU APL has not been
+tested on a big-endian target; if you are attempting a big-endian port,
+this is the first place to look if boolean vectors/arrays come out
+corrupted.
 

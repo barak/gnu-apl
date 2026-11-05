@@ -1,6 +1,8 @@
 ⍝ File_IO.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ same as File_IO_1.tc but using FILE_IO.apl library
       ⍝ This is the recommeded way to use file_io.so
       ⍝
@@ -9,6 +11,10 @@
       ⍝ This file demonstrates the use of the FILE_IO.apl library
       ⍝ and checks that the wrapper functions in FILE_IO.apl are working
       ⍝
+
+      z←⎕FIO.unlink 'FILE_IO.test1'
+      z←⎕FIO.unlink 'FILE_IO.test2'
+      z←⎕FIO.unlink 'FILE_IO.test3'
 
       ⍝⍝⍝
       ⍝⍝⍝ If this segfaults then re-install GNU APL !!!
@@ -36,7 +42,7 @@ DUMPED ³
       FIO∆fclose Handle
 DOMAIN ERROR+
 FIO∆fclose[2]  Ze←⎕FIO[4]Bh
-                  ^      ^
+                  ^
       →
 
       ⍝ create new file
@@ -156,6 +162,32 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       FIO∆pclose Handle ⍝ close command (returning its exit code)
 0
 
+      ⍝ regression (Blake McBride, Bugs31 #20): ⎕FIO[25] (pclose) on a
+      ⍝ handle NOT opened via ⎕FIO[24] (popen) -- e.g. a plain fopen()'d
+      ⍝ file -- used to still call the real C pclose(), which decrements
+      ⍝ the interpreter's global SIGCHLD-nesting counter (Bugs30 #19)
+      ⍝ without a matching increment, permanently desynchronizing it and
+      ⍝ corrupting the exit status of every later, genuine popen()/
+      ⍝ pclose() pair. ⎕FIO[25] now refuses a non-popen handle outright.
+      ⍝
+      H←FIO∆fopen_ro Filename
+      FIO∆pclose H
+DOMAIN ERROR+
+FIO∆pclose[2]  Ze←⎕FIO[25]Bh
+                  ^
+      )SIC
+      FIO∆fclose H
+0
+
+      ⍝ control: a genuine popen()/pclose() pair still gives the exact
+      ⍝ exit status afterward, unaffected by the rejected pclose above
+      ⍝
+      H2←FIO∆popen_ro 'exit 7'
+      1000 FIO∆fread H2
+0
+      FIO∆pclose H2
+1792
+
       ⍝ read entire file
       ⍝
       ⎕UCS FIO∆read_file Filename
@@ -166,9 +198,9 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       ⍝ socket communication: send 'Hello' from one socket to another
       ⍝ and 'World!' back.
       ⍝
-      AF_INET     ← 2           ⍝ see /usr/include/.../bits/socket.h
-      SOCK_STREAM ← 1           ⍝ see /usr/include/.../bits/socket_type.h
-      IPPROTO_IP       ← 0      ⍝ see /usr/include/netinet/in.h
+      AF_INET     ← ⎕FIO[62] 'AF_INET'   ⍝ socket constants of this platform
+      SOCK_STREAM ← ⎕FIO[62] 'SOCK_STREAM'
+      IPPROTO_IP  ← ⎕FIO[62] 'IPPROTO_IP'
       LOCALHOST←256⊥127 0 0 1   ⍝ 127.0.0.1 in host byte order
       Port ← 22222
       Server←AF_INET, LOCALHOST, Port
@@ -180,8 +212,8 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
 
       ⍝ setsockopt(Handle, SOL_SOCKET, SO_REUSEADDR, 1)
       ⍝
-      SOL_SOCKET←1              ⍝ see /usr/include/asm-generic/socket.h
-      SO_REUSEADDR←2            ⍝ see /usr/include/asm-generic/socket.h
+      SOL_SOCKET  ← ⎕FIO[62] 'SOL_SOCKET'     ⍝ e.g. 1 on x86, 65535 on sparc64
+      SO_REUSEADDR← ⎕FIO[62] 'SO_REUSEADDR'
       (SOL_SOCKET, SO_REUSEADDR, 1) FIO∆setsockopt Handle
 0
 

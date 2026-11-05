@@ -97,7 +97,7 @@ particular *⎕SYL[24 25 26;]* control the number of cores being used:
 ==== ⎕SYL[25;2]
 
 *⎕SYL[25;2])* is the number of cores either chosen by ⎕SYL[24;2] or else as
-indicated by the platform. The value 12 above as reported on a i7-8700
+indicated by the platform. The value 12 above was reported on an i7-8700
 Intel CPU with 6 physical cores and 2 core threads per physical core.
 
 ==== ⎕SYL[26;2]
@@ -134,7 +134,7 @@ Parallel execution is initialized as follows:
   the interpreter are determined by *pthread_getaffinity_np()* and all CPUs
   that are available to the interpreter are stored in the vector.
 
-* Then *Parallel::init()* creates a thread pool with 
+* Then *Parallel::init()* creates a thread pool with
   *Thread_context::init_parallel*, with one thread for each CPU
   in *CPU_pool::the_CPUs*. If *CORE_COUNT_WANTED = -3* then only the first
   thread is activated (and the user needs to use ⎕SYL in order to activate
@@ -226,7 +226,7 @@ Thread_context::Thread_context()
 ----
 
 * The workers perform their work and, after finishing it, increment their
-  *Thread_context::job_number* and decrement *busy_worker_count*.again:
+  *Thread_context::job_number* and decrement *busy_worker_count* again:
 
 ----
    /// end parallel execution of work in a worker
@@ -278,7 +278,7 @@ T~par~(N) = ⍺~par~ + β~par~ × N.
 The terms ⍺~seq~ and ⍺~par~ are the start-up times for the computation, while
 the terms β~seq~ and β~par~ are the per-item times for the computation.
 
-Under normal circumstance one has:
+Under normal circumstances one has:
 
 * ⍺~seq~ ≤  ⍺~par~
 * β~seq~ ≥ β~par~
@@ -337,7 +337,7 @@ is performed (where "no other process" means not counting the typically 250 or
 so operating system processes that are sitting idle on the CPU) the results
 can differ substantially between different measurements of the same code.
 
-So in practice, lets discuss the results of a benchmark:
+So in practice, let's discuss the results of a benchmark:
 
 image::./APL3.png[APL3,300,150,role="text-center"]
 
@@ -349,7 +349,7 @@ the theory. The thick lines are those that have the smallest squared
 differences from the measurement points (the line that best matches the
 measurement points).
 
-To be on the safe side, lets repeat *the same* benchmark:
+To be on the safe side, let's repeat *the same* benchmark:
 
 image::./APL4.png[APL4,300,150,role="text-center"]
 
@@ -410,7 +410,7 @@ The *Scalar2.apl* workspace understands the following command line options:
 |Option           |Effect                         |Example  |Default
 |-c core-counts   |set the number of cores        |-c 2,3   |2
 |-d vector-lengths|set the vector lengths (N-axis)|-d 200×⍳2|⍳20
-|-f function      |select the function to measure |-f 20    | 39 
+|-f function      |select the function to measure |-f 20    | 39
 |===
 
 For every core count, *Scalar2.apl* displays a separate plot window with the
@@ -547,4 +547,3 @@ for parallel APL is slightly smaller than the number of cores available. The
 number of cores available is also influenced by other (even idle) processes on
 the machine because they also influence the scheduling of the threads that
 perform the APL work.
-

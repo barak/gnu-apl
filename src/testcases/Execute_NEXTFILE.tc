@@ -1,0 +1,33 @@
+⍝ Execute_NEXTFILE.tc
+⍝ ----------------------------------
+
+⍝@ test3.
+
+      ⍝ ⍎']NEXTFILE' inside a defined function (e.g. a testcase giving up
+      ⍝ after a failed precondition): the command is executed after ⍎ and
+      ⍝ the function have been unwound, so the SI is clear at the end of
+      ⍝ this file and the rest of the file is skipped.
+      ⍝
+      ∇GIVE_UP
+'giving up'
+⍎']NEXTFILE'
+'not reached'
+      ∇
+
+      GIVE_UP
+giving up
+
+
+
+
+
+      ⍝ this line must never be executed: its expected output is wrong
+      ⍝ on purpose, so that this testcase fails if ]NEXTFILE did not skip.
+      ⍝
+      'skipped'
+THIS LINE SHALL NOT BE REACHED
+
+
+
+
+

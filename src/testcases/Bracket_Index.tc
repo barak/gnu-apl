@@ -1,6 +1,8 @@
 ⍝ Bracket_Index.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       LANG←'APPLE PIE'
       LANG[1 7 4]
 APL
@@ -8,7 +10,7 @@ APL
       M1[;2]
 2 4
 
-⍝ Check ⎕IO ----------------------------------
+      ⍝ Check ⎕IO ----------------------------------
 
       ⎕IO←1
       'CURTAIL'[1 2 4]
@@ -19,7 +21,7 @@ CUT
 
       ⎕IO←1
 
-⍝ Index vector ----------------------------------
+      ⍝ Index vector ----------------------------------
 
       A←23 9 6.3 8 ¯3 7
       Z←A[3]
@@ -49,14 +51,14 @@ CUT
       ρQ
 2 3
 
-⍝ Index matrix ----------------------------------
+      ⍝ Index matrix ----------------------------------
 
       ⎕←C←3 6ρ'ABCDEFGHIJKLMNOPQR'
 ABCDEF
 GHIJKL
 MNOPQR
       J←C[2;3]
-J
+      J
 I
       ρJ
 
@@ -81,7 +83,7 @@ PQN
       ρN
 2 2 3
 
-⍝ Elided index ----------------------------------
+      ⍝ Elided index ----------------------------------
 
       D←3 4ρC[1 2;]
       D
@@ -94,9 +96,11 @@ AEI
 IJKL
 
       1 2 3[]
-1 2 3
+RANK ERROR+
+      1 2 3[]
+          ^^
 
-⍝ repeated index values ----------------------------------
+      ⍝ repeated index values ----------------------------------
 
       H←2 4ρ3 4 1 2 2 3 4 1
       H
@@ -108,7 +112,7 @@ MITE
       'NAB'[3 2 1 2 1 2]
 BANANA
 
-⍝ higher rank index ----------------------------------
+      ⍝ higher rank index ----------------------------------
 
       U←2 3 4ρ(,C),'STUVWX'
       U
@@ -136,7 +140,7 @@ MNOP
 IJKL
 UVWX
 
-⍝ nested array index ----------------------------------
+      ⍝ nested array index ----------------------------------
 
       V←'H' 'HI' ('HIM' 'HIS')
       Z←V[1]
@@ -159,7 +163,7 @@ H
       ρρS
 0
 
-⍝ selective specification ----------------------------------
+      ⍝ selective specification ----------------------------------
 
       ρV
 3
@@ -177,8 +181,135 @@ H
 D E F
       B←3 4 5
       B[]←9
-B
+      B
 9 9 9
+
+      ⍝ Bugs28 #52 regression: the PARENTHESIZED selective-specification
+      ⍝ form (V[])←B (unlike the plain, unparenthesized V[]←B just above,
+      ⍝ which was already correct) silently replaced V wholesale with B,
+      ⍝ with none of the shape conformance an ordinary selective
+      ⍝ specification requires -- (V[])←1 2 3 turned V←⍳5 into the
+      ⍝ 3-element vector 1 2 3 instead of requiring ⍴,B to be 1 or 5.
+      ⍝ Root cause: Prefix.cc's A[] (elided-index) handling built its
+      ⍝ result via Z=CLONE(A,LOC) -- with the active NEW_CLONE scheme,
+      ⍝ CLONE() is not a real copy, just a new Value_P handle on the
+      ⍝ SAME Value object -- so when A was an lval-cellref array
+      ⍝ carrying Symbol::resolve_lv()'s set_lval_whole_symbol() marker
+      ⍝ (normally only meant for a genuinely EMPTY selector, e.g.
+      ⍝ ((⍳0)⊃sym)←B, to mean "replace the whole array, no conformance
+      ⍝ check"), that marker survived onto Z completely unchanged, even
+      ⍝ though A[] selects EVERY position of A, not none of them. Fixed
+      ⍝ by explicitly clearing the marker on Z, since CLONE() doesn't
+      ⍝ actually build the fresh Value every other lvalue-producing
+      ⍝ function is documented to return.
+      ⍝
+      V←⍳5
+      (V[])←1 2 3
+LENGTH ERROR+
+      (V[])←1 2 3
+      ^    ^
+
+      )SIC
+      ⍴V
+5
+
+      V←⍳5
+      (V[])←1 2 3 4 5
+      V
+1 2 3 4 5
+
+      ⍝ control: a genuinely empty selector still replaces wholesale
+      ⍝
+      V←⍳5
+      (V[⍬])←1 2 3
+      ⍴V
+5
+
+      ⍝ regression (Blake McBride, Bugs31 #18): a 1-ELEMENT non-scalar
+      ⍝ RHS (e.g. ,9, shape ,1) used to be enclosed into a scalar
+      ⍝ selection instead of scalar-extended -- Value::assign_cellrefs()
+      ⍝ checked new_value->is_scalar() (rank == 0) instead of ⍴,new_value
+      ⍝ being 1, contradicting LRM p.43 rule 2 ("an array with empty
+      ⍝ shape when ones are removed" is exempt from rule 1's enclosure
+      ⍝ just as much as a genuine scalar). Every one of these must give
+      ⍝ the plain scalar 9, matching (…)←9.
+      ⍝
+      A←5 ⋄ (A[])←,9 ⋄ A ⋄ ≡A
+9
+0
+
+      M←2 2⍴⍳4 ⋄ (M[1;1])←,9 ⋄ M[1;1] ⋄ ≡M[1;1]
+9
+0
+
+      ⍝ control: the ordinary (non-selective, already-correct) forms
+      ⍝
+      V←1 2 3 ⋄ (V[1])←,9 ⋄ V ⋄ ≡V
+9 2 3
+1
+
+      V←1 2 3 ⋄ (V[1])←9 ⋄ V
+9 2 3
+
+      V←1 2 3 ⋄ (1↑V)←,9 ⋄ V
+9 2 3
+
+      V←1 2 3 ⋄ (V[1 2])←,9 ⋄ V
+9 9 3
+
+      ⍝ regression (Blake McBride, Bugs31 #19): the identity fast paths
+      ⍝ of ⌽ (scalar), 0⌽/0⊖, ⍉ (scalar/vector, and identity dyadic ⍉)
+      ⍝ return their argument ALIASED (CLONE() under the active
+      ⍝ NEW_CLONE scheme is not a real copy, just a new Value_P handle
+      ⍝ on the SAME Value object), so Symbol::resolve_lv()'s
+      ⍝ set_lval_whole_symbol() marker survived the "selecting" function
+      ⍝ unbroken -- Value::assign_cellrefs() then wrongly took its
+      ⍝ wholesale-replace shortcut (skipping all shape conformance)
+      ⍝ instead of an ordinary selective specification, e.g. (0⌽V)←9
+      ⍝ silently replaced V wholesale with the scalar 9 instead of
+      ⍝ scalar-extending it to 9 9 9. Fixed by Value::clear_lval_markers(),
+      ⍝ called at each aliasing identity fast path (see
+      ⍝ Bif_F12_ROTATE.cc/Bif_F12_TRANSPOSE.cc/Bif_F12_TAKE_DROP.cc/
+      ⍝ Bif_F12_COMMA.cc) -- same root cause as Bugs28 #52 (elided A[]),
+      ⍝ generalized to every aliasing identity fast path.
+      ⍝
+      V←1 2 3 ⋄ (0⌽V)←9 ⋄ V
+9 9 9
+
+      V←1 2 3 ⋄ (0⌽V)←9 9
+LENGTH ERROR+
+      (0⌽V)←9 9
+      ^    ^
+      )SIC
+
+      V←5 ⋄ (⌽V)←9 9
+LENGTH ERROR+
+      (⌽V)←9 9
+      ^   ^
+      )SIC
+
+      M←2 3⍴⍳6 ⋄ (1 2⍉M)←9 ⋄ M
+9 9 9
+9 9 9
+
+      ⍝ control: the identical (already-correct) A[] form, and a
+      ⍝ genuinely conforming RHS through the same identity fast paths
+      ⍝
+      V←1 2 3 ⋄ (V[])←9 ⋄ V
+9 9 9
+
+      V←1 2 3 ⋄ (0↓V)←9 ⋄ V
+9 9 9
+
+      M←2 3⍴⍳6 ⋄ (1 2⍉M)←2 3⍴9 ⋄ M
+9 9 9
+9 9 9
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
 
       ⍝ Regression
       ⍝
@@ -229,14 +360,147 @@ OK      - no duplicate parents
  Z←RO B
 ∇
 
+      ]FILE_CTL SKIP_APL2   ⍝ GNU APL-only function header
 ∇Z←(LO opex RO) [X] B
  Z←RO (⎕NC 'X') B
 ∇
-     1 oper 'xyz' [2] 3
+      ]FILE_CTL NO_SKIP
+      1 oper 'xyz' [2] 3
 y 3
 
+      ]FILE_CTL SKIP_APL2   ⍝ uses a function with a GNU APL-only header
       1 opex 'xyz' [2] 3
 y 0 3
+
+      ⍝ Regression: Bugs6 #5 (Blake McBride). IndexExpr never joining
+      ⍝ all_index_exprs (so )CHECK's "no stale indices" and
+      ⍝ IndexExpr::erase_stale() are permanent no-ops) is currently
+      ⍝ deliberate -- see the long comment on IndexExpr's constructor:
+      ⍝ actually joining the ring has twice caused a real SIGSEGV
+      ⍝ elsewhere (Quad_SYL.tc's )CLEAR, only reproducible via the full
+      ⍝ testcase suite, not this file alone) despite passing everything
+      ⍝ tried here. This test still has value regardless of which way
+      ⍝ that constructor is wired: a rank>=2 literal index whose
+      ⍝ evaluation is aborted (error) partway, repeated with )SIC, must
+      ⍝ not crash or corrupt anything either way.
+      ⍝
+      ]FILE_CTL NO_SKIP
+      T←4 4⍴⍳16
+
+∇ Z←BUGS6_5_FOO
+ Z←UNDEFVAR_BUGS6_5[1;2]
+∇
+
+      BUGS6_5_FOO
+VALUE ERROR+
+BUGS6_5_FOO[1]  Z←UNDEFVAR_BUGS6_5[1;2]
+                  ^
+
+      )SIC
+      BUGS6_5_FOO
+VALUE ERROR+
+BUGS6_5_FOO[1]  Z←UNDEFVAR_BUGS6_5[1;2]
+                  ^
+
+      )SIC
+      BUGS6_5_FOO
+VALUE ERROR+
+BUGS6_5_FOO[1]  Z←UNDEFVAR_BUGS6_5[1;2]
+                  ^
+
+      )SIC
+
+∇ Z←BUGS6_5_BAR
+ Z←T[1;2]
+∇
+
+      BUGS6_5_BAR
+2
+
+      BUGS6_5_BAR
+2
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⎕EX 'BUGS6_5_FOO'
+1
+      ⎕EX 'BUGS6_5_BAR'
+1
+
+      ⍝ Regression: Bugs25 #2 (Blake McBride). A float or complex literal
+      ⍝ in [ ] (axis or index) was rejected at parse time with a bare
+      ⍝ DOMAIN ERROR, even when the equivalent variable works fine --
+      ⍝ Parser::optimize_literal_axes() called Cell::get_int_value()
+      ⍝ (IntCell-only) instead of Cell::get_near_int() (any near-int
+      ⍝ numeric cell) on a literal already established as near-int.
+      ⍝ Fixed in Parser.cc; a near-int literal too large to fit an
+      ⍝ int64_t (e.g. 1E30) must still not be taken down the sAxis fast
+      ⍝ path (Parser.cc), and must not crash Token::canonical() when
+      ⍝ later rendering the caret line for the resulting runtime error
+      ⍝ (Token.cc -- get_near_int() there can throw too, and naively
+      ⍝ catching that throw does not help, since Error::update_error_info()
+      ⍝ recurses through plain calls, not exception unwinding).
+      ⍝
+      ⍝ Bugs28 #100(t): an index is by definition a ShapeItem (int64_t);
+      ⍝ cValue::index(cValue_R) used to call the throwing get_near_int()
+      ⍝ unconditionally, so a too-large index (like 1E30 below) raised a
+      ⍝ bare, uncontextualized DOMAIN ERROR instead of the well-formed
+      ⍝ INDEX ERROR it actually is. Fixed by checking is_near_int64_t()
+      ⍝ (which cannot itself throw) first. Token.cc's caret-line
+      ⍝ rendering (above, right below "must not crash Token::canonical()")
+      ⍝ used to fall back to a meaningless "?" for the very same
+      ⍝ too-large-for-int64_t values, for the very same reason
+      ⍝ (get_near_int() throws); it now instead formats the value safely
+      ⍝ via get_real_value() (which does not throw for a numeric cell),
+      ⍝ so the caret line below shows 1E30, not [?].
+      ⍝
+      ⌽[2.0](2 2⍴⍳4)
+2 1
+4 3
+
+      (1 2 3)[2.0]
+2
+
+      (1 2 3)[1J0]
+1
+
+      1↑[1J0](2 2⍴⍳4)
+1 2
+
+      ⌽[1E10](2 2⍴⍳4)
+AXIS ERROR+
+      ⌽[10000000000](2 2⍴⍳4)
+      ^
+
+      )SIC
+
+      (1 2 3)[1E30]
+INDEX ERROR+
+      (1 2 3)[1E30]
+      ^      ^
+
+      )MORE
+A[B]: B is not a valid index for A (an integer too large for a (signed) 63-bit index)
+      )SIC
+
+      ⎕FX 'Z←FOO' 'Z←(1 2 3)[1E30]'
+FOO
+
+      FOO
+INDEX ERROR+
+FOO[1]  Z←(1 2 3)[1E30]
+          ^      ^
+
+      )MORE
+A[B]: B is not a valid index for A (an integer too large for a (signed) 63-bit index)
+      )SIC
+
+      ⎕EX 'FOO'
+1
 
 
 

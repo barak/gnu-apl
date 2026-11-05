@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,14 +22,25 @@
 */
 
 #include "Avec.hh"
+#include "Bif_F0_ZILDE.hh"
 #include "Bif_F12_COMMA.hh"
 #include "Bif_F12_DOMINO.hh"
+#include "Bif_F12_ELEMENT.hh"
+#include "Bif_F12_ENCODE_DECODE.hh"
+#include "Bif_F12_EQUIV.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "Bif_F12_INDEX_OF.hh"
 #include "Bif_F12_INTERVAL_INDEX.hh"
 #include "Bif_F12_PARTITION_PICK.hh"
+#include "Bif_F12_RHO.hh"
+#include "Bif_F12_ROTATE.hh"
 #include "Bif_F12_SORT.hh"
 #include "Bif_F12_TAKE_DROP.hh"
+#include "Bif_F12_TRANSPOSE.hh"
+#include "Bif_F12_UNION_INTER.hh"
+#include "Bif_F1_EXECUTE.hh"
+#include "Bif_F2_INDEX.hh"
+#include "Bif_F2_LEFT_RIGHT.hh"
 #include "Bif_OPER1_COMMUTE.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Bif_OPER1_REDUCE.hh"
@@ -66,15 +77,7 @@
 
 vector<ID> ID::all_IDs;
 
-//----------------------------------------------------------------------------
-UCS_string
-ID::get_name_UCS(Id id)
-{
-const UTF8 * name = get_name(id);
-const UTF8_string utf(charP(name));
-   return UCS_string(utf);
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 const UTF8 *
 ID::get_name(Id id)
 {
@@ -96,13 +99,21 @@ ID::get_name(Id id)
 
    return reinterpret_cast<const UTF8 *>("unknown ID");
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ostream &
 operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+UCS_string
+ID::get_name_UCS(Id id)
+{
+const UTF8 * name = get_name(id);
+const UTF8_string utf(name);
+   return UCS_string(utf);
+}
+//────────────────────────────────────────────────────────────────────────────
 cFunction_P
 ID::get_system_function(Id id)
 {
@@ -121,7 +132,7 @@ ID::get_system_function(Id id)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Symbol *
 ID::get_system_variable(Id id)
 {
@@ -141,7 +152,7 @@ ID::get_system_variable(Id id)
 
    return 0;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 TokenTag
 ID::get_token_tag(Id id)
 {
@@ -160,4 +171,4 @@ ID::get_token_tag(Id id)
 
    return TOK_INVALID;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

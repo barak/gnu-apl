@@ -1,0 +1,16 @@
+⍝ Interval.tc
+⍝ ═══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: B simple scalar or one-item nonneg int; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ ,B
+      ⍝ inv: ⍴⍴Z ←→ ,1
+      B ← 3+4∣|⎕RVAL 0                       ⍝ B in 3..6
+      Z ← ⍳B
+      (⍴Z) ≡ ,B
+1
+      (⍴⍴Z) ≡ ,1
+1

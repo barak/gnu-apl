@@ -1,7 +1,43 @@
 ⍝ Quad_PLOT.tc
 ⍝ ----------------------------------
 
-      ]NEXTFILE no-GUI   ⍝ done if neither GTK nor XCB is available
+⍝@ test3.
+
+      ⍝ bug-apl@gnu.org, 6/17/2026 (Dave Alden):
+      ⍝ A ⎕PLOT B always used ASCII driver if any attribute was provided,
+      ⍝ ignoring the compile-time default driver. Explicit ASCII must still work:
+      ⊃⍴⍴(⊂'gui_driver: ASCII') ⎕PLOT 1 3 2 4 4
+3
+
+      ⍝ regression (Dave Alden 6/24/2026): LHA with attributes but no gui_driver
+      ⍝ must NOT get DOMAIN ERROR (result rank is build-dependent):
+      0 ≠ 1⊃⎕EC '(⊂''caption: regression test'') ⎕PLOT 1 3 2 4 4'
+1
+
+      ⍝ ASCII-plot f(x)=sin(x)÷x in the x range where 10≥|f(x)|
+      ⍝ (i.e. all x ≠ 0 with |x|≤10 in steps of 0.1)
+      x ← (¯0.1 × ⌽⍳100), 0.1 × ⍳100
+      y ← (1○x)÷x
+      Z ← ('gui_driver: ASCII' 'terminal_rows: 15' 'terminal_cols: 60') ⎕PLOT (10≥|y)/y
+      ⎕←Z[1;;]
+╔════════╤═════════╤═════════╤═════════╤═════════╤═════════╗
+║        │         │        ●●●●       │         │         ║
+║        │         │       ● │  ●●     │         │         ║
+╟────────┼─────────┼──────●──┼───●●────┼─────────┼─────────╢
+║        │         │     ●   │    ●    │         │         ║
+║        │         │    ●●   │     ●   │         │         ║
+║        │         │   ●●    │     ●●  │         │         ║
+╟────────┼─────────┼───●─────┼──────●──┼─────────┼─────────╢
+║        │         │  ●●     │       ● │         │         ║
+║  ●●●●●●●●●       │ ●●      │        ●│         ●●●●●●●●  ║
+║●●●     │ ●●●     │●●       │        ●●       ●●│      ●●●║
+╟────────┼───●●●──●●●────────┼─────────●●●──●●●──┼─────────╢
+║        │     ●●●●│         │         │ ●●●●    │         ║
+║        │         │         │         │         │         ║
+╚════════╧═════════╧═════════╧═════════╧═════════╧═════════╝
+
+      ⎕PLOT ¯3   ⍝ close all ⎕PLOT windows
+³
 
       ⍝ only checks that ⎕PLOT was compiled
       ⍝
@@ -9,4 +45,59 @@
 
       )MORE
 NO )MORE ERROR INFO
+
+      ⍝ Bugs11 #5 (Blake McBride, 2026-08-04): monadic ⎕PLOT lacked the
+      ⍝ element_count<2 guard that the dyadic form has, so a 0-row
+      ⍝ argument reached setup_data() with row_count==0; Plot_data's six
+      ⍝ min/max members were then read uninitialized by
+      ⍝ Plot_window_properties (UB, occasionally a crash).
+      ⍝
+      ⎕PLOT 0 5⍴0
+LENGTH ERROR
+      ⎕PLOT 0 5⍴0
+      ^
+
+      ⎕PLOT 0 0⍴0
+LENGTH ERROR
+      ⎕PLOT 0 0⍴0
+      ^
+
+      ⍝ clear the SI left behind by the LENGTH ERRORs above
+      ⍝
+      )SIC
+
+      ⍝ regression (found while auditing get_cravel() call sites after
+      ⍝ Blake McBride's Bugs12.md #1, 2026-08-07): setup_data_3D()/2D()
+      ⍝ fetched cX/cY(/cZ) from the SAME packed B via three (or two)
+      ⍝ consecutive no-cache get_cravel() calls before reading any of
+      ⍝ them -- each fetch silently overwrote B's single shared
+      ⍝ ravel.cell_fetch_cache, so by the time X[p]/Y[p](/Z[p]) were
+      ⍝ finally read, cX/cY(/cZ) all aliased the LAST fetch (cZ for the
+      ⍝ 3-plane case, cY for the 2-plane case) -- silent wrong RESULTS,
+      ⍝ not a crash, and only for B large enough to be packed (small B
+      ⍝ stays RPT_CELLS and is unaffected). Fixed by giving each
+      ⍝ coordinate its own explicit cache cell (get_cravel(idx, cache)).
+      ⍝
+      ⍝ X increasing, Y decreasing (anti-diagonal "\"): confirmed live
+      ⍝ that the pre-fix code rendered an ascending "/" here instead
+      ⍝ (X wrongly aliased to Y's descending values).
+      ⍝
+      X←⍳1000
+      Y←1000-⍳1000
+      B←2 2 500⍴X,Y
+      Z←('gui_driver: ASCII' 'terminal_rows: 10' 'terminal_cols: 40') ⎕PLOT B
+      ⎕←Z[1;;]
+╔════════╤═════════╤═════════╤═════════╗
+║●●●●●   │         │         │         ║
+║    ●●●●●●        │         │         ║
+╟────────┼●●●●●────┼─────────┼─────────╢
+║        │    ●●●●●●         │         ║
+║        │         ●●●●●●    │         ║
+║        │         │    ●●●●●●         ║
+╟────────┼─────────┼─────────●●●●●●────╢
+║        │         │         │    ●●●●●║
+╚════════╧═════════╧═════════╧═════════╝
+
+      ⎕PLOT ¯3   ⍝ close all ⎕PLOT windows
+³
 

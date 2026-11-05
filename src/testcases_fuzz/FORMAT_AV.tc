@@ -1,0 +1,141 @@
+⍝ FORMAT_AV.tc
+⍝ ----------------------------------
+
+⍝ IBM APL2 ⎕AV, row by row, as character literals: ⎕UCS shows which code
+⍝ point each character of a literal arrives as (GNU APL vs. IBM APL2 via
+⍝ the MEGA11 harness, i.e. through testcases_apl2/apl2_codec.py). Control
+⍝ characters, DEL, | and ⋸ cannot be in a literal here and are left out,
+⍝ and so are ⍬ ⍶ ⍹: they are not in IBM APL2's real ⎕AV (verified with
+⍝ ⎕UCS 16 16⍴⎕AV below), although GNU APL's table of it has them.
+
+      ⍝ row 0x20: ⎕AV positions 20 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F
+      ⎕UCS ' !"#$%&''()*+,-./'
+32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47
+
+
+
+      ⍝ row 0x30: ⎕AV positions 30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F
+      ⎕UCS '0123456789:;<=>?'
+48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+
+
+
+      ⍝ row 0x40: ⎕AV positions 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F
+      ⎕UCS '@ABCDEFGHIJKLMNO'
+64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79
+
+
+
+      ⍝ row 0x50: ⎕AV positions 50 51 52 53 54 55 56 57 58 59 5A 5B 5C 5D 5E 5F
+      ⎕UCS 'PQRSTUVWXYZ[\]^_'
+80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95
+
+
+
+      ⍝ row 0x60: ⎕AV positions 60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F
+      ⎕UCS '`abcdefghijklmno'
+96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111
+
+
+
+      ⍝ row 0x70: ⎕AV positions 70 71 72 73 74 75 76 77 78 79 7A 7B 7D 7E
+      ⎕UCS 'pqrstuvwxyz{}~'
+112 113 114 115 116 117 118 119 120 121 122 123 125 126
+
+
+
+      ⍝ row 0x80: ⎕AV positions 80 81 82 83 84 85 86 87 88 89 8A 8B 8C 8D 8E 8F
+      ⎕UCS 'ÇüéâäàåçêëèïîìÄÅ'
+199 252 233 226 228 224 229 231 234 235 232 239 238 236 196 197
+
+
+
+      ⍝ row 0x90: ⎕AV positions 90 91 92 93 94 95 96 97 98 99 9A 9B 9C 9D 9F
+      ⎕UCS '⎕⍞⌹ôöòûù⊤ÖÜø£⊥⌶'
+9109 9054 9017 244 246 242 251 249 8868 214 220 248 163 8869 9014
+
+
+
+      ⍝ row 0xA0: ⎕AV positions A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 AA AB AC AD AE AF
+      ⎕UCS 'áíóúñÑªº¿⌈¬½∪¡⍕⍎'
+225 237 243 250 241 209 170 186 191 8968 172 189 8746 161 9045 9038
+
+
+
+      ⍝ row 0xB0: ⎕AV positions B0 B1 B2 B3 B4 B5 B6 B7 B8 B9 BA BB BC BD BE BF
+      ⎕UCS '░▒▓│┤⍟∆∇→╣║╗╝←⌊┐'
+9617 9618 9619 9474 9508 9055 8710 8711 8594 9571 9553 9559 9565 8592 8970 9488
+
+
+
+      ⍝ row 0xC0: ⎕AV positions C0 C1 C2 C3 C4 C5 C6 C7 C8 C9 CA CB CC CD CE CF
+      ⎕UCS '└┴┬├─┼↑↓╚╔╩╦╠═╬≡'
+9492 9524 9516 9500 9472 9532 8593 8595 9562 9556 9577 9574 9568 9552 9580 8801
+
+
+
+      ⍝ row 0xD0: ⎕AV positions D0 D2 D3 D4 D5 D6 D7 D8 D9 DA DB DC DD DE DF
+      ⎕UCS '⍸∵⌷⍂⌻⊢⊣◊┘┌█▄¦Ì▀'
+9080 8757 9015 9026 9019 8866 8867 9674 9496 9484 9608 9604 166 204 9600
+
+
+
+      ⍝ row 0xE0: ⎕AV positions E0 E2 E3 E4 E5 E6 E7 E8 E9 EA EB EC ED EE EF
+      ⎕UCS '⍺⊂⊃⍝⍲⍴⍱⌽⊖○∨⍳⍉ϵ∩'
+9082 8834 8835 9053 9074 9076 9073 9021 8854 9675 8744 9075 9033 1013 8745
+
+
+
+      ⍝ row 0xF0: ⎕AV positions F0 F1 F2 F3 F4 F5 F6 F7 F8 F9 FA FB FC FD FE FF
+      ⎕UCS '⌿⍀≥≤≠×÷⍙∘⍵⍫⍋⍒¯¨ '
+9023 9024 8805 8804 8800 215 247 9049 8728 9077 9067 9035 9042 175 168 160
+
+
+
+      ⍝ the entire ⎕AV, in ⎕AV order: in IBM APL2 this shows its real ⎕AV (to
+      ⍝ check/correct GNU APL's table of it, Avec::IBM_quad_AV(), which
+      ⍝ apl2_codec.py copies). In GNU APL it is GNU APL's own ⎕AV, so a
+      ⍝ difference is expected. The display skips the 32 control characters
+      ⍝ (they would break the lines of this file); the ⎕UCS numbers below
+      ⍝ show all 256 positions.
+      ⍝
+      14 16⍴32↓⎕AV
+ !"#$%&'()*+,-./
+0123456789:;<=>?
+@ABCDEFGHIJKLMNO
+PQRSTUVWXYZ[\]^_
+`abcdefghijklmno
+pqrstuvwxyz{|}~
+¥€⇄∧∼«⋆⋸⌸²⌼μ⍁»⍣⍅
+⎕⍞⌹⍆⍤⍇⍈⍊⊤λ⍍⍏£⊥⍶⌶
+⍐⍑χ≢⍖⍗⍘∊⍛⌈⍜⍢∪⍨⍕⍎
+⍬⍪∣│┤⍟∆∇→╣║╗╝←⌊┐
+└┴┬├─┼↑↓╔╚╩╦╠═╬≡
+⍸⍷∵⌷⍂⌻⊢⊣◊┘┌█▄▌▐▀
+⍺⍹⊂⊃⍝⍲⍴⍱⌽⊖○∨⍳⍉ϵ∩
+⌿⍀≥≤≠×÷⍙∘⍵⍫⍋⍒¯¨ 
+
+
+
+      ⎕UCS 16 16⍴⎕AV
+   0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
+  16   17   18   19   20   21   22   23   24   25   26   27   28   29   30   31
+  32   33   34   35   36   37   38   39   40   41   42   43   44   45   46   47
+  48   49   50   51   52   53   54   55   56   57   58   59   60   61   62   63
+  64   65   66   67   68   69   70   71   72   73   74   75   76   77   78   79
+  80   81   82   83   84   85   86   87   88   89   90   91   92   93   94   95
+  96   97   98   99  100  101  102  103  104  105  106  107  108  109  110  111
+ 112  113  114  115  116  117  118  119  120  121  122  123  124  125  126  127
+ 165 8364 8644 8743 8764  171 8902 8952 9016  178 9020  956 9025  187 9059 9029
+9109 9054 9017 9030 9060 9031 9032 9034 8868  955 9037 9039  163 8869 9078 9014
+9040 9041  967 8802 9046 9047 9048 8714 9051 8968 9052 9058 8746 9064 9045 9038
+9068 9066 8739 9474 9508 9055 8710 8711 8594 9571 9553 9559 9565 8592 8970 9488
+9492 9524 9516 9500 9472 9532 8593 8595 9556 9562 9577 9574 9568 9552 9580 8801
+9080 9079 8757 9015 9026 9019 8866 8867 9674 9496 9484 9608 9604 9612 9616 9600
+9082 9081 8834 8835 9053 9074 9076 9073 9021 8854 9675 8744 9075 9033 1013 8745
+9023 9024 8805 8804 8800  215  247 9049 8728 9077 9067 9035 9042  175  168  160
+
+
+
+⍝ ==================================
+

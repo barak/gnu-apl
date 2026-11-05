@@ -1,0 +1,3536 @@
+⍝ ZZ74_Regression.tc
+⍝ ══════════════════
+
+⍝@ test3.
+
+      ⍝ Faults in the construction of the 3-line error display, in
+      ⍝ particular for statements that were optimized by the parser.
+      ⍝
+
+
+
+
+
+      ⍝ a defined function with a multi-line string: the lines of the body
+      ⍝ are no longer the lines of the function text. reparse() used the
+      ⍝ text of the wrong line (here: abc) for an optimized statement.
+      ⍝
+      ∇Z←MLS B
+      Z←"""
+      abc
+      """
+      Z←Z+2 3⍴1
+      ∇
+
+
+
+
+
+      MLS 1
+DOMAIN ERROR
+MLS[2]  Z←Z+2 3⍴1
+          ^^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ the same for a comment line, which has no tokens in the body
+      ⍝
+      ∇Z←CMT B
+      ⍝ a comment
+      Z←(2 2⍴1)+1 2 3
+      ∇
+
+
+
+
+
+      CMT 1
+RANK ERROR+
+CMT[2]  Z←(2 2⍴1)+1 2 3
+          ^      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ a conditional statement C →→ T ←→ F ←← is one statement in the text,
+      ⍝ but its segments C, T, and F are statements of their own in the body.
+      ⍝ For an optimized segment, line 2 showed the entire statement with
+      ⍝ the carets of the segment.
+      ⍝
+      0 →→ 'T' ←→ (2 2⍴1)+1 2 3 ←←
+RANK ERROR+
+      (2 2⍴1)+1 2 3
+      ^      ^
+
+
+
+
+
+      1 →→ (2 2⍴1)+1 2 3 ←→ 'F' ←←
+RANK ERROR+
+      (2 2⍴1)+1 2 3
+      ^      ^
+
+
+
+
+
+      ⍝ a folded ⊂B has 2 tokens (not 3 as a folded A⍴B), and repeated folds
+      ⍝ (⊂⊂B, A⍴⊂B) are one value. Counting 3 tokens for every fold put the
+      ⍝ carets left of it one token off.
+      ⍝
+      'a'+(⊂1 2)
+DOMAIN ERROR
+      'a'+(⊂1 2)
+      ^  ^
+
+
+
+
+
+      'a'+⊂⊂1 2
+DOMAIN ERROR
+      'a'+⊂⊂1 2
+      ^  ^
+
+
+
+
+
+      'a'+2 2⍴⊂1 2
+DOMAIN ERROR
+      'a'+2 2⍴⊂1 2
+      ^  ^
+
+
+
+
+
+      X←3 ◊ (X ⊂ ⊂1 2)+'a'
+RANK ERROR+
+      (X⊂⊂1 2)+'a'
+       ^^
+
+
+
+
+
+      ⍝ the macro of a derived function reports the whole statement: its
+      ⍝ range ended at the END token, which has no counterpart in the
+      ⍝ unoptimized statement
+      ⍝
+      (⍳⍤1) 2 2⍴'ab'
+DOMAIN ERROR
+      (⍳⍤1)2 2⍴'ab'
+      ^    ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ a folded value (2⍴1) together with a merged ⊤∧ (2 tokens, 1 in the
+      ⍝ optimized body): the carets are placed by the PCs of the Token_locs
+      ⍝ (the positions of the tokens in the original token string of the
+      ⍝ line) and are therefore not shifted by the optimizations.
+      ⍝
+      1 2 3 4 + (2⍴1)⊤∧1 2 3
+LENGTH ERROR+
+      1 2 3 4+(2⍴1)⊤∧1 2 3
+              ^    ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      1 2 3 4 + 1 0 1⊤∧(2⍴1)
+LENGTH ERROR+
+      1 2 3 4+1 0 1⊤∧(2⍴1)
+              ^    ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #4: a folded ⊂B that is also folded by monadic , or ⍪
+      ⍝ (and A⍴B or ⊂⊂B under ,): the left caret is under the ( as
+      ⍝ entered, not one token further right.
+      ⍝
+
+
+
+
+
+      X←(,⊂'abc')+1
+DOMAIN ERROR
+      X←(,⊂'abc')+1
+        ^        ^
+
+
+      )SIC
+
+
+
+
+
+      X←(⍪⊂'abc')+1
+DOMAIN ERROR
+      X←(⍪⊂'abc')+1
+        ^        ^
+
+
+      )SIC
+
+
+
+
+
+      X←1 2+(,⊂'ab'),1 2 3
+LENGTH ERROR+
+      X←1 2+(,⊂'ab'),1 2 3
+        ^  ^
+
+
+      )SIC
+
+
+
+
+
+      X←(,2 2⍴'abcd')+1
+DOMAIN ERROR
+      X←(,2 2⍴'abcd')+1
+        ^            ^
+
+
+      )SIC
+
+
+
+
+
+      X←(,⊂⊂'abc')+1
+DOMAIN ERROR
+      X←(,⊂⊂'abc')+1
+        ^         ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #5: a one-character literal before an unbalanced ) or ]
+      ⍝ was displayed as VALUE ERROR (with a stale line 2).
+      ⍝
+
+
+
+
+
+      'a'◊2)
+Unbalanced right parenthesis+
+      'a'◊2)
+           ^
+
+
+      X←'a' ◊ 2)
+Unbalanced right parenthesis+
+      X←'a'◊2)
+             ^
+
+
+      'a' ◊ 2]
+Unbalanced right square bracket+
+      'a'◊2]
+           ^
+
+
+      ⍝ Bugs35 #6: an empty statement or a conditional statement before
+      ⍝ the failed one: line 2 shows the statement as entered, not the
+      ⍝ optimized body.
+      ⍝
+
+
+
+
+
+       ◊ X←(2 2⍴7)+1 2 3
+RANK ERROR+
+      X←(2 2⍴7)+1 2 3
+        ^      ^
+
+
+      )SIC
+
+
+
+
+
+      1 ◊ ◊ X←(⊂'ab')+1 2 3
+1
+DOMAIN ERROR
+      X←(⊂'ab')+1 2 3
+        ^      ^
+
+      )SIC
+
+
+
+
+
+      X←1 →→ 2 ←→ 3 ←← ◊ Z←(2 2⍴7)+1 2 3
+2
+RANK ERROR+
+      Z←(2 2⍴7)+1 2 3
+        ^      ^
+
+      )SIC
+
+
+
+
+
+      ⍎' ◊ X←(⊂''ab'')+1 2 3'
+DOMAIN ERROR
+      X←(⊂'ab')+1 2 3
+        ^      ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #51: line 2 shows the canonical form (APL input format) of
+      ⍝ the parsed statement: a parenthesized group that the parser has
+      ⍝ folded into one value keeps its parentheses where they matter, e.g.
+      ⍝ (1 2) (3 4 5) or (1 2 3)[2], and loses redundant ones, e.g. (1 2)+3.
+      ⍝
+
+
+
+
+
+      ⊣⎕FX 'F51' '(1 2)+1 2 3'
+
+
+
+
+
+      F51
+LENGTH ERROR+
+F51[1]  1 2+1 2 3
+        ^  ^
+
+
+      )SIC
+
+
+
+
+
+      1 (2) 3+'a'
+DOMAIN ERROR
+      1 2 3+'a'
+      ^    ^
+
+
+      )SIC
+
+
+
+
+
+      (1)+'a'
+DOMAIN ERROR
+      1+'a'
+      ^^
+
+
+      )SIC
+
+
+
+
+
+      (1 2)(3 4 5)+1 2 3
+LENGTH ERROR+
+      (1 2) (3 4 5)+1 2 3
+      ^            ^
+
+      )SIC
+
+
+
+
+
+      A←5
+
+
+
+
+
+      A (1 2)+'a'
+DOMAIN ERROR
+      A(1 2)+'a'
+      ^     ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      (1 2) A+'a'
+DOMAIN ERROR
+      (1 2)A+'a'
+      ^     ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      (1 2 3)[4]
+INDEX ERROR+
+      (1 2 3)[4]
+      ^      ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs35 #51 (cont.): numbers in line 2 have full precision (they
+      ⍝ were shown with ⎕PP 10), other tokens their canonical form
+      ⍝ (ρ → ⍴, * → ⋆).
+      ⍝
+
+
+
+
+
+      1   ((2 3))   4 5                  ÷ 0
+DOMAIN ERROR
+      1 (2 3) 4 5÷0
+      ^          ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      1.50 ÷ 0
+DOMAIN ERROR
+      1.5÷0
+      ^  ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      3.14159265358979 1E10 00.250e05J1.0+'a'
+DOMAIN ERROR
+      3.14159265358979 10000000000 25000J1+'a'
+      ^                                   ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      2 3ρ*'a'
+DOMAIN ERROR
+      2 3⍴⋆'a'
+          ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ PR_APL_FUN (1 ⎕CR, error line 2) is the APL input format: the
+      ⍝ shortest text that ⍎ turns into an identical value, with full
+      ⍝ precision (⎕PP is ignored). It lost ranks, shapes, and enclosures.
+      ⍝
+
+
+
+
+
+      ⎕PP←5
+
+
+
+
+
+      1 ⎕CR 3.14159265358979
+3.14159265358979
+
+
+
+
+
+      1 ⎕CR ,'a'
+,'a'
+
+
+
+
+
+      1 ⎕CR ,5
+,5
+
+
+
+
+
+      1 ⎕CR ⊂1 2
+⊂1 2
+
+
+
+
+
+      1 ⎕CR 2 2⍴⍳4
+2 2⍴1 2 3 4
+
+
+
+
+
+      1 ⎕CR 1 (⊂1 2)
+1 (⊂1 2)
+
+
+
+
+
+      1 ⎕CR (,1) 2
+(,1) 2
+
+
+
+
+
+      1 ⎕CR 0⍴⊂1 2
+0⍴⊂0 0
+
+
+
+
+
+      1 ⎕CR 1E¯5 1J2 ¯2
+1E¯5 1J2 ¯2
+
+
+
+
+
+      1 ⎕CR 'it''s' ⍬ (2 2⍴'abcd')
+'it''s' ⍬ (2 2⍴'abcd')
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ Bugs35 #2: [∆-m] deletes lines 1 through m (it deleted only line m)
+      ⍝
+
+
+
+
+
+      ⊣⎕FX 'FED' 'A←1' 'B←2' 'C←3' 'D←4' 'E←5'
+
+
+
+
+
+      ∇FED[∆-3]∇
+
+
+
+
+
+      ⎕CR 'FED'
+FED
+D←4
+E←5
+
+
+
+
+
+      ⍝ Bugs35 #7: the endpoints of ∆ and ⎕ ranges need not exist (LRM
+      ⍝ pp. 388, 391). The lines within the range are deleted or shown.
+      ⍝
+
+
+
+
+
+      ⊣⎕FX 'FED' 'A←1' 'B←2' 'C←3' 'D←4' 'E←5'
+
+
+
+
+
+      ∇FED[∆4-9]∇
+
+
+
+
+
+      ⎕CR 'FED'
+FED
+A←1
+B←2
+C←3
+
+
+
+
+
+      ⊣⎕FX 'FED' 'A←1' 'B←2' 'C←3' 'D←4' 'E←5'
+
+
+
+
+
+      ∇FED[∆1.5-3.5]∇
+
+
+
+
+
+      ⎕CR 'FED'
+FED
+A←1
+D←4
+E←5
+
+
+
+
+
+      ⊣⎕FX 'FED' 'A←1' 'B←2' 'C←3' 'D←4' 'E←5'
+
+
+
+
+
+      ∇FED[∆3.5-]∇
+
+
+
+
+
+      ⎕CR 'FED'
+FED
+A←1
+B←2
+C←3
+
+
+
+
+
+      ⊣⎕FX 'FED' 'A←1' 'B←2' 'C←3' 'D←4' 'E←5'
+
+
+
+
+
+      ∇FED[∆7-9]∇
+
+
+
+
+
+      ⎕CR 'FED'
+FED
+A←1
+B←2
+C←3
+D←4
+E←5
+
+
+
+
+
+      ∇FED[⎕2.5-3.5]∇
+[3]   C←3
+
+
+
+
+
+      ∇FED[⎕-2.5]∇
+    ∇
+[0]   FED
+[1]   A←1
+[2]   B←2
+
+
+
+
+
+      ∇FED[⎕1.5-2.5]∇
+[2]   B←2
+
+
+
+
+
+      ∇FED[⎕7-9]∇
+
+
+
+
+
+      ⍝ Bugs35 #1: a 1 or 3 without a decorator cannot signal a negative B
+      ⍝ (DOMAIN ERROR like '5.5'⍕¯1.5; the sign was dropped silently)
+      ⍝
+
+
+
+
+
+      '5.1'⍕¯1.5
+DOMAIN ERROR+
+      '5.1'⍕¯1.5
+      ^    ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      '55.3'⍕¯1.5
+DOMAIN ERROR+
+      '55.3'⍕¯1.5
+      ^     ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      '-5.1'⍕¯1.5 1.5
+-1.5 1.5
+
+
+
+
+
+      '5.1-'⍕¯1.5
+1.5-
+
+
+
+
+
+      ⍝ Bugs35 #3: E-format ⍕ rounds an exact tie away from zero (like
+      ⍝ the int path, fixed format, and the display)
+      ⍝
+
+
+
+
+
+      ¯1⍕2.5 3.5 0.5 1.5 ¯2.5
+3E0 4E0 5E¯1 2E0 ¯3E0
+
+
+
+
+
+      ¯2⍕0.125 0.375 1.25
+1.3E¯1 3.8E¯1 1.3E0
+
+
+
+
+
+      (¯1⍕25)≡¯1⍕25.0
+1
+
+
+
+
+
+      ¯1⍕9.5 99.5
+1E1 1E2
+
+
+
+
+
+      ⍝ Bugs35 #11: with ⎕CT←0, A|B for a huge integral A and a small B of
+      ⍝ the opposite sign returned A itself (no residue modulo A)
+      ⍝
+
+
+
+
+
+      ⎕CT←0
+
+
+
+
+
+      (1E19|¯1)<1E19
+1
+
+
+
+
+
+      0<1E19|¯1
+1
+
+
+
+
+
+      (¯1E19|1)>¯1E19
+1
+
+
+
+
+
+      (1E300|¯1)<1E300
+1
+
+
+
+
+
+      (1E19|1E19|¯1)=1E19|¯1
+1
+
+
+
+
+
+      7|¯1E19
+4
+
+
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+
+      ⍝ Bugs35 D4: line 2 of the error display shows the label of the line
+      ⍝ (but only for its first statement)
+      ⍝
+
+
+
+
+
+      ∇Z←LBL
+[1] L1: Z←1 2+1 2 3
+[2] ∇
+
+
+
+
+
+      LBL
+LENGTH ERROR+
+LBL[1]  L1: Z←1 2+1 2 3
+              ^  ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ∇Z←LB2
+[1] L1: Z←4 ◊ Z←1 2+1 2 3
+[2] ∇
+
+
+
+
+
+      LB2
+LENGTH ERROR+
+LB2[1]  Z←1 2+1 2 3
+          ^  ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      )ERASE LBL LB2
+
+
+
+
+
+      ⍝ Bugs35 #12: format by example rounds an exact tie away from zero
+      ⍝ (like 0⍕, ¯N⍕, and the display), not to even
+      ⍝
+
+
+
+
+
+      ' 5'⍕0.5 1.5 2.5 3.5 4.5
+ 1 2 3 4 5
+
+
+
+
+
+      ' 5.5'⍕0.25 0.75 2.25 0.125
+  .3  .8 2.3  .1
+
+
+
+
+
+      ' 5.55'⍕0.125 0.375
+  .13  .38
+
+
+
+
+
+      ' ¯1.7E¯01'⍕0.125 125 0.375
+  1.3E¯01  1.3E 02  3.8E¯01
+
+
+
+
+
+      ' 55'⍕9.5 99.4 0.49
+ 10 99   
+
+
+
+
+
+      ' 55,555.50'⍕1234.565 0.005
+  1,234.57       .01
+
+
+
+
+
+      ⍝ Bugs35 #13: the 7 (scaled form) marker and an exponent decorator
+      ⍝ also work in a field without a decimal point
+      ⍝
+
+
+
+
+
+      ' 57E¯01'⍕123
+  1E 02
+
+
+
+
+
+      ' 57X01'⍕123
+  1X02
+
+
+
+
+
+      ' ¯157E¯01'⍕0.0123 ¯5
+    1E¯02   ¯5E 00
+
+
+
+
+
+      ⍝ Bugs35 D6 follow-up: a sign or significant digits must never be
+      ⍝ lost silently. A blank decorator cannot show a negative B.
+      ⍝
+
+
+
+
+
+      ' 15.5'⍕¯5
+DOMAIN ERROR+
+      ' 15.5'⍕¯5
+      ^      ^
+
+
+
+
+
+      )MORE
+A⍕B : B does not fit into A (B is negative, but A has no conditional ('1', '2', or '3') non-blank decorator to show that, APL2 LRM p.141)
+
+
+
+
+
+      ' ¯15.5'⍕¯5
+  ¯5  
+
+
+
+
+
+      2 ¯1⍕5
+DOMAIN ERROR+
+      2 ¯1⍕5
+      ^   ^
+
+
+
+
+
+      )MORE
+A⍕B : B does not fit into A (width 2 is too small for 5E0)
+
+
+
+
+
+      ⍝ Bugs35 #14: a value shown as 0 is blank in a 5 field (LRM p.141),
+      ⍝ also without a fraction; never ¯0; E-format keeps its mantissa 0
+      ⍝
+
+
+
+
+
+      ' 55'⍕0 5
+     5
+
+
+
+
+
+      ' 55.55'⍕0 5
+        5   
+
+
+
+
+
+      ' 5555'⍕2 22 0 222
+    2   22       222
+
+
+
+
+
+      ' 0555'⍕0 5
+ 0000 0005
+
+
+
+
+
+      ' 8555'⍕0 5
+ **** ***5
+
+
+
+
+
+      ' ¯155'⍕¯0.2 ¯5
+        ¯5
+
+
+
+
+
+      ' ¯1.7000E¯01'⍕0 1
+  0.0000E 00  1.0000E 00
+
+
+
+
+
+      ⍝ Bugs35 #15: format by example formats integers exactly (not
+      ⍝ rounded to a double)
+      ⍝
+
+
+
+
+
+      '5555555555555555555'⍕9223372036854775807 1234567890123456789
+92233720368547758071234567890123456789
+
+
+
+
+
+      '¯5555555555555555551'⍕¯9223372036854775807
+¯9223372036854775807
+
+
+
+
+
+      '55555555555555555555'⍕9007199254740993
+    9007199254740993
+
+
+
+
+
+      '0000000000000000000'⍕123456789012345678
+0123456789012345678
+
+
+
+
+
+      ' 55,555,555,555,555,555,555'⍕9223372036854775807
+  9,223,372,036,854,775,807
+
+
+
+
+
+      ⍝ Bugs35 #16: on the right side a floating decorator is placed next to
+      ⍝ the number and a simple decorator stays at its position in A
+      ⍝
+
+
+
+
+
+      ' (55.51)'⍕¯3.4 ¯3.45 3.4
+  (3.4)   (3.45)   3.4  
+
+
+
+
+
+      ' 55.51CR'⍕¯3.4 ¯3.45 ¯3
+  3.4CR   3.45CR  3CR   
+
+
+
+
+
+      ' 55.55%'⍕3.4 3.45
+  3.4 %  3.45%
+
+
+
+
+
+      ' -551.20CR'⍕¯4 40 ¯400
+   -4.00     40.00CR -400.00  
+
+
+
+
+
+      ⍝ Bugs35 #17, #18: ⎕FC is an implicit argument of dyadic ⍕ only (LRM
+      ⍝ p.291): not of ⎕TF, )OUT, the display, or monadic ⍕; format by
+      ⍝ specification uses ⎕FC[1 4 6]
+      ⍝
+
+
+
+
+
+      Y←1.5 ¯2.5 3J0.5 ◊ ⎕FC←',.*0_-'
+
+
+
+
+
+      2 ⎕TF 'Y'
+Y←1.5 ¯2.5 3J5E¯1
+
+
+
+
+
+      1 ⎕TF 'Y'
+NY 1 3 1.5 ¯2.5 3J5E¯1
+
+
+
+
+
+      ¯2.5 ¯3
+¯2.5 ¯3
+
+
+
+
+
+      ⍎⍕1.5
+1.5
+
+
+
+
+
+      5 1⍕¯2.5 ¯3
+ -2,5 -3,0
+
+
+
+
+
+      0 ¯2⍕¯2.5
+-2,5E0
+
+
+
+
+
+      ⍝ )OUT/)IN do not depend on ⎕FC either
+      ⍝
+
+
+
+
+
+      )OUT FCOUT74 Y
+
+
+
+
+
+      )ERASE Y
+
+
+
+
+
+      )IN FCOUT74
+
+
+
+
+
+      Y≡1.5 ¯2.5 3J0.5
+1
+
+
+
+
+
+      ⎕FC←''
+
+
+
+
+
+      )ERASE Y
+
+
+
+
+
+      ⍝ Bugs35 #19: the width and precision of ⍕ by specification are
+      ⍝ checked before they are narrowed to int
+      ⍝
+
+
+
+
+
+      0 ¯4294967297⍕1.5
+DOMAIN ERROR+
+      0 ¯4294967297⍕1.5
+      ^            ^
+
+
+
+
+
+      ⍴4294967301 1⍕1.5
+DOMAIN ERROR+
+      ⍴4294967301 1⍕1.5
+       ^           ^
+
+
+
+
+
+      )MORE
+A⍕B: width 4294967301 is too large
+
+
+
+
+
+      ⍝ Bugs35 #20: A○B with an A outside ¯12..12 is a DOMAIN ERROR, also
+      ⍝ if its low 32 bits are a valid function number
+      ⍝
+
+
+
+
+
+      4294967297○1
+DOMAIN ERROR
+      4294967297○1
+      ^         ^
+
+
+
+
+
+      9223372036854775807○1
+DOMAIN ERROR
+      9223372036854775807○1
+      ^                  ^
+
+
+
+
+
+      4294967308○2J3
+DOMAIN ERROR
+      4294967308○2J3
+      ^         ^
+
+
+
+
+
+      ⍝ Bugs35 #21: 1 ⎕RVAL and 3 ⎕RVAL weights are not truncated to int
+      ⍝
+
+
+
+
+
+      1 ⎕RVAL 4294967296 1
+DOMAIN ERROR+
+      1 ⎕RVAL 4294967296 1
+      ^ ^
+
+
+
+
+
+      )MORE
+the weight 4294967296 in a vector right argument B of 1 ⎕RVAL B is too large (max. 2147483647)
+
+
+
+
+
+      3 ⎕RVAL 2147483648 1 0 0 0
+DOMAIN ERROR+
+      3 ⎕RVAL 2147483648 1 0 0 0
+      ^ ^
+
+
+
+
+
+      )MORE
+the weight 2147483648 in the right argument B of 3 ⎕RVAL B is too large (max. 2147483647)
+
+
+
+
+
+      ⍝ Bugs35 #22: ⌹[7] prints every coefficient as the number it is
+      ⍝
+
+
+
+
+
+      ⌹[7] ¯1
+¯1
+
+
+
+
+
+      ⌹[7] ¯1J¯2 1
+x - 1J2
+
+
+
+
+
+      ⌹[7] ¯1J2 1
+x - 1J¯2
+
+
+
+
+
+      ⌹[7] 5 ¯1J2
+¯1J2x + 5
+
+
+
+
+
+      ⌹[7] 4294967297 ¯3 5
+5x² - 3x + 4294967297
+
+
+
+
+
+      ⌹[7] 3 ¯9223372036854775807 1
+x² - 9223372036854775807x + 3
+
+
+
+
+
+      ⌹[7] 1.23456789 2
+2x + 1.23456789
+
+
+
+
+
+      ⍝ Bugs35 #23: A⌹[9]B: the remainder for deg A < deg B is A; zero high
+      ⍝ coefficients of B are ignored; B = 0 is a DOMAIN ERROR
+      ⍝
+
+
+
+
+
+      ⊃5⌹[9]1 1
+0
+5
+
+
+
+
+
+      ⊃1 2⌹[9]1 2 3
+0 0
+1 2
+
+
+
+
+
+      (6 5 1⌹[9]2 1 0)≡6 5 1⌹[9]2 1
+1
+
+
+
+
+
+      1 2⌹[9]0 0
+DOMAIN ERROR+
+      1 2⌹[9]0 0
+      ^  ^
+
+
+
+
+
+      )MORE
+A⌹[9]B: B is the zero polynomial
+
+
+
+
+
+      ⍝ Bugs35 #24: ⌹[11] with a power that does not fit into an int is a
+      ⍝ DOMAIN ERROR (was an assertion); an empty polynomial is 0
+      ⍝
+
+
+
+
+
+      ⌹[11]'x⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹'
+DOMAIN ERROR+
+      ⌹[11]'x⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹⁹'
+      ^
+
+
+
+
+
+      )MORE
+⌹[11]B: the power of 'x' is too large
+
+
+
+
+
+      ⌹[11]''
+0
+
+
+
+
+
+      ⍝ Bugs35 #25: X∨0, X∨X, X∧X for X = ¯2⋆63 return the float 2⋆63
+      ⍝
+
+
+
+
+
+      X←¯9223372036854775807-1
+
+
+
+
+
+      X∨0
+9.223372037E18
+
+
+
+
+
+      X∨X
+9.223372037E18
+
+
+
+
+
+      X∧X
+9.223372037E18
+
+
+
+
+
+      )ERASE X
+
+
+
+
+
+      ⍝ Bugs35 #27: A∼B with rank B > 1 was a RANK ERROR (ISO 13751 10.2.16);
+      ⍝ now any B, like APL2 (L∼R ←→ (∼L∊R)/L). A must still be a vector.
+      ⍝
+
+
+
+
+
+      1 2 3∼2 2⍴1 3
+2
+
+
+
+
+
+      (⍳100)∼10 10⍴⍳95   ⍝ large_eval_AB()
+96 97 98 99 100
+
+
+
+
+
+      (2 2⍴1 3)∼1
+RANK ERROR+
+      (2 2⍴1 3)∼1
+      ^        ^
+
+
+
+
+
+      )MORE
+A∼B: A must be a scalar or a vector
+
+
+
+
+
+      ⍝ Bugs35 #28: ⍸ of a scalar: the index of its only item is ⍬
+      ⍝
+
+
+
+
+
+      (⍸5)≡5⍴⊂⍬
+1
+
+
+
+
+
+      (⍸⍬⍴1)≡,⍳⍬
+1
+
+
+
+
+
+      ≡⍸0
+2
+
+
+
+
+
+      ⍝ Bugs35 #29: a non-scalar A of A⌽B is checked also if B is empty
+      ⍝ along the axis
+      ⍝
+
+
+
+
+
+      'ab'⌽2 0⍴0
+DOMAIN ERROR
+      'ab'⌽2 0⍴0
+      ^   ^
+
+
+
+
+
+      1.5 2.5⌽2 0⍴0
+DOMAIN ERROR
+      1.5 2.5⌽2 0⍴0
+      ^      ^
+
+
+
+
+
+      ⍝ Bugs35 #30: the prototype of an empty A⊂B has the length of the
+      ⍝ partition that A defines
+      ⍝
+
+
+
+
+
+      ⍴↑1 1⊂0 2⍴0
+2
+
+
+
+
+
+      ⍴↑1 2⊂0 2⍴0
+1
+
+
+
+
+
+      ⍴↑2 2 0 1⊂0 4⍴0
+2
+
+
+
+
+
+      ⍝ Bugs35 #31: ⊃ of items of different rank prepends 1s to the smaller
+      ⍝ shapes (aligns them at the last axis) and loses no item data
+      ⍝
+
+
+
+
+
+      ⍴Z←⊃(1 1⍴9)(1 2 3 4 5 6 7)
+2 1 7
+
+
+
+
+
+      Z
+9 0 0 0 0 0 0
+
+1 2 3 4 5 6 7
+
+
+
+
+
+      ⍴⊃(2 3⍴⍳6)(1 2 3 4 5)
+2 2 5
+
+
+
+
+
+      )ERASE Z
+
+
+
+
+
+      ⍝ Bugs35 #33: A⍋B with a scalar B (LRM p.155); an empty A is allowed
+      ⍝ (ISO 13751 10.2.21)
+      ⍝
+
+
+
+
+
+      'abc'⍋'a'
+RANK ERROR+
+      'abc'⍋'a'
+      ^    ^
+
+
+
+
+
+      ''⍋'ba'
+1 2
+
+
+
+
+
+      ⍝ Bugs35 #34: ⍳, ∊, =, ≠ on large integers are ⎕CT-tolerant at every
+      ⍝ length (the exact packed fast paths are not used for them)
+      ⍝
+
+
+
+
+
+      a←100000000000000000 ◊ b←a+1
+
+
+
+
+
+      {+/(⍵⍴a)=⍵⍴b}¨10 17 64
+10 17 64
+
+
+
+
+
+      {+/(⍵⍴a)∊⍵⍴b}¨10 17 64
+10 17 64
+
+
+
+
+
+      (17⍴b)⍳17⍴a
+1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+
+
+
+
+
+      (100⍴b)⍳6⍴a
+1 1 1 1 1 1
+
+
+
+
+
+      +/(12⍴a)≠12⍴b
+0
+
+
+
+
+
+      )ERASE a b
+
+
+
+
+
+      ⍝ Bugs35 #35: A↓B with the int64 minimum in A is an over-drop
+      ⍝
+
+
+
+
+
+      X←¯9223372036854775807-1
+
+
+
+
+
+      ⍴X↓⍳3
+0
+
+
+
+
+
+      ⍴(X 0)↓2 2⍴⍳4
+0 2
+
+
+
+
+
+      )ERASE X
+
+
+
+
+
+      ⍝ Bugs35 #36: generalized A⍳B with an empty B has the prototype
+      ⍝ ⊂(⍴⍴A)⍴0
+      ⍝
+
+
+
+
+
+      ≡(2 2⍴⍳4)⍳⍬
+2
+
+
+
+
+
+      1↑(2 2⍴⍳4)⍳⍬
+ 0 0 
+
+
+
+
+
+      ⍝ Bugs35 #37: a literal ⍤ operand y with more than 3 items is a parse
+      ⍝ error (no stale statement); ⎕FX returns the line number quietly
+      ⍝
+
+
+
+
+
+      (⊂⍤1 2 3 4)⍳3
+LENGTH ERROR+
+
+
+
+
+
+      )MORE
+⍤ y B: j too long (⍴j = 4)
+
+
+
+
+
+      ⎕FX 'Z←F B' 'Z←(⊂⍤1 2 3 4)B'
+2
+
+
+
+
+
+      (⊂⍤1E20)⍳3
+DOMAIN ERROR
+      (⊂⍤1E20)⍳3
+      ^
+
+
+
+
+
+      ⍝ Bugs35 #38 (part): f⍣N (B) with a parenthesized B: B, not ⊂B
+      ⍝
+
+
+
+
+
+      -⍣2 (5 6)
+5 6
+
+
+
+
+
+
+      ⍝ Bugs35 #38: a variable or parenthesized right operand of ⍣ or ⍤ is
+      ⍝ the entire N resp. y; its tail is not split off as B (like Dyalog)
+      ⍝
+
+
+
+
+
+
+      N38←3 5
+
+
+
+
+
+
+      (-⍣N38)1
+RANK ERROR+
+      (-⍣N38)1
+      ^
+
+
+
+
+
+
+      )MORE
+f⍣N B: N must be a scalar or 1-element vector; N has 2 items
+
+
+
+
+
+
+      -⍣N38⊢1
+RANK ERROR+
+      -⍣N38⊢1
+      ^
+
+
+
+
+
+
+      (-⍣(3 5))1
+RANK ERROR+
+      (-⍣(3 5))1
+      ^
+
+
+
+
+
+
+      Y38←0 0 0 7
+
+
+
+
+
+
+      (⊂⍤Y38)10 20 30
+LENGTH ERROR+
+      (⊂⍤Y38)10 20 30
+      ^
+
+
+
+
+
+
+      ⍝ a strand of names still works: K38 is N resp. y, B38 is B
+      ⍝
+
+
+
+
+
+
+      K38←1 ◊ B38←10 20
+
+
+
+
+
+
+      -⍣K38 B38
+¯10 ¯20
+
+
+
+
+
+
+      ⊂⍤K38 B38
+ 10 20 
+
+
+
+
+
+
+      ⍝ ⍤ follows ISO 13751 9.3.4/9.3.5: y not a vector is a RANK ERROR
+      ⍝ (ISO: domain-error), frames 2 and 1 a LENGTH ERROR (a 1-item nested B
+      ⍝ is not disclosed), an empty frame is extended
+      ⍝
+
+
+
+
+
+      (,⍤(1 1⍴1)) 1 2 3
+RANK ERROR+
+      (,⍤(1 1⍴1))1 2 3
+      ^
+
+
+
+
+
+      'ab' (,⍤0) ,⊂1 2
+LENGTH ERROR+
+      'ab'(,⍤0),⊂1 2
+      ^   ^
+
+
+
+
+
+      'ab' (,⍤0) ⊂1 2
+ a  1 2 
+ b  1 2 
+
+
+
+
+
+      )ERASE N38 Y38 K38 B38
+
+
+
+
+
+      ⍝ Bugs35 #39: a monadic-operator lambda (or a named monadic operator
+      ⍝ with an axis) as the left operand of ⍤ or ⍣ with a literal right
+      ⍝ operand keeps its own left operand
+      ⍝
+
+
+
+
+
+      -{⍶ ⍵}⍣2 ⊢5
+5
+
+
+
+
+
+      -{⍶ ⍵}⍤0 ⊢ 1 2
+¯1 ¯2
+
+
+
+
+
+      +{⍶/⍵}⍤1 ⊢2 3⍴⍳6
+6 15
+
+
+
+
+
+      ∇Z←(F OPX)[X] B
+[1] Z←F[X] B
+[2] ∇
+
+
+
+
+
+      ⌽OPX[1]⍤2 ⊢2 3⍴⍳6
+4 5 6
+1 2 3
+
+
+
+
+
+      )ERASE OPX
+
+
+
+
+
+      ⍝ Bugs35 #40: reduce, n-wise reduce and scan with an operand that sets
+      ⍝ ⎕IO; scan with a defined operand under ⎕IO←0
+      ⍝
+
+
+
+
+
+      {⎕IO←0 ⋄ ⍺+⍵}/1 2 3 4
+10
+
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      {⎕IO←0 ⋄ ⍺+⍵}\1 2 3 4
+1 3 6 10
+
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      2{⎕IO←0 ⋄ ⍺+⍵}/1 2 3 4
+3 5 7
+
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      ¯2{⎕IO←0 ⋄ ⍺-⍵}/1 2 3 4
+1 1 1
+
+
+
+
+
+      {⍺+⍵}\2 3⍴⍳6
+0 1  3
+3 7 12
+
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      ⍝ Bugs35 #41: A f¨B with both A and B empty requires the same shape
+      ⍝
+
+
+
+
+
+      (0 2⍴5)+¨2 0⍴0
+LENGTH ERROR+
+      (0 2⍴5)+¨2 0⍴0
+      ^      ^
+
+
+
+
+
+      )MORE
+A f¨B: ⍴A is 0 2 but ⍴B is 2 0
+
+
+
+
+
+      ⍴(0 2⍴5)+¨0 2⍴0
+0 2
+
+
+
+
+
+      ⍝ Bugs35 #44: a monadic lambda operator accepts an axis χ
+      ⍝
+
+
+
+
+
+      ⌽{⍶[χ]⍵}[1] 2 3⍴⍳6
+4 5 6
+1 2 3
+
+
+
+
+
+      1 ⌽{⍺ ⍶[χ] ⍵}[2] 2 3⍴⍳6
+2 3 1
+5 6 4
+
+
+
+
+
+      ⍝ dyadic lambda operators with χ, like ∇Z←(F OPX G)[X] B (D15)
+      ⍝
+
+
+
+
+
+      OPX74←{⍶ ⍹[χ] ⍵}
+
+
+
+
+
+      - OPX74 ⌽[1] 2 3⍴⍳6
+¯4 ¯5 ¯6
+¯1 ¯2 ¯3
+
+
+
+
+
+      - {⍶ ⍹ ⍵} ⌽[1] 2 3⍴⍳6
+AXIS ERROR+
+      -{⍶ ⍹ ⍵}⌽[1]2 3⍴⍳6
+      ^
+
+
+
+
+
+      )MORE
+λ1[X]: λ1 has no axis argument (χ is not used)
+
+
+
+
+
+      ⍝ ⍤[X]: X is the axis of the final ⊃[X] (NARS), checked by ⊃ itself
+      ⍝
+
+
+
+
+
+      (⌽⍤1)[1] 2 3⍴⍳6
+3 6
+2 5
+1 4
+
+
+
+
+
+      (⌽⍤1)[3] 2 3⍴⍳6
+AXIS ERROR+
+      (⌽⍤1)[3]2 3⍴⍳6
+      ^            ^
+
+
+
+
+
+      )MORE
+⊃[X]B: X[1] = 3 is not a valid axis (expecting 1≤X[1]<3).
+
+
+
+
+
+      )ERASE X
+
+
+
+
+
+      ⍝ Bugs35 #49 (D16): every system variable may be localized; for some
+      ⍝ (⎕AI, ⎕TS, ⎕EM, ...) localizing has no effect
+      ⍝
+
+
+
+
+
+      ⎕FX 'F49;⎕AI;⎕TS;⎕EM' '⍴⎕TS'
+F49
+
+
+
+
+
+      F49
+7
+
+
+
+
+
+      TZ49←⎕TZ ◊ ⎕TZ←1
+
+
+
+
+
+      ⎕FX 'Z←G49;⎕TZ' '⎕TZ←5' 'Z←⎕TZ'
+G49
+
+
+
+
+
+      G49 ⎕TZ
+5 1
+
+
+
+
+
+      ⎕TZ←TZ49
+
+
+
+
+
+      ⎕FX 'Z←H49;⎕PS' '⎕PS←1 3' 'Z←⎕PS'
+H49
+
+
+
+
+
+      (H49) ⎕PS
+ 1 3  0 0 
+
+
+
+
+
+      ⎕FX 'K49;⎕FX' '1'   ⍝ a system function is not a variable
+1
+
+
+
+
+
+      ⎕FX 'K49;⍞' '1'
+1
+
+
+
+
+
+      ⍝ Bugs35 #49: on display, local names are separated by semicolons
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←J49 C;D E' 'Z←C'
+J49
+
+
+
+
+
+      (⎕CR 'J49')[⎕IO;]
+Z←J49 C;D;E
+
+
+
+
+
+      ⍝ Bugs35 #52: ⍎ with an operator applied to a branch is a DOMAIN ERROR
+      ⍝ (LRM p.121)
+      ⍝
+
+
+
+
+
+      ⍎¨'2+2' '→3'
+DOMAIN ERROR: →N in macro ⍎¨
+      ⍎¨'2+2' '→3'
+      ^
+
+
+
+
+
+      )ERASE F49 G49 H49 J49 TZ49
+
+
+
+
+
+      ⍝ Bugs35 #45: f/ and f\ keep a nested scalar result of f enclosed
+      ⍝ (same as with a defined f)
+      ⍝
+
+
+
+
+
+      ,¨/1 2 3
+  1 2 3  
+
+
+
+
+
+      (,¨/1 2 3)≡{⍺,¨⍵}/1 2 3
+1
+
+
+
+
+
+      ,⍨¨/1 2 3
+  3 2 1  
+
+
+
+
+
+      ≡¨,¨\1 2 3
+0 2 2
+
+
+
+
+
+      ⍝ Bugs35 #47: a function ⎕FXed into a localized name is freed when
+      ⍝ the name is popped; ⎕FX over a named lambda does not delete it
+      ⍝ while the body of another function still refers to it
+      ⍝
+
+
+
+
+
+      ⎕FX 'F47;H' '⎕FX ''Z←H'' ''Z←7''' 'H'
+F47
+
+
+
+
+
+      F47 ◊ F47
+H
+7
+H
+7
+
+
+
+
+
+      ⎕FX 'K47;H' 'H←{⍵+1}' '⎕FX ''Z←H'' ''Z←9''' 'H'
+K47
+
+
+
+
+
+      K47
+H
+9
+
+
+
+
+
+      )ERASE F47 K47
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+
+      ⍝ Bugs35 #49: local names may be separated by blanks (LRM p.293)
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←G49 C;D E' 'Z←C'
+G49
+
+
+
+
+
+      ⎕FX 'H49;D E;F' '1'
+H49
+
+
+
+
+
+      ⎕FX 'Z←K1 C;;D' 'Z←C'
+1
+
+
+
+
+
+      )MORE
+Name expected (;; in local variables) in function header
+
+
+
+
+
+      )ERASE G49 H49
+
+
+
+
+
+      ⍝ Bugs35 #52: ⍎ of a branch applies only if ⍎ is the leftmost
+      ⍝ primitive (LRM p.121); ⍎'→' in immediate execution is →
+      ⍝
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⎕FX 'Z←K52' 'Z←1' '2+⍎''→3''' 'Z←2' 'Z←3'
+K52
+
+
+
+
+
+      K52
+SYNTAX ERROR+
+K52[2]  2+⍎'→3'
+          ^
+
+
+
+
+
+      )MORE
+⍎ of a branch is not the leftmost primitive
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⎕FX 'Z←K2' 'Z←1' '⍎''→3''' 'Z←2' 'Z←3'
+K2
+
+
+
+
+
+      K2
+3
+
+
+
+
+
+      ⎕FX 'S52' '÷0'
+S52
+
+
+
+
+
+      S52
+DOMAIN ERROR
+S52[1]  ÷0
+        ^
+
+
+
+
+
+      ⍎'→'
+
+
+
+
+
+      )SI
+
+
+
+
+
+      )ERASE K52 K2 S52
+
+
+
+
+
+      ⍝ Bugs35 #53: an unbalanced →→ ←→ ←← is a normal SYNTAX ERROR (no
+      ⍝ stderr text), and ⎕FX returns the row of the bad line
+      ⍝
+
+
+
+
+
+      1→→2
+SYNTAX ERROR+
+
+
+
+
+
+      )MORE
+→→ without ←← (aka. IF without ENDIF)
+
+
+
+
+
+      ⍎'1→→2'
+SYNTAX ERROR+
+      ⍎'1→→2'
+      ^^
+
+
+
+
+
+      ⎕FX 'F53' '1' '1→→2'
+3
+
+
+
+
+
+      ⍝ Bugs35 #54: ⎕FX of a duplicate label or a label equal to a header
+      ⍝ name (also the function name) returns the row, without an error
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←F11' 'Z:Z←1'
+2
+
+
+
+
+
+      ⎕FX 'Z←F54' 'L:' 'L:'
+3
+
+
+
+
+
+      ⎕FX 'Z←F10' 'F10:Z←1'
+2
+
+
+
+
+
+      ⍝ Bugs35 #56: ⎕EX of an invalid name or of ⍞ returns 0
+      ⍝
+
+
+
+
+
+      ⎕EX '1x'
+0
+
+
+
+
+
+      ⎕EX 2 2⍴'1xA '
+0 1
+
+
+
+
+
+      ⎕EX '⍞'
+0
+
+
+
+
+
+      ⍝ Bugs35 #57: ⎕RE['g'] with a match of the empty string at the end of
+      ⍝ B, and ⎕RE with an empty B
+      ⍝
+
+
+
+
+
+      'a*' ⎕RE['g'] 'aab'
+ aa     
+
+
+
+
+
+      '\b' ⎕RE['g↓'] 'ab cd'
+ 0 0  2 0  3 0  5 0 
+
+
+
+
+
+      ⍴'x*' ⎕RE['g'] 'abc'
+4
+
+
+
+
+
+      ⍴'' ⎕RE['g'] ''
+1
+
+
+
+
+
+      ⍝ Bugs35 #67: ]BOXING accepts only OFF or a valid number (its own
+      ⍝ output goes to CERR, which is not compared here: check )MORE)
+      ⍝
+
+
+
+
+
+      ]BOXING ON
+
+
+
+
+
+      )MORE
+Parameter ON is not valid for command ]BOXING.
+  Valid parameters are OFF, N, and -N (or ¯N) with
+  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }
+
+
+
+
+
+      ⍝ ]BOXING accepts a negative N as -N and (APL style) as ¯N
+      ⍝
+      ]BOXING ¯4
+      1 2 (3 4)
+┏→━━━━━━━━┓
+┃1 2 ┏→━━┓┃
+┃    ┃3 4┃┃
+┃    ┗∼━━┛┃
+┗ϵ━━━━━━━━┛
+
+      ]BOXING -4
+      1 2 (3 4)
+┏→━━━━━━━━┓
+┃1 2 ┏→━━┓┃
+┃    ┃3 4┃┃
+┃    ┗∼━━┛┃
+┗ϵ━━━━━━━━┛
+
+      ⍝ ⎕PS[2] follows ]BOXING (⎕←V is not boxed)
+      ⍝
+      ⎕←⎕PS
+0 ¯4
+
+      ]BOXING OFF
+      1 2 (3 4)
+ 1 2  3 4 
+
+      ⎕PS
+0 0
+
+
+
+
+
+      ⍝ the print length limit ⎕SYL[28;2] also applies with ]BOXING. The
+      ⍝ unboxed fallback of ]BOXING ¯N printed all 1000 items; 500 now (the
+      ⍝ note about the truncation goes to CERR, which is not compared here)
+      ⍝
+      ⎕PW←80
+      ⎕SYL[28;2]←1000
+      ]BOXING ¯4
+      1000⍴'x'
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+      xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+      ]BOXING OFF
+      ⎕SYL[28;2]←0
+      ⎕SYL[28;2]
+0
+
+
+
+
+
+      ⍝ ⎕SYL[28;2] (print length limit) is 0 (no limit) or at least 1000
+      ⍝
+      ⎕SYL[28;2]←100
+DOMAIN ERROR+
+      ⎕SYL[28;2]←100
+      ^         ^
+
+      )MORE
+Bad print length limit 100 in ⎕SYL[28;2] (expecting 0 for no limit or at least 1000)
+
+      )SIC
+
+
+
+
+
+      ⍝ )MORE of ⎕SYL assignments shows the index as written (⎕IO)
+      ⍝
+      ⎕SYL[4;2]←1
+INDEX ERROR+
+      ⎕SYL[4;2]←1
+      ^        ^
+
+      )MORE
+Bad ⎕SYL index 4 (not a writable limit)
+
+      )SIC
+
+
+
+
+
+      ⍝ )OUT then )IN keeps the ASCII * in ⎕FC[3] (ATF has only one * which
+      ⍝ )IN reads as ⋆)
+      ⍝
+      )OUT FCRT74 ⎕FC
+      ⎕FC←'.,⋆0_¯'
+      )IN FCRT74 ⎕FC
+      ⎕UCS ⎕FC
+46 44 42 48 95 175
+
+      )DROP FCRT74.atf
+³
+
+
+
+
+
+      ⍝ ⎕FX of a name that is a variable: the DEFN ERROR came only when
+      ⍝ the new function was bound to the name, and the function (and
+      ⍝ the values in its body) leaked as stale values (--TR)
+      ⍝
+      VFX74←5
+      ⎕FX 'VFX74' '1'
+DEFN ERROR
+      ⎕FX 'VFX74' '1'
+      ^
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE VFX74
+
+
+
+
+
+      ⍝ Bugs35 #69: 2 ⎕AT of a system function is 7⍴0
+      ⍝
+
+
+
+
+
+      2 ⎕AT '⎕FX'
+0 0 0 0 0 0 0
+
+
+
+
+
+      ⍝ Bugs35 #71: a CR inside a string literal is kept by ⍎ and ⎕FX (only
+      ⍝ the CR of a CRLF line end is ignored)
+      ⍝
+
+
+
+
+
+      ⎕UCS ⍎'''a',(⎕UCS 13),'b'''
+97 13 98
+
+
+
+
+
+      ⎕FX 'Z←G71' ('Z←''a',(⎕UCS 13),'b''')
+G71
+
+
+
+
+
+      ⎕UCS G71
+97 13 98
+
+
+
+
+
+      )ERASE G71
+
+
+
+
+
+      ⍝ Bugs35 #72: ⎕NL 5 does not list unbound ⍺ ⍵ λ … (⎕NC says 6)
+      ⍝
+
+
+
+
+
+      +/(⎕NL 5)[;1]∊'λχ⍵⍶⍹⍺'
+0
+
+
+
+
+
+      ⍝ Bugs35 #73: ⍎ of text with a lambda rejected at fix time reports the
+      ⍝ error and leaks nothing
+      ⍝
+
+
+
+
+
+      ⍎'2 3 4,{→0} 5'
+SYNTAX ERROR+
+      ⍎'2 3 4,{→0} 5'
+      ^^
+
+
+
+
+
+      )MORE
+→ is not allowed in λ expression 
+
+
+
+
+
+      ⍝ Bugs35 #74: a lambda inside ( ) or [ ] does not corrupt the offsets
+      ⍝ of the matching brackets
+      ⍝
+
+
+
+
+
+      (⍴⍤(1+{⍵}0))2 3⍴⍳6
+3
+3
+
+
+
+
+
+      (+/[{⍵}1]) 2 3⍴⍳6
+5 7 9
+
+
+
+
+
+      M74←2 3⍴⍳6
+
+
+
+
+
+      (1↓[{⍵}1]M74)←0 ◊ M74
+1 2 3
+0 0 0
+
+
+
+
+
+      )ERASE M74
+
+
+
+
+
+      ⍝ Bugs35 #75: an assignment or branch left of a dangling operator is
+      ⍝ not executed (SYNTAX ERROR without side effects)
+      ⍝
+
+
+
+
+
+      R75←'old'
+
+
+
+
+
+      R75←2 3 \
+SYNTAX ERROR+
+      R75←2 3\
+             ^
+
+
+
+
+
+      )MORE
+Missing mandatory right argument of function \ (at the right end of the statement)
+
+
+
+
+
+      R75
+old
+
+
+
+
+
+      ⎕FX 'Z←F75' 'Z←0' '→4 /' 'Z←1' 'Z←2'
+F75
+
+
+
+
+
+      F75
+SYNTAX ERROR+
+F75[2]  →4/
+          ^
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      )ERASE R75 F75
+
+
+
+
+
+      ⍝ Bugs35 #75: a parenthesized group that cannot be reduced: nothing is
+      ⍝ assigned (also no function)
+      ⍝
+
+
+
+
+
+      Z75←{⍵+7}(⌿5)
+SYNTAX ERROR+
+      Z75←{⍵+7}(⌿5)
+               ^^
+
+
+
+
+
+      )MORE
+invalid expression in parentheses
+
+
+
+
+
+      ⎕NC 'Z75'
+0
+
+
+
+
+
+      ⍝ Bugs35 #76: (⊃Z)←1 into a nested scalar item leaves no PointerCell
+      ⍝ to a simple scalar
+      ⍝
+
+
+
+
+
+      Z76←⊂⊂1 2
+
+
+
+
+
+      (⊃Z76)←1
+
+
+
+
+
+      (≡Z76) (Z76≡1)
+0 1
+
+
+
+
+
+      Z76,Z76
+1 1
+
+
+
+
+
+      X76←1 (⊂1 2)
+
+
+
+
+
+      (⊃X76[2])←1
+
+
+
+
+
+      X76≡1 1
+1
+
+
+
+
+
+      )ERASE Z76 X76
+
+
+
+
+
+      ⍝ Bugs35 #77: ⍎'⊣ 7' returns the committed value 0 (the multi-line
+      ⍝ comment optimization does not apply in ⍎)
+      ⍝
+
+
+
+
+
+      ⍎'⊣ 7'
+
+
+
+
+
+      Z77←⍎'⊣ 7' ◊ Z77
+0
+
+
+
+
+
+      )ERASE Z77
+
+
+
+
+
+      ⍝ Bugs35 #78: ⎕SVC/⎕SVS/⎕SVO/⎕SVR of a name matrix: ⍴Z ←→ ¯1↓⍴B (,4),
+      ⍝ also for 0 or 1 rows
+      ⍝
+
+
+
+
+
+      ⍴⎕SVS 0 3⍴'a'
+0 4
+
+
+
+
+
+      ⍴⎕SVC 1 3⍴'abc'
+1 4
+
+
+
+
+
+      ⍴⎕SVO 1 3⍴'abc'
+1
+
+
+
+
+
+      ⍴⎕SVO 0 3⍴'a'
+0
+
+
+
+
+
+      ⍝ Bugs36 F1: a value followed by a function without right argument
+      ⍝ (R←5 ∘. 1, R←5 +): SYNTAX ERROR before the assignment or branch
+      ⍝
+      R←0
+      R←5 ∘. 1
+SYNTAX ERROR+
+      R←5∘.1
+      ^  ^
+
+      )MORE
+function without right argument
+      R
+0
+      )SIC
+
+
+
+
+
+      R←5 +
+SYNTAX ERROR+
+      R←5+
+         ^
+
+      R
+0
+      )SIC
+
+
+
+
+
+∇Z←FB36_GOTO
+Z←0
+→4 ∘. 1
+Z←1
+Z←2
+∇
+
+
+
+
+
+      FB36_GOTO
+SYNTAX ERROR+
+FB36_GOTO[2]  →4∘.1
+              ^ ^
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs36 F2: a decimal point without fractional digits, followed by
+      ⍝ an exponent, used to trip Assert(row.size() == all_formats.size())
+      ⍝
+      '7.A1'⍕1
+1.A0
+
+
+
+
+
+      '7.A1'⍕12
+1.A1
+
+
+
+
+
+      '97.E11'⍕1234
+01.E03
+
+
+
+
+
+      '43473.A(,5'⍕1
+    1.A(0 
+
+
+
+
+
+      ',297.A01'⍕1.234
+  01.A00
+
+
+
+
+
+      ⍝ Bugs36 F3: error line 2 of a dangling ∘. or +. is the statement
+      ⍝
+      5∘.
+SYNTAX ERROR+
+      5∘.
+       ^
+
+      )SIC
+
+
+
+
+
+      R←5 ∘.
+SYNTAX ERROR+
+      R←5∘.
+         ^
+
+      R
+0
+      )SIC
+
+
+
+
+
+      ⍝ Bugs36 F4: the caret of an unbalanced closing delimiter is on the
+      ⍝ delimiter (not past the end of the line); an unbalanced opening
+      ⍝ delimiter shows the statement and a caret on the outermost opener
+      ⍝
+      2)
+Unbalanced right parenthesis+
+      2)
+       ^
+
+      )SIC
+
+
+
+
+
+      1 2 3]
+Unbalanced right square bracket+
+      1 2 3]
+           ^
+
+      )SIC
+
+
+
+
+
+      (1 2]
+Unbalanced right square bracket+
+      (1 2]
+      ^   ^
+
+      )SIC
+
+
+
+
+
+      (2
+Unbalanced left parenthesis+
+      (2
+      ^
+
+      )SIC
+
+
+
+
+
+      A←(1 2
+Unbalanced left parenthesis+
+      A←(1 2
+        ^
+
+      )SIC
+
+
+
+
+
+      A[1
+Unbalanced left square bracket+
+      A[1
+       ^
+
+      )SIC
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+

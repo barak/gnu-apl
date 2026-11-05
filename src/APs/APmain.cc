@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2013  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -53,7 +52,7 @@ bool LOG_Svar_DB_signals = false;
 extern const char * prog_name();
 extern bool verbose;
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 bool verbose = false;
 int event_port = 0;
@@ -69,6 +68,7 @@ string error_loc = "?";
 
 /// the name of this AP (apXXX where XXX is the processor number)
 char AP_NAME[40] = "AP" STR(AP_NUM);
+//════════════════════════════════════════════════════════════════════════════
 
 AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
@@ -76,7 +76,7 @@ ostream & get_CERR()
 {
    return cerr;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint64_t
 now_ms()
 {
@@ -88,7 +88,7 @@ uint64_t ret = current.tv_sec;
    ret += current.tv_usec/1000;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return true if key already exists; otherwise add variable and return false
 bool
 add_var(SV_key key)
@@ -107,7 +107,7 @@ Coupled_var cv = { key, 0, 0 };
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 print_vars(ostream & out)
 {
@@ -127,7 +127,7 @@ print_vars(ostream & out)
          get_CERR() << endl;
        }
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 do_Assert(const char * cond, const char * fun, const char * file, int line)
 {
@@ -135,8 +135,9 @@ do_Assert(const char * cond, const char * fun, const char * file, int line)
         << file << ":" << line << endl;
 
    assert(0);
+   abort();   // not reached
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 control_C(int)
 {
@@ -149,10 +150,12 @@ AP_num3 this_proc = ProcessorID::get_id();
    exit(0);
 }
 
+#if ! MINGW_SRC
 static struct sigaction old_ctl_C_action;
 static struct sigaction new_ctl_C_action;
+#endif // ! MINGW_SRC
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int usage()
 {
    get_CERR()
@@ -170,7 +173,7 @@ int usage()
 
    return 1;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 TCP_socket tcp2 = NO_TCP_SOCKET;
 
 TCP_socket
@@ -178,16 +181,46 @@ get_TCP_for_key(SV_key key)
 {
    return tcp2;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 main(int argc, char * argv[])
 {
 bool need_help = false;
 bool auto_started = false;
 
+   // Bugs8 #3 (Blake McBride): src/main.cc used to set SIGCHLD to SIG_IGN
+   // ("do not create zombies") before execve()ing this AP binary. (Since
+   // Bugs32 #11 it installs a handler instead, which execve() resets to
+   // SIG_DFL, but an AP may also be started by other programs.) SIG_IGN
+   // survives execve() (POSIX), so without this reset every AP linked
+   // against this shared main() (AP100, AP210 -- see APs/Makefile.am's
+   // common_files) inherits it, and any raw popen()/pclose() it does
+   // (e.g. AP100.cc) has its pclose() always fail with ECHILD and
+   // return -1, which AP100.cc's "result >> 8 & 0xFF" then turns into a
+   // bogus exit status of 255 for every host command. Reset here
+   // (before the fork() below, so the forked child -- which is the AP
+   // that actually runs -- starts from a sane signal state too) rather
+   // than in each such AP individually.
+   //
+   // NOTE: APserver does NOT link this file -- APserver_SOURCES in
+   // APs/Makefile.am gives it its own independent main() -- so this
+   // reset does not reach it. It went unprotected for a while (Bugs27
+   // #59(g), Bill Heagy) until it got the identical reset directly in
+   // its own main() (APserver.cc); keep that in sync with this one if
+   // either changes.
+   //
+#if ! MINGW_SRC
+   signal(SIGCHLD, SIG_DFL);
+#endif // ! MINGW_SRC
+
    prog = argv[0];
 char bin_path[FILENAME_MAX];
    strncpy(bin_path, prog, sizeof(bin_path) - 1);
+   // strncpy() does not NUL-terminate when the source is >= the given
+   // length, so a long enough argv[0] left bin_path without a
+   // terminator, and strrchr() below could then read past the buffer
+   // looking for one.
+   bin_path[sizeof(bin_path) - 1] = 0;
 
 char * slash = strrchr(bin_path, '/');
    if (slash)
@@ -222,8 +255,12 @@ char * slash = strrchr(bin_path, '/');
                          { ProcessorID::set_grand_ID(AP_num(atoi(val))); ++a; }
          else
             {
+              // was 'argv[a]': the loop already did 'opt = argv[a++]'
+              // above, so by this point 'a' has moved on to the NEXT
+              // argument (or is out of range at the end of argv) --
+              // the offending option is 'opt', not argv[a].
               get_CERR() << pref << ": Bad command line option '"
-                   << argv[a] << "'" << endl;
+                   << opt << "'" << endl;
               need_help = true;
             }
        }
@@ -234,16 +271,33 @@ char * slash = strrchr(bin_path, '/');
 
    // serious attempt to run: run in the background
    //
-   if (fork())   return 0;            // parent returns (daemonize)
+#if ! MINGW_SRC
+   {
+     const pid_t child = fork();
+     // fork() returns -1 on failure, the child's PID (> 0) in the
+     // parent, and 0 in the child. The old 'if (fork()) return 0;'
+     // treated -1 as "truthy" the same as a successful parent return,
+     // so a failed fork silently exited 0 as if daemonizing had
+     // succeeded -- no child process ever started, no error reported.
+     if (child == -1)
+        {
+          get_CERR() << pref << ": fork() failed: "
+                     << strerror(errno) << endl;
+          return 1;
+        }
+     if (child)   return 0;            // parent returns (daemonize)
+   }
+#endif // ! MINGW_SRC
 
    // child code...
    // register as e.g. AP210-port. We do this BEFORE closing stdout so that
    // caller of our parent waits until we have closed stdout
    //
-
+#if ! MINGW_SRC
    memset(&new_ctl_C_action, 0, sizeof(struct sigaction));
    new_ctl_C_action.sa_handler = &control_C;
    sigaction(SIGTERM, &new_ctl_C_action, &old_ctl_C_action);
+#endif // ! MINGW_SRC
 
 Svar_partner this_proc(ProcessorID::get_id(), NO_TCP_SOCKET);
 
@@ -295,6 +349,7 @@ string progname(prog_name());
               goon = false;
               if (verbose)   get_CERR() << AP_NAME
                                         << " done (parent died)" << endl;
+              if (del)   delete[] del;
               continue;
             }
 
@@ -438,7 +493,8 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
                           << signal->get_sigName() << ")" << endl;
           }
 
-         if (del)   delete del;
+         delete signal;
+         if (del)   delete[] del;
        }
 
    return 0;
@@ -448,13 +504,13 @@ int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 ostream &
 operator << (ostream & os, Unicode uni)
 {
@@ -485,5 +541,5 @@ operator << (ostream & os, Unicode uni)
              << char(0x80 | (uni >>  6 & 0x3F))
              << char(0x80 | (uni       & 0x3F));
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

@@ -1,6 +1,8 @@
 ⍝ ZZ18_Regression
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ Bug when assigning variable to result of function call on self
       ⍝
       D←5 5 ⍴ 0

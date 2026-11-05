@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "fn" network command: report whether a named symbol is undefined,
+/// a system function, or a user-defined function (and if so, its source)
 class FnCommand : public NetworkCommand {
 public:
+    /// constructor
     FnCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

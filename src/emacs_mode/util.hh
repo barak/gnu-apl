@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 
+/// split \b s into substrings at every occurrence of \b delim
 std::vector<std::string> split(const std::string &s, char delim);
 
 #endif

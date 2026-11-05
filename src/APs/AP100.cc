@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,14 +19,15 @@
 */
 
 #include <cassert>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include <signal.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 
 #include "APmain.hh"
 #include "CDR_string.hh"
@@ -35,18 +36,88 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+/** true iff popen()/execve()-like command execution is disabled by the
+    preferences file. AP100's whole job is to run a shell command received
+    from a coupled variable and return its output (a documented, intentional
+    capability -- see doc/apl.texi, "Shared Variables"), not a bug in itself;
+    but that means AP100 should respect the same
+    CHECK_SECURITY(disable_Quad_FIO__exec) (see Security.hh/Security.def)
+    that gates execve()/popen() inside the main interpreter (⎕FIO.exec etc.),
+    so an installation that has disabled shell execution for the interpreter
+    does not still expose it via this AP.
+
+    AP100 is a separate, minimal executable (see APs/Makefile.am:
+    AP100_SOURCES only pulls in APmain/Backtrace/Svar_DB/Svar_record) that
+    does not link UserPreferences/Workspace, so the full CHECK_SECURITY
+    macro (which throws an APL DOMAIN_ERROR via Workspace) is not usable
+    here -- this re-implements just enough of the same preferences-file
+    lookup (same two file locations, same flag name, same
+    cfg_SECURITY_LEVEL_WANTED semantics) instead of linking in the entire
+    interpreter core for one flag.
+
+    Only the "matches all profiles" section of the preferences file (file
+    Profile 0, i.e. before any "Profile N" line, or after an explicit
+    "Profile 0" line) is honored: AP100 has no -p N profile selection of
+    its own, unlike the main interpreter.
+**/
+static bool
+exec_disabled()
+{
+#if !defined(cfg_SECURITY_LEVEL_WANTED) || cfg_SECURITY_LEVEL_WANTED == 0
+   return false;
+#elif cfg_SECURITY_LEVEL_WANTED == 2
+   return true;
+#else
+   string paths[2];
+   paths[0] = string(apl_DIR__sysconf) + "/gnu-apl.d/preferences";
+   if (const char * home = getenv("HOME"))
+      paths[1] = string(home) + "/.gnu_apl/preferences";
+
+   for (int p = 0; p < 2; ++p)
+       {
+         if (paths[p].empty())   continue;
+         ifstream in(paths[p].c_str());
+         if (!in.is_open())   continue;
+
+         int file_profile = 0;
+         string line;
+         while (getline(in, line))
+             {
+               istringstream iss(line);
+               string opt, arg;
+               iss >> opt >> arg;
+               if (opt.empty() || opt[0] == '#')   continue;
+
+               if (opt == "Profile")
+                  {
+                    file_profile = atoi(arg.c_str());
+                    continue;
+                  }
+
+               if (file_profile != 0)   continue;   // not our (default) profile
+
+               if (opt == "disable_Quad_FIO__exec")
+                  return arg == "yes" || arg == "Yes" || arg == "YES";
+             }
+       }
+
+   return false;   // no preferences file, or flag not set: allowed
+#endif
+}
+
+//════════════════════════════════════════════════════════════════════════════
 const char * prog_name()
 {
    return "AP100";
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 struct SVAR_context
 {
    SVAR_context()
   {}
 };
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int
 set_ACK(Coupled_var & var, int exco)
 {
@@ -69,7 +140,7 @@ const CDR_string * cdr = new CDR_string(_cdr, sizeof(_cdr));
 
    return exco;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 handle_var(Coupled_var & var)
 {
@@ -98,11 +169,28 @@ const CDR_header & header = cdr.header();
         return;
       }
 
+   if (header.get_nelm() > cdr.size() - 20)   // element count exceeds buffer
+      {
+        get_CERR() << "Bad CDR nelm (" << header.get_nelm()
+             << " exceeds " << (cdr.size() - 20) << " available bytes)"
+             << endl;
+        set_ACK(var, 447);
+        return;
+      }
+
 const string cmd(reinterpret_cast<const char *> (cdr.get_items()) + 20,
                  header.get_nelm());
 
    if (verbose)   get_CERR() << pref << " got command[" << cmd.size() << "] '"
                              << cmd << "'" << endl;
+
+   if (exec_disabled())
+      {
+        get_CERR() << pref << " popen() refused: disabled by preferences"
+                      " (disable_Quad_FIO__exec)" << endl;
+        set_ACK(var, 2);  // 2 := DISABLED (distinct from 1 := INVALID COMMAND)
+        return;
+      }
 
    fp = popen(cmd.c_str(), "r");
    if (fp == 0)   // bad command
@@ -125,9 +213,10 @@ const int result = pclose(fp);
    get_CERR() << pref << " finished command with exit code "
               << result << endl;
 
-   set_ACK(var, WEXITSTATUS(result));
+// set_ACK(var, WEXITSTATUS(result));
+      set_ACK(var, result >> 8 & 0xFF);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 bool
 is_valid_varname(const uint32_t * varname)
 {
@@ -135,7 +224,7 @@ is_valid_varname(const uint32_t * varname)
    //
    return *varname;   // varname is not empty
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 bool
 initialize(Coupled_var & var)
 {
@@ -143,13 +232,13 @@ initialize(Coupled_var & var)
    Svar_DB::set_control(var.key, USE_BY_1);
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 bool
 make_counter_offer(SV_key key)
 {
    return true;   // make counter offer
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 APL_error_code
 assign_value(Coupled_var & var, const string & data)
@@ -166,7 +255,7 @@ assign_value(Coupled_var & var, const string & data)
    handle_var(var);
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 APL_error_code
 get_value(Coupled_var & var, string & data)
 {
@@ -176,7 +265,7 @@ get_value(Coupled_var & var, string & data)
                  var.data->size());
    error_loc = "no_error";   return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 retract(Coupled_var & var)
 {
@@ -187,4 +276,4 @@ SVAR_context * ctx = var.context;
       }
 }
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

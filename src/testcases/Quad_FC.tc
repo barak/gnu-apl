@@ -1,6 +1,8 @@
 ⍝ Quad_FC.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕IO
 1
 
@@ -12,11 +14,15 @@
       ⎕FC
 uvwxyz
 
-      ⍝ set default values if B is too short
+      ⍝ set default values if B is too short (Blake McBride,
+      ⍝ LanguageVariances.md #13, 2026-08-10: default fill char is the
+      ⍝ ASCII asterisk per apl2lrm.txt Figure 33 p.291, not GNU APL's
+      ⍝ own ⋆ power-primitive glyph -- see testcases/Format_by_example.tc
+      ⍝ for the fuller root-cause note)
       ⍝
       ⎕FC←''
       ⎕FC
-.,⋆0_¯
+.,*0_¯
 
       ⍝  non-indexed assignment
       ⍝
@@ -27,20 +33,63 @@ pqrstu
       ⎕FC←1 2 3
 DOMAIN ERROR
       ⎕FC←1 2 3
-          ^
+      ^  ^
 
       →
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       ⎕FC←''
       N←123.456
       N
 123.456
 
+      ⍝ ⎕FC is used by dyadic ⍕ only (LRM p.291), not by the display
+      ⍝ (Bugs35 #17, #18)
+      ⍝
       ⎕FC[1]←'∆' ◊ N
-123∆456
+123.456
+
+      8 3⍕N
+ 123∆456
 
       ⎕FC←''
-⍝ ==================================
+
+      ⍝ regression (Blake McBride, Bugs28 #73, 2026-08-11): an
+      ⍝ out-of-range indexed assignment to ⎕FC was silently ignored
+      ⍝ instead of raising INDEX ERROR -- even though a *reference* to
+      ⍝ the same out-of-range index (e.g. ⎕FC[7]) already correctly
+      ⍝ raises INDEX ERROR; an assignment must be at least as strict.
+      ⍝
+      ⎕FC[7]←'x'
+INDEX ERROR
+      ⎕FC[7]←'x'
+      ^     ^
+      )MORE
+NO )MORE ERROR INFO
+      )SIC
+
+      ⎕FC[0]←'y'
+INDEX ERROR
+      ⎕FC[0]←'y'
+      ^     ^
+      )MORE
+NO )MORE ERROR INFO
+      )SIC
+
+      ⎕FC[100]←'z'
+INDEX ERROR
+      ⎕FC[100]←'z'
+      ^       ^
+      )MORE
+NO )MORE ERROR INFO
+      )SIC
+
+      ⍝ none of the rejected assignments above changed ⎕FC
+      ⍝
+      ⎕FC
+.,*0_¯
+
+      ⎕FC←''
+      ⍝ ==================================
 

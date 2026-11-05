@@ -25,7 +25,7 @@
 #ifndef __CELL_ICC_DEFINED__
 #define __CELL_ICC_DEFINED__
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline bool
 Cell::tolerantly_equal(APL_Float A, APL_Float B, double C)
 {
@@ -44,7 +44,7 @@ const APL_Float dist_A_B = A > B ? (A - B) : (B - A);
 
    return dist_A_B < C*mag_max;
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline bool
 Cell::same_half_plane(APL_Complex A, APL_Complex B)
 {
@@ -56,53 +56,58 @@ Cell::same_half_plane(APL_Complex A, APL_Complex B)
 
    return false;
 }
-//----------------------------------------------------------------------------
+//──────────────────────────────────────────────────────────────────────────
 inline bool
 Cell::tolerantly_equal(APL_Complex A, APL_Complex B, double C)
 {
-   // if A equals B, return true
+   // ISO/IEC 13751 p.19, "A is Tolerantly-Equal to B Within C":
+   // Z is one if the distance-between A and B (i.e. mag(A-B)) is less
+   // than C times the larger-magnitude of A and B (i.e. C×max(mag(A),
+   // mag(B))). The standard's half-plane pre-check is deliberately NOT
+   // applied here: it breaks complex modulo of Gaussian integers (see
+   // NumericCell::cpx_gcd()).
    //
-   if (A == B) return true;
+   // IBM APL2's apl2lrm.pdf phrases this differently ("real and
+   // imaginary parts are equal"), which read literally would compare
+   // the real and imaginary parts independently, each against its own
+   // (possibly tiny) scale rather than one scale shared by both. That
+   // reading conflicts with testcases/Boolean.tc's own
+   // `1J1E¯15 = 1J1E¯14` (expected: 1), which only holds if the tiny
+   // imaginary difference is judged against the dominant (~1) overall
+   // magnitude rather than against the imaginary parts' own scale -
+   // deliberately kept as ISO's shared-scale formula for that reason.
+   //
+   if (A == B)   return true;
 
-   // ISO: if A and B are not in the same half-plane, return false.
-   //
-   // Note: this leads to problems with complex modulo of Gaussian integers, so
-   //       we do not do it.
-   //
-   // if (!same_half_plane(A, B))   return false;
-
-   // If the distance-between A and B is ≤ C times the larger-magnitude
-   // of A and B, return true
-   //
-   // Implementation: Instead of mag(A-B)  ≤ C × max(mag(A),   mag(B))
-   // we compute:                mag²(A-B) ≤ C² × max(mag²(A), mag²(B))
-   //                                      == max(mag²(C×A), mag²(C×B))
-   //
-   // that avoids unneccessary computations of sqrt().
-   //
-
-   // 1. compute left side: mag²(A-B)
+   // Compare squared magnitudes instead of mag(A-B) < C×max(mag(A),mag(B))
+   // to avoid two sqrt() calls; squaring both (non-negative) sides of that
+   // inequality gives mag²(A-B) < C²×max(mag(A),mag(B))² , and since
+   // squaring is monotonic, max(mag(A),mag(B))² == max(mag²(A), mag²(B)).
+   // (An earlier version of this code mistakenly scaled by C instead of
+   // C², making it roughly 1/C times too permissive.)
    //
 const APL_Complex A_B = A - B;
-const APL_Float dist2_A_B = A_B.real() * A_B.real()
-                          + A_B.imag() * A_B.imag();
+const APL_Float dist2_A_B = A_B.real()*A_B.real() + A_B.imag()*A_B.imag();
 
-   // 2. compute right side: max(mag²C×A, mag²C×B)
-   //
-const APL_Float Cmag2_A   = C * ComplexCell::mag2(A);
-const APL_Float Cmag2_B   = C * ComplexCell::mag2(B);
-const APL_Float mag2_max = Cmag2_A > Cmag2_B ? Cmag2_A : Cmag2_B;
+const APL_Float mag2_A = A.real()*A.real() + A.imag()*A.imag();
+const APL_Float mag2_B = B.real()*B.real() + B.imag()*B.imag();
+const APL_Float mag2_max = mag2_A > mag2_B ? mag2_A : mag2_B;
 
-   // compare
-   //
-   return dist2_A_B <= mag2_max;
+   return dist2_A_B < (C*C)*mag2_max;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 inline bool
 Cell::integral_within(APL_Float A, double qct)
 {
-   if (A < (floor(A) + qct))   return true;
-   if (A > (ceil(A)  - qct))   return true;
+   // A nearby integer of 0 is never a match: ⎕CT never tolerantly
+   // equates a nonzero value with zero (APL's rule for comparison
+   // against zero is exact), so the floor-anchor is skipped when it is
+   // 0 and the ceil-anchor is skipped when it is 0 -- distinct from
+   // skipping whenever |A|<1, which would also suppress the legitimate
+   // match against a nonzero neighbour (e.g. A=0.99999999999995 should
+   // still match ceil(A)=1) (Blake McBride, Bugs22 #1).
+   if (floor(A) != 0.0 && A < (floor(A) + qct))   return true;
+   if (ceil(A)  != 0.0 && A > (ceil(A)  - qct))   return true;
    return false;
 
    // Note: despite its name (coming from the ISO standard) this implementation
@@ -118,7 +123,7 @@ const APL_Float real_dn = floor(A) + qct;
 
    return A > real_up || A < real_dn;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __CELL_ICC_DEFINED__
 

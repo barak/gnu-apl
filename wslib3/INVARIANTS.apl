@@ -81,13 +81,15 @@
            »»»
 
 ⍝-----------------------------------------------------------------------------
-∇A INV∆CHECK[X] B;I;L;R;A1;A2;Z1;Z2
+∇A INV∆CHECK[X] B;I;L;R;A1;A2;Z1;Z2;⎕CT
  ⍝
  ⍝⍝ check that the invariant A is valid for (L R Z)←B, possibly for
  ⍝⍝ multiple I as defined by X. Be quiet if so, complain if not.
  ⍝
  (R Z)←¯2↑B ◊ L←↑B
  ⍎(2≠⎕NC 'X')/"X←',0'" ◊ ⍎'X←',X          ⍝ set X ← ,0 if not provided
+
+   ⎕CT←1E¯10   ⍝ otherwise some tests fail
 
  ⍝ split string A (the invariant) into A1 left of ←→ and A2 right of ←→
  (A1 A2)←(1+∨\"←→"⍷A)⊂A ◊ A2←2↓A2
@@ -104,24 +106,49 @@ ERROR:
 ∇
 
 ⍝-----------------------------------------------------------------------------
-∇L INV∆EQUIV R
-⍝⍝ check that L ≡ R and complain if not, detailing L and R
-→(L ≡ R)⍴0 ⍝ OK
-'*** L INV∆EQUIV R failed'
+∇Z←L INV∆STRUCT R
+⍝⍝ 1 iff L and R have identical structure: same shape and nesting at every
+⍝⍝ level. Values are not compared here.
+ Z←0
+ →((⍴L)≢⍴R)⍴0                       ⍝ shapes must agree
+ →((≡L)≠≡R)⍴0                        ⍝ depths must agree
+ →(1≥≡L)⍴OK                          ⍝ simple (depth ≤ 1): structure OK
+ Z←∧/(,L){⍺ INV∆STRUCT ⍵}¨,R        ⍝ nested: recurse on each item pair
+ →0
+OK: Z←1
+∇
 
-'≡L:'       (≡L)
-'≡R:'       (≡R)
-'⍴L:'       (⍴L)
-'⍴R:'       (⍴R)
-'L:'        (L)
-'R:'        (R)
-'4 ⎕CR L:'  (4 ⎕CR L)
-'4 ⎕CR R:'  (4 ⎕CR R)
-'10 ⎕CR L:' (10 ⎕CR 'L')
-'10 ⎕CR R:' (10 ⎕CR 'R')
-'2 ⎕TF L:' (2 ⎕TF 'L')
-'2 ⎕TF R:' (2 ⎕TF 'R')
-→((⍴L)≢⍴R)⍴0   ⍝ cannot compare L and R
-'L=R:'     (L=R)
+⍝-----------------------------------------------------------------------------
+∇Z←L INV∆NEAR R
+⍝⍝ 1 iff L and R are equivalent: structure checked recursively via INV∆STRUCT,
+⍝⍝ all leaf values compared via (∊L)=∊R — = uses ⎕CT for numerics and
+⍝⍝ works for characters without DOMAIN ERROR.
+ Z←0
+ →(~Z←L INV∆STRUCT R)⍴0    ⍝ structure must match exactly
+ Z←∧/(∊L)=∊R               ⍝ all leaf values agree (⎕CT for nums, exact for chars)
+∇
+
+⍝-----------------------------------------------------------------------------
+∇L INV∆EQUIV R
+⍝⍝ Check that L and R are equivalent (see INV∆NEAR), complain if not.
+⍝⍝ Structure (shape, nesting) is checked exactly; numeric values within ⎕CT.
+ →(L ≡ R)⍴0 ⍝ OK (fast path: exact match)
+ →(L INV∆NEAR R)⍴0 ⍝ OK (slow path: match within ⎕CT)
+ '*** L INV∆EQUIV R failed'
+
+ '≡L:'       (≡L)
+ '≡R:'       (≡R)
+ '⍴L:'       (⍴L)
+ '⍴R:'       (⍴R)
+ 'L:'        (L)
+ 'R:'        (R)
+ '4 ⎕CR L:'  (4 ⎕CR L)
+ '4 ⎕CR R:'  (4 ⎕CR R)
+ '10 ⎕CR L:' (10 ⎕CR 'L')
+ '10 ⎕CR R:' (10 ⎕CR 'R')
+ '2 ⎕TF L:'  (2 ⎕TF 'L')
+ '2 ⎕TF R:'  (2 ⎕TF 'R')
+ →((⍴L)≢⍴R)⍴0   ⍝ cannot compare element-wise if shapes differ
+ 'L=R:'     (L=R)
 ∇
 

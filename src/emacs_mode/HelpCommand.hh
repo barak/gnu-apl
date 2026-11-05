@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2018  Elias Mårtenson, Alexey Veretenniokv
+    Copyright (C) 2018  Elias Mårtenson, Alexey Veretennikov
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,18 +28,20 @@
 #include "emacs.hh"
 #include <vector>
 
-// help command returns the entries from Help.def in
-// form of S-expressions.
-// It could either accept 1 argument - the APL symbol
-// to describe, or no arguments - in this case all
-// entries from Help.def will be returned
-// If no entry found, "nil" is returned so it is
-// safe to "read" on Emacs Lisp side.
+//════════════════════════════════════════════════════════════════════════════
+/// the "help" network command: return the entries from Help.def as
+/// S-expressions. Takes either one argument (the APL symbol to describe)
+/// or none (return every entry from Help.def). If no entry is found,
+/// "nil" is returned so it is always safe to "read" on the Emacs Lisp side.
 class HelpCommand : public NetworkCommand {
 public:
+    /// one Help.def entry, as loaded via the help_def() macro
     struct HelpEntry
     {
+        /// default constructor (leaves fields uninitialized/empty)
         HelpEntry() {}
+
+        /// constructor
         HelpEntry(int ar,
                   const char* prim,
                   const char* arg_name,
@@ -50,18 +52,35 @@ public:
             name(arg_name),
             short_desc(title),
             long_desc(descr) {}
+
+        /// 0 (niladic), 1 (monadic), or 2 (dyadic)
         int arity;
+
+        /// the APL glyph/name this entry describes
         std::string symbol;
+
+        /// the argument name(s) shown in the entry's syntax line
         std::string name;
+
+        /// one-line summary
         std::string short_desc;
+
+        /// full description
         std::string long_desc;
     };
+
+    /// all loaded HelpEntry records
     typedef std::vector<HelpEntry> HelpEntries;
 public:
+    /// constructor: loads help_entries from Help.def
     HelpCommand( std::string name_in );
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 private: // variables
+    /// every entry loaded from Help.def
     HelpEntries help_entries;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

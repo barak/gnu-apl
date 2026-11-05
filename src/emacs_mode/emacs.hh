@@ -37,29 +37,43 @@
 #include "../Native_interface.hh"
 #pragma GCC diagnostic pop
 
+/// lock (\b v true) or unlock (\b v false) apl_main_lock, the mutex
+/// serializing every emacs-mode connection's access to the single,
+/// shared APL interpreter
 void set_active( bool v );
 
+/// the emacs-mode wire protocol version reported by VersionCommand
 #define PROTOCOL_VERSION "1.6"
 
 #define END_TAG "APL_NATIVE_END_TAG"
 #define NOTIFICATION_START_TAG "APL_NATIVE_NOTIFICATION_START"
 #define NOTIFICATION_END_TAG "APL_NATIVE_NOTIFICATION_END"
 
+//════════════════════════════════════════════════════════════════════════════
+/// RAII guard around set_active(): holds the interpreter lock for its
+/// scope
 class ActiveWrapper
 {
 public:
+    /// constructor: set_active(true)
     ActiveWrapper() { set_active( true ); };
+
+    /// destructor: set_active(false)
     virtual ~ActiveWrapper() { set_active( false ); };
 };
+//════════════════════════════════════════════════════════════════════════════
 
+/// convert a UTF-8 std::string to a UCS_string
 const UCS_string ucs_string_from_string( const std::string &string );
+
+/// build a new APL character vector Value from a UTF-8 std::string
 Value_P make_string_cell( const std::string &string, const char *loc );
 
 /// return a UTF8 encoded std:string
 inline std::string to_string(const UCS_string & ucs)
 {
     const UTF8_string utf(ucs);
-    return string(charP(&utf[0]), utf.size());
+    return string(utf.c_str(), utf.size());
 }
 
 #endif

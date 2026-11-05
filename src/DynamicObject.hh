@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+//════════════════════════════════════════════════════════════════════════════
 /** @file
 */
 
@@ -44,9 +45,12 @@ class IndexExpr;
 class DynamicObject
 {
    friend class Value;   // for rValue()
+   friend class cValue;  // for rValue() in moved const methods
 
 public:
    /// constructor: a DynamicObject allocated at source location \b loc
+   /// @param loc caller location for diagnostics
+   /// @param anchor the doubly linked list anchor to insert into
    DynamicObject(const char * loc, DynamicObject * anchor)
    : alloc_loc(loc)
    {
@@ -60,23 +64,43 @@ public:
    }
 
    /// a special constructor for the statically allocated anchors
+   /// @param loc caller location for diagnostics
    DynamicObject(const char * loc)
    : alloc_loc(loc),
      next(this),
      prev(this)
    {}
 
-   /// return the next DynamicObject in its list
-   DynamicObject * get_next()              { return next; }
+   /// destructor: unlink this DynamicObject from its list. Not just
+   /// belt-and-braces: if a derived class's (Value's, IndexExpr's)
+   /// constructor body throws *after* this base sub-object was already
+   /// linked in by one of the constructors above, C++ still destroys
+   /// the already-constructed base sub-object during unwinding -- so
+   /// this destructor is what unlinks it. Without it, a Value whose
+   /// ravel allocation threw WS_FULL/bad_alloc stayed linked into
+   /// all_values after being freed, corrupting the ring (reported by
+   /// Blake McBride, Bugs6 #1). unlink() is idempotent (it self-links
+   /// after unlinking), so this is harmless for objects that already
+   /// unlinked themselves (Value::~Value() does) or that were never
+   /// linked to begin with (IndexExpr's anchor-only constructor).
+   ~DynamicObject()
+      { unlink(); }
 
    /// return the next DynamicObject in its list
    const DynamicObject * get_next()  const { return next; }
 
    /// return the previous DynamicObject in its list
-   DynamicObject * get_prev()             { return prev; }
+   const DynamicObject * get_prev() const { return prev; }
+
+   /// where this value was allocated.
+   const char * where_allocated() const
+      { return alloc_loc; }
+
+   /// return the next DynamicObject in its list
+   DynamicObject * get_next()              { return next; }
 
    /// return the previous DynamicObject in its list
-   const DynamicObject * get_prev() const { return prev; }
+   DynamicObject * get_prev()             { return prev; }
 
    /// unlink this DynamicObject from its list
    void unlink()
@@ -90,30 +114,28 @@ public:
         next = this;
       }
 
-   /// cast to IndexExpr *. Caller must check that this cast is valid.
-   const IndexExpr * pIndexExpr() const;
-
-   /// cast to IndexExpr *. Caller must check that this cast is valid.
-   IndexExpr * pIndexExpr();
-
-   /// print this object
-   ///
-   void print(ostream & out) const;
-
-   /// print new object message
-   ///
-   void print_new(ostream & out, const char * loc) const;
-
-   /// print the list of objects starting at this object
-   void print_chain(ostream & out) const;
-
-   /// where this value was allocated.
-   const char * where_allocated() const
-      { return alloc_loc; }
-
    /// return a pointer to all allocated Values
    static const DynamicObject * get_all_values()
       { return &all_values; }
+
+   /// cast to IndexExpr *. Caller must check that this cast is valid.
+   const IndexExpr * pIndexExpr() const;
+
+   /// print this object
+   /// @param out output stream to print to
+   void print(ostream & out) const;
+
+   /// print the list of objects starting at this object
+   /// @param out output stream to print to
+   void print_chain(ostream & out) const;
+
+   /// print new object message
+   /// @param out output stream to print to
+   /// @param loc caller location for diagnostics
+   void print_new(ostream & out, const char * loc) const;
+
+   /// cast to IndexExpr *. Caller must check that this cast is valid.
+   IndexExpr * pIndexExpr();
 
 protected:
    /// downcast to const Value &. Caller must check that this cast is valid.
@@ -137,5 +159,6 @@ protected:
    /// the anchor for all dynamic IndexExpr instances
    static DynamicObject all_index_exprs;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __DYNAMIC_OBJECT_HH_DEFINED__

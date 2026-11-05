@@ -1,7 +1,9 @@
 ⍝ Reshape.tc
 ⍝ ----------------------------------
 
-⍝ ----------------------------------
+⍝@ test3.
+
+      ⍝ ----------------------------------
 
       Z←2 3 4ρι24
       Z
@@ -68,7 +70,7 @@
       ρρX
 2
 
-⍝ empty argument ----------------------------------
+      ⍝ empty argument ----------------------------------
 
       S←0 2ρι0
       S
@@ -96,7 +98,7 @@
       ρρH
 0
 
-⍝ Zero in L ----------------------------------
+      ⍝ Zero in L ----------------------------------
 
       M←3 0ρ0
       ρM
@@ -112,13 +114,13 @@
       ⍝ Regression
       ⍝
       ¯1⍴1
-DOMAIN ERROR
+DOMAIN ERROR+
       ¯1⍴1
       ^ ^
 
       →
 
-⍝ selective spec ----------------------------------
+      ⍝ selective spec ----------------------------------
 
       T←'GROWTH'
       (2 3ρT)←2 3ρ-ι6
@@ -134,14 +136,177 @@ ABCD ¯5 ¯6
       T
 7 8 3 4 5 6
 
-⍝ regression
+      ⍝ regression (Blake McBride, Bugs12.md #11b, 2026-08-06): a partial
+      ⍝ shape product legitimately overflows int64 when a later axis is
+      ⍝ 0 (the overflowing partial product is intentionally discarded,
+      ⍝ per design comments in Shape.hh/Shape.cc) -- but doing that via
+      ⍝ plain "volume *= len" made the overflow itself UB rather than
+      ⍝ just an intentionally-discarded value. Shape::add_shape_item()
+      ⍝ and Shape::fits_into() now multiply via uint64_t (well-defined
+      ⍝ wraparound) instead.
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      ⍴ 10000000 100000000000000 0⍴42
+10000000 100000000000000 0
 
+      0 = ≢, 10000000 100000000000000 0⍴42
+1
+
+      ⍝ regression
+
+      ]FILE_CTL NO_SKIP
       ¯1⍴0,0
-DOMAIN ERROR
+DOMAIN ERROR+
       ¯1⍴0,0
       ^ ^
 
       )SIC
 
-⍝ ==================================
+      ⍝ Bugs28 #32 regression: parse-time constant folding of A⍴B (4+
+      ⍝ tokens, e.g. inside ⎕FX-defined function bodies) raised its
+      ⍝ errors *while parsing* instead of when the statement actually
+      ⍝ runs -- no failed statement/carets were shown, ⎕EM/⎕ET stayed
+      ⍝ unset, and ⎕FX refused to define an otherwise syntactically
+      ⍝ valid function outright. Parser.cc's optimize_short_primitives()
+      ⍝ now validates A (integral, fits ShapeItem, rank ≤ MAX_RANK)
+      ⍝ before ever constructing a Shape from it, deferring to the
+      ⍝ ordinary (correctly-reporting) runtime path instead of folding
+      ⍝ when it isn't. Along the way: ComplexCell::is_near_int()/
+      ⍝ is_near_int64_t() considered e.g. 2J1 "int-like" (both parts
+      ⍝ independently near-integers) without requiring the imaginary
+      ⍝ part be ≈0 -- get_near_int() then threw for the same value one
+      ⍝ guard later, in one case (Token.cc's own error-message
+      ⍝ formatting) recursing back into the very error-reporting code
+      ⍝ the guard existed to protect, and stack-overflowing.
+      ⍝
+      Z←'2'⍴5
+DOMAIN ERROR
+      Z←'2'⍴5
+        ^  ^
 
+      ⎕EM
+DOMAIN ERROR 
+      Z←'2'⍴5
+        ^  ^ 
+
+      ⎕ET
+5 4
+
+      )SIC
+      Z←2.5⍴5
+DOMAIN ERROR
+      Z←2.5⍴5
+        ^  ^
+
+      )SIC
+      Z←2J1⍴5
+DOMAIN ERROR
+      Z←2J1⍴5
+        ^  ^
+
+      )SIC
+
+      ⍝ ⎕FX must be able to define the function -- the DOMAIN ERROR
+      ⍝ belongs to *running* line 1, not to ⎕FX itself
+      ⍝
+      ⎕FX 'ZZ32F' 'Z←''2''⍴5' 'Z←1'
+ZZ32F
+
+      ⎕NC 'ZZ32F'
+3
+
+      ZZ32F 5
+DOMAIN ERROR
+ZZ32F[1]  Z←'2'⍴5
+            ^  ^
+
+      )SIC
+
+      ⍝ regression (Bugs28 #100(t)): a monadic fold of an already-
+      ⍝ simple-scalar B (e.g. ⊂1, where the comment right above this
+      ⍝ code says "otherwise ⊂B is B" and correctly leaves B itself
+      ⍝ unchanged) never retagged B's own token, unlike a non-scalar ⊂
+      ⍝ fold, which does -- so nothing marked "a fold happened here" at
+      ⍝ this position, and Executable.cc's error-display reconstruction
+      ⍝ (which relies on spotting that marker to know it must show the
+      ⍝ un-optimized statement instead of the compacted one) never
+      ⍝ triggered: a later error in the same statement displayed the
+      ⍝ compacted, ⊂-less text, e.g. (⊂1)↑M shown as (1)↑M.
+      ⍝ The left caret is at the (: the error display used to count 3
+      ⍝ tokens (as for A⍴B) for the 2 tokens of ⊂B, which put it one
+      ⍝ token too far left, at the ←.
+      ⍝
+      M←2 2⍴⍳4
+      Z←(⊂1)↑M
+LENGTH ERROR+
+      Z←(⊂1)↑M
+        ^   ^
+
+      )SIC
+
+      ⍝ control: ⊂B for a non-scalar B was already correctly displayed
+      ⍝ before this fix (it already retagged B), and ⊂1 itself (no
+      ⍝ error) still computes the same, unwrapped value it always did
+      ⍝
+      Z←(⊂1 2)↑M
+DOMAIN ERROR
+      Z←(⊂1 2)↑M
+        ^     ^
+
+      )SIC
+
+      ≡⊂1
+0
+
+      ⍝ regression (Blake McBride, Bugs31 #28 and #5): the parse-time
+      ⍝ constant folding of a literal A⍴B accepted a negative item of A
+      ⍝ (⍴0 ¯2⍴0 was 0 ¯2) while the runtime A⍴B gave DOMAIN ERROR. The
+      ⍝ malformed value then made the rank operator's empty-frame path
+      ⍝ assert (#28), and made A/B throw std::length_error, which ended
+      ⍝ the session (#5). Folded and runtime A⍴B now both give DOMAIN
+      ⍝ ERROR.
+      ⍝
+      ⍴0 ¯2⍴0
+DOMAIN ERROR+
+      ⍴0 ¯2⍴0
+       ^   ^
+
+      )SIC
+      ⍴0 ¯2 3⍴0
+DOMAIN ERROR+
+      ⍴0 ¯2 3⍴0
+       ^     ^
+
+      )SIC
+      A←0 ¯2 ◊ ⍴A⍴0
+DOMAIN ERROR+
+      ⍴A⍴0
+       ^^
+
+      )SIC
+      (⌈/⍤1)0 ¯2⍴0
+DOMAIN ERROR+
+      (⌈/⍤1)0 ¯2⍴0
+            ^   ^
+
+      )SIC
+      Z←1 0/0 ¯2⍴0
+DOMAIN ERROR+
+      Z←1 0/0 ¯2⍴0
+            ^   ^
+
+      )SIC
+      Z←1/0 ¯2⍴0
+DOMAIN ERROR+
+      Z←1/0 ¯2⍴0
+          ^   ^
+
+      )SIC
+      'session still alive'
+session still alive
+
+      )ERASE A
+
+      )ERASE M Z
+
+      ⍝ ==================================

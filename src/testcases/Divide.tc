@@ -1,6 +1,8 @@
 ⍝ Divide.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       3÷2
 1.5
       9 4 7 10÷.25
@@ -61,7 +63,7 @@
       M1←¯9○M ◊ M2←¯11○M ◊ V1←¯9○V ◊ V2←¯11○V
 
       0 2⍕Q←V ⌹ M               ⍝ complex V ⌹ complex M
- 1.20J2.23 ¯.30J.64 ¯1.44J¯1.82 .54J¯.21 .84J¯.77
+1.20J2.23 ¯.30J.64 ¯1.44J¯1.82 .54J¯.21 .84J¯.77
 
       ⍝ Precision ? As to precision in general, different APL_Float and complex
       ⍝ variants produce slightly different results. We therefore check that the
@@ -82,11 +84,11 @@
       Q22 ← V2 ⌹ M2
 
       0 2⍕Q11,Q12,Q21,⍪Q22
-  1.20J2.23   2.23J¯1.20 ¯2.23J1.20   1.20J2.23
-  ¯.30J.64     .64J.30    ¯.64J¯.30   ¯.30J.64
- ¯1.44J¯1.82 ¯1.82J1.44   1.82J¯1.44 ¯1.44J¯1.82
-   .54J¯.21   ¯.21J¯.54    .21J.54     .54J¯.21
-   .84J¯.77   ¯.77J¯.84    .77J.84     .84J¯.77
+ 1.20J2.23   2.23J¯1.20 ¯2.23J1.20   1.20J2.23
+ ¯.30J.64     .64J.30    ¯.64J¯.30   ¯.30J.64
+¯1.44J¯1.82 ¯1.82J1.44   1.82J¯1.44 ¯1.44J¯1.82
+  .54J¯.21   ¯.21J¯.54    .21J.54     .54J¯.21
+  .84J¯.77   ¯.77J¯.84    .77J.84     .84J¯.77
 
       ⍝ precisions...
       P11 ← +/ V1 - M1 +.× Q11
@@ -106,10 +108,10 @@
       ⍝
       MM←5 4⍴M
        0 2⍕Q ← V ⌹ MM
- 1.38J.88 ¯1.38J.35 .31J¯.06 .50J¯1.04
+1.38J.88 ¯1.38J.35 .31J¯.06 .50J¯1.04
 
       0 4⍕ +/ V - MM +.× Q    ⍝ precision ? (large since over specified)
- ¯.0188J¯.0168
+¯.0188J¯.0168
 
 
       ⍝ under specified MM
@@ -118,10 +120,10 @@
       V ⌹ MM
 LENGTH ERROR+
       V⌹MM
-      ^ ^
+      ^^
 
       )MORE
-A⌹B : B is under-specified (B has more columns than rows)
+A⌹B : Bad shape 4 5 of argument B (expecting rows ≥ columns)
 
 
       ⍝ row count V ≠ row count MM
@@ -130,10 +132,10 @@ A⌹B : B is under-specified (B has more columns than rows)
       V ⌹ MM
 LENGTH ERROR+
       V⌹MM
-      ^ ^
+      ^^
 
       )MORE
-A÷B : number of rows in A ≠ number of rows in B
+A⌹B : Bad rows 5 of argument A (expecting rows A = rows B = 6)
 
 
       ⍝ linear dependent MM
@@ -142,18 +144,15 @@ A÷B : number of rows in A ≠ number of rows in B
        V ⌹ MM
 DOMAIN ERROR+
       V⌹MM
-      ^ ^
+      ^^
 
       )MORE
-A⌹B : linearly dependent (complex) B? ⍴B is 5 5, but the estimated rank is 4.
-      NOTE that the estimated rank is controlled by ⎕CT.
-
-      )SIC
-
+A⌹B : Bad rank 4 of complex argument B (expecting rank ≥ 5 for ⍴B = 5 5; is B linearly dependent? the estimated rank is controlled by ⎕CT)
       ⍝ Regression...
 
       ⍝ N÷0 variants
       ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
       2 2.2 2J2  ∘.{(⎕EC (⍕⍺),"÷",(⍕⍵))[2]}  0 0.0 0J0
   5 4   5 4   5 4  
   5 4   5 4   5 4  
@@ -161,8 +160,71 @@ A⌹B : linearly dependent (complex) B? ⍴B is 5 5, but the estimated rank is 4
 
       ⍝ 0÷N variants
       ⍝
+      ]FILE_CTL NO_SKIP
       0 0.0 0J0  ∘.÷  2 2.2 2J2
 0 0 0
 0 0 0
 0 0 0
 
+      ⍝ estimate_rank() regression: laic1_MIN() must compare |gamma|
+      ⍝ against the running smallest-singular-value estimate SEST, not
+      ⍝ against |alpha|. MM below has true singular values ≈2.236E20 and
+      ⍝ ≈13416; at the (deliberately tightened) ⎕CT below its true
+      ⍝ condition ratio (≈6E¯17) is smaller than ⎕CT, so MM is singular
+      ⍝ for rank-estimation purposes and ⌹MM must fail with DOMAIN ERROR.
+      ⍝ (with the bug, |gamma| was wrongly compared to the much larger
+      ⍝ |alpha|, MM was misjudged as full rank, and ⌹MM silently returned
+      ⍝ a meaningless inverse instead of failing.)
+      ⍝
+      SAVE_CT←⎕CT ⋄ ⎕CT←1.2E¯16
+      MM←2 2⍴2E20 1E20 0 15000
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+
+      ⍝ ⎕CT/RCOND lower-bound regression: in A⌹B/⌹B, ⎕CT doubles as
+      ⍝ gelsy()'s RCOND parameter (not an ordinary comparison tolerance).
+      ⍝ Below machine epsilon, a genuinely singular B's post-QR diagonal
+      ⍝ residual (pure rounding noise, ≈ machine epsilon) can no longer
+      ⍝ be told apart from a real singular value, so the rank test could
+      ⍝ never detect ANY singular matrix. GNU APL now rejects such a ⎕CT
+      ⍝ up front, before even looking at B. (Before this fix, ⌹MM below
+      ⍝ silently returned a large-magnitude but meaningless "inverse"
+      ⍝ instead of failing -- confirmed MM+.×⌹MM was nowhere near the
+      ⍝ identity.)
+      ⍝
+      ⎕CT←0
+      MM←2 2⍴1 2 2 4          ⍝ exactly singular: det=0, row2=2×row1
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+
+      )SIC
+
+      ⍝ same, with a tiny but nonzero ⎕CT -- still below the floor
+      ⍝
+      ⎕CT←1E¯300
+      ⌹MM
+DOMAIN ERROR+
+      ⌹MM
+      ^
+
+      )SIC
+
+      ⍝ the floor applies regardless of B, even to a trivially
+      ⍝ well-conditioned matrix -- ⎕CT here is RCOND, an algorithm
+      ⍝ input, not a promise about THIS particular B's achievable
+      ⍝ accuracy
+      ⍝
+      ⌹2 2⍴1 0 0 1
+DOMAIN ERROR+
+      ⌹2 2⍴1 0 0 1
+      ^
+
+      )SIC
+
+      ⍝ restore
+      ⍝
+      ⎕CT←SAVE_CT

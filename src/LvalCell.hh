@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "Cell.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /**
     A cell pointing to another cell.
     This is used for selective assignments.
@@ -36,32 +36,51 @@ class LvalCell : public Cell
 {
 public:
    /// Constructor: a cell pointing to another cell
+   /// @param cell        target cell that this lval points to
+   /// @param cell_owner  value that owns the target cell
    LvalCell(Cell * cell, Value * cell_owner);
 
    /// Constructor: copy from other LvalCell
+   /// @param other  source LvalCell to copy from
    LvalCell(const LvalCell & other);
-
-   /// overloaded Cell::init_other
-   virtual void init_other(void * other, Value & cell_owner,
-                           const char * loc) const;
 
    /// Overloaded Cell::is_lval_cell()
    virtual bool is_lval_cell()  const   { return true; }
 
+   /// Overloaded Cell::get_cell_owner(): the owner of the cell pointed to
+   virtual Value * get_cell_owner() const
+      { return value.pval.owner; }
+
+   /// Overloaded Cell::character_representation()
+   /// @param pctx  print context controlling format
+   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+
    /// Overloaded Cell::get_lval_value()
    virtual Cell * get_lval_value() const;
 
-   /// Overloaded Cell::character_representation()
-   virtual PrintBuffer character_representation(const PrintContext &pctx) const;
+   /// Overloaded Cell::check_consistency(): make sure that owner (if any)
+   /// owns this Cell
+   virtual void check_consistency() const;
 
-   /// return the owner of the cell pointed to
-   Value * get_cell_owner() const
-      { return value.pval.owner; }
+   /// throw a DOMAIN ERROR (with )MORE info) for a selective specification
+   /// whose target cell has no single array that owns it
+   static void throw_no_owner();
 
-   /// make sure that owner (if any) owns this Cell
-   void check_consistency() const;
+   /// overloaded Cell::init_other
+   /// @param other       raw memory for the new cell to initialise
+   /// @param cell_owner  value that will own the new cell
+   /// @param loc         caller location for diagnostics
+   virtual void init_other(void * other, Value & cell_owner,
+                           const char * loc) const;
 
 protected:
+   /// Overloaded Cell::get_classname().
+   virtual const char * get_classname() const   { return "LvalCell"; }
+
+  /// Overloaded Cell::CDR_size() should not be called for lval cells
+   virtual int CDR_size() const
+      { NeverReach("CDR_size called on LvalCell base class"); return 0; }
+
    ///  Overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
       { return CT_CELLREF; }
@@ -69,20 +88,7 @@ protected:
    /// Overloaded Cell::greater().
    virtual bool greater(const Cell & other) const
       { DOMAIN_ERROR; }
-
-   /// Overloaded Cell::get_classname().
-   virtual const char * get_classname() const   { return "LvalCell"; }
-
-  /// Overloaded Cell::CDR_size() should not be called for lval cells
-   virtual int CDR_size() const
-      { NeverReach("CDR_size called on LvalCell base class"); }
-
-   /// downcast to const LvalCell
-   virtual const LvalCell & cLvalCell() const   { return *this; }
-
-   /// downcast to LvalCell
-   virtual LvalCell & vLvalCell()   { return *this; }
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __LVALCELL_HH_DEFINED__

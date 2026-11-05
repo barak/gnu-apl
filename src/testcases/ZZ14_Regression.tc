@@ -1,6 +1,8 @@
 ⍝ ZZ14_Regression.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⍝ problem reported by Kacper
       ⍝ 
       ⍝
@@ -11,7 +13,7 @@ CLEAR WS
 test
 
       test
-⋄
+      ⋄
 
       ⎕CR 'test'
 test
@@ -48,5 +50,5 @@ OK      - no duplicate parents
 
 
 
-⍝ ==================================
+      ⍝ ==================================
 

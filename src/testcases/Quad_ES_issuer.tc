@@ -1,0 +1,113 @@
+⍝ Quad_ES_issuer.tc
+⍝ ----------------------------------
+
+⍝@ test3.
+
+      ⍝ lrm p.282: when ⎕ES is executed from within a defined function,
+      ⍝ the event is generated as though the function (the "issuer")
+      ⍝ were primitive. Suspension occurs at the calling point, so the
+      ⍝ error message shows the issuer's CALLING statement. A ⎕ES that
+      ⍝ is executed via ⍎ (or in A of ⎕EA) inside a function counts as
+      ⍝ executed within that function (confirmed with IBM APL2).
+      ⍝
+      ⍝ The cases are captured with 3⊃⎕EC so that they can also be run
+      ⍝ (and compared) with IBM APL2 via MEGA11 (testcases_apl2), which
+      ⍝ records statement values but not error displays or )SI.
+      ⍝
+      ⍝ Compared with IBM APL2 via MEGA11 (2026-10-02): rows 1-3 of ⎕EM
+      ⍝ agree for every case below (including the single caret, e.g.
+      ⍝ under EXPO 0), except for two general display differences that
+      ⍝ are unrelated to ⎕ES: IBM APL2 shows the entire ◊-line T3[1]
+      ⍝ 'x'◊U◊'y' (GNU APL: only the failed statement U), and its ⎕EM
+      ⍝ has two more rows for the outer statement (e.g. W ^) when the
+      ⍝ issuer was called from another defined function.
+
+      )ERASE TEST W EXPO V U T3 T4 W4
+
+∇TEST
+ ⍎'⎕ES ''HELLO'''
+∇
+
+∇W
+ TEST
+∇
+
+∇Z←EXPO A
+ ⎕ES(0=A)/'ZERO INVALID'
+ Z←⋆A
+∇
+
+∇V
+ EXPO 0
+∇
+
+∇U
+ ⎕ES 5 4
+∇
+
+∇T3
+ 'x' ◊ U ◊ 'y'
+∇
+
+∇T4
+ '⎕ES ''HELLO''' ⎕EA '3÷0'
+∇
+
+∇W4
+ T4
+∇
+
+      ⍝ ⎕ES via ⍎ in TEST, TEST called from immediate execution
+      ⍝
+      3⊃⎕EC 'TEST'
+HELLO
+      TEST
+      ^
+
+      ⍝ ... TEST called from W
+      ⍝
+      3⊃⎕EC 'W'
+HELLO
+W[1]  TEST
+      ^
+
+      ⍝ ⎕ES directly in EXPO, EXPO called from immediate execution
+      ⍝
+      3⊃⎕EC 'EXPO 0'
+ZERO INVALID
+      EXPO 0
+      ^
+
+      ⍝ ... EXPO called from V
+      ⍝
+      3⊃⎕EC 'V'
+ZERO INVALID
+V[1]  EXPO 0
+      ^
+
+      ⍝ ⎕ES directly in U, U called from T3 (after 'x', before 'y')
+      ⍝
+      3⊃⎕EC 'T3'
+x
+DOMAIN ERROR
+T3[1]  U
+       ^
+
+      ⍝ ⎕ES in A of ⎕EA in T4, T4 called from immediate execution
+      ⍝
+      3⊃⎕EC 'T4'
+HELLO
+      T4
+      ^
+
+      ⍝ ... T4 called from W4
+      ⍝
+      3⊃⎕EC 'W4'
+HELLO
+W4[1]  T4
+       ^
+
+      )ERASE TEST W EXPO V U T3 T4 W4
+
+      ⍝ ==================================
+

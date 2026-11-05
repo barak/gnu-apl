@@ -33,6 +33,12 @@ accepts the following command line options:
 .B --cfg
 show ./configure options used and exit.
 .TP
+.B -C new_root
+do chroot(new_root) before starting APL (root only, not on Windows).
+.TP
+.B --CPU_limit_secs sec
+set CPU time limit to \fIsec\fP seconds.
+.TP
 .B --[no]Color
 start with ]COLOR ON [OFF].
 .TP
@@ -44,6 +50,10 @@ run in (old) emacs mode.
 .TP
 .B --emacs_arg arg
 run in (new) emacs mode with argument arg.
+.TP
+.B --eval expr
+evaluate the APL line \fIexpr\fP and exit. Implies \fB--silent\fP and
+\fB--noColor\fP.
 .TP
 .B -f file
 read input from \fIfile\fP rather than from the keyboard. When the end of
@@ -60,8 +70,18 @@ print all command line options with a brief hint what they do.
 .B -L wsname
 )LOAD wsname on start-up.
 .TP
+.B --libroot dir
+use \fBdir\fP as the library root: \fBdir\fP/workspaces is library 0 and
+\fBdir\fP/wslib1 ... \fBdir\fP/wslib9 are libraries 1-9. Overrides
+\fB$APL_LIB_ROOT\fP and the LIBREF-N settings of the \fBpreferences\fP files.
+.TP
 .B --LX expr
 execute expr first (like ⎕LX)
+.TP
+.B --mem limit
+set a memory limit for the interpreter. \fIlimit\fP is either an absolute
+byte count or a percentage of physical memory (e.g. \fB50%\fP, which is
+also the default if no \fIlimit\fP is given).
 .TP
 .B --id proc
 use processor ID \fIproc\fP for this interpreter. If no ID is provided,
@@ -81,8 +101,20 @@ copy the input line (after editing) to stdout. For creating session logs.
 do not echo stdin to stdout. Almost a must for scripting (unless
 you troubleshoot a script).
 .TP
+.B --to_COUT
+redirect CERR to COUT (like \fB2>&1\fP in bash).
+.TP
 .B --noCONT
 do not load a \fBCONTINUE\fP workspace on start-up.
+.TP
+.B --noPrefs
+do not read the system and user \fBpreferences\fP and
+\fBparallel_thresholds\fP files; use the built-in defaults.
+Used by the testcases so that they do not depend on an installed GNU APL.
+.TP
+.B --OFF
+automatically )OFF (i.e. exit) after the last \fB-f\fP input file has
+been processed.
 .TP
 .B -p N
 use profile N in preference files
@@ -92,8 +124,25 @@ do [not] start APserver (a shared variable server) on start-up. This
 disables communication with other workspaces or auxiliary
 processors through shared variables.
 .TP
+.B --pack_min N
+set the minimum element count for packed ravels to N (N \(>= 1).
+Arrays with fewer than N elements are stored in unpacked (Cell-array) form.
+The same setting is accessible at run time as \fB⎕SYL[34;2]\fP.
+The default value is set at \fB./configure\fP time (default: 12).
+.TP
 .B --par pproc
 use processor parent ID \fIpproc\fP (default: no parent ID).
+.TP
+.B --PW value
+initial value of \fB⎕PW\fP.
+.TP
+.B --rawCIN
+do not emit escape sequences on stdin/stdout. Useful when input/output
+is piped through something that does not understand terminal escape
+sequences.
+.TP
+.B --safe
+run in safe mode: no shared variables and no native functions.
 .TP
 .B -s, --script
 this option is an abbreviation for
@@ -123,6 +172,19 @@ needed to compile.
 .TP
 .B --show_all_dirs
 display all the directories above.
+.TP
+.B --status
+display the optional features of GNU APL (like the debug command ]STATUS),
+whether they are enabled, and if not, why not. Shared variables are
+reported after the attempt to connect to APserver. Then exit.
+.TP
+.B --strict_IBM_APL2_formatting mode
+select the output format of APL values (and of monadic format):
+\fBno\fR (GNU APL's traditional format),
+\fByes\fR (exactly as IBM APL2), or
+\fBparentheses\fR (as \fBno\fR, but nested items in parentheses instead
+of blanks). Overrides the preference STRICT_IBM_APL2_FORMATTING in the
+preferences files.
 .TP
 .B -q, --silent
 suppress printing of the GNU APL welcome message. Useful for APL scripts.
@@ -163,6 +225,15 @@ like `\fB--TM 3\fR', but exit after the first failed testcase.
 The is useful for automatic regression tests, where no errors are
 expected.
 .TP
+.B --TM 5
+exit immediately after the first failed testcase \fIline\fR (rather
+than waiting for the current testcase file to finish, as \fB--TM 4\fR
+does).
+.TP
+.B --TM 6
+like \fB--TM 5\fR, but do not exit; stay in the interpreter so that
+the failure can be investigated right away.
+.TP
 .B --TR
 execute test case files in random order.
 .TP
@@ -171,6 +242,17 @@ Normally, when the interpreter is run with the `\fB-T\fR' option, then
 an existing summary.log file is overridden without notice.  This
 option causes new test results to be appended to a possibly
 existing summary.log instead of overriding it.
+.TP
+.B --tcp_port port
+redirect CIN/COUT/CERR to/from TCP port \fIport\fP. Implies \fB--noSV\fP
+and \fB--rawCIN\fP.
+.TP
+.B --tcp_websocket
+the TCP connection given by \fB--tcp_port\fP speaks the WebSocket
+protocol rather than a plain byte stream.
+.TP
+.B -u UID
+run as user \fIUID\fP (root only, not on Windows).
 .TP
 .B -v, --version
 show version information and exit.
@@ -191,6 +273,32 @@ of arguments argc/argv in main(int argc, char * argv[]) in C/C++).
 ignored by the interpreter, but copied to ⎕ARG, along with their argument(s)
 (if any). The number of + indicates the number of option arguments (including
 the name of the option itself).
+
+.SH COMMAND LINE COMPLETION
+
+If the \fBbash-completion\fP package is installed, then
+.B GNU APL
+provides TAB completion for its own command line options in bash: typing
+.B apl\ --
+followed by TAB lists (and completes) the long options above; this works
+for any partial option, e.g. \fBapl --sc\fP TAB completes to \fBapl
+--script\fP. This completion is purely static (the known, fixed set of
+.B apl
+options), unlike e.g. \fBmake\fP's completion, which asks the \fBmake\fP
+binary itself for its (dynamic) list of targets; it therefore does not
+require running
+.B apl
+itself.
+.PP
+The completion script is installed automatically by
+.B make install
+(as part of the normal GNU APL build) into the directory reported by
+.B pkg-config\ --variable=completionsdir\ bash-completion
+if that package is present at \fB./configure\fP time, or otherwise into
+\fB$(datarootdir)/bash-completion/completions\fP. A new shell picks it
+up automatically; in an already-running shell it can be loaded with
+.B source
+without restarting.
 
 .SH REPORTING BUGS
 

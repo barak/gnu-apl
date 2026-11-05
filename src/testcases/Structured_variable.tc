@@ -1,6 +1,8 @@
 ⍝ Structured_variable.tc
 
       PERSON.firstname ← 'Jane'   ⍝ creates PERSON with member 'firstname'
+⍝@ test3.
+
       PERSON.lastname  ← 'Doe'    ⍝ add a second member 'lastname' to PERSON
 
       PERSON.address.city   ←  'Berkeley 94704'     ⍝ also does PERSON.address
@@ -66,7 +68,7 @@ Doe
       A.b←42                  ⍝ will fail since a.b is not a leaf
 DOMAIN ERROR+
       A.b←42
-       ^ ^
+      ^
       )MORE
 member access: cannot override non-leaf member A.b
       )ERASE or ⎕EX that member first.
@@ -85,7 +87,7 @@ leaf-Cde
       (↑A.b)←2
 DOMAIN ERROR+
       (↑A.b)←2
-         ^  ^
+        ^
       )more
 member access: cannot use non-leaf member A.b in selective specification.
       )ERASE or ⎕EX that member first.
@@ -97,21 +99,21 @@ member access: cannot use non-leaf member A.b in selective specification.
       A.b.c←1
       A['d']←"ddd"
       A
+.b: □
+.b.c: 1
+
 .d: ┌→──┐
     │ddd│
     └───┘
 
+      A['d']←"def"
+      A
 .b: □
 .b.c: 1
 
-      A['d']←"def"
-      A
 .d: ┌→──┐
     │def│
     └───┘
-
-.b: □
-.b.c: 1
 
 
       Q←2 2⍴'a' 'leaf-a' 'bb' 'leaf-bb'
@@ -120,17 +122,19 @@ member access: cannot use non-leaf member A.b in selective specification.
  bb leaf-bb 
 
       W←38 ⎕CR Q   ⍝ member names in Q are sorted, but 38 ⎕CR hashes them
+                   ⍝ internally -- print_members() re-sorts by name for
+                   ⍝ display regardless, so W still prints alphabetically.
       W
-.bb: ┌→──────┐
-     │leaf-bb│
-     └───────┘
-
 .a:  ┌→─────┐
      │leaf-a│
      └──────┘
 
+.bb: ┌→──────┐
+     │leaf-bb│
+     └───────┘
+
       R←39 ⎕CR W
-R
+      R
  bb leaf-bb 
  a  leaf-a  
 
@@ -161,5 +165,368 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
-      )ERASE A C
+      ⍝ Bugs28 #14 regression: the phrase "D V" (member access, D='.')
+      ⍝ also matches ⍤/⍣ followed by a plain symbol, since both are
+      ⍝ TC_OPER2 like '.'. A trailing ← after such a symbol used to hit
+      ⍝ an internal Assert() (ASS_var_seen bookkeeping meant only for a
+      ⍝ genuine member chain) instead of a clean SYNTAX ERROR.
+      ⍝
+      X←1
+      +⍤X←
+SYNTAX ERROR
+      +⍤X←
+       ^ ^
+
+      )SIC
+      +⍣X←
+SYNTAX ERROR
+      +⍣X←
+       ^ ^
+
+      ⍝ neighbouring forms stay exactly as before
+      ⍝
+      )SIC
+      ×⍤1←
+SYNTAX ERROR+
+      ×⍤1←
+      ^  ^
+
+      )SIC
+      ×⍤X←5
+SYNTAX ERROR
+      ×⍤X←5
+       ^  ^
+
+      )SIC
+      +∘X←
+VALENCE ERROR+
+      +∘X←
+       ^
+
+      )SIC
+      +⍤X
+VALENCE ERROR+
+      +⍤X
+      ^
+
+      )SIC
+
+      ⍝ real member-access chains are unaffected
+      ⍝
+      SV_MM.a.b←2
+      SV_MM.a.b
+2
+
+      ⍝ regression (Blake McBride, Bugs31 #27): a member chain ending in
+      ⍝ a ⎕-name (e.g. A.⎕I, never a real system variable -- just a
+      ⍝ member happening to be named like one), followed by a dyadic-
+      ⍝ looking trailing primitive and ←, reached Prefix::reduce_D_V__()
+      ⍝ via case 1 (plain member reference) with ASS_var_seen ALREADY
+      ⍝ set by an earlier, unrelated phrase reduction -- the Bugs28 #14
+      ⍝ fix's own TOK_OPER2_INNER check just above does not catch this
+      ⍝ variant (at0() genuinely IS '.' for a real member chain), so
+      ⍝ execution reached the bare Assert(get_assign_state() !=
+      ⍝ ASS_var_seen), aborting the whole interpreter with an internal
+      ⍝ assertion and a raw )SI dump instead of a clean SYNTAX ERROR.
+      ⍝
+      A.⎕I↓←1
+SYNTAX ERROR+
+      ⎕I
+      ^ ^
+
+      )SIC
+      A.⎕A↓←1
+SYNTAX ERROR+
+      ⎕A
+      ^ ^
+
+      )SIC
+      A.⎕Z↓←1
+SYNTAX ERROR+
+      ⎕Z
+      ^ ^
+
+      )SIC
+      A.⎕FMT↓←1
+SYNTAX ERROR+
+      ⎕FMT
+      ^   ^
+
+      )SIC
+      foo.bar.⎕I↓←1
+SYNTAX ERROR+
+      ⎕I
+      ^ ^
+
+      )SIC
+
+      ⍝ control: a normal (non-⎕) member name already gave a clean
+      ⍝ SYNTAX ERROR here too (bare monadic ↓ is simply not a valid
+      ⍝ selector), unaffected by this fix
+      ⍝
+      A.b←5
+      A.b↓←1
+SYNTAX ERROR+
+      A.b↓←1
+      ^    ^
+
+      )SIC
+      )ERASE foo
+
+      ⍝ Bugs28 #53 regression: ⎕EX/)ERASE of a nonexistent MEMBER threw
+      ⍝ VALUE ERROR (via cValue::get_existing_member(), which never
+      ⍝ returns 0 -- correct for an actual member *reference*, e.g.
+      ⍝ plain S.zz, but wrong for ⎕EX/)ERASE, whose job is only to
+      ⍝ check whether there is something there to remove) instead of
+      ⍝ reporting simple failure (0 / "NOT ERASED"). With no try/catch
+      ⍝ around it, the exception escaped all the way out of
+      ⍝ Quad_EX::expunge() to Command::process_line, which then blamed
+      ⍝ whatever statement happened to be current (not this one) and
+      ⍝ leaked an internal diagnostic string. Fixed by
+      ⍝ cValue::try_existing_member(), a non-throwing sibling that
+      ⍝ mirrors the same traversal, returning 0 for every "no such
+      ⍝ member" condition instead of throwing (a plain try/catch is
+      ⍝ not enough here: constructing/throwing an Error has an
+      ⍝ observable console side effect even when caught immediately).
+      ⍝
+      ZZ53S.a←1
+      ⎕EX 'ZZ53S.zz'
+0
+
+      ⍝ control: an existing member is still correctly expunged once,
+      ⍝ and correctly fails the second time (already gone)
+      ⍝
+      ⎕EX 'ZZ53S.a'
+1
+
+      ⎕EX 'ZZ53S.a'
+0
+
+      ZZ53S.a←1
+      )ERASE ZZ53S.zz
+
+      ⍝ NOTE: )ERASE's "NOT ERASED: ..." diagnostic goes to CERR
+      ⍝ (SymbolTable::erase_symbols() ignores its own `out` parameter
+      ⍝ and always writes to CERR -- see Workspace::erase_symbols()),
+      ⍝ so it never appears as expected stdout text in a .tc file
+      ⍝ (matching the pre-existing convention, e.g. AAA1.tc's
+      ⍝ ")ERASE JUMPS" with no "NOT ERASED: JUMPS" expected line).
+      ⍝
+      )ERASE ZZ53S.a
+
+      ⍝ regression (Bugs28 #100(u)): a ⎕-name in the member chain (e.g.
+      ⍝ S.⎕IO←1) was accepted like any other symbol and silently created
+      ⍝ a member literally named "⎕IO", instead of being rejected the
+      ⍝ same way a ⎕-name already is in other name positions (headers,
+      ⍝ local variables).
+      ⍝
+      ZZ54S.a←1
+      ZZ54S.⎕IO←1
+DOMAIN ERROR+
+      ZZ54S.⎕IO←1
+      ^
+
+      )MORE
+member access: '⎕IO' is a ⎕-name and cannot be used as a member name
+      )SIC
+
+      ⍝ control: an ordinary member is unaffected
+      ⍝
+      ZZ54S.b←2
+      2 ⎕TF 'ZZ54S'
+ZZ54S←(38⎕CR(8 2⍴0 0 0 0 0 0 0 0 0 0 0 0 (1⍴'b') 2 (1⍴'a') 1))
+
+      )ERASE ZZ54S
+
+      ⍝ regression (Bugs28 #55, Blake McBride): a member reference
+      ⍝ immediately followed by a bracket index (e.g. S.b[1]) was
+      ⍝ SYNTAX ERROR / LEFT SYNTAX ERROR instead of indexing into the
+      ⍝ member, and assigning through it (S.b[1]←'q') had no effect on
+      ⍝ the actual stored member. Root cause: this parser shifts
+      ⍝ right-to-left, so the bracket index (already collapsed to one
+      ⍝ token) is shifted onto the stack BEFORE the member chain's '.'
+      ⍝ and name -- and the plain "symbol[index]" phrase (prio ≥
+      ⍝ BS_ANY_BRA, reduced unconditionally with no shift/reduce
+      ⍝ lookahead) then eagerly bound to the bare member-name symbol,
+      ⍝ treating it as an ordinary (nonexistent) global variable,
+      ⍝ before the '.' ever got a chance to combine it into a proper
+      ⍝ member reference. Fixed in Prefix::push_Symbol(): when a
+      ⍝ dot-adjacent value-member symbol is about to be pushed AND
+      ⍝ something with strong binding priority (a pending index) is
+      ⍝ already on the stack, resolve the whole chain right there
+      ⍝ (Prefix::push_member_chain(), reusing the same member-walking
+      ⍝ logic Prefix::reduce_D_V__() already had) and push a plain
+      ⍝ value or, when the reference will itself be indexed-assigned or
+      ⍝ selectively assigned, an lvalue-capable cellref array -- so the
+      ⍝ existing, fully generic value-based phrases (A C, A ASS B, ...)
+      ⍝ apply to it afterward exactly as they already do for any other
+      ⍝ already-resolved value.
+      ⍝
+      ZZ55S.b←'xyz'
+      ZZ55S.b[1]
+x
+      ZZ55S.b[1]←'q'
+      ZZ55S.b
+qyz
+
+      ⍝ control: multi-level chain, both read and write
+      ⍝
+      ZZ55S.a.b←'hello'
+      ZZ55S.a.b[2]
+e
+      ZZ55S.a.b[2]←'E'
+      ZZ55S.a.b
+hEllo
+
+      ⍝ control: selective specification (already worked before this
+      ⍝ fix, since it does not involve a pending index at shift time)
+      ⍝ is unaffected
+      ⍝
+      (2↑ZZ55S.b)←'ab'
+      ZZ55S.b
+abz
+
+      ⍝ control: indexing a simple-scalar (non-vector) member is a
+      ⍝ pre-existing, unrelated limitation (no lvalue path for a single
+      ⍝ scalar cell), correctly reported as RANK ERROR rather than
+      ⍝ crashing or corrupting anything -- same as indexing an ordinary
+      ⍝ scalar variable
+      ⍝
+      ZZ55S.n←42
+      ZZ55S.n[1]
+RANK ERROR+
+      ZZ55S.n[1]
+      ^      ^
+
+      )MORE
+A[B]: A is not a vector (single-index A[B] only applies to vector A); ⍴⍴A is 0
+      )SIC
+
+      ⍝ control: a missing top-level variable is still correctly
+      ⍝ rejected (not auto-created) when only referenced, not assigned
+      ⍝
+      ZZ55UNDEF.member[1]
+VALUE ERROR+
+      ZZ55UNDEF.member[1]
+                      ^
+
+      )MORE
+member access: missing top-level variable ZZ55UNDEF for member ZZ55UNDEF.member not found
+      )SIC
+
+      )ERASE ZZ55S
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ regression (Blake McBride, Bugs31 #23): the identity fast paths
+      ⍝ of ⌽ (scalar), 0⌽/0⊖, ⍉ (scalar/vector, and identity dyadic ⍉)
+      ⍝ return their argument ALIASED (CLONE() under the active
+      ⍝ NEW_CLONE scheme is not a real copy, just a new Value_P handle
+      ⍝ on the SAME Value object), so Value::set_lval_bare_member_ref()'s
+      ⍝ marker on a bare member reference like ZZ56S.a survived the
+      ⍝ "selecting" function unbroken and was wrongly rejected by
+      ⍝ Value::assign_cellrefs()'s bare-member SYNTAX ERROR -- even
+      ⍝ though the error text itself names exactly this form
+      ⍝ ((⌽S.member)←B) as the correct way to do it. Fixed by
+      ⍝ Value::clear_lval_markers(), called at each aliasing identity
+      ⍝ fast path (see Bif_F12_ROTATE.cc/Bif_F12_TRANSPOSE.cc/
+      ⍝ Bif_F12_TAKE_DROP.cc/Bif_F12_COMMA.cc).
+      ⍝
+      ZZ56S.a←5
+      (⌽ZZ56S.a)←7
+      ZZ56S.a
+7
+
+      ZZ56S.a←1 2 3
+      (0⌽ZZ56S.a)←9 8 7
+      ZZ56S.a
+9 8 7
+
+      ZZ56S.a←1 2 3
+      (⍉ZZ56S.a)←9 8 7
+      ZZ56S.a
+9 8 7
+
+      ⍝ control: a genuinely non-identity application still worked even
+      ⍝ before this fix (Bugs30 #14 only promised this much)
+      ⍝
+      ZZ56S.a←1 2 3
+      (⌽ZZ56S.a)←9 8 7
+      ZZ56S.a
+7 8 9
+
+      )ERASE ZZ56S
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ regression (Blake McBride, Bugs31 #26): S.a[]←B on a SCALAR member
+      ⍝ was RANK ERROR (the member was pushed as a disconnected read-only
+      ⍝ copy instead of an lvalue), while A[]←B on a plain scalar A, and
+      ⍝ S.a[]←B on a vector or matrix member, worked.
+      ⍝
+      )ERASE ZZ26S
+      ZZ26S.a←5
+      ZZ26S.a[]←7
+      ZZ26S.a
+7
+
+      (ZZ26S.a[])←8
+      ZZ26S.a
+8
+
+      ZZ26S.a[]←,6
+      ZZ26S.a
+6
+
+      ZZ26S.a←'x'
+      ZZ26S.a[]←'y'
+      ZZ26S.a
+y
+
+      ZZ26S.b.c←3
+      ZZ26S.b.c[]←4
+      ZZ26S.b.c
+4
+
+      ⍝ a non-conforming B is an error, the member is unchanged
+      ⍝
+      ZZ26S.a←5
+      ZZ26S.a[]←1 2
+LENGTH ERROR+
+      ZZ26S.a[]←1 2
+      ^        ^
+
+      )SIC
+      ZZ26S.a
+5
+
+      ⍝ control: the bare member is still not a selective-specification
+      ⍝ target (Bugs30 #14)
+      ⍝
+      (ZZ26S.a)←7
+SYNTAX ERROR+
+      (ZZ26S.a)←7
+      ^         ^
+
+      )SIC
+      ZZ26S.a
+5
+
+      )ERASE ZZ26S
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE A C SV_MM
 

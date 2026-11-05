@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,17 +33,18 @@
 using namespace std;
 
 #if cfg_APSERVER_TRANSPORT == 1
-# define ABSTRACT_OFFSET 1
+#  define ABSTRACT_OFFSET 1
 #else
-# define ABSTRACT_OFFSET 0
+#  define ABSTRACT_OFFSET 0
 #endif
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// a pointer to one record (one shared variable) of the shared Svar_DB_memory
 class Svar_record_P
 {
 public:
    /// constructor: fetch record with key \b key from APserver
+   /// @param key shared variable key identifying the record
    Svar_record_P(SV_key key);
 
    /// return pointer to the record (overloaded -> operator)
@@ -56,65 +57,28 @@ protected:
 
 private:
    /// don't copy...
-  Svar_record_P(const Svar_record_P & other);
+  Svar_record_P(const Svar_record_P & other) = delete;
 
    /// don't copy...
-   Svar_record_P & operator =(const Svar_record_P & other);
+   Svar_record_P & operator =(const Svar_record_P & other) = delete;
 };
-//----------------------------------------------------------------------------
-# define READ_RECORD(key, open_act, closed_act)		\
-    if (Svar_DB::APserver_available())			\
-         { const Svar_record_P svar(key); open_act }	\
+//────────────────────────────────────────────────────────────────────────────
+#define READ_RECORD(key, open_act, closed_act)         \
+    if (Svar_DB::APserver_available())                  \
+         { const Svar_record_P svar(key); open_act }    \
     else { closed_act }
 
 /// Access to the shared variable database in APserver
 class Svar_DB
 {
 public:
-   /// open (and possibly initialize) the shared variable database
-   static void init(const char * bin_path, const char * prog, int retry_max,
-                    bool logit, bool do_svars);
+   /// return true if the connection to APserver is up
+   static bool APserver_available()
+      { return DB_tcp != NO_TCP_SOCKET; }
 
-   /// open (and possibly initialize) the shared variable database
-   void open_shared_memory(const char * progname, bool logit, bool do_svars);
-
-   /// match a new offer against the DB. Return: 0 on error, 1 if the
-   /// new offer was inserted into the DB (sicne no match was found), or
-   /// 2 if a pending offer was found. In the latter case, the pending offer
-   /// was removed and its relevant data returned through the d_... args.
-   static SV_key match_or_make(const uint32_t * UCS_varname,
-                               const AP_num3 & to, const Svar_partner & from);
-
-   /// return true if \b id is registered in APserver
-   static bool is_registered_id(const AP_num3 & id);
-
-   /// close the connection to the APserver
-   static void close_connection();
-
-   /// get TCP socket to APserver, complain if not connected
-   static TCP_socket get_Svar_DB_tcp(const char * calling_function);
-
-   
-   /// retract an offer, return previous coupling
-   static void retract_var(SV_key key);
-
-   /// return pointer to varname or 0 if key does not exist
-   static const uint32_t * get_svar_name(SV_key key)
-      {
-        READ_RECORD(key, return svar->get_svar_name(); , return 0; )
-      }
-
-   /// find ID of the procesdsor that has offered the variable with key \b key
-   static AP_num3 find_offering_id(SV_key key);
-
-   /// add processors with pending offers to \b to_proc. Duplicates
-   /// are OK and will be removed later
-   static void get_offering_processors(AP_num to_proc,
-                                       std::vector<AP_num> & processors);
-
-   /// return all variables shared between \b to_proc and \b from_proc
-   static void get_offered_variables(AP_num to_proc, AP_num from_proc,
-                                     std::vector<uint32_t> & varnames);
+   /// why the connection to APserver has failed ("" if it has not)
+   static const char * get_connect_error()
+      { return connect_error; }
 
    /// return coupling of \b entry with \b key.
    static SV_Coupling get_coupling(SV_key key)
@@ -128,13 +92,20 @@ public:
         READ_RECORD(key, return svar->get_control(); , return NO_SVAR_CONTROL; )
       }
 
-   /// set the current control vector of this variable
-   static void set_control(SV_key key, Svar_Control ctl);
+   /// return the fd towards APserver
+   static TCP_socket get_DB_tcp()
+      { return DB_tcp; }
 
    /// return the current state of this variable
    static Svar_state get_state(SV_key key)
       {
         READ_RECORD(key, return svar->get_state(); , return SVS_NOT_SHARED; )
+      }
+
+   /// return pointer to varname or 0 if key does not exist
+   static const uint32_t * get_svar_name(SV_key key)
+      {
+        READ_RECORD(key, return svar->get_svar_name(); , return 0; )
       }
 
    /// true if key is shared between workspaces (as opposed to shared between
@@ -144,49 +115,90 @@ public:
         READ_RECORD(key, return svar->is_ws_to_ws(); , return false; )
       }
 
-   /// return true iff setting the shared variable is allowed
-   static bool may_set(SV_key key, int attempt);
-
-   /// return true iff reading the shared variable is allowed
-   static bool may_use(SV_key key, int attempt);
-
-   /// set the current state of this variable
-   static void set_state(SV_key key, bool used, const char * loc);
-
-   /// some shared variables names belong to a pair, like CTL and DAT in AP210.
-   /// return the key of the other variable 
-   static SV_key find_pairing_key(SV_key key);
-
-   /// clear all events, return the current event bitmap.
-   static Svar_event clear_all_events(AP_num3 id);
-
-   /// return events for processor \b proc
-   static SV_key get_events(Svar_event & events, AP_num3 proc);
+   /// open (and possibly initialize) the shared variable database
+   /// @param progname name of the calling program
+   /// @param logit true to log connection steps
+   /// @param do_svars true to actually connect (false for dry-run)
+   void open_shared_memory(const char * progname, bool logit, bool do_svars);
 
    /// set an event for proc (and maybe also for key)
    static void add_event(SV_key key, AP_num3 id, Svar_event event);
 
-   /// print the database
-   static void print(ostream & out);
+   /// clear all events, return the current event bitmap.
+   static Svar_event clear_all_events(AP_num3 id);
+
+   /// close the connection to the APserver
+   static void close_connection();
 
    /// return a socket that is connect to APserver
    static TCP_socket connect_to_APserver(const char * bin_path,
                                          const char * prog, int retry_max,
                                          bool logit);
 
+   /// print TCP error information
+   static void DB_tcp_error(const char * op, int got, int expected);
+
    /// close TCP connection to APserver
    static void disconnect();
 
-   /// return true if the connection to APserver is up
-   static bool APserver_available()
-      { return DB_tcp != NO_TCP_SOCKET; }
+   /// find ID of the procesdsor that has offered the variable with key \b key
+   static AP_num3 find_offering_id(SV_key key);
 
-   /// return the fd towards APserver
-   static TCP_socket get_DB_tcp()
-      { return DB_tcp; }
+   /// some shared variables names belong to a pair, like CTL and DAT in AP210.
+   /// return the key of the other variable
+   static SV_key find_pairing_key(SV_key key);
 
-   /// print TCP error information
-   static void DB_tcp_error(const char * op, int got, int expected);
+   /// return events for processor \b proc
+   static SV_key get_events(Svar_event & events, AP_num3 proc);
+
+   /// return all variables shared between \b to_proc and \b from_proc
+   static void get_offered_variables(AP_num to_proc, AP_num from_proc,
+                                     std::vector<uint32_t> & varnames);
+
+   /// add processors with pending offers to \b to_proc. Duplicates
+   /// are OK and will be removed later
+   static void get_offering_processors(AP_num to_proc,
+                                       std::vector<AP_num> & processors);
+
+   /// get TCP socket to APserver, complain if not connected
+   static TCP_socket get_Svar_DB_tcp(const char * calling_function);
+
+   /// open (and possibly initialize) the shared variable database
+   /// @param bin_path directory path of the APL interpreter binary
+   /// @param prog name of the program (for APserver startup)
+   /// @param retry_max maximum number of connection retry attempts
+   /// @param logit true to log connection steps
+   /// @param do_svars true to actually connect (false for dry-run)
+   static void init(const char * bin_path, const char * prog, int retry_max,
+                    bool logit, bool do_svars);
+
+   /// return true if \b id is registered in APserver
+   static bool is_registered_id(const AP_num3 & id);
+
+   /// match a new offer against the DB. Return: 0 on error, 1 if the
+   /// new offer was inserted into the DB (sicne no match was found), or
+   /// 2 if a pending offer was found. In the latter case, the pending offer
+   /// was removed and its relevant data returned through the d_... args.
+   static SV_key match_or_make(const uint32_t * UCS_varname,
+                               const AP_num3 & to, const Svar_partner & from);
+
+   /// return true iff setting the shared variable is allowed
+   static bool may_set(SV_key key, int attempt);
+
+   /// return true iff reading the shared variable is allowed
+   static bool may_use(SV_key key, int attempt);
+
+   /// print the database
+   static void print(ostream & out);
+
+   /// retract an offer, return previous coupling
+   static void retract_var(SV_key key);
+
+   /// set the current control vector of this variable
+   static void set_control(SV_key key, Svar_Control ctl);
+
+   /// set the current state of this variable
+   static void set_state(SV_key key, bool used, const char * loc);
 
 protected:
    /// start an APserver process, return true on failure
@@ -196,6 +208,9 @@ protected:
    /// the TCP connection to APserver, NO_TCP_SOCKET if invalid
    static TCP_socket DB_tcp;
 
+   /// why the connection to APserver has failed ("" if it has not)
+   static char connect_error[100];
+
    /// The TCP port of APserver
    static uint16_t APserver_port;
 
@@ -203,13 +218,14 @@ protected:
    static bool do_log;
 private:
    /// don't create...
-  Svar_DB();
+  Svar_DB() = delete;
 
    /// don't copy...
-  Svar_DB(const Svar_DB & other);
+  Svar_DB(const Svar_DB & other) = delete;
 
    /// don't copy...
-   Svar_DB& operator =(const Svar_DB & other);
+   Svar_DB& operator =(const Svar_DB & other) = delete;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __SVAR_DB_HH_DEFINED__

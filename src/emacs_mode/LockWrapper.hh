@@ -26,13 +26,21 @@
 
 #include <pthread.h>
 
+//════════════════════════════════════════════════════════════════════════════
+/// RAII lock guard: locks \b lock_in on construction, unlocks it on
+/// destruction
 class LockWrapper {
 public:
+    /// constructor: locks \b lock_in
     LockWrapper( pthread_mutex_t *lock_in );
+
+    /// destructor: unlocks the wrapped mutex
     virtual ~LockWrapper();
 
 private:
+    /// the wrapped mutex
     pthread_mutex_t *lock;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

@@ -1,0 +1,111 @@
+⍝ ZZ69_Regression.tc
+⍝ ══════════════════
+
+      ⍝ bug-apl@gnu.org, "GNU APL analysis 22" (Blake McBride, 2026-08-20),
+      ⍝ findings #4 and #5: regression coverage for the printer stack-
+      ⍝ overflow and the packed-ravel exactness findings. See SVN log for
+      ⍝ details; findings #1/#2/#3/#6/#7 from the same report are covered
+      ⍝ in Residue.tc, Domino_stress.tc, Circle_Functions.tc, Quad_JSON.tc
+      ⍝ and Quad_XML.tc respectively.
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ #4: displaying (⎕← or ⍕) a sufficiently deeply nested value used
+      ⍝ to SIGSEGV the interpreter via unbounded mutual recursion between
+      ⍝ PrintBuffer::PrintBuffer() and PointerCell::character_
+      ⍝ representation(), with no depth counter or limit anywhere in that
+      ⍝ recursion. Two independent layers now guard against this:
+      ⍝
+      ⍝ 1. PointerCell's constructor -- the single chokepoint every
+      ⍝    nesting-increasing construction (⊂, strand notation, indexed/
+      ⍝    selective/member assignment, ...) funnels through -- refuses to
+      ⍝    nest a value one level deeper than MAX_DEPTH (254), raising
+      ⍝    SYSTEM LIMIT (nesting depth) immediately, during construction,
+      ⍝    rather than only failing later when eventually printed.
+      ⍝
+      ⍝ 2. PrintBuffer::MAX_PRINT_NESTING_DEPTH (500), the original fix,
+      ⍝    remains as defense in depth for any value that reaches the
+      ⍝    printer via a path other than PointerCell (e.g. workspace
+      ⍝    deserialisation); it is no longer reachable from ordinary APL
+      ⍝    construction now that layer 1 stops it 246 levels earlier.
+      ⍝
+∇Z←DEEP N;I
+ Z←1 2
+ I←0
+L: I←I+1
+ →(I>N)/0
+ Z←⊂Z
+ →L
+∇
+      ⍝ exactly at the limit (depth 254) still succeeds; not printed here
+      ⍝ (a 254-deep box is enormous) -- printing a shallow value is
+      ⍝ covered separately below.
+      ⍝
+      W←DEEP 253
+      ≡W
+254
+      )ERASE W
+
+      ⍝ one level deeper (depth 255) is refused during construction --
+      ⍝ V is never assigned, long before any print is attempted
+      ⍝
+      V←DEEP 254
+SYSTEM LIMIT (nesting depth)
+DEEP[5]  Z←⊂Z
+           ^
+      )SIC
+
+      ⎕←V
+VALUE ERROR+
+      ⎕←V
+        ^
+      )SIC
+
+      ⍝ a value safely under the limit must still print normally
+      ⍝
+      X←DEEP 5
+      6≡≡X
+1
+      )ERASE X DEEP
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ #5: Value::try_pack() escalated a ravel mixing exact IntCells
+      ⍝ and FloatCells to a packed RPT_FLOAT64 ravel, silently demoting
+      ⍝ every exact IntCell to a double -- observable once the ravel
+      ⍝ length crosses ⎕SYL[34;2] (the packing threshold), since a
+      ⍝ shorter, otherwise-identical ravel stays unpacked (mixed Cell
+      ⍝ storage) and keeps each cell's own correct type. V and W below
+      ⍝ differ only in length (11 vs 12 elements): both contain the same
+      ⍝ first element (20÷1, an exact integer 20), but only W's length
+      ⍝ reaches the default packing threshold of 12.
+      ⍝
+      ⎕SYL[34;2]
+12
+      V←20÷⍳11
+      W←20÷⍳12
+      V[1]≡W[1]
+1
+      (!V[1]) ≡ !W[1]
+1
+      !W[1]
+2432902008176640000
+      )ERASE V W
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )CLEAR
+CLEAR WS
+
+      ]NEXTFILE

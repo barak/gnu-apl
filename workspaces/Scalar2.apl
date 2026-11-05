@@ -218,7 +218,7 @@ options:
  ATTS.caption       ← 'Parallel Speedup vs. Core Count'
  ATTS.pw_pos_X      ← 200
  ATTS.pw_pos_Y      ← 200
- ATTS. format_X ← "%d\nCores"
+ ATTS.format_X      ← "%.0f\nCores"
  ATTS.legend_X      ← 50
  ATTS.legend_Y      ← 200
  ATTS.legend_name_1 ← "parallel speedup"
@@ -238,16 +238,16 @@ Loop:
   DLEN←∆DLENS[I]
   INIT_DATA DLEN
 
-  ⎕SYL[26;2] ← 0   ⍝ sequential
+  ⎕SYL[27;2] ← 0   ⍝ sequential
   (PZ LEN SUM SUM2) ← ONE_PASS EXPR
   DATA[I;1 2]←DLEN, SUM
 
-  ⎕SYL[26;2] ← CORES   ⍝ parallel
+  ⎕SYL[27;2] ← CORES   ⍝ parallel
   (SZ LEN SUM SUM2) ← ONE_PASS EXPR
   DATA[I;4 5]←DLEN, SUM
   →((⍴∆DLENS) ≥ I←I+1)⍴Loop
 
-  ⎕SYL[26;2] ← 0   ⍝ back to sequential
+  ⎕SYL[27;2] ← 0   ⍝ back to sequential
 
    →(PZ≡SZ)⍴SAME_DATA
    '***FATAL: data mismatch'

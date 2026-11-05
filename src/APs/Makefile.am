@@ -24,5 +24,9 @@ AP210_CXXFLAGS    = $(AM_CXXFLAGS) -DAP_NUM=210
 APmain_CXXFLAGS   = $(AM_CXXFLAGS)
 APserver_CXXFLAGS = $(AM_CXXFLAGS)
 
+if apl_TARGET_MINGW
+AM_LDFLAGS = -L/usr/x86_64-w64-mingw32/lib -lws2_32
+endif
+
 AM_MAKEFLAGS = -j $(MAKE_J)
 

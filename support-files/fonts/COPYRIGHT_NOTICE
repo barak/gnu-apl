@@ -1,0 +1,58 @@
+GNU APL Font
+============
+
+The font file GNU_APL.ttf distributed here is a derived work of the BQN386
+font by dzaima, cloned from:
+
+    https://github.com/dzaima/BQN386.git
+
+on 2026-06-15.
+
+The following modifications were made to add and fix glyphs required for
+GNU APL on Windows (MinGW/cmd.exe):
+
+  - Added glyph U+2208 (∈, element-of / epsilon)
+  - Added glyph U+2297 (⊗, circle-times, constructed as an overstrike
+    of the asterisk U+2217 inside the circle ring, matching the APL
+    overstrike convention used for U+235F ⍟)
+  - Cleared advance-width rounding hints from glyphs U+2223 (∣),
+    U+2282 (⊂), U+2283 (⊃), U+20AC (€), U+222A (∪), U+22A5 (⊥)
+    to ensure uniform one-column display width in Windows console
+
+The upstream BQN386 font is released into the public domain under the
+Unlicense of the BQN386 project. The full text of the upstream license
+at the time of the download follows:
+
+---------------------------------------------------------------------------
+
+This is free and unencumbered software released into the public domain.
+
+Anyone is free to copy, modify, publish, use, compile, sell, or
+distribute this software, either in source code form or as a compiled
+binary, for any purpose, commercial or non-commercial, and by any
+means.
+
+In jurisdictions that recognize copyright laws, the author or authors
+of this software dedicate any and all copyright interest in the
+software to the public domain. We make this dedication for the benefit
+of the public at large and to the detriment of our heirs and
+successors. We intend this dedication to be an overt act of
+relinquishment in perpetuity of all present and future rights to this
+software under copyright law.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+For more information, please refer to <https://unlicense.org>
+
+---------------------------------------------------------------------------
+
+The modifications described above were made by Dr. Jürgen Sauermann
+<bug-apl@gnu.org> and are likewise dedicated to the public domain
+under the same Unlicense terms.
+

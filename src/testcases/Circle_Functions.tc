@@ -1,12 +1,14 @@
 ⍝ Circle_Functions.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       1○1.5708
 1
       2○.25
 0.9689124217
 
-⍝ ----------------------------------
+      ⍝ ----------------------------------
 
       1○1.570796327
 1
@@ -21,14 +23,14 @@
       2○○45÷180
 0.7071067812
 
-⍝ Inverses of Circular Functions ----------------------------------
+      ⍝ Inverses of Circular Functions ----------------------------------
 
       ¯1○1
 1.570796327
       ¯2○.54032023059
 0.9999786982
 
-⍝ Hyperbolic Functions ----------------------------------
+      ⍝ Hyperbolic Functions ----------------------------------
 
       5○1
 1.175201194
@@ -39,7 +41,7 @@
       ¯6○1.543080635
 1
 
-⍝ Complex Number Functions ----------------------------------
+      ⍝ Complex Number Functions ----------------------------------
 
       9 10 11 12○3J4
 3 5 4 0.927295218
@@ -51,7 +53,7 @@
       8 ¯8○2
 0J¯2.236067977 0J2.236067977
 
-⍝ Circle Functions with Complex arguments ----------------------------------
+      ⍝ Circle Functions with Complex arguments ----------------------------------
 
       6 1⍴¯7 ¯6 ¯5 ¯3 ¯2 ¯1○1J1
 0.4023594781J1.017221968
@@ -64,11 +66,11 @@
       ⍝ Regression
       ⍝
       0 ¯1 ¯2 ¯6 ¯7 ∘.○ ¯2 ¯2J0
-            0J1.732050808             0J1.732050808
- ¯1.570796327J1.316957897  ¯1.570796327J1.316957897
-  3.141592654J1.316957897   3.141592654J1.316957897
-  1.316957897J3.141592654   1.316957897J3.141592654
-¯0.5493061443J1.570796327 ¯0.5493061443J1.570796327
+            0J1.732050808              0J1.732050808
+ ¯1.570796327J1.316957897   ¯1.570796327J1.316957897
+  3.141592654J¯1.316957897   3.141592654J¯1.316957897
+  1.316957897J3.141592654    1.316957897J3.141592654
+¯0.5493061443J1.570796327  ¯0.5493061443J1.570796327
 
       ¯4 ¯3 ∘.○ 1 1J0
 0            0
@@ -84,7 +86,7 @@
 0 3.141592654
 
 
-⍝ Comparison with IBM APL2
+      ⍝ Comparison with IBM APL2
 
       ⍝ Real and quasi-real arguments
       ⍝
@@ -175,4 +177,174 @@
 ¯8                0J8.062257748
 ¯8J¯1 ¯0.9923935736J8.061317821
 ¯8J¯8  ¯7.968811272J8.031310796
+
+      ⍝ Regression (Blake McBride, LanguageVariances.md #6, 2026-08-10):
+      ⍝ Bif_F12_CIRCLE (○) was the only scalar function missing its
+      ⍝ eval_AXB() override, so a dyadic axis specification fell through
+      ⍝ to Function::phrase_error() -- VALENCE ERROR -- even though every
+      ⍝ dyadic scalar function is required to accept an axis (apl2lrm.txt
+      ⍝ Figure 7 p.45, Figure 9 p.51). Added the same eval_AXB() every
+      ⍝ other scalar function class already has.
+      ⍝
+      1 2○[1]2 3⍴⍳6
+ 0.8414709848 0.9092974268 0.1411200081
+¯0.6536436209 0.2836621855 0.9601702867
+
+      ⍝ Regression (Blake McBride, Bugs22 #3): ¯12○B (and the latent
+      ⍝ ¯8○B) discarded do_bif_circle_fun()'s ErrorCode and always
+      ⍝ reported success, so an overflowing result silently became 0
+      ⍝ instead of DOMAIN ERROR.
+      ⍝
+      ⎕PP←17
+      ¯12○0J¯700
+1.0142320547350045E304
+
+      ¯12○0J¯710
+DOMAIN ERROR
+      ¯12○0J¯710
+      ^  ^
+      )SIC
+
+      ⍝ Bugs28 #47 regression: A○B with a genuinely complex A (non-zero
+      ⍝ imaginary part, e.g. 1J1) silently used only A's real part
+      ⍝ instead of raising DOMAIN ERROR -- RealCell.cc/ComplexCell.cc's
+      ⍝ bif_circle_fun() checked A->is_near_int() for validity, and
+      ⍝ ComplexCell::is_near_int() used to return true whenever BOTH
+      ⍝ parts were independently near-integral (1J1 qualified), then
+      ⍝ get_checked_near_int() silently returned just the real part.
+      ⍝ Already fixed as a side effect of the Bugs28 #32 fix to
+      ⍝ ComplexCell::is_near_int()/is_near_int64_t(), which now also
+      ⍝ requires the imaginary part be ≈0 -- kept here as its own
+      ⍝ regression test since #32's fix was for a different symptom
+      ⍝ (parse-time constant folding / a stack overflow).
+      ⍝
+      1J1○3.5
+DOMAIN ERROR
+      1J1○3.5
+      ^  ^
+
+      )SIC
+      1J1∘.○3.5 4
+DOMAIN ERROR
+      1J1∘.○3.5 4
+      ^  ^
+
+      )SIC
+
+      ⍝ control: a non-integral real A was already correctly rejected
+      ⍝
+      0.5○1
+DOMAIN ERROR
+      0.5○1
+      ^  ^
+
+      )SIC
+
+      ⍝ regression (Bugs28 #85): 4○, ¯4○, 8○, ¯8○ and 0○ computed
+      ⍝ sqrt(1±b²) (or sqrt(b²-1)) directly, so b*b overflowed to +∞ for
+      ⍝ any |b| above roughly 1.34E154 even though the true result
+      ⍝ (≈|b|) is perfectly finite -- the interpreter's own is_finite()
+      ⍝ safety net then turned that overflow into a spurious DOMAIN
+      ⍝ ERROR. 4○/8○/¯8○ now use hypot(1.0, b), and ¯4○/0○ use
+      ⍝ |b|×sqrt(1-1÷b²), neither of which needs to square b directly.
+      ⍝
+      4○1E155
+1E155
+
+      4○1E154
+1E154
+
+      0○1E155
+0J1E155
+
+      8○1E155
+0J¯1E155
+
+      ¯8○1E155
+0J1E155
+
+      ¯4○1E155
+1E155
+
+      ⍝ regression (Blake McBride, Bugs31 #12): the r2127 fix above's
+      ⍝ 8○ shortcut (hypot(1.0, b.real())) always builds a POSITIVE-
+      ⍝ imaginary root, but the sign selection below it (unchanged,
+      ⍝ written for the general complex_sqrt() path) consulted the
+      ⍝ actual, tiny, no-longer-reflected-in-root b.imag() -- flipping
+      ⍝ the sign for a near-real b whose tiny imaginary part shares its
+      ⍝ real part's sign, disagreeing with both the exactly-real
+      ⍝ neighbour and the just-outside-band general-path neighbour.
+      ⍝
+      8○0.5
+0J¯1.1180339887498949
+
+      8○0.5J0
+0J¯1.1180339887498949
+
+      8○0.5J1E¯11
+0J¯1.1180339887498949
+
+      8○¯0.5J¯1E¯11
+0J1.1180339887498949
+
+      ⍝ control: just outside the near-zero band (general path).
+      ⍝ The last (17th) digit of the tiny real part depends on the platform
+      ⍝ (x87 vs. SSE floating point: 32-bit x86 gives ...5798E¯10, 64-bit
+      ⍝ ...5793E¯10; exact: ...57967E¯10). The wildcard ⁰ in the expected
+      ⍝ output matches any digits there.
+      ⍝
+      8○0.5J1E¯9
+4.472135954999579⁰E¯10J¯1.1180339887498949
+
+      8○¯0.5J¯1E¯9
+¯4.472135954999579⁰E¯10J1.1180339887498949
+
+      ⍝ regression (Blake McBride, Bugs31 #13): the same near-real
+      ⍝ shortcut-vs-general-path sign discontinuity in 0○ and ¯4○
+      ⍝ (pre-existing, not r2127-introduced -- #12 above showed the same
+      ⍝ defect freshly introduced in the newer 8○ case).
+      ⍝
+      0○2
+0J1.7320508075688772
+
+      ⍝ (the small real parts below are no longer dropped, Bugs32 #27:
+      ⍝ 0○2J1E¯11 ≈ 1.1547E¯11J¯1.7321, ¯4○0.1J¯1E¯11 ≈ 1.005E¯12J¯0.99499)
+      ⍝
+      ⎕PP←10   ⍝ (at ⎕PP←10 the tiny part is not displayed, lrm p. 13)
+      0○2J1E¯11
+0J¯1.732050808
+      ⎕PP←17
+
+      ¯4○0.1
+0J0.99498743710661997
+
+      ⎕PP←10
+      ¯4○0.1J¯1E¯11
+0J¯0.9949874371
+      ⎕PP←17
+
+      ⍝ regression (Blake McBride, Bugs31 #14): ¯7○'s (arctanh) r2127
+      ⍝ near-zero-imaginary shortcut discarded b.imag() unconditionally,
+      ⍝ but d(atanh)/dx = 1/(1-x²) blows up as b.real() approaches ±1,
+      ⍝ so even a tiny imaginary part can contribute non-negligibly once
+      ⍝ amplified -- ¯7○z must agree with its own definition
+      ⍝ 0.5×((⍟1+z)-(⍟1-z)) for such a z.
+      ⍝
+      Z←(1-1E¯9)+0J1E¯11
+      (¯7○Z) ≡ 0.5×((⍟1+Z)-(⍟1-Z))
+1
+      )ERASE Z
+
+      ⍝ control: an ordinary near-real argument away from ±1, compared
+      ⍝ within ⎕CT: the last digit at ⎕PP←17 depends on the libm (its
+      ⍝ correctly rounded value is 0.54930614433405489, Bugs32 #33)
+      ⍝
+      (¯7○0.5J1E¯11) = 0.54930614433405484J1.3333333333333333E¯11
+1
+
+
+      ⍝ restore the default for the testcases that follow (see --TR)
+      ⍝
+      ⎕PP←10
+
 

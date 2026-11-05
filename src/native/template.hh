@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2013  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -78,10 +78,11 @@ No such process
 // mandatory functios
 extern "C" void * get_function_mux(const char * function_name);
 static Fun_signature get_signature();
+static int get_ABI_version();
 static bool close_fun(Cause cause, const NativeFunction * caller);
-static Token eval_fill_B(Value_P B, const NativeFunction * caller);
-static Token eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller);
-static Token eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller);
+static Token eval_fill_B(const cValue * B, const NativeFunction * caller);
+static Token eval_fill_AB(const cValue * A, const cValue * B, const NativeFunction * caller);
+static Token eval_ident_Bx(const cValue * B, sAxis x, const NativeFunction * caller);
 
 #if defined TEMPLATE_F0
 
@@ -94,6 +95,8 @@ get_function_mux(const char * function_name)
 {
    if (!strcmp(function_name, "get_signature"))
       return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "get_ABI_version"))
+      return reinterpret_cast<void *>(&get_ABI_version);
    if (!strcmp(function_name, "eval_"))
       return reinterpret_cast<void *>(&eval_);
    if (!strcmp(function_name, "eval_fill_B"))
@@ -113,16 +116,16 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_F12
 
 Fun_signature get_signature() { return SIG_Z_A_F2_B; }
 
-static Token eval_B(Value_P B, const NativeFunction * caller);
-static Token eval_AB(Value_P A, Value_P B, const NativeFunction * caller);
-static Token eval_XB(Value_P X, Value_P B, const NativeFunction * caller);
-static Token eval_AXB(Value_P A, Value_P X, Value_P B,
+static Token eval_B(const cValue * B, const NativeFunction * caller);
+static Token eval_AB(const cValue * A, const cValue * B, const NativeFunction * caller);
+static Token eval_XB(const cValue * X, const cValue * B, const NativeFunction * caller);
+static Token eval_AXB(const cValue * A, const cValue * X, const cValue * B,
                       const NativeFunction * caller);
 
 void *
@@ -130,6 +133,8 @@ get_function_mux(const char * function_name)
 {
    if (!strcmp(function_name, "get_signature"))
       return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "get_ABI_version"))
+      return reinterpret_cast<void *>(&get_ABI_version);
    if (!strcmp(function_name, "eval_B"))
       return reinterpret_cast<void *>(&eval_B);
    if (!strcmp(function_name, "eval_AB"))
@@ -146,54 +151,54 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_B(Value_P B, const NativeFunction * caller)
+eval_B(const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string(UTF8_string("eval_B() called")));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
+eval_AB(const cValue * A, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_AB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
+eval_XB(const cValue * X, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_XB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_AXB(Value_P A, Value_P X, Value_P B, const NativeFunction * caller)
+eval_AXB(const cValue * A, const cValue * X, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_AXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_OP1
 
 Fun_signature get_signature() { return SIG_Z_A_LO_OP1_B; }
 
-static Token eval_LB(Function & LO, Value_P B, const NativeFunction * caller);
-static Token eval_ALB(Value_P A, Function & LO, Value_P B,
+static Token eval_LB(Function & LO, const cValue * B, const NativeFunction * caller);
+static Token eval_ALB(const cValue * A, Function & LO, const cValue * B,
                       const NativeFunction * caller);
-static Token eval_LXB(Function & LO, Value_P X, Value_P B,
+static Token eval_LXB(Function & LO, const cValue * X, const cValue * B,
                       const NativeFunction * caller);
-static Token eval_ALXB(Value_P A, Function & LO, Value_P X, Value_P B,
+static Token eval_ALXB(const cValue * A, Function & LO, const cValue * X, const cValue * B,
                        const NativeFunction * caller);
 
 void *
@@ -201,6 +206,8 @@ get_function_mux(const char * function_name)
 {
    if (!strcmp(function_name, "get_signature"))
       return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "get_ABI_version"))
+      return reinterpret_cast<void *>(&get_ABI_version);
    if (!strcmp(function_name, "eval_LB"))
       return reinterpret_cast<void *>(&eval_LB);
    if (!strcmp(function_name, "eval_ALB"))
@@ -217,36 +224,36 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_LB(Function & LO, Value_P B, const NativeFunction * caller)
+eval_LB(Function & LO, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_LB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_ALB(Value_P A, Function & LO, Value_P B, const NativeFunction * caller)
+eval_ALB(const cValue * A, Function & LO, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_ALB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_LXB(Function & LO, Value_P X, Value_P B, const NativeFunction * caller)
+eval_LXB(Function & LO, const cValue * X, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_LXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_ALXB(Value_P A, Function & LO, Value_P X, Value_P B,
+eval_ALXB(const cValue * A, Function & LO, const cValue * X, const cValue * B,
           const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_ALXB() called"));
@@ -254,26 +261,28 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #elif defined TEMPLATE_OP2
 
 Fun_signature get_signature() { return SIG_Z_A_LO_OP2_RO_B; }
 
-static Token eval_LRB(Function & LO, Function & RO, Value_P B,
+static Token eval_LRB(Function & LO, Function & RO, const cValue * B,
                       const NativeFunction * caller);
-static Token eval_ALRB(Value_P A, Function & LO, Function & RO, Value_P B,
+static Token eval_ALRB(const cValue * A, Function & LO, Function & RO, const cValue * B,
                        const NativeFunction * caller);
-static Token eval_LRXB(Function & LO, Function & RO, Value_P X, Value_P B,
+static Token eval_LRXB(Function & LO, Function & RO, const cValue * X, const cValue * B,
                        const NativeFunction * caller);
-static Token eval_ALRXB(Value_P A, Function & LO, Function & RO, Value_P X,
-                        Value_P B, const NativeFunction * caller);
+static Token eval_ALRXB(const cValue * A, Function & LO, Function & RO, const cValue * X,
+                        const cValue * B, const NativeFunction * caller);
 
 void *
 get_function_mux(const char * function_name)
 {
    if (!strcmp(function_name, "get_signature"))
       return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "get_ABI_version"))
+      return reinterpret_cast<void *>(&get_ABI_version);
    if (!strcmp(function_name, "eval_LRB"))
       return reinterpret_cast<void *>(&eval_LRB);
    if (!strcmp(function_name, "eval_ALRB"))
@@ -290,9 +299,9 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_ident_Bx);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_LRB(Function & LO, Function & RO, Value_P B,
+eval_LRB(Function & LO, Function & RO, const cValue * B,
          const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_LRB() called"));
@@ -300,9 +309,9 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_ALRB(Value_P A, Function & LO, Function & RO, Value_P B,
+eval_ALRB(const cValue * A, Function & LO, Function & RO, const cValue * B,
           const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_ALRB() called"));
@@ -311,9 +320,9 @@ Value_P Z(ucs, LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_LRXB(Function & LO, Function & RO, Value_P X, Value_P B,
+eval_LRXB(Function & LO, Function & RO, const cValue * X, const cValue * B,
           const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_LRXB() called"));
@@ -321,9 +330,9 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_ALRXB(Value_P A, Function & LO, Function & RO, Value_P X, Value_P B,
+eval_ALRXB(const cValue * A, Function & LO, Function & RO, const cValue * X, const cValue * B,
            const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_ALRXB() called"));
@@ -331,9 +340,20 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif
+
+/// a mandatory function returning the ABI contract version (see
+/// Native_interface.hh) that this library was compiled against, so that
+/// NativeFunction can refuse to use a library built against a different,
+/// binary-incompatible version of GNU APL instead of silently
+/// misinterpreting its Value/Cell layout.
+int
+get_ABI_version()
+{
+   return NATIVE_ABI_VERSION;
+}
 
 /// an optional function that is called when the native function in the
 /// APL interpreter is about to be removed. Return \b true if the caller shall
@@ -347,32 +367,32 @@ close_fun(Cause cause, const NativeFunction * caller)
 // prevent compiler warning
 bool (*close_fun_is_unused)(Cause, const NativeFunction *) = &close_fun;
 
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_fill_B(Value_P B, const NativeFunction * caller)
+eval_fill_B(const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_fill_B() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller)
+eval_fill_AB(const cValue * A, const cValue * B, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_fill_AB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller)
+eval_ident_Bx(const cValue * B, sAxis x, const NativeFunction * caller)
 {
 UCS_string ucs(UTF8_string("eval_ident_Bx() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 

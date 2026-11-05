@@ -96,16 +96,15 @@ perfo_4(M_join         , _AB, "M_join(B)",  -1)                       // 56
 #endif
 
 // select optimizations. Use 0 or 1 for individual optimizations or
-// FT_ANY or RT_ANY to enable ebntire groups (in file Performance.hh)
+// OFT_ANY or ORT_ANY to enable ebntire groups (in file Performance.hh)
 //
-optim(FT_ANY, FT_LABEL_LITERAL,   "⎕FX Time: Label to integer literal")   // 0
-optim(FT_ANY, FT_DIRECT_BRANCHES, "⎕FX Time: Unconditional branches"  )   // 1
-optim(FT_ANY, FT_LITERAL_AXIS,    "⎕FX Time: Literal axis [X]"        )   // 2
-optim(FT_ANY, FT_LITERAL_INDEX,   "⎕FX Time: Literal index [X1;...]"  )   // 3
-optim(FT_ANY, FT_SHORT_PRIMITIVE, "⎕FX Time: Short primitives"        )   // 4
-optim(RT_ANY, RT_A_RHO_B,         "Run Time: In-place A⍴B"            )   // 5
-optim(RT_ANY, RT_COMMA_B,         "Run Time: In-place ,B"             )   // 6
-optim(RT_ANY, RT_COMMA1_B,        "Run Time: In-place ⍪B"             )   // 7
+optim(OFT_ANY, FT_LABEL_LITERAL,   "⎕FX Time: Label to integer literal")   // 0
+optim(OFT_ANY, FT_DIRECT_BRANCHES, "⎕FX Time: Unconditional branches"  )   // 1
+optim(OFT_ANY, FT_LITERAL_AXIS,    "⎕FX Time: Literal axis [X]"        )   // 2
+optim(OFT_ANY, FT_LITERAL_INDEX,   "⎕FX Time: Literal index [X1;...]"  )   // 3
+optim(OFT_ANY, FT_SHORT_PRIMITIVE, "⎕FX Time: Short primitives"        )   // 4
+optim(ORT_ANY, RT_COMMA_B,         "Run Time: In-place ,B"             )   // 6
+optim(ORT_ANY, RT_COMMA1_B,        "Run Time: In-place ⍪B"             )   // 7
 
 #undef optim
 #undef perfo_1

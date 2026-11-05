@@ -24,13 +24,13 @@
 #include "SqliteProvider.hh"
 #include "SqliteConnection.hh"
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 SqliteProvider::~SqliteProvider()
 {
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static SqliteConnection *
-create_sqlite_connection(const Value & B)
+create_sqlite_connection(const cValue & B)
 {
     if (!B.is_char_string())
        {
@@ -56,23 +56,23 @@ sqlite3 * db;
                 << sqlite3_errmsg(db);
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Connection *
-SqliteProvider::open_database(const Value & B)
+SqliteProvider::open_database(const cValue & B)
 {
 Connection * conn = create_sqlite_connection(B);
     return conn;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 const char *
 SqliteProvider::version_string() const
 {
    return "SQLite-" SQLITE_VERSION;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 int
 SqliteProvider::version_number() const
 {
    return SQLITE_VERSION_NUMBER;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

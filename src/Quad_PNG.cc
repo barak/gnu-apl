@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2024  Dr. Jürgen Sauermann
+    Copyright © 2018-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 #endif   // HAVE_LOCALE_H
 
 #include "Quad_PNG.hh"
+#include "Sys.hh"
 #include "Token.hh"
 
 Quad_PNG  Quad_PNG::fun;
@@ -42,14 +43,14 @@ Quad_PNG  Quad_PNG::fun;
     defined( apl_GTK3      ) && \
     defined( HAVE_LIBGTK_3 ) 
 
-# define PNG_GTK	1
+# define PNG_GTK        1
 #else
-# define PNG_GTK	0
+# define PNG_GTK        0
 #endif
 
 /// PNG_LIBS defines if the PNG related libraries (and their header files)
 /// are present
-#if	defined( HAVE_LIBZ           ) && \
+#if     defined( HAVE_LIBZ           ) && \
     defined( HAVE_ZLIB_H         ) && \
     defined( HAVE_LIBPNG         ) && \
     defined( HAVE_LIBPNG16_PNG_H )
@@ -139,7 +140,7 @@ int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
 static vector<PNG_context *> all_PNG_contexts;
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)
 {
@@ -147,216 +148,99 @@ Quad_PNG::Quad_PNG()
    __sem_init(PNG_window_sema, /* processes */ 0, /* initial */ 0);
 #endif
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Quad_PNG::~Quad_PNG()
 {
 #if PNG_LIBS
    __sem_destroy(PNG_window_sema);
 #endif   // PNG_LIBS
 }
-//---------------------------------------------------------------------------
-/// callback for libpng warnings
-void
-PNG_warn(png_structp png_ptr, png_const_charp reason)
-{
-   CERR << "*** libpng warning: " << reason << " ***" << endl;
-}
-//---------------------------------------------------------------------------
-/// callback for libpng errors
-void
-PNG_err(png_structp png_ptr, png_const_charp reason)
-{
-   MORE_ERROR() << "libpng error: " << reason;
-   DOMAIN_ERROR;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Quad_PNG::read_PNG_file(const UTF8_string & filename1)
-{
-#if PNG_LIBS
-
-   // filename1 is the file to be read. It may or may not have a .png extension
-   // If opening filename1 fails we try filename2 = filename1.png
-   //
-int errno1 = 0;
-FILE * in = fopen(filename1.c_str(), "rb");
-   if (in == 0 && !filename1.ends_with(".png"))
-      {
-         errno1 = errno;              // remember why filename1 has failed
-         UTF8_string filename2(filename1);
-         filename2 << ".png";
-         in = fopen(filename2.c_str(), "r");
-      }
-
-   if (in == 0)   // neither filename nor filename.png
-      {
-        MORE_ERROR() << "Cannot open file '" << filename1.c_str()
-                     << "' in ⎕PNG B: " << strerror(errno1);
-        DOMAIN_ERROR;
-      }
-
-png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-                                             0, PNG_err, PNG_warn);
-   if (!png_ptr)   WS_FULL;
-
-png_infop info_ptr = png_create_info_struct(png_ptr);
-   if (!info_ptr)   WS_FULL;
-
-    png_init_io(png_ptr, in);
-
-   // We use the low-level interface for a better control of the input
-   // transformations...
-
-   // 1. read the image parameters.
-   //
-   png_read_info(png_ptr, info_ptr);
-
-   // primary image parameters (from the PNG file read)
-   //
-const int width = png_get_image_width(png_ptr, info_ptr);
-const int height = png_get_image_height(png_ptr, info_ptr);
-const int color_type = png_get_color_type(png_ptr, info_ptr);
-const int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-
-const bool alpha_used   = color_type & 0x04;
-const bool color_used   = color_type & 0x02;
-const bool palette_used = color_type & 0x01;
-const int planes = (alpha_used ? 1 : 0) + (color_used ? 3 : 1);
-
-   // secondary image parameters (derived from the primary parameters)
-   //
-const int bytes_per_color = (bit_depth + 7) / 8;       // 1 or 2 bytes
-
-const int bytes_per_pixel = planes * bytes_per_color;
-
-   if (verbosity & SHOW_DATA)
-      {
-        CERR << "width:         " << width  << " pixels"           << endl
-             << "height:        " << height << " pixels"           << endl
-             << "color_type:    " << color_type                    << endl
-             << " ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
-             << " ├─── color:   " << (color_used ? "yes" : "no")   << endl
-             << " └─── palette: " << (palette_used ? "yes" : "no") << endl
-             << "bit_depth:     " << bit_depth << " bits/color"    << endl
-             << "planes:        " << planes                        << endl;
-      }
-
-   // 2. allocate the pixel memory and scanline pointers...
-   //
-UTF8 * RGB = new UTF8[planes*height*width*2];
-UTF8 ** row_pointers = new UTF8 *[height];
-
-UTF8 * scanline = RGB;
-   loop(y, height)
-       {
-         row_pointers[y] = scanline;
-         scanline += planes*width*2;
-       }
-
-   // 3. set the desired input transformations...
-   //
-   if (color_type == PNG_COLOR_TYPE_PALETTE)   // color palettes → RGB
-      png_set_palette_to_rgb(png_ptr);
-
-   if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)   // bits → byte
-      png_set_expand_gray_1_2_4_to_8(png_ptr);
-
-   if (png_get_valid(png_ptr, info_ptr,
-      PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
-
-   // update the info_ptr according to the desired transformations.
-   png_read_update_info(png_ptr, info_ptr);
-
-   png_read_image(png_ptr, row_pointers);
-
-   png_read_end(png_ptr, info_ptr);
-
-Shape shape_Z(/* BW, BW⍺, RGB, or RGB⍺ */ planes, height, width);
-Value_P Z(shape_Z, LOC);
-
-   // due to png_set_expand_gray_1_2_4_to_8() above, packed 1-bit, 2-bit,
-   // and 4-bit pixels were expanded to one byte per color value. The only
-   // question remaining is therefore whether the colors are 8-bit or 16-bit.
-   //
-   // Like GTK, GNU APL uses a normalized double (0.0-1.0) for colors
-
-   loop(rgb, planes)      // loop over 1, 2, 3, or 4 planes
-   loop(y, height)        // loop over scanlines
-       {
-         const UTF8 * scanline = row_pointers[y];
-         loop(x, width)   // loop over the pixels on the scanlines
-             {
-               const UTF8 * pixel = scanline + x*bytes_per_pixel;
-               const UTF8 * color = pixel + rgb*bytes_per_color;
-               if (bit_depth == 16)
-                  {
-                    const uint16_t value = color[0] << 8 | color[1];
-                    Z->next_ravel_Float(int(value) / 65535.0);
-                  }
-               else if (bit_depth == 8)
-                  {
-                    Z->next_ravel_Float(int(color[0]) / 255.0);
-                  }
-               else if (bit_depth == 4)
-                  {
-                    Z->next_ravel_Float(int(color[0]) / 15.0);
-                  }
-               else if (bit_depth == 2)
-                  {
-                    Z->next_ravel_Float(int(color[0]) / 3.0);
-                  }
-               else if (bit_depth == 1)
-                  {
-                    Z->next_ravel_Float(color[0] ? 1.0 : 0.0);
-                  }
-               else
-                  {
-                    MORE_ERROR() << "Illegal bitdepth " << bit_depth
-                                 << " in ⎕PNG B (file: " << filename1 << ")";
-                    DOMAIN_ERROR;
-                  }
-             }
-       }
-
-   png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-
-   loop(y, height)   row_pointers[y] = 0;   // just in case
-   delete [] row_pointers;
-   delete [] RGB;
-
-   Z->check_value(LOC);
-   return Z;
-
-#else   // not PNG_LIBS
-   return Value_P();
-#endif  // (not) PNG_LIBS
-}
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 #if PNG_LIBS
 Token
-Quad_PNG::eval_B(Value_P B) const
+Quad_PNG::eval_AB(cValue_R A, cValue_R B) const
 {
-   if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
+   // write pixels B to file A. A is either
+   //
+   // 1. a string for the filename, or
+   // 2. a 2-element vector (nested filename, bit-depth)
+   //
+   if (A.is_apl_char_vector())   // case 1: write PNG-file A depth 8
+      {
+        if (B.get_rank() != 3)   RANK_ERROR;
+
+        UCS_string filename_ucs(A);
+        UTF8_string filename_utf8(filename_ucs);
+        write_PNG_file(filename_utf8.c_str(), 8, B);
+
+        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+      }
+   else if (A.element_count() == 2)   // case 2: PNG file A[1] depth A[2]
+      {
+        // case 1 above checks this before calling write_PNG_file(); this
+        // branch didn't -- write_PNG_file() reads B's shape items 0/1/2
+        // assuming rank 3, guarded only by Assert() (a no-op at
+        // ASSERT_LEVEL 0), so a wrong-rank B read garbage height/width
+        // and could walk off B's actual ravel.
+        if (B.get_rank() != 3)   RANK_ERROR;
+
+        const APL_Integer A1 = A.get_int_value(1);   // bit depth
+        if (const Value_P A0 = A.try_pointer_value(0))   // probably file name
+           {
+             UCS_string filename_ucs(*A0);
+             UTF8_string filename_utf8(filename_ucs);
+             write_PNG_file(filename_utf8.c_str(), A1, B);
+
+        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
+           }
+        else
+           {
+             MORE_ERROR() << "A1 is not a string (filename) in A1 A2 ⎕PNG B";
+             DOMAIN_ERROR;
+           }
+      }
+   else   // A is not a file name
+      {
+        MORE_ERROR() << "A is not a filename in A ⎕PNG B";
+        LENGTH_ERROR;
+      }
+}
+#else   // not PNG_LIBS
+
+Token
+Quad_PNG::eval_AB(cValue_R A, cValue_R B) const
+{
+  // complain about missing libraries. Same as monadic eval_B().
+  return eval_B(B);
+}
+#endif   // PNG_LIBS
+//────────────────────────────────────────────────────────────────────────────
+#if PNG_LIBS
+Token
+Quad_PNG::eval_B(cValue_R B) const
+{
+   if (B.get_rank() == 0 && !B.is_pointer_cell(0))
       {
         // scalar (integer) argument: window control and logging
         //
-        const APL_Integer B0 = B->get_cscalar().get_int_value();
+        Cell cache;
+        const APL_Integer B0 = B.get_cscalar(cache).get_int_value();
         Value_P Z = window_control(B0);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (B->is_apl_char_vector())   // read PNG file
+   if (B.is_apl_char_vector())   // read PNG file
       {
-        const UCS_string filename_ucs(*B);
+        const UCS_string filename_ucs(B);
         UTF8_string filename_utf(filename_ucs);
         Value_P Z = read_PNG_file(filename_utf);
         return Token(TOK_APL_VALUE1, Z);
       }
 
 #if PNG_GTK
-   if (B->get_rank() == 3)   // display B (an RGB or RGBA matrix)
+   if (B.get_rank() == 3)   // display B (an RGB or RGBA matrix)
       {
-        const APL_Integer handle = display_PNG_main(B);
+        const APL_Integer handle = display_PNG_main(CLONE(&B, LOC));
 
         sem_wait(PNG_window_sema);   // blocks until window shown
         sem_post(PNG_window_sema);   // restore for next sem_wait()
@@ -370,7 +254,7 @@ Quad_PNG::eval_B(Value_P B) const
 }
 #else   // not PNG_LIBS
 Token
-Quad_PNG::eval_B(Value_P B) const
+Quad_PNG::eval_B(cValue_R B) const
 {
 const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
 const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
@@ -379,7 +263,7 @@ const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
    return missing_files("⎕PNG", libs, hdrs, pkgs);
 }
 #endif   // PNG_LIBS
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_PNG::window_control(APL_Integer B0) const
 {
@@ -479,7 +363,239 @@ Quad_PNG::window_control(APL_Integer B0) const
 
    return IntScalar(0, LOC);
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// callback for libpng warnings
+void
+PNG_warn(png_structp png_ptr, png_const_charp reason)
+{
+   CERR << "*** libpng warning: " << reason << " ***" << endl;
+}
+//────────────────────────────────────────────────────────────────────────────
+/// callback for libpng errors
+void
+PNG_err(png_structp png_ptr, png_const_charp reason)
+{
+   MORE_ERROR() << "libpng error: " << reason;
+   DOMAIN_ERROR;
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Quad_PNG::read_PNG_file(const UTF8_string & filename1)
+{
+#if PNG_LIBS
+
+   // filename1 is the file to be read. It may or may not have a .png extension
+   // If opening filename1 fails we try filename2 = filename1.png
+   //
+int errno1 = 0;
+FileReader reader(filename1.c_str());
+   if (!reader && !filename1.ends_with(".png"))
+      {
+         // .png file could not be openend and the filename did not have
+         // the .png extension. Try again with .png appended,
+         // 
+         errno1 = errno;              // remember why filename1 has failed
+         UTF8_string filename2(filename1);
+         filename2 << ".png";
+         new (&reader) FileReader(filename2.c_str());
+      }
+
+   if (!reader)   // neither filename nor filename.png couldbe opened
+      {
+        MORE_ERROR() << "Cannot open file '" << filename1.c_str()
+                     << "' in ⎕PNG B: " << strerror(errno1);
+        DOMAIN_ERROR;
+      }
+
+png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+                                             0, PNG_err, PNG_warn);
+   if (!png_ptr)   WS_FULL;
+
+png_infop info_ptr = png_create_info_struct(png_ptr);
+   if (!info_ptr)   WS_FULL;
+
+   // PNG_err() (registered above) throws DOMAIN_ERROR on any libpng
+   // decode error, e.g. a truncated/corrupt IDAT after a valid IHDR.
+   // Without a try/catch here, that throw unwinds straight past the
+   // png_destroy_read_struct()/delete[] cleanup at the end of this
+   // function, leaking png_ptr/info_ptr and (once allocated below)
+   // RGB/row_pointers on every malformed-input decode error -- a
+   // mild but freely repeatable DoS (⎕PNG on the same bad file again
+   // and again). Catch, clean up, then rethrow so the DOMAIN_ERROR
+   // itself is still reported to the caller unchanged.
+   //
+UTF8 * RGB = 0;
+UTF8 ** row_pointers = 0;
+   try
+      {
+    png_init_io(png_ptr, reader.get_FILE());
+
+   // We use the low-level interface for a better control of the input
+   // transformations...
+
+   // 1. read the image parameters.
+   //
+   png_read_info(png_ptr, info_ptr);
+
+   // primary image parameters (from the PNG file read)
+   //
+const int width = png_get_image_width(png_ptr, info_ptr);
+const int height = png_get_image_height(png_ptr, info_ptr);
+const int color_type = png_get_color_type(png_ptr, info_ptr);
+const int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+
+const bool alpha_used   = color_type & 0x04;
+const bool color_used   = color_type & 0x02;
+const bool palette_used = color_type & 0x01;
+
+   if (verbosity & SHOW_DATA)
+      {
+        CERR << "width:         " << width  << " pixels"           << endl
+             << "height:        " << height << " pixels"           << endl
+             << "color_type:    " << color_type                    << endl
+             << " ├─── alpha:   " << (alpha_used ? "yes" : "no")   << endl
+             << " ├─── color:   " << (color_used ? "yes" : "no")   << endl
+             << " └─── palette: " << (palette_used ? "yes" : "no") << endl
+             << "bit_depth:     " << bit_depth << " bits/color"    << endl;
+      }
+
+   // 2. set the desired input transformations. This must happen BEFORE
+   //    png_read_update_info() below, and the pixel buffer must not be
+   //    sized until AFTER it: png_set_tRNS_to_alpha() (for a PNG that
+   //    carries a tRNS chunk) adds an alpha channel that the original,
+   //    pre-transform color_type never accounted for. Deriving `planes`
+   //    from color_type and sizing the buffer/row-stride from that stale
+   //    count (as this code used to) under-allocates whenever tRNS is
+   //    present -- for 16-bit GRAY/RGB specifically, libpng then writes
+   //    the true (wider, alpha-added) decoded image into a buffer sized
+   //    for the narrower one: a heap overflow. (8-bit and palette cases
+   //    happened to still fit only because of the unconditional "*2"
+   //    over-allocation below, which masked the same underlying bug.)
+   //
+   if (color_type == PNG_COLOR_TYPE_PALETTE)   // color palettes → RGB
+      png_set_palette_to_rgb(png_ptr);
+
+   if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)   // bits → byte
+      png_set_expand_gray_1_2_4_to_8(png_ptr);
+
+   if (png_get_valid(png_ptr, info_ptr,
+      PNG_INFO_tRNS)) png_set_tRNS_to_alpha(png_ptr);
+
+   // update the info_ptr according to the desired transformations.
+   png_read_update_info(png_ptr, info_ptr);
+
+   // the TRUE post-transform channel count -- querying png_get_channels()
+   // after png_read_update_info() is libpng's own documented way to learn
+   // the format that png_read_image() will actually produce, rather than
+   // re-deriving it from the pre-transform color_type above.
+   //
+const int planes = png_get_channels(png_ptr, info_ptr);
+
+   // secondary image parameters (derived from the primary parameters)
+   //
+const int bytes_per_color = (bit_depth + 7) / 8;       // 1 or 2 bytes
+
+const int bytes_per_pixel = planes * bytes_per_color;
+
+   // 3. allocate the pixel memory and scanline pointers...
+   //
+if ((size_t)planes * height > SIZE_MAX / 2 / (unsigned)width)   WS_FULL;
+   // The guard above is computed in size_t, but width/height/planes are
+   // all plain int, so "planes*height*width*2" here used to multiply
+   // entirely in 32-bit int -- silently wrapping (UB) for a large,
+   // highly compressible image (e.g. ~26000x26000 RGB) that passes the
+   // size_t guard but overflows INT_MAX, under-allocating RGB while
+   // png_read_image() still writes the full (large) decoded image into
+   // it. Force the same size_t arithmetic used by the guard.
+const size_t rgb_bytes = size_t(planes) * height * width * 2;
+   RGB = new UTF8[rgb_bytes];
+   row_pointers = new UTF8 *[height];
+
+UTF8 * scanline = RGB;
+   loop(y, height)
+       {
+         row_pointers[y] = scanline;
+         // size_t(planes)*width*2, not planes*width*2: the latter is
+         // 32-bit int arithmetic (planes/width are int) and overflows
+         // (UB) for a row stride > INT_MAX even though rgb_bytes above
+         // was already widened to size_t -- row_pointers[y] would then
+         // point far outside RGB, into which png_read_image() writes.
+         scanline += size_t(planes) * width * 2;
+       }
+
+   png_read_image(png_ptr, row_pointers);
+
+   png_read_end(png_ptr, info_ptr);
+
+Shape shape_Z(/* BW, BW⍺, RGB, or RGB⍺ */ planes, height, width);
+Value_P Z(shape_Z, LOC);
+
+   // due to png_set_expand_gray_1_2_4_to_8() above, packed 1-bit, 2-bit,
+   // and 4-bit pixels were expanded to one byte per color value. The only
+   // question remaining is therefore whether the colors are 8-bit or 16-bit.
+   //
+   // Like GTK, GNU APL uses a normalized double (0.0-1.0) for colors
+
+   loop(rgb, planes)      // loop over 1, 2, 3, or 4 planes
+   loop(y, height)        // loop over scanlines
+       {
+         const UTF8 * scanline = row_pointers[y];
+         loop(x, width)   // loop over the pixels on the scanlines
+             {
+               const UTF8 * pixel = scanline + x*bytes_per_pixel;
+               const UTF8 * color = pixel + rgb*bytes_per_color;
+               if (bit_depth == 16)
+                  {
+                    const uint16_t value = color[0] << 8 | color[1];
+                    Z->next_ravel_Float(int(value) / 65535.0);
+                  }
+               else if (bit_depth == 8)
+                  {
+                    Z->next_ravel_Float(int(color[0]) / 255.0);
+                  }
+               else if (bit_depth == 4)
+                  {
+                    Z->next_ravel_Float(int(color[0]) / 15.0);
+                  }
+               else if (bit_depth == 2)
+                  {
+                    Z->next_ravel_Float(int(color[0]) / 3.0);
+                  }
+               else if (bit_depth == 1)
+                  {
+                    Z->next_ravel_Float(color[0] ? 1.0 : 0.0);
+                  }
+               else
+                  {
+                    MORE_ERROR() << "Illegal bitdepth " << bit_depth
+                                 << " in ⎕PNG B (file: " << filename1 << ")";
+                    DOMAIN_ERROR;
+                  }
+             }
+       }
+
+   png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+
+   loop(y, height)   row_pointers[y] = 0;   // just in case
+   delete [] row_pointers;
+   delete [] RGB;
+
+   Z->check_value(LOC);
+   return Z;
+      }
+   catch (...)
+      {
+        png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+        delete [] row_pointers;
+        delete [] RGB;
+        throw;
+      }
+
+#else   // not PNG_LIBS
+   return Value_P();
+#endif  // (not) PNG_LIBS
+}
+//────────────────────────────────────────────────────────────────────────────
 bool
 Quad_PNG::valid_type_and_bits(int color_type, int bit_depth)
 {
@@ -493,7 +609,13 @@ enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
    switch(color_type)
       {
         case PNG_COLOR_TYPE_GRAY:              // type 0: 1, 2, 4, 8, or 16
-             return valid & 1 << bit_depth;
+             // bit_depth comes straight from the user (A.get_int_value(1))
+             // and can be negative or arbitrarily large; 1 << bit_depth is
+             // UB outside [0, 31] and, on x86, wraps the shift count into
+             // range so e.g. 33 and 40 were wrongly accepted as valid
+             // (Blake McBride, Bugs12.md #10). Range-check before shifting.
+             //
+             return bit_depth >= 1 && bit_depth <= 16 && (valid & 1 << bit_depth);
 
         case PNG_COLOR_TYPE_RGB:                // type 2: 8 or 16
         case PNG_COLOR_TYPE_GRAY_ALPHA:         // type 4: 8 or 16
@@ -506,10 +628,10 @@ enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
 
    return false;
 }
-//---------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Quad_PNG::write_PNG_file(const char * filename, int bit_depth,
-                         const Value & B)
+                         const cValue & B)
 {
 #if PNG_LIBS
 
@@ -523,8 +645,8 @@ int color_type;
    else if (planes == 4)   color_type = PNG_COLOR_TYPE_RGB_ALPHA;
    else
       {
-        MORE_ERROR() << "Bad number of planes (" << planes
-                     << ") in B of A ⎕PNG B";
+        MORE_ERROR() << "A ⎕PNG B: bad number of planes (" << planes
+                     << ") in B.";
         DOMAIN_ERROR;
       }
 
@@ -533,17 +655,17 @@ const bool color_used   = color_type & PNG_COLOR_MASK_COLOR;     // 0x02
 const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
    if (!valid_type_and_bits(color_type, bit_depth))
       {
-        MORE_ERROR() << "Bad/unsupported combination of color type "
+        MORE_ERROR() << "A ⎕PNG B: bad/unsupported combination of color type "
                      << color_type << " and bit depth " << bit_depth
-                     << " in A ⎕PNG B";
+                     << ".";
         DOMAIN_ERROR;
       }
 
-FILE * out = fopen(filename, "wb");
-   if (out == 0)
+FileWriter writer(filename);
+   if (!writer)
        {
-          MORE_ERROR() << "Cannot open PNG output file " << filename
-                       << " in A ⎕PNG B: " << strerror(errno);
+          MORE_ERROR() << "A ⎕PNG B: cannot open PNG output file " << filename
+                       << ": " << strerror(errno);
           DOMAIN_ERROR;
        }
 
@@ -554,7 +676,7 @@ png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 png_infop info_ptr = png_create_info_struct(png_ptr);
     if (!info_ptr)   WS_FULL;
 
-   png_init_io(png_ptr, out);
+   png_init_io(png_ptr, writer.get_FILE());
 
    // add a Software keyword indicating GNU APL's ⎕PNG as image producer
    //
@@ -580,9 +702,16 @@ png_text text_ptr[1];
              << "planes:        " << planes                        << endl;
       }
 
+if (B.element_count() > (ShapeItem)(SIZE_MAX / 2))   WS_FULL;
 UTF8 * RGB = new UTF8[2*B.element_count()];
 UTF8 ** row_pointers = new UTF8 *[height];
 
+// the fill loop below can throw (e.g. DOMAIN_ERROR on an out-of-range
+// color component or bad bit_depth); without this try/catch, that
+// leaked png_ptr/info_ptr/RGB/row_pointers -- their only cleanup used to
+// be at the very end of this function, past every possible throw site.
+try
+   {
 UTF8 * scanline = RGB;
    loop(y, height)
        {
@@ -591,7 +720,7 @@ UTF8 * scanline = RGB;
          loop(c, planes)
              {
                const ShapeItem APL_offset = x + (y + c*height)*width;
-               const double val = B.get_cravel(APL_offset).get_real_value();
+               const double val = B.get_real_value(APL_offset);
                if (val < 0.0)
                   {
                     MORE_ERROR() << "negative color component " << val
@@ -646,6 +775,14 @@ UTF8 * scanline = RGB;
                     DOMAIN_ERROR;
                   }
              }
+
+         // sub-byte bit depths (1/2/4) only advance scanline every
+         // 8/bit_depth pixels; if width is not a multiple of that, the
+         // last byte of this row is left half-written and libpng (which
+         // expects exactly ceil(width*bit_depth/8) bytes per row) would
+         // read the next row starting mid-byte, shifting every row after
+         // it. Pad to the next byte boundary before starting the next row.
+         if (bit_depth < 8 && (width % (8 / bit_depth)))   ++scanline;
        }
 
    png_set_IHDR(png_ptr, info_ptr, width, height,
@@ -653,73 +790,32 @@ UTF8 * scanline = RGB;
                 PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
    png_set_rows(png_ptr, info_ptr, row_pointers);
 
+   // png_write_png() (the high-level, "do everything" call) already
+   // writes the image data and the end marker internally when row
+   // pointers were set via png_set_rows() above -- the extra
+   // png_write_image()/png_write_end() calls that used to follow it
+   // appended a second IDAT chunk and a second IEND chunk after the
+   // file's real end, corrupting the output. Keep only the one call.
    png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_IDENTITY, 0);
-   png_write_image(png_ptr, row_pointers);
-   png_write_end(png_ptr, info_ptr);
+   }
+catch (...)
+   {
+     loop(y, height)   row_pointers[y] = 0;   // just in case
+     delete [] row_pointers;
+     delete [] RGB;
+     png_destroy_write_struct(&png_ptr, &info_ptr);
+     throw;
+   }
 
    loop(y, height)   row_pointers[y] = 0;   // just in case
    delete [] row_pointers;
    delete [] RGB;
 
    png_destroy_write_struct(&png_ptr, &info_ptr);
-   fclose(out);
 
 #endif   // PNG_LIBS
 }
-//-----------------------------------------------------------------------------
-#if PNG_LIBS
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const
-{
-   // write pixels B to file A. A is either
-   //
-   // 1. a string for the filename, or
-   // 2. a 2-element vector (nested filename, bit-depth)
-   //
-   if (A->is_apl_char_vector())   // case 1: write PNG-file A depth 8
-      {
-        if (B->get_rank() != 3)   RANK_ERROR;
-
-        UCS_string filename_ucs(*A);
-        UTF8_string filename_utf8(filename_ucs);
-        write_PNG_file(filename_utf8.c_str(), 8, *B);
-
-        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
-      }
-   else if (A->element_count() == 2)   // case 2: PNG file A[1] depth A[2]
-      {
-        const APL_Integer A1 = A->get_cravel(1).get_int_value();   // bit depth
-        if (A->get_cravel(0).is_pointer_cell())   // probably file name
-           {
-             const Value_P A0 = A->get_cravel(0).get_pointer_value();
-             UCS_string filename_ucs(*A0);
-             UTF8_string filename_utf8(filename_ucs);
-             write_PNG_file(filename_utf8.c_str(), A1, *B);
-
-        return Token(TOK_APL_VALUE1, Idx0_0(LOC));
-           }
-        else
-           {
-             MORE_ERROR() << "A1 is not a string (filename) in A1 A2 ⎕PNG B";
-             DOMAIN_ERROR;
-           }
-      }
-   else   // A is not a file name
-      {
-        MORE_ERROR() << "A is not a filename in A ⎕PNG B";
-        LENGTH_ERROR;
-      }
-}
-#else   // not PNG_LIBS
-
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const
-{
-  // complain about missing libraries. Same as monadic eval_B().
-  return eval_B(B);
-}
-#endif   // PNG_LIBS
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished. Executed in the thread named apl/⎕PNG.
 #if PNG_GTK
@@ -731,7 +827,7 @@ gtk_main_wrapper(void * w_props)
    if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// callback when the plot window is destroyed
 extern "C" gboolean
 PNG_plot_destroyed(GtkWidget * top_level, gpointer user_data);
@@ -761,7 +857,7 @@ const PNG_context * pctx = reinterpret_cast<PNG_context *>(user_data);
 
   return TRUE;   // event handled by this handler
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// convert APL pixel data to a Gtk/Cairo surface
 static cairo_surface_t *
 paint_data(const PNG_context & pctx)
@@ -772,7 +868,7 @@ paint_data(const PNG_context & pctx)
       bytes for each pixel with one byte per color component (or alpha).
     */
 
-const Value * B = pctx.get_APL_value().get();
+const cValue * B = pctx.get_APL_value().get();
 const ShapeItem width  = B->get_shape_item(2);
 const ShapeItem height = B->get_shape_item(1);
 const bool has_colors  = B->get_shape_item(0) > 2;   // RGB or RGBA
@@ -799,20 +895,20 @@ const int stride = cairo_image_surface_get_stride(ret);   // = row size (bytes)
                const ShapeItem xy3 = xy2 + plane;   // ⍺
 
                // the GNU APL color values are 0.0 - 1.0
-               double red = B->get_cravel(xy0).get_real_value();
+               double red = B->get_real_value(xy0);
                double green = red;
                double blue  = red;
                double alpha = 1.0;
 
                if (has_colors)   // RGB
                   {
-                    green = B->get_cravel(xy1).get_real_value();
-                    blue  = B->get_cravel(xy2).get_real_value();
-                    if (has_alpha) alpha = B->get_cravel(xy3).get_real_value();
+                    green = B->get_real_value(xy1);
+                    blue  = B->get_real_value(xy2);
+                    if (has_alpha) alpha = B->get_real_value(xy3);
                   }
                else              // grey
                   {
-                    if (has_alpha) alpha = B->get_cravel(xy1).get_real_value();
+                    if (has_alpha) alpha = B->get_real_value(xy1);
                   }
 
                /* row[x] is a pixel which, according to enum cairo_format_t:
@@ -833,7 +929,7 @@ const int stride = cairo_image_surface_get_stride(ret);   // = row size (bytes)
    cairo_surface_mark_dirty(ret);   // end of direct access (commit caches)
    return ret;
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Gtk callback to draw the ⎕PNG window
 extern "C" gboolean
 PNG_draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data);
@@ -863,7 +959,7 @@ cairo_surface_t * source_surfrace = paint_data(*pctx);
    if (verbosity & SHOW_EVENTS)   CERR << "PNG_draw_callback() done." << endl;
    return TRUE;   // event handled by this handler
 }
-//-----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #include "Focus.icc"
 
@@ -945,7 +1041,7 @@ PNG_context * pctx = new PNG_context(B);
    sem_post(Quad_PNG::PNG_window_sema);   // unleash the APL interpreter
    return pctx->handle;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 
 #endif   // PNG_GTK
 

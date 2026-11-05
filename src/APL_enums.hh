@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,20 +28,28 @@
 #ifndef __APL_ENUMS_HH_DEFINED__
 #define __APL_ENUMS_HH_DEFINED__
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// supposedly the longest possible filename
 enum
 {
   APL_PATH_MAX = 4096
 };
-//----------------------------------------------------------------------------
+#ifndef cfg_MAX_DEPTH_WANTED
+#  define cfg_MAX_DEPTH_WANTED 254
+#endif
+//────────────────────────────────────────────────────────────────────────────
 enum
 {
-   MAX_RANK = cfg_MAX_RANK_WANTED
+   MAX_RANK  = cfg_MAX_RANK_WANTED,
+   MAX_DEPTH = cfg_MAX_DEPTH_WANTED
 };
-//----------------------------------------------------------------------------
-/// Auxiliary processor numbers
-enum AP_num
+//────────────────────────────────────────────────────────────────────────────
+/// Auxiliary processor numbers. Fixed underlying type: AP_num holds
+/// arbitrary --id values, not just the enumerators below, and an
+/// unscoped enum with no fixed underlying type otherwise only has
+/// [dcl.enum]/8's smallest-bit-field range as its valid value set --
+/// UBSan flags every out-of-that-range load (Blake McBride, Bugs14 #11).
+enum AP_num : int
 {
   NO_AP          = -1,     ///< invalid AP
   AP_NULL        = 0,      ///< invalid AP for structs using memset(0)
@@ -49,7 +57,7 @@ enum AP_num
   AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
   AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the state of an assignment
 enum Assign_state
 {
@@ -58,7 +66,7 @@ enum Assign_state
    ASS_var_seen   = 2,   ///< var and ← seen
    ASS_unknown    = 3,   ///< not known (too much effort to figure it)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The bits in an uint32_t
 enum Bitmask
 {
@@ -95,7 +103,7 @@ enum Bitmask
    BIT_30 = 1 << 30,   ///<< dito.
    BIT_31 = 1 << 31    ///<< dito.
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the cause for something
 enum Cause
 {
@@ -103,7 +111,7 @@ enum Cause
    CAUSE_SHUTDOWN = 1,
    CAUSE_ERASED   = 2,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the CDR data types
 enum CDR_type
 {
@@ -116,7 +124,7 @@ enum CDR_type
    CDR_PROG64  = 6,   ///< 2*32 bit progression vector
    CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// The possible cell types (in the ravel of an APL value)
 enum CellType
 {
@@ -149,7 +157,7 @@ enum CellType
    CTS_U64    = 0x1000000,   ///< unsigned           64-bit integer
    CTS_MASK   = 0x1FFF000,   ///< 
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// flags of a line to be printed. These flags extend CellType
 enum Col_flags
 {
@@ -157,7 +165,7 @@ enum Col_flags
    real_has_E    = 0x0200,   // real part scaled (exponential format)
    imag_has_E    = 0x0400,   // imag part scaled (exponential format)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the result of a comparison cell_1.compare(cell_2)
 enum Comp_result
 {
@@ -165,7 +173,7 @@ enum Comp_result
   COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
   COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of cores/tasks to be used
 enum CoreCount
 {
@@ -173,7 +181,7 @@ enum CoreCount
   CCNT_0       = 0,    ///<< no core
   CCNT_1       = 1,    ///< one core ...
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the cores/tasks to be used
 enum CoreNumber
 {
@@ -181,22 +189,22 @@ enum CoreNumber
   CNUM_MASTER  = 0,   ///< the interpreter core
   CNUM_WORKER1 = 1,   ///< the first worker core ...
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the CPUs reported by the OS
 enum CPU_Number
 {
    CPU_0 = 0   ///< the first (only) CPU
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of CPUs available
 enum CPU_count
 {
    CPU_CNT_1 = 1   ///< one CPU
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the line number of an APL function line (0 being the line to
 /// return from the function).
-enum Function_Line
+enum Function_Line : int
 {
    Function_Invalid = -3,   // invalid function line (in →N optimization)
    Function_Retry   = -2,   // →'' in immediate execution
@@ -207,6 +215,7 @@ enum Function_Line
 };
 
 /// Function_Line ++ (pre increment)
+/// @param fl  the function line to increment
 inline Function_Line operator ++(Function_Line & fl)
 {
    fl = Function_Line(fl + 1);
@@ -214,24 +223,40 @@ inline Function_Line operator ++(Function_Line & fl)
 }
 
 /// Function_Line ++ (post increment)
+/// @param fl  the function line to increment
+/// @param     unused post-increment distinguisher
 inline Function_Line operator ++(Function_Line & fl, int)
 {
 const Function_Line before_increment = fl;
    fl = Function_Line(fl + 1);
    return before_increment;
 }
-//----------------------------------------------------------------------------
-/// an offset into the body of a user-defined function. If we consider the APL
-/// interpreter as a high-level machine that executes token in user defined
-/// functions then this offset is the "program counter" of the high-level
-/// machine.
-enum Function_PC
+//────────────────────────────────────────────────────────────────────────────
+/// a position of a token in a token string before it is executed: in
+/// particular Token_loc::pc, i.e. the position of a token in the token string
+/// that the tokenizer has produced for its line, and the positions used by
+/// the tokenizer, the parser, and the optimizations.
+enum Function_PC : int
 {
    Function_PC_0       =  0,   ///< the first token in a function
    Function_PC_done    = -1,   ///< goto 0 (leave function)
    Function_PC_invalid = -1    ///< dito
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// a position in the body of an Executable as executed by the prefix parser
+/// (Prefix.cc), i.e. the "program counter" of the high-level machine that
+/// executes the body. The body is optimized and stored statement by
+/// statement in reverse order, so that a Prefix_PC is something entirely
+/// different from a Function_PC (in particular a Token_loc::pc). It is an
+/// enum class so that the compiler rejects any mixup of the two.
+enum class Prefix_PC : int {};
+
+/// the first token in the body
+constexpr Prefix_PC Prefix_PC_0 = Prefix_PC(0);
+
+/// no position (or: leave the function)
+constexpr Prefix_PC Prefix_PC_invalid = Prefix_PC(-1);
+//────────────────────────────────────────────────────────────────────────────
 /// signature of a defined function
 enum Fun_signature
 {
@@ -252,6 +277,7 @@ enum Fun_signature
    SIG_OP1             = SIG_LO  | SIG_FUN,   ///< monadic operator
    SIG_OP1_X           = SIG_OP1 | SIG_X,     ///< monadic operator with axis
    SIG_OP2             = SIG_OP1 | SIG_RO,    ///< dyadic operator
+   SIG_OP2_X           = SIG_OP2 | SIG_X,     ///< dyadic operator with axis
    SIG_LORO            = SIG_LO  | SIG_RO,    ///< monadic or dyadic operator
 
    // argument variants
@@ -275,12 +301,14 @@ enum Fun_signature
    SIG_LO_OP1_B        = SIG_MON | SIG_OP1,             ///< dito
    SIG_LO_OP1_X_B      = SIG_MON | SIG_OP1_X,           ///< dito
    SIG_LO_OP2_RO_B     = SIG_MON | SIG_OP2,             ///< dito
+   SIG_LO_OP2_X_RO_B   = SIG_MON | SIG_OP2_X,           ///< dito
 
    SIG_Z_F1_B          = SIG_Z   | SIG_F1_B,            ///< dito
    SIG_Z_F1_X_B        = SIG_Z   | SIG_F1_X_B,          ///< dito
    SIG_Z_LO_OP1_B      = SIG_Z   | SIG_LO_OP1_B,        ///< dito
    SIG_Z_LO_OP1_X_B    = SIG_Z   | SIG_LO_OP1_X_B,      ///< dito
    SIG_Z_LO_OP2_RO_B   = SIG_Z   | SIG_LO_OP2_RO_B,     ///< dito
+   SIG_Z_LO_OP2_X_RO_B = SIG_Z   | SIG_LO_OP2_X_RO_B,   ///< dito
 
    // dyadic
    //
@@ -289,20 +317,47 @@ enum Fun_signature
    SIG_A_LO_OP1_B      = SIG_DYA | SIG_OP1,             ///< dito
    SIG_A_LO_OP1_X_B    = SIG_DYA | SIG_OP1_X,           ///< dito
    SIG_A_LO_OP2_RO_B   = SIG_DYA | SIG_OP2,             ///< dito
+   SIG_A_LO_OP2_X_RO_B = SIG_DYA | SIG_OP2_X,           ///< dito
 
    SIG_Z_A_F2_B        = SIG_Z   | SIG_A_F2_B,          ///< dito
    SIG_Z_A_F2_X_B      = SIG_Z   | SIG_A_F2_X_B,        ///< dito
    SIG_Z_A_LO_OP1_B    = SIG_Z   | SIG_A_LO_OP1_B,      ///< dito
    SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
    SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
+   SIG_Z_A_LO_OP2_X_RO_B = SIG_Z | SIG_A_LO_OP2_X_RO_B, ///< dito
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+/// which valence(s) of a function genuinely select (or overtake, as ↑
+/// does) item(s) of the right argument -- i.e. propagate/produce lvalues
+/// for a selective specification (f1 f2 ... fn VAR)←B, as opposed to
+/// merely computing a new value from B's content. See
+/// Function::get_selectivity(). Every defined function, and every
+/// value-computing or non-selecting primitive (scalar functions, dyadic
+/// , (catenate), dyadic ∊ (membership), monadic ⍴ (shape-of), ...)
+/// returns SEL_NONE by not overriding it.
+///
+/// Deliberately independent of the APL2 LRM's own Figure 6 selective-
+/// specification table, which is neither necessary nor sufficient here:
+/// it omits monadic ⊂ (Enclose) and monadic ⊃ (Disclose), both of which
+/// are genuinely, unambiguously selective in this implementation, while
+/// conversely listing plain primitive scalar functions under "each"
+/// without regard to whether a *specific* scalar function actually
+/// selects anything (none do).
+enum Fun_selectivity
+{
+   SEL_NONE   = 0,      ///< not allowed in a selective specification
+   SEL_MON    = 0x01,   ///< fun B       is allowed in selective specificatiom
+   SEL_MON_X  = 0x02,   ///< fun[X] B    is allowed in selective specificatiom
+   SEL_DYA    = 0x04,   ///< A fun B     is allowed in selective specificatiom
+   SEL_DYA_X  = 0x08,   ///< A fun[X] B  is allowed in selective specificatiom
+};
+//────────────────────────────────────────────────────────────────────────────
 /// (unnamed) lambda number
 enum Lambda_number
 {
    LAMBDA_NUM_0 = 0   // first (or named) lambda
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ///  What to list, used by )SYMBOLS, )VARS, and )FUNS.
 enum ListCategory
 {
@@ -319,14 +374,14 @@ enum ListCategory
                | LIST_OPERS,
   LIST_ALL     = 0xFFFFFFFF   ///< list everything
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 // whether ⎕LX shall be executed at the end of the file
 enum LX_mode
 {
    no_LX = 0,     ///< no
    do_LX = 1      ///< yes
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the status of a function line
 enum Multiline_status
 {
@@ -336,7 +391,7 @@ enum Multiline_status
    MLS_Inside_multi    = 3,   ///< start of a nulti-line string or literal
    MLS_End_of_multi    = 4   ///< end of a nulti-line string or literal 
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 ///  What is being parsed (defined function, immediate execution statements,
 /// or ⍎expr)
 enum ParseMode
@@ -345,19 +400,20 @@ enum ParseMode
    PM_STATEMENT_LIST = 1,   ///< immediate execution
    PM_EXECUTE        = 2,   ///< execute (⍎)
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Different ways of printing APL values.
 enum PrintStyle
 {
    PST_NONE          = 0,                ///< nothing
 
-   // character sets for inner and outer frames
+   // character sets (CS) for inner and outer frames
    //
    PST_CS_NONE       = 0x00000000,       ///< ASCII chars (- | and +)
    PST_CS_ASCII      = 0x00000001,       ///< ASCII chars (- | and +)
    PST_CS_THIN       = 0x00000002,       ///< thin lines
    PST_CS_THICK      = 0x00000003,       ///< thick lines
    PST_CS_DOUBLE     = 0x00000004,       ///< double lines
+   PST_CS_PARENS     = 0x00000005,       ///< (multi-line) parentheses only
    PST_CS_MASK       = 0x0000000F,       ///< mask for line style
 
    PST_CS_INNER      = PST_CS_MASK,      ///< mask for inner line style
@@ -374,8 +430,7 @@ enum PrintStyle
    PST_SIMPLE_MIXED  = 0x00004000,       ///< simple mixed
 
    PST_MATRIX        = 0x00010000,       ///< multi line output
-   PST_INPUT         = 0x00020000,       ///< use '' for chars and () for nested
-   PST_PACKED        = 0x00040000,       ///< 4 byte/char
+   PST_INPUT         = 0x00020000,       ///< APL input format (e.g. ⊂1 2)
    PST_NARS          = 0x00080000,       ///< NARS APL ⎕FMT style
    PST_QUOTE_CHARS   = 0x00100000,       ///< quote chars and strings
    PST_PRETTY        = 0x00200000,       ///< print control characters nicely
@@ -390,11 +445,8 @@ enum PrintStyle
                      | PST_NO_FRACT_0
                      | PST_NO_EXPO_0,
 
-   /// ⎕CR function display
+   /// APL input format (1 ⎕CR, error line 2)
    PR_APL_FUN        = PST_INPUT,
-
-   // ⎕ output
-   PR_Quad           = PST_INPUT,
 
    /// ⍞ output
    PR_QUOTE_Quad     = PST_NONE,
@@ -411,33 +463,33 @@ enum PrintStyle
                      | PST_CS_THICK,
 
    /// 7/8 ⎕CR (boxed with thin line graphics chars)
-   PR_BOXED_GRAPHIC1 = 0
+   PR_BOXED_THIN     = 0
                      | PST_MATRIX
                      | PST_PRETTY
                      | PST_CS_THIN,
 
    /// 9 ⎕CR (boxed with thick line graphics chars in a double box)
-   PR_BOXED_GRAPHIC2 = 0
+   PR_BOXED_DOUBLE   = 0
                      | PST_MATRIX
                      | PST_PRETTY
                      | PST_CS_THICK 
                      | PST_CS_DOUBLE << 4, ///< DISPLAY graphic in double box
 
    /// 29 ⎕CR (boxed with thick line graphics chars, but strings quoted)
-   PR_BOXED_GRAPHIC3 = 0
+   PR_BOXED_QUOTED   = 0
                      | PST_MATRIX
                      | PST_PRETTY
                      | PST_CS_THICK
                      | PST_QUOTE_CHARS,
 
    /// 46 ⎕CR (8 ⎕CR but without frame decorators)
-   PR_BOXED_GRAPHIC4 = 0
+   PR_PLAIN_THIN     = 0
                      | PST_PRETTY
                      | PST_CS_THIN
                      | PST_PLAIN,
 
    /// 47 ⎕CR (4 ⎕CR but without frame decorators)
-   PR_BOXED_GRAPHIC5 = 0
+   PR_PLAIN_THICK    = 0
                      | PST_PRETTY
                      | PST_CS_THICK
                      | PST_PLAIN,
@@ -448,16 +500,16 @@ enum PrintStyle
                      | PST_NARS,
 
    /// 21 ⎕CR (7 ⎕CR in NARS style (shape lengths instead of ↓ and →)
-   PR_NARS1          = 0
-                     | PR_BOXED_GRAPHIC1
+   PR_NARS_THIN      = 0
+                     | PR_BOXED_THIN
                      | PST_NARS,
 
    /// 22 ⎕CR (9 ⎕CR in NARS style (shape lengths instead of ↓ and →)
-   PR_NARS2          = 0
-                     | PR_BOXED_GRAPHIC2
+   PR_NARS_DOUBLE    = 0
+                     | PR_BOXED_DOUBLE
                      | PST_NARS,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {
@@ -471,21 +523,21 @@ enum SI_mode
    SIM_SI_dbg     = SIM_debug,
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 enum Silence
 {
   FULL_BANNER  = 0,
   BRIEF_BANNER = 1,
   NO_BANNER    = 2,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the order of a comparison
 enum Sort_order
 {
    SORT_DESCENDING = 0,   ///< sort descending
    SORT_ASCENDING  = 1,   ///< sort asscending
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// events for a symbol
 enum Symbol_Event
 {
@@ -495,7 +547,7 @@ enum Symbol_Event
    SEV_ASSIGNED = 4,
    SEV_ERASED   = 5,
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 enum TimeScale
 {
   SECONDS_PER_MINUTE  =     60 * 1,                      ///<         60
@@ -506,21 +558,73 @@ enum TimeScale
   SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
   SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
 };
-//----------------------------------------------------------------------------
-/// possible properties of a Value.
-enum ValueFlags
+//────────────────────────────────────────────────────────────────────────────
+/// Ravel packing type stored in VF_Flags::ravel_type (16 bits, full enum value).
+/// RPT_CELLS (= 0) is the default "unpacked" sentinel; packed atoms encode their
+/// ordinal in the low byte and 1<<ordinal in the high byte (like enum NameClass).
+/// Group membership test: (rt & RPT_xxx) != 0.
+enum RavelType
 {
-  VF_NONE     = 0x0000,   ///< no flags
-  VF_complete = 0x0400,   ///< CHECK called
-  VF_marked   = 0x0800,   ///< marked to detect stale
-  VF_temp     = 0x1000,   ///< computed value
-  VF_member   = 0x2000,   ///< used for member access
-  VF_packed   = 0x4000,   ///< packed homogenious ravel
+  // atoms — RPT_CELLS = 0 (unpacked, default); others: low byte = ordinal, high byte = 1<<ordinal
+  RPT_CELLS      = 0,        ///< unpacked Cell ravel (zero = default/not-packed sentinel)
+  RPT_BOOL       = 0x0201,   ///< 1-bit booleans               (ordinal 1)
+  RPT_UNICODE16  = 0x0402,   ///< 16-bit Unicode scalars       (ordinal 2)
+  RPT_UNICODE32  = 0x0803,   ///< 32-bit Unicode scalars       (ordinal 3)
+  RPT_INT64      = 0x1004,   ///< 64-bit signed integers       (ordinal 4)
+  RPT_FLOAT64    = 0x2005,   ///< 64-bit IEEE 754 doubles      (ordinal 5)
+  RPT_COMPLEX    = 0x4006,   ///< 2×64-bit complex (128 bits)  (ordinal 6)
+  RPT_UNKNOWN    = 0x00FF,   ///< construction sentinel
+
+  RPT_case_mask  = 0x00FF,   ///< ordinal field (low byte)
+  RPT_bool_mask  = 0xFF00,   ///< one-hot bits field (high byte)
+
+  // group bitmasks — membership test: (rt & RT_xxx) != 0
+  //
+  RPT_char       = (RPT_UNICODE16 | RPT_UNICODE32) & RPT_bool_mask,
+  RPT_integer    = (RPT_INT64     | RPT_BOOL     ) & RPT_bool_mask,
+  RPT_real       = (RPT_integer   | RPT_FLOAT64  ) & RPT_bool_mask,
+  RPT_numeric    = (RPT_real      | RPT_COMPLEX  ) & RPT_bool_mask,
+  RPT_subword    = (RPT_numeric   | RPT_char     ) & RPT_bool_mask,
+  RPT_packed     = (RPT_char      | RPT_numeric  ) & RPT_bool_mask,
+  RPT_copyable   = (RPT_char      | RPT_numeric  ) & RPT_bool_mask,
 };
 
-extern ostream & print_flags(ostream & out, ValueFlags flags);
 
-//----------------------------------------------------------------------------
+/// C++ bitfield overlay for the flags + value_depth word in ValueBase.
+/// bits 0-4: the five VF_ flags; bits 5-20: ravel_type; bits 21-28: value_depth; bits 29-31: spare.
+struct VF_Flags
+{
+   uint32_t complete    :  1;   ///< check_value() called
+   uint32_t marked      :  1;   ///< marked to detect stale
+   uint32_t temp        :  1;   ///< computed value
+   uint32_t member      :  1;   ///< used for member access
+   uint32_t left_value  :  1;   ///< set by Value::get_cellrefs(): this
+                                ///< value's ravel consists entirely of
+                                ///< LvalCells (a selective-assignment
+                                ///< target) -- test this instead of
+                                ///< inspecting a cell's type/position
+                                ///< (e.g. is_lval_cell(0)), which is only
+                                ///< reliable for a value fresh out of
+                                ///< get_cellrefs() and silently wrong for
+                                ///< one built by other means (e.g. a
+                                ///< nested each's own Z, which mixes
+                                ///< plain and pointer cells positionally).
+   uint32_t ravel_type  : 16;   ///< full RavelType enum value (RPT_CELLS = 0 means unpacked)
+   uint32_t value_depth :  8;   ///< cached ≡ depth: 0..254 = depth, 255 = dirty
+   uint32_t             :  3;   ///< spare
+};
+/// sentinel stored in value_depth when the cached depth is invalid
+enum { VF_DEPTH_DIRTY = 255 };
+static_assert(cfg_MAX_DEPTH_WANTED <= 254,
+              "cfg_MAX_DEPTH_WANTED must be ≤ 254 (255 reserved as dirty sentinel)");
+
+/// @param out    output stream to write to
+/// @param flags  a Value's flags, flat-encoded the same way get_flags()
+///               packs them (bit 0 complete, bit 1 marked, bit 2 temp,
+///               bit 3 member) -- NOT a VF_Flags bitfield.
+extern ostream & print_flags(ostream & out, uint32_t flags);
+
+//────────────────────────────────────────────────────────────────────────────
 /// events for APL values
 enum VH_event
 {
@@ -546,13 +650,13 @@ enum VH_event
   VHE_Stale,       ///< stale value erased
   VHE_Visit,       ///< test point
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// the number of TOK_VOID removed from the body of an \b Executable
 enum VoidCount
 {
   NO_VOID_TOKEN_REMOVED = 0
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __APL_ENUMS_HH_DEFINED__
 

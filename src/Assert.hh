@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@
    That is, higher cfg_ASSERT_LEVEL_WANTED will raise more complaints.
 
    The default ./configure (intended for normal users) will have
-   cfg_ASSERT_LEVEL_WANTED = 0.
+   cfg_ASSERT_LEVEL_WANTED = 1.
 
    The ./configure DEVELOP_WANTED=yes (aka. make develop) will have
    cfg_ASSERT_LEVEL_WANTED = 2.
@@ -50,38 +50,42 @@
 
 #include "Common.hh"
 
-/// the complaint function
+/// the complaint function. NOT noreturn: normally throws (via
+/// throw_apl_error()) rather than returning, but a re-entrant call --
+/// do_Assert() invoked again while already unwinding from an earlier
+/// one, see Assert.cc's Asserting_guard -- returns normally instead of
+/// throwing again, to break what would otherwise be unbounded recursion.
+/// @param cond stringified condition that failed
+/// @param fun  name of the enclosing C++ function
+/// @param file source file name
+/// @param line source line number
 extern void do_Assert(const char * cond, const char * fun,
-                      const char * file, int line)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
+                      const char * file, int line);
 
 #ifndef cfg_ASSERT_LEVEL_WANTED
 
-#error "ASSERT_LEVEL_WANTED not defined"
+#  error "ASSERT_LEVEL_WANTED not defined"
 
 #elif cfg_ASSERT_LEVEL_WANTED == 0
 
 // use 'if (x) {}' below to suppress 'uninitialized' compiler warnings
 
-#define Assert1(x) if (x) {}   // no-op
-#define Assert(x)  if (x) {}   // no-op
+#  define Assert1(x) if (x) {}   // no-op
+#  define Assert(x)  if (x) {}   // no-op
 
 #elif cfg_ASSERT_LEVEL_WANTED == 1
 
-#define Assert1(x) if (x) {}   // no-op
-#define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
+#  define Assert1(x) if (x) {}   // no-op
+#  define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #elif cfg_ASSERT_LEVEL_WANTED == 2
 
-#define Assert1(x) if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
-#define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
+#  define Assert1(x) if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
+#  define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #else
 
-#error "Bad or #undef'ed cfg_ASSERT_LEVEL_WANTED"
+#  error "Bad or #undef'ed cfg_ASSERT_LEVEL_WANTED"
 
 #endif
 
@@ -91,7 +95,7 @@ extern void do_Assert(const char * cond, const char * fun,
 
 /// assertion being fatal if wrong
 #define Assert_fatal(x) if (!(x)) {\
-   cerr << endl << endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
+   get_CERR() << endl << endl << "FATAL error at " << __FILE__ << ":" << __LINE__ \
         << endl;   exit(2); }
 
 #endif // __ASSERT_HH_DEFINED__

@@ -1,18 +1,22 @@
 ⍝ Quad_PP.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       ⎕PP←10
       2÷3
 0.6666666667
 
       ⎕PP←200
       7÷9
-0.77777777777777777
+0.77777777777777779
 
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕CT/⎕PP limits differ (documented)
       ⎕PP
 17
 
 
+      ]FILE_CTL NO_SKIP
       ⎕PP←1
       333
 333
@@ -58,7 +62,7 @@
 1
 
       ⍝ 0 degrees
-1R0
+      1R0
 1
 
       ⍝ 45 degrees
@@ -93,7 +97,51 @@
       1R6.283185307179586
 1
 
-⍝ ==================================
+      ⍝ Regression (Blake McBride, LanguageVariances.md #39, 2026-08-10):
+      ⍝ float display used a hand-rolled digit-extraction algorithm
+      ⍝ (repeated ×/÷ by powers of 10) that accumulated several ULP of
+      ⍝ rounding error for extreme exponents, and a BIG_FLOAT threshold
+      ⍝ (1.7976e308, only 5 significant digits) far below the true
+      ⍝ finite double range, wrongly showing large-but-finite values as
+      ⍝ ∞. Replaced with libc's own (C99/IEEE-754 correctly-rounded) %e
+      ⍝ conversion. Expected values below independently verified against
+      ⍝ Python's exact Decimal arithmetic, not just "what GNU APL used to
+      ⍝ print" -- e.g. 1E200's correctly-rounded 17-significant-digit
+      ⍝ value genuinely is 9.9999999999999997E199, not a "clean" 1E200.
+      ⍝
+      ⎕PP←17
+
+      1E100
+1E100
+
+      1E200
+9.9999999999999997E199
+
+      1E¯100
+1E¯100
+
+      1E¯200
+9.9999999999999998E¯201
+
+      1.7E308
+1.6999999999999999E308
+
+      ]FILE_CTL SKIP_APL2   ⍝ ⎕CT/⎕PP limits differ (documented)
+      1.7976931348623157E308
+1.7976931348623157E308
+
+      ]FILE_CTL NO_SKIP
+      2.2250738585072014E¯308
+2.2250738585072014E¯308
+
+      ⍝ overflow: still a clean error, not ∞ (APL2 has no infinity)
+      ⍝
+      1E400
+Bad number+
+      1E400
+      ^    ^
+
+      ⍝ ==================================
 
       ⎕PP←10
 

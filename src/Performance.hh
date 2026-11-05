@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,25 +32,25 @@
 
 #if defined(cfg_PERFORMANCE_COUNTERS_WANTED)
 
-# define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
-# define PERFORMANCE_END(statistics, counter, len) \
+#  define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
+#  define PERFORMANCE_END(statistics, counter, len) \
    Performance::statistics.add_sample(cycle_counter() - counter, len);
-# define CELL_PERFORMANCE_END(get_stat, counter, subseq)   \
+#  define CELL_PERFORMANCE_END(get_stat, counter, subseq)   \
    { const uint64_t end = cycle_counter();                 \
      CellFunctionStatistics * stat = get_stat;             \
      if (stat)   stat->add_sample(end - counter, subseq); }
 
 #else
 
-# define PERFORMANCE_START(counter)
-# define PERFORMANCE_END(statistics, counter, len)
-# define CELL_PERFORMANCE_END(get_stat, counter, subseq)
+#  define PERFORMANCE_START(counter)
+#  define PERFORMANCE_END(statistics, counter, len)
+#  define CELL_PERFORMANCE_END(get_stat, counter, subseq)
 
 #endif
 
 using namespace std;
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// performance statistics IDs
 enum Pfstat_ID
 {
@@ -88,7 +88,7 @@ enum Pfstat_ID
         PFS_SCALAR_AB_overhead,
         PFS_ALL
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// one statistics for computing the mean and the variance of samples
 class Statistics_record
 {
@@ -97,33 +97,18 @@ public:
    Statistics_record()   { reset(); }
 
    /// constructor
+   /// @param cnt initial sample count
+   /// @param da initial sum of sample values
+   /// @param da2 initial sum of squared sample values
    Statistics_record(uint64_t cnt, uint64_t da, double da2)
    : count(cnt),
      data(da),
      data2(da2)
    {}
 
-   /// reset record to count 0, mean 0, variance 0
-   void reset()
-      {
-        count = 0;
-        data = 0;
-        data2 = 0;
-      }
-
-   /// add one sample
-   void add_sample(uint64_t val)
-      {
-        ++count;
-        data += val;
-        data2 += val*val;
-      }
-
-   /// print count, data, and data2
-   void print(ostream & out);
-
-   /// write count, data, and data2 to file
-   void save_record(ostream & outf);
+   /// return the average
+   uint64_t get_average() const
+      { return average(data, count); }
 
    /// return the number of samples
    uint64_t get_count() const
@@ -133,19 +118,44 @@ public:
    uint64_t get_sum() const
       { return data; }
 
-   /// return the average
-   uint64_t get_average() const
-      { return average(data, count); }
-
    /// return the sum of squares
    double get_sum2() const
       { return data2; }
 
+   /// add one sample
+   /// @param val cycle count of the sample to add
+   void add_sample(uint64_t val)
+      {
+        ++count;
+        data += val;
+        data2 += val*val;
+      }
+
+   /// reset record to count 0, mean 0, variance 0
+   void reset()
+      {
+        count = 0;
+        data = 0;
+        data2 = 0;
+      }
+
+   /// print count, data, and data2
+   /// @param out output stream to write to
+   void print(ostream & out);
+
+   /// write count, data, and data2 to file
+   /// @param outf output file stream to write to
+   void save_record(ostream & outf);
+
    /// the average of \b count items with sum \b sum
+   /// @param sum total of all sample values
+   /// @param count number of samples
    static uint64_t average(uint64_t sum, uint64_t count)
       { return count ? sum/count : 0; }
 
    /// print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)
+   /// @param out output stream to write to
+   /// @param num value to print
    static void print5(ostream & out, uint64_t num);
 
 protected:
@@ -158,12 +168,13 @@ protected:
    /// sum of squares of sample values
    double data2;   // can grow quickly!
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// Base class for different kinds of statistics
 class Statistics
 {
 public:
    /// constructor
+   /// @param _id statistics identifier
    Statistics(Pfstat_ID _id)
   : id(_id)
    {}
@@ -171,43 +182,65 @@ public:
    /// destructor
    virtual ~Statistics();
 
-   /// print statistics
-   virtual void print(ostream & out) = 0;
-
-   /// write statistics to file
-   virtual void save_data(ostream & outf, const char * perf_name) = 0;
-
-   /// reset \b this statistics
-   virtual void reset() = 0;
-
    /// return the statistics for the first passes
    virtual const Statistics_record * get_first_record() const
-      { return 0; }
-
-   /// return the statistics for the subsequent passes
-   virtual const Statistics_record * get_record() const
       { return 0; }
 
    /// return the name of \b this statistics
    const char * get_name() const
       { return get_name(id); }
 
+   /// return the statistics for the subsequent passes
+   virtual const Statistics_record * get_record() const
+      { return 0; }
+
+   /// print statistics
+   /// @param out output stream to write to
+   virtual void print(ostream & out) = 0;
+
+   /// reset \b this statistics
+   virtual void reset() = 0;
+
+   /// write statistics to file
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
+   virtual void save_data(ostream & outf, const char * perf_name) = 0;
+
    /// return the name of the statistics with ID \b id
+   /// @param id statistics identifier to look up
    static const char * get_name(Pfstat_ID id);
 
 protected:
    /// the ID of \b this statistics
    const Pfstat_ID id;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// Performance counters for an entire APL system function
 class FunctionStatistics : public Statistics
 {
 public:
    /// constructor: FunctionStatistics with ID \b id
+   /// @param id statistics identifier for this function
    FunctionStatistics(Pfstat_ID id)
    : Statistics(id)
    { reset(); }
+
+   /// return the (CPU-)cycles statistics
+   const Statistics_record & get_data() const
+      { return vec_cycles; }
+
+   /// return the (CPU-)cycles statistics
+   virtual const Statistics_record * get_record() const
+      { return &vec_cycles; }
+
+   /// add a sample
+   /// @param cycles CPU cycle count for this sample
+   /// @param veclen vector length (number of elements processed)
+   void add_sample(uint64_t cycles, uint64_t veclen)
+      {
+         vec_cycles.add_sample(cycles);
+         vec_lengths.add_sample(veclen);
+       }
 
    /// overloaded Statistics::print()
    virtual void reset()
@@ -220,22 +253,9 @@ public:
    virtual void print(ostream & out);
 
    /// overloaded Statistics::save_data()
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name);
-
-   /// return the (CPU-)cycles statistics
-   virtual const Statistics_record * get_record() const
-      { return &vec_cycles; }
-
-   /// return the (CPU-)cycles statistics
-   const Statistics_record & get_data() const
-      { return vec_cycles; }
-
-   /// add a sample
-   void add_sample(uint64_t cycles, uint64_t veclen)
-      {
-         vec_cycles.add_sample(cycles);
-         vec_lengths.add_sample(veclen);
-       }
 
 protected:
    /// a statistics of vector lengths
@@ -244,12 +264,13 @@ protected:
    /// the cycles executed
    Statistics_record vec_cycles;
 };
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// Performance counters for one cell level function
 class CellFunctionStatistics : public Statistics
 {
 public:
    /// constructor: reset this statistics
+   /// @param _id statistics identifier for this cell function
    CellFunctionStatistics(Pfstat_ID _id)
    : Statistics(_id)
    { reset(); }
@@ -262,6 +283,8 @@ public:
         }
 
    /// add a sample to \b this statistics
+   /// @param val CPU cycle count for this sample
+   /// @param subseq true if this is a subsequent (not first) execution
    void add_sample(uint64_t val, bool subseq)
       {
          if (subseq)   subsequent.add_sample(val);
@@ -269,9 +292,12 @@ public:
        }
 
    /// overloaded Statistics::print()
+   /// @param out output stream to write to
    virtual void print(ostream & out);
 
    /// overloaded Statistics::save_data()
+   /// @param outf output file stream to write to
+   /// @param perf_name name label for this statistics entry
    virtual void save_data(ostream & outf, const char * perf_name);
 
    /// return the record for the first executions
@@ -309,7 +335,7 @@ protected:
    /// statistics for subsequent executions
    Statistics_record subsequent;
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /**
      Performance (cycle-) counters at different levels
  **/
@@ -319,15 +345,21 @@ class Performance
 public:
 
    /// return statistics object for ID \b id
+   /// @param id statistics identifier to look up
    static Statistics * get_statistics(Pfstat_ID id);
 
    /// return statistics type of ID \b id
+   /// @param id statistics identifier to query
    static int get_statistics_type(Pfstat_ID id);
 
    /// print all counters
+   /// @param which selects which counters to print
+   /// @param out output stream to write to
    static void print(Pfstat_ID which, ostream & out);
 
    /// write all counters to .def file
+   /// @param out output stream for human-readable output
+   /// @param out_file output stream for the .def file
    static void save_data(ostream & out, ostream & out_file);
 
    /// reset all counters
@@ -355,7 +387,7 @@ public:
 
 #include "Performance.def"
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 /// The (unique) ID of an optimization
 enum Optimization_ID
 {
@@ -369,19 +401,19 @@ enum Optimization_ID
 /// Individual optimiizations can be enabled/disabled in Performance.def
 enum Do_Optimization
 {
-  FT_ANY = 1,   ///< all ⎕FX time optimizations
-  RT_ANY = 1,   ///< all run time optimizations
+  OFT_ANY = 1,   ///< all ⎕FX time optimizations
+  ORT_ANY = 1,   ///< all run time optimizations
 
 #define optim(enabled, tag, __text)  \
    DO_ ## tag = enabled, DONT_ ## tag = 1 - enabled,
 #include "Performance.def"
 };
-
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 class OptmizationStatistics
 {
 public:
    /// return the value of counter \b opt
+   /// @param opt optimization identifier to query
    static int64_t get(Optimization_ID opt)
       {
         return optimization_counters[opt];
@@ -394,6 +426,7 @@ public:
       }
 
    /// increment counter \b opt
+   /// @param opt optimization identifier whose counter to increment
    static void count(Optimization_ID opt)
       {
         ++optimization_counters[opt];
@@ -403,5 +436,5 @@ protected:
    /// an array of counters (one for each \b Optimization_ID)
    static int64_t optimization_counters[OPT_COUNTER_COUNT];
 };
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 #endif // __PERFORMANCE_HH_DEFINED__

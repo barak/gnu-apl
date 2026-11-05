@@ -1,0 +1,231 @@
+⍝ FORMAT_STRICT.tc
+⍝ ----------------------------------
+
+⍝ details of STRICT_IBM_APL2_FORMATTING yes. Expected output: GNU APL in
+⍝ strict mode. The first group was verified with IBM APL2 (MEGA11); the
+⍝ other groups follow APL2 output seen in FORMAT_FUZZ (to be verified).
+⍝ Run with: apl --id 1010 --strict_IBM_APL2_formatting yes -T ...
+⍝ (make testSTRICT)
+
+
+      ⍝ nested items (also character vectors) in a column with numbers: left-aligned
+      ⍝
+
+      3 1⍴379 (1 2) 123456
+    379 
+ 1 2    
+ 123456 
+
+
+
+
+
+      3 1⍴1554 1E¯5 (⊂'AB')
+    1554 
+ 0.00001 
+  AB     
+
+
+
+
+
+      ⎕PP←5
+
+
+
+
+
+      3 1⍴600 (⊂1 2) 4.2E¯9
+    600 
+  1 2   
+ 4.2E¯9 
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      3 1⍴118.26 24.87 (⊂1 2)
+ 118.26 
+  24.87 
+  1 2   
+
+
+
+
+
+      3 1⍴12345 (1 2) (3 4 5 6 7 8)
+       12345 
+ 1 2         
+ 3 4 5 6 7 8 
+
+
+
+
+
+      3 1⍴1J2 22J33.5 (⊂'BC')
+     1J2 
+ 22J33.5 
+  BC     
+
+
+
+
+
+      ⍝ integral numbers of a mixed array are displayed with all their digits
+      ⍝ (as IBM APL2 does it, see FORMAT_FUZZ.tc; Bugs34 #7, #22)
+      ⍝
+
+      ⎕PP←5
+
+
+
+
+
+      9.81 9716500 'X'
+9.81 9716500 X
+
+
+
+
+
+      'X' 9716500 9.81
+X 9716500 9.81
+
+
+
+
+
+      9716500 'X' 9.81
+9716500 X 9.81
+
+
+
+
+
+      2J1 9716500 'X'
+2J1 9716500 X
+
+
+
+
+
+      9716500 'X'
+9716500 X
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ the scaling decision is made after rounding to ⎕PP digits
+      ⍝
+
+      ⎕PP←5
+
+
+
+
+
+      9.99999E¯6
+0.00001
+
+
+
+
+
+      99999.6
+1E5
+
+
+
+
+
+      ¯99999.6
+¯1E5
+
+
+
+
+
+      0.0000099994
+9.9994E¯6
+
+
+
+
+
+      99999.4
+99999
+
+
+
+
+
+      2 1⍴9.99999E¯6 0.5
+0.00001
+0.5
+
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+
+      ⍝ the preference affects the display only: the integers of a numeric
+      ⍝ strand with a non-integer stay integers (they were stored as floats,
+      ⍝ which changed values above 2⋆53, Bugs34 #7)
+      ⍝
+      ⎕CT←0
+
+
+
+
+
+      X←0.5 9007199254740993
+
+
+
+
+
+      X[2]=9007199254740993
+1
+
+
+
+
+
+      Q←1 2.5 9007199254740993
+
+
+
+
+
+      2 ⎕TF 'Q'
+Q←1 2.5 9007199254740993
+
+
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+

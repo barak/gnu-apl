@@ -1,8 +1,10 @@
 ⍝ Factorial.tc
 ⍝ ----------------------------------
 
+⍝@ test3.
 
-⍝ ----------------------------------
+
+      ⍝ ----------------------------------
 
       !4
 24
@@ -15,9 +17,11 @@
       !.05 ¯.05
 0.9735042656 1.031453317
 
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
       !20 22 44 66 88
 2432902008176640000 1.124000728E21 2.658271575E54 5.443449391E92 1.854826423E134
 
+      ]FILE_CTL NO_SKIP
       !170
 7.257415615E306
 
@@ -25,6 +29,71 @@
 DOMAIN ERROR
       !171
       ^
+
+      ⍝ Bugs28 #12 regression: a dyadic scalar function (here "-") whose
+      ⍝ *temporary* left argument came from another scalar function
+      ⍝ ("1×3") leaked its own result when a following monadic scalar
+      ⍝ function then failed -- Prefix::pop_args_push_result() dropped
+      ⍝ the discarded left-argument token without releasing its value,
+      ⍝ invisible as long as something else reused that Prefix slot
+      ⍝ before the statement ended, but a leak once an exception (here
+      ⍝ !'s own DOMAIN ERROR) ended it first.
+      ⍝
+      !(1×3)-4
+DOMAIN ERROR
+      !(1×3)-4
+      ^
+
+      )SIC
+      )CHECK BRIEF
+
+      !(0.5-0.5)+¯1
+DOMAIN ERROR
+      !(0.5-0.5)+¯1
+      ^
+
+      )SIC
+      )CHECK BRIEF
+
+      !(1 2×3)-4
+DOMAIN ERROR
+      !(1 2×3)-4
+      ^
+
+      )SIC
+      )CHECK BRIEF
+
+      ⍝ control: no leak when the monadic function succeeds
+      ⍝
+      !(1×3)-2
+1
+
+      )CHECK BRIEF
+
+      ⍝ regression (Bugs28 #83): !B rejected any B > 170.0 outright,
+      ⍝ even though tgamma(b+1) is still finite up to about 170.62 --
+      ⍝ the isfinite() check right below that pre-check (mirroring
+      ⍝ bif_exponential_f()) already catches the real overflow.
+      ⍝
+      !170.5
+9.483367567E307
+
+      ⍝ regression (Bugs28 #100(m)): float_factorials[] (IntCell.cc) --
+      ⍝ the lookup table used for integer !B -- was written with only
+      ⍝ 16 significant digits per entry, one short of round-trippable
+      ⍝ for a double; 138 of its 170 entries (not just !21/!22, the two
+      ⍝ the report happened to check) were off by 1-2 ulp from the
+      ⍝ correctly-rounded value, invisible at the default ⎕PP but
+      ⍝ exposed at a high enough ⎕PP or by comparing against the exact
+      ⍝ integer. Regenerated at 17 significant digits (sufficient for
+      ⍝ any double) throughout.
+      ⍝
+      ⎕PP←17
+      (!21)-51090942171709440000
+0
+      (!22)-1124000727777607680000
+0
+      ⎕PP←10
 
       →
 

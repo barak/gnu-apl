@@ -1,0 +1,23 @@
+⍝ Reshape.tc
+⍝ ══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A simple scalar/vector nonneg integers
+      ⍝ inv: ⍴Z ←→ ,A
+      ⍝ inv: ⍴⍴Z ←→ ⍴,A
+      A ← 2 3 4                               ⍝ target shape
+      B ← ⎕RVAL 1 (,24) (,0 1 0 0 0)
+      Z ← A⍴B
+      (⍴Z) ≡ ,A
+1
+      (⍴⍴Z) ≡ ⍴,A
+1
+      ⍝ Scalar A reshapes to vector
+      A ← 3+4∣|⎕RVAL 0                       ⍝ A in 3..6
+      B ← ⎕RVAL 0
+      Z ← A⍴B
+      (⍴Z) ≡ ,A
+1

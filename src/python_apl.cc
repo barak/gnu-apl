@@ -19,7 +19,7 @@ using namespace std;
 
 static int display_mode = 1;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 // initialization...
 
 extern void init_modules(const char * argv0, bool log_startup);
@@ -34,6 +34,8 @@ const bool log_startup = false;
    UserPreferences::uprefs.user_do_svars = false;
    UserPreferences::uprefs.system_do_svars = false;
    UserPreferences::uprefs.requested_id = 3000;
+   UserPreferences::uprefs.feature_off("shared variables", "RUN",
+                                       "GNU APL runs as Python module");
 
    init_modules("apl", log_startup);
 
@@ -52,7 +54,7 @@ init_if_necessary()
 static bool init_done = false;
    if (!init_done) { do_init(); init_done = true; }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_command(PyObject * self, PyObject * args)
 {
@@ -73,9 +75,9 @@ ostringstream out;
 
   return PyUnicode_DecodeUTF8(out.str().data(), out.str().size(), 0);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
-apl_to_python(const Value * value)
+apl_to_python(const cValue * value)
 {
 PyObject * shape = PyList_New(value->get_rank());
    loop(r, value->get_rank())
@@ -83,43 +85,78 @@ PyObject * shape = PyList_New(value->get_rank());
 
 const ShapeItem ravel_len = value->nz_element_count();
 PyObject * ravel = PyList_New(ravel_len);
-   loop(i, ravel_len)
-       {
-         const Cell & cell = value->get_cravel(i);
-         if (cell.is_integer_cell())
-            PyList_SetItem(ravel, i, PyLong_FromLong(cell.get_int_value()));
-         else if (cell.is_float_cell())
-            PyList_SetItem(ravel, i, PyFloat_FromDouble(cell.get_real_value()));
-         else if (cell.is_complex_cell())
+const RavelType rt = value->get_ravel_type();
+   if (rt & RPT_integer)
+      {
+        loop(i, ravel_len)
+            PyList_SetItem(ravel, i, PyLong_FromLong(value->get_int_value(i)));
+      }
+   else if (rt == RPT_FLOAT64)
+      {
+        loop(i, ravel_len)
+            PyList_SetItem(ravel, i, PyFloat_FromDouble(value->get_real_value(i)));
+      }
+   else if (rt == RPT_COMPLEX)
+      {
+        loop(i, ravel_len)
             PyList_SetItem(ravel, i,
-                           PyComplex_FromDoubles(cell.get_real_value(),
-                                                 cell.get_imag_value()));
-         else if (cell.is_character_cell())
-            {
-              const UCS_string ucs(cell.get_char_value());   // 1-element string
-              UTF8_string utf(ucs);
-              PyList_SetItem(ravel, i, PyUnicode_FromStringAndSize(utf.c_str(),
-                                                                   utf.size()));
-            }
-         else if (cell.is_pointer_cell())
-            {
-              Value_P sub_val = cell.get_pointer_value();
-              PyList_SetItem(ravel, i, apl_to_python(sub_val.get()));
-            }
-         else
-            {
-               CERR << "*** Bad cell type at " LOC << endl;
-               return 0;
-            }
-       }
+                           PyComplex_FromDoubles(value->get_real_value(i),
+                                                 value->get_imag_value(i)));
+      }
+   else if (rt & RPT_char)
+      {
+        loop(i, ravel_len)
+           {
+             const UCS_string ucs(value->get_char_value(i));
+             UTF8_string utf(ucs);
+             PyList_SetItem(ravel, i, PyUnicode_FromStringAndSize(utf.c_str(),
+                                                                  utf.size()));
+           }
+      }
+   else   // RPT_CELLS: may have pointers or mixed types
+      {
+        loop(i, ravel_len)
+           {
+             Cell cache;
+             const Cell & cell = value->get_cravel(i, cache);
+             if (cell.is_integer_cell())
+                PyList_SetItem(ravel, i, PyLong_FromLong(cell.get_int_value()));
+             else if (cell.is_float_cell())
+                PyList_SetItem(ravel, i, PyFloat_FromDouble(cell.get_real_value()));
+             else if (cell.is_complex_cell())
+                PyList_SetItem(ravel, i,
+                               PyComplex_FromDoubles(cell.get_real_value(),
+                                                     cell.get_imag_value()));
+             else if (cell.is_character_cell())
+                {
+                  const UCS_string ucs(cell.get_char_value());
+                  UTF8_string utf(ucs);
+                  PyList_SetItem(ravel, i, PyUnicode_FromStringAndSize(utf.c_str(),
+                                                                       utf.size()));
+                }
+             else if (cell.is_pointer_cell())
+                {
+                  Value_P sub_val = cell.get_pointer_value();
+                  PyList_SetItem(ravel, i, apl_to_python(sub_val.get()));
+                }
+             else
+                {
+                   CERR << "*** Bad cell type at " LOC << endl;
+                   return 0;
+                }
+           }
+      }
 
-   return PyTuple_Pack(2, shape, ravel);
+PyObject * ret = PyTuple_Pack(2, shape, ravel);
+   Py_DECREF(shape);
+   Py_DECREF(ravel);
+   return ret;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject * exec_result = 0;
 
 bool
-python_result_callback(Token & result)
+python_result_callback(const Token & result)
 {
 const TokenTag tag = result.get_tag();
 bool do_display = false;
@@ -127,33 +164,47 @@ bool do_display = false;
    if (tag == TOK_APL_VALUE2)                       // committed value
       {
         do_display = display_mode > 1;
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
-                                   apl_to_python(result.get_apl_val().get()));
+        PyObject * code = PyLong_FromLong(2);
+        PyObject * val = apl_to_python(result.get_apl_val().get());
+        exec_result = PyTuple_Pack(2, code, val);
+        Py_DECREF(code);
+        Py_DECREF(val);
       }
    else if (result.get_Class() == TC_VALUE)   // non-committed value
       {
         do_display = display_mode > 0;
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(1),
-                                   apl_to_python(result.get_apl_val().get()));
-
+        PyObject * code = PyLong_FromLong(1);
+        PyObject * val = apl_to_python(result.get_apl_val().get());
+        exec_result = PyTuple_Pack(2, code, val);
+        Py_DECREF(code);
+        Py_DECREF(val);
       }
    else if (tag == TOK_VOID)                            // void
       {
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(3), Py_None);
+        PyObject * code = PyLong_FromLong(3);
+        exec_result = PyTuple_Pack(2, code, Py_None);
+        Py_DECREF(code);
       }
-   else if (tag == TOK_BRANCH)                           // →N
+   else if (tag == TOK_BRANCH_INT || tag == TOK_BRANCH_LAB)   // →N or →LAB
       {
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(4),
-                                   PyLong_FromLong(result.get_int_val()));
+        PyObject * code = PyLong_FromLong(4);
+        PyObject * val = PyLong_FromLong(result.get_int_val());
+        exec_result = PyTuple_Pack(2, code, val);
+        Py_DECREF(code);
+        Py_DECREF(val);
       }
    else if (tag == TOK_NOBRANCH)                         // →''
       {
         // never called because TOK_NOBRANCH is a NOOP
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(4), Py_None);
+        PyObject * code = PyLong_FromLong(4);
+        exec_result = PyTuple_Pack(2, code, Py_None);
+        Py_DECREF(code);
       }
    else if (tag == TOK_ESCAPE)                           // →
       {
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(5), Py_None);
+        PyObject * code = PyLong_FromLong(5);
+        exec_result = PyTuple_Pack(2, code, Py_None);
+        Py_DECREF(code);
       }
    else
       {
@@ -163,7 +214,7 @@ bool do_display = false;
 
    return do_display;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_exec(PyObject * self, PyObject * args)
 {
@@ -191,11 +242,14 @@ UCS_string line_ucs(line_utf8);
         CERR << "cought ErrorCode" << endl;
         return PyLong_FromLong(error_code);
       }
-   catch (...)
+   catch (std::bad_alloc &)
       {
         CERR << "cought something else" << endl;
         return PyLong_FromLong(-1);
       }
+
+   catch (...)
+      { FIXME; }
 
    if (exec_result == 0)   // error or defined function without return value
       {
@@ -203,20 +257,28 @@ UCS_string line_ucs(line_utf8);
            {
              const Error & err = StateIndicator::get_error(si);
              const ErrorCode ec = err.get_error_code();
-             return PyTuple_Pack(2, PyLong_FromLong(0), PyLong_FromLong(ec));
+             PyObject * code = PyLong_FromLong(0);
+             PyObject * val = PyLong_FromLong(ec);
+             PyObject * ret = PyTuple_Pack(2, code, val);
+             Py_DECREF(code);
+             Py_DECREF(val);
+             return ret;
            }
 
         // defined function without result
         //
-        return PyTuple_Pack(2, PyLong_FromLong(3), Py_None);
+        PyObject * code = PyLong_FromLong(3);
+        PyObject * ret = PyTuple_Pack(2, code, Py_None);
+        Py_DECREF(code);
+        return ret;
       }
 
 PyObject * ret = exec_result;
    exec_result = 0;
    return ret;
 }
-//----------------------------------------------------------------------------
-static const Value *
+//════════════════════════════════════════════════════════════════════════════
+static const cValue *
 apl_get_var_value(PyObject * args)
 {
 const char * varname = 0;
@@ -230,6 +292,7 @@ const char * varname = 0;
 
 UTF8_string varname_utf8(varname);
 UCS_string varname_ucs(varname_utf8);
+//════════════════════════════════════════════════════════════════════════════
 Symbol * sym = Workspace::lookup_existing_symbol(varname_ucs);
    if (sym == 0)
       {
@@ -246,7 +309,7 @@ const ValueStackItem * top = sym->top_of_stack();
 
    return top->get_val_cptr();
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
 make_shape(const Shape & shape)
 {
@@ -256,63 +319,81 @@ PyObject * result = PyList_New(shape.get_rank());
 
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
 apl_get_shape(PyObject * self, PyObject * args)
 {
-const Value * value = apl_get_var_value(args);
+const cValue * value = apl_get_var_value(args);
    if (value == 0)   return 0;
 
    return make_shape(value->get_shape());
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
-make_ravel(const Value * value)
+make_ravel(const cValue * value)
 {
 const ShapeItem len = value->nz_element_count();
 PyObject * result = PyList_New(len);
 
-   loop(l, len)
+   const RavelType rt = value->get_ravel_type();
+   if (rt & RPT_integer)
       {
-        const Cell & cell = value->get_cravel(l);
-        PyObject * item = Py_None;
-        if (cell.is_integer_cell())
+        loop(l, len)
+            PyList_SetItem(result, l, PyLong_FromLong(value->get_int_value(l)));
+      }
+   else if (rt == RPT_FLOAT64)
+      {
+        loop(l, len)
+            PyList_SetItem(result, l, PyFloat_FromDouble(value->get_real_value(l)));
+      }
+   else
+      {
+        loop(l, len)
            {
-             item = PyLong_FromLong(cell.get_int_value());
+             Cell cache;
+             const Cell & cell = value->get_cravel(l, cache);
+             PyObject * item = Py_None;
+             if (cell.is_integer_cell())
+                {
+                  item = PyLong_FromLong(cell.get_int_value());
+                }
+             else if (cell.is_float_cell())
+                {
+                  item = PyFloat_FromDouble(cell.get_real_value());
+                }
+             else
+                {
+                  CERR << "*** Warning: unsupported Cell type" << endl;
+                }
+             PyList_SetItem(result, l, item);
            }
-        else if (cell.is_float_cell())
-           {
-             item = PyFloat_FromDouble(cell.get_real_value());
-           }
-        else
-           {
-             CERR << "*** Warning: unsupported Cell type" << endl;
-           }
-        PyList_SetItem(result, l, item);
       }
 
    return result;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
 apl_get_ravel(PyObject * self, PyObject * args)
 {
-const Value * value = apl_get_var_value(args);
+const cValue * value = apl_get_var_value(args);
    if (value == 0)   return 0;
    return make_ravel(value);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
 apl_get_value(PyObject * self, PyObject * args)
 {
-const Value * value = apl_get_var_value(args);
+const cValue * value = apl_get_var_value(args);
    if (value == 0)   return 0;
 
 PyObject * shape = make_shape(value->get_shape());
 PyObject * ravel = make_ravel(value);
-   return PyTuple_Pack(2, shape, ravel);
+PyObject * ret = PyTuple_Pack(2, shape, ravel);
+   Py_DECREF(shape);
+   Py_DECREF(ravel);
+   return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static Shape
 list_to_shape(PyObject * shape)
 {
@@ -331,7 +412,7 @@ const uRank rank = PyList_Size(shape);
        }
    return ret;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Shape
 shape_for_item(PyObject * item)
 {
@@ -352,7 +433,7 @@ shape_for_item(PyObject * item)
 PyObject * shape = PyTuple_GetItem(item, 1);
    return list_to_shape(shape);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static Value_P python_to_apl(PyObject * ravel, PyObject * shape);
 
 static Value_P
@@ -384,7 +465,13 @@ const ShapeItem len_Z = Z->nz_element_count();
                                 (PyUnicode_AsUTF8AndSize(ravel, &len));
         UTF8_string utf(data, len);
         UCS_string ucs(utf);
-        loop(z, len_Z)   Z->next_ravel_Char(ucs[z % ucs.size()]);
+        // len_Z (nz_element_count()) is always >= 1 (the prototype
+        // element), so this loop runs at least once even for an empty
+        // shape/source -- "z % ucs.size()" then divides by zero (SIGFPE)
+        // for an empty string.
+        if (ucs.size() == 0)   loop(z, len_Z)   Z->next_ravel_Char(UNI_SPACE);
+        else                   loop(z, len_Z)
+                                   Z->next_ravel_Char(ucs[z % ucs.size()]);
       }
    else if (PyTuple_Check(ravel))   // item is a tuple (val, shape)
       {
@@ -396,12 +483,17 @@ const ShapeItem len_Z = Z->nz_element_count();
    else if (PyList_Check(ravel))   // ravel is a list
       {
         const ShapeItem src_len = PyList_Size(ravel);
-        loop(z, len_Z)
-            {
-              PyObject * src = PyList_GetItem(ravel, z % src_len);
-              Value_P sub = python_to_apl(src, 0);
-              Z->next_ravel_Value(sub.get());
-            }
+        // same len_Z >= 1 vs. empty-source issue as the string case
+        // above: "z % src_len" divides by zero (SIGFPE) for an empty
+        // list.
+        if (src_len == 0)   loop(z, len_Z)   Z->next_ravel_Int(0);
+        else
+           loop(z, len_Z)
+               {
+                 PyObject * src = PyList_GetItem(ravel, z % src_len);
+                 Value_P sub = python_to_apl(src, 0);
+                 Z->next_ravel_Value(sub.get());
+               }
       }
    else
       {
@@ -412,14 +504,14 @@ const ShapeItem len_Z = Z->nz_element_count();
    Z->check_value(LOC);
    return Z;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static Value_P
 python_to_apl(PyObject * ravel, PyObject * shape)
 {
    if (shape)   return python_to_apl(ravel, list_to_shape(shape));
    else         return python_to_apl(ravel, shape_for_item(ravel));
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 static PyObject *
 apl_set_value(PyObject * self, PyObject * args)
 {
@@ -441,7 +533,7 @@ const int arg_count = PyTuple_Size(args);
       }
    else if (arg_count == 3)   // set_value(varname, ravel, shape)
       {
-        if (!PyArg_ParseTuple(args, "sOO", &varname, &ravel, shape))
+        if (!PyArg_ParseTuple(args, "sOO", &varname, &ravel, &shape))
            {
               CERR << "*** Bad arguments in set_value(varname, ravel, shape) ."
                    << endl;
@@ -480,9 +572,9 @@ Value_P value = python_to_apl(ravel, shape);
       }
 
    sym->assign(value, true, LOC);
-   return Py_None;
+   Py_RETURN_NONE;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_fix_function(PyObject * self, PyObject * args)
 {
@@ -501,16 +593,16 @@ int error_line = 0;
 
 const UTF8_string creator("python");
 UserFunction * fun = UserFunction::fix(text_ucs, error_line, false, LOC,
-                                       creator, true);
+                                       creator);
 
-   if (fun)   return Py_None;
+   if (fun)   Py_RETURN_NONE;
 
    CERR << "*** invalid string argument of fix_function()" << endl
         << "*** offending function line: " << error_line << endl;
 
    return PyLong_FromLong(error_line);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_set_display(PyObject * self, PyObject * args)
 {
@@ -532,7 +624,7 @@ const int oldmode = display_mode;
    display_mode = mode;
    return PyLong_FromLong(oldmode);
 }
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 const char * DESCR_help =
 "gnu_apl.help() : print help for a topic.\n"
 "\n"
@@ -740,7 +832,7 @@ const char * DESCR_set_value =
 "    gnu_apl.set_value('Var', [1, [2, 3], 4])    # Var ← 1 (2 3) 4\n"
 ;
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════
 static PyObject *
 apl_help(PyObject * self, PyObject * args)
 {
@@ -772,7 +864,7 @@ const char * topic = 0;
                    << DESCR_set_value    << sep
                    << DESCR_set_display  << sep
                    << DESCR_values       << sep << endl;
-              return Py_None;
+              Py_RETURN_NONE;
             }
 
          if (help == 0)
@@ -789,9 +881,9 @@ const char * topic = 0;
          CERR << DESCR_help << endl;
        }
 
-   return Py_None;
+   Py_RETURN_NONE;
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static PyMethodDef AplMethods[] =
 {
   { "help",         apl_help,         METH_VARARGS, DESCR_help         },
@@ -805,7 +897,7 @@ static PyMethodDef AplMethods[] =
   { "set_display",  apl_set_display,  METH_VARARGS, DESCR_set_display  },
   { NULL,           0,                0,            0 }   /* Sentinel */
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static struct PyModuleDef apl_module =
 {
   PyModuleDef_HEAD_INIT,
@@ -815,17 +907,17 @@ static struct PyModuleDef apl_module =
                   -1 if the module keeps state in global variables. */
   AplMethods
 };
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 PyMODINIT_FUNC
 PyInit_gnu_apl(void)
 {
     return PyModule_Create(&apl_module);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 int64_t
 get_main()
 {
    return 0;
 }
 
-//============================================================================
+//════════════════════════════════════════════════════════════════════════════

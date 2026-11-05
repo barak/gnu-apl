@@ -28,23 +28,48 @@
 #include "SqliteConnection.hh"
 #include "ArgListBuilder.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// ArgListBuilder for a Sqlite prepared statement
 class SqliteArgListBuilder : public ArgListBuilder
 {
 public:
+    /// constructor: prepare \b sql on \b connection_in
     SqliteArgListBuilder( SqliteConnection *connection_in, const string &sql );
+
+    /// destructor
     virtual ~SqliteArgListBuilder();
+
+    /// see ArgListBuilder::append_string()
     virtual void append_string(const string &arg, int pos);
+
+    /// see ArgListBuilder::append_long()
     virtual void append_long(long arg, int pos);
+
+    /// see ArgListBuilder::append_double()
     virtual void append_double(double arg, int pos);
+
+    /// see ArgListBuilder::append_null()
     virtual void append_null(int pos);
+
+    /// see ArgListBuilder::run_query()
     virtual Value_P run_query();
+
+    /// see ArgListBuilder::clear_args()
     virtual void clear_args();
 
 private:
+    /// (re-)prepare \b sql into \b statement
     void init_sql();
+
+    /// the SQL text this builder was constructed with
     string sql;
+
+    /// the connection \b statement was prepared on
     SqliteConnection * connection;
+
+    /// the underlying Sqlite prepared statement
     sqlite3_stmt * statement;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

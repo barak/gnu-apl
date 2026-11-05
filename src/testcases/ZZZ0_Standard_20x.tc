@@ -1,6 +1,8 @@
 ⍝ ZZZ0_Standard_20x.tc
 ⍝ Examples from the APL standard 
 ⍝ ----------------------------------
+⍝@ test3.
+
 
       ⎕CT←1E¯10
       ⎕PP←6
@@ -27,27 +29,31 @@
 
       ⎕PP←999
       ⍕D
-0.7 0.8 0.9 0.7 0.8 0.9
-
+0.69999999999999996 0.80000000000000004 0.90000000000000002 0.69999999999999996 
+      0.80000000000000004 0.90000000000000002
       ⍝ APL2 says 0 0 0 0 0 0, ISO differs slightly
       D-⍎⍕D
 0 0 0 0 0 0
 
       ⎕PP←4
+      ⍝ Note: a number whose fractional part starts with 5 zeroes is scaled
+      ⍝ (lrm p.11-13, verified with IBM APL2: 7.89E¯6, not 0.00000789 as
+      ⍝ in the standard's example). We follow lrm/IBM APL2.
+      ⍝
       M←0.78901×(10⋆⍳6)∘.×1 1E¯10 1E¯6 0.01 0.1
       ⍕M
-7.89E0 7.89E¯10 0.00000789    0.0789 7.89E¯1
-7.89E1 7.89E¯9  0.0000789     0.789  7.89E0 
-7.89E2 7.89E¯8  0.000789      7.89   7.89E1 
-7.89E3 7.89E¯7  0.00789      78.9    7.89E2 
-7.89E4 7.89E¯6  0.0789      789      7.89E3 
-7.89E5 7.89E¯5  0.789      7890      7.89E4 
+7.89E0 7.89E¯10 7.89E¯6    0.0789 7.89E¯1
+7.89E1 7.89E¯9  7.89E¯5    0.789  7.89E0 
+7.89E2 7.89E¯8  7.89E¯4    7.89   7.89E1 
+7.89E3 7.89E¯7  7.89E¯3   78.9    7.89E2 
+7.89E4 7.89E¯6  7.89E¯2  789      7.89E3 
+7.89E5 7.89E¯5  7.89E¯1 7890      7.89E4 
 
    ⍕5⍴M
-7.89 7.89E¯10 0.00000789 0.0789 0.789
+7.89 7.89E¯10 7.89E¯6 0.0789 0.789
 
       ⍕1 5⍴M
-7.89 7.89E¯10 0.00000789 0.0789 0.789
+7.89 7.89E¯10 7.89E¯6 0.0789 0.789
 
       ⍝ page 245 ------------------------------------------------------
       ⍝
@@ -66,8 +72,14 @@
       ⍴1 0 2 0 4 0 8 0⍕0 4⍴1
 0 15
 
+      ⍝ Regression (Blake McBride, LanguageVariances.md #12, 2026-08-10):
+      ⍝ see testcases/Format_by_spec.tc for the root cause (UCS_string::
+      ⍝ from_big()'s hand-rolled digit extraction losing precision on
+      ⍝ large exact integers). Expected value independently verified via
+      ⍝ Python's exact integer arithmetic (2**100).
+      ⍝
       31 0 ⍕ 2⋆100
-1267650600228229401300000000000
+1267650600228229401496703205376
 
       31 20 ⍕ .07
           .07000000000000000⁰

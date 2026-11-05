@@ -1,5 +1,7 @@
 ⍝ ----------------------------------
 
+⍝@ test3.
+
       )CLEAR
 CLEAR WS
 
@@ -44,7 +46,7 @@ CLEAR WS
  FOO2  4 B2:   1 2 3 ⋆⋆ 
  FOO2  5 B2:   1 2 3 4 ⋆ 
 
-   )CHECK
+      )CHECK
 OK      - no stale functions
 OK      - no stale values
 OK      - no stale indices

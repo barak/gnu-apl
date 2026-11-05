@@ -1,6 +1,11 @@
 ⍝ Quad_LX
 ⍝ ----------------------------------
 
+⍝@ test3.
+
+      )DROP quad_lx
+³
+
       ⎕LX←"'Hello World'"
 
       )WSID quad_lx
@@ -12,5 +17,22 @@ WAS ³
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 Hello World
 
-⍝ ==================================
+      ⍝ ==================================
+
+      ⍝ Bugs28 #100(a): ⎕LX[idx]←B was silently ignored (empty inline
+      ⍝ Quad_LX::assign_indexed() body); it must actually mutate ⎕LX,
+      ⍝ and reject an out-of-range idx like a plain reference does.
+
+      ⎕LX←'Hello'
+      ⎕LX[1]←'J'
+      ⎕LX
+Jello
+
+      ⎕LX[10]←'X'
+INDEX ERROR
+      ⎕LX[10]←'X'
+      ^      ^
+      )SIC
+
+      ⍝ ==================================
 

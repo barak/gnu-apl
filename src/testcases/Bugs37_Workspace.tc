@@ -1,0 +1,228 @@
+⍝ Bugs37_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs37 items that need workspace files (#7).
+⍝ The files are created in the testcase libraries and dropped again.
+
+⍝@ test3.
+
+      ⍝ Bugs37 #7: )OUT and )IN keep strings and comments unchanged. In APL
+      ⍝ code, the ASCII * ^ ~ come back as the principal ⋆ ∧ ∼
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ∇Z←A B37_FOO7 B;S
+       S←'a*b^c~d ⋆∧∼' ⍝ x*2 ^ ~ ⋆
+       S←S,"q*\"^~"
+       Z←(A*B)∧∼A^~B
+      ∇
+
+
+
+
+
+      V←'a*b^c~d' 'e⋆f∧g∼h' ◊ W←2 3⍴'*^~⋆∧∼' ◊ ⎕FC[3]←'⋆'
+
+
+
+
+
+      )OUT B37_IO7 B37_FOO7 V W ⎕FC
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )IN B37_IO7
+
+
+
+
+
+      ⎕CR 'B37_FOO7'
+Z←A B37_FOO7 B;S                  
+       S←'a*b^c~d ⋆∧∼' ⍝ x*2 ^ ~ ⋆
+       S←S,"q*\"^~"               
+       Z←(A⋆B)∧∼A∧∼B              
+
+      V ≡ 'a*b^c~d' 'e⋆f∧g∼h'
+1
+
+
+
+
+      W ≡ 2 3⍴'*^~⋆∧∼'
+1
+
+
+
+
+      ⎕FC
+.,⋆0_¯
+
+
+
+
+      1 B37_FOO7 0
+0
+
+
+
+
+      ⍝ clean up
+      ⍝
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )DROP B37_IO7.atf
+⁰-³
+
+
+
+
+
+
+
+
+
+      ⍝ Bugs37 #27: )COPY of a .apl file: a function replaces a variable of
+      ⍝ the same name (LRM p. 423) instead of running its body as statements
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←B37_F27 X' 'A←''clobbered''' 'Z←X'
+B37_F27
+
+
+
+
+      )DUMP B37_CP27
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      A←'keep'
+
+
+
+
+      B37_F27←99
+
+
+
+
+      )COPY B37_CP27.apl B37_F27
+DUMPED ³
+
+
+
+
+      A
+keep
+
+
+
+
+      B37_F27 5
+5
+
+
+
+
+      A
+clobbered
+
+
+
+
+      ⍝ a function that cannot be replaced (here: suspended) is not copied,
+      ⍝ and its body is skipped rather than executed
+      ⍝
+
+
+
+
+
+      ⎕FX 'Z←B37_F27 X' 'Z←÷0'
+B37_F27
+
+
+
+
+      A←'keep'
+
+
+
+
+      B37_F27 5
+DOMAIN ERROR
+B37_F27[1]  Z←÷0
+              ^
+
+
+
+
+      ⍝ (the DEFN ERROR is printed while reading the .apl file, which -T
+      ⍝ does not compare)
+      ⍝
+      )COPY B37_CP27.apl B37_F27
+DUMPED ³
+
+
+
+
+      A
+keep
+
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )DROP B37_CP27.apl
+⁰-³
+
+
+
+

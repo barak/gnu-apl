@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,9 +26,21 @@
 
 Bif_OPER1_COMMUTE   Bif_OPER1_COMMUTE::fun;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-Bif_OPER1_COMMUTE::eval_LB(Token & LO, Value_P B) const
+Bif_OPER1_COMMUTE::eval_ALB(cValue_R A, Token & LO, cValue_R B) const
+{
+   return LO.get_function()->eval_AB(B, A);
+}
+//────────────────────────────────────────────────────────────────────────────
+Token
+Bif_OPER1_COMMUTE::eval_ALXB(cValue_R A, Token & LO, cValue_R X, cValue_R B) const
+{
+   return LO.get_function()->eval_AXB(B, X, A);
+}
+//────────────────────────────────────────────────────────────────────────────
+Token
+Bif_OPER1_COMMUTE::eval_LB(Token & LO, cValue_R B) const
 {
    if (!LO.is_function())   SYNTAX_ERROR;
 cFunction_P fun_LO = LO.get_function();
@@ -70,11 +82,10 @@ cFunction_P fun_LO = LO.get_function();
       {
         const DerivedFunction * A_LO =
                       reinterpret_cast<const DerivedFunction *>(fun_LO);
-        Value_P    A = A_LO->get_bound_LO_value();
-        if (+A)   // definitelt special case
+        if (Value_P A = A_LO->get_bound_LO_value())   // definitelt special case
            {
               cFunction_P LO = A_LO->get_OPER();
-              return LO->eval_AB(B, A);
+              return LO->eval_AB(B, *A);
            }
       }
 
@@ -82,22 +93,10 @@ cFunction_P fun_LO = LO.get_function();
    //
    return fun_LO->eval_AB(B, B);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Token
-Bif_OPER1_COMMUTE::eval_LXB(Token & LO, Value_P X, Value_P B) const
+Bif_OPER1_COMMUTE::eval_LXB(Token & LO, cValue_R X, cValue_R B) const
 {
    return LO.get_function()->eval_AXB(B, X, B);
 }
-//----------------------------------------------------------------------------
-Token
-Bif_OPER1_COMMUTE::eval_ALB(Value_P A, Token & LO, Value_P B) const
-{
-   return LO.get_function()->eval_AB(B, A);
-}
-//----------------------------------------------------------------------------
-Token
-Bif_OPER1_COMMUTE::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
-{
-   return LO.get_function()->eval_AXB(B, X, A);
-}
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════

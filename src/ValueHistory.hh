@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ using namespace std;
 
 class Value;
 
+//════════════════════════════════════════════════════════════════════════════
 /// a ringbuffer of events related to the manipulation of values
 class VH_entry
 {
@@ -39,13 +40,20 @@ public:
    VH_entry()   {}
 
    /// Constructor: event for \b val
-   VH_entry(const Value * val, VH_event ev, int ia, const char * loc);
+   /// @param val  APL value to which this event belongs
+   /// @param ev   event type
+   /// @param ia   integer argument (meaning depends on event type)
+   /// @param loc  caller location for diagnostics
+   VH_entry(const cValue * val, VH_event ev, int ia, const char * loc);
 
    /// init the event history
    static void init();
 
    /// print the history of \b value
-   static void print_history(ostream & out, const Value & value,
+   /// @param out    output stream
+   /// @param value  APL value whose history is to be printed
+   /// @param loc    caller location for diagnostics
+   static void print_history(ostream & out, const cValue & value,
                              const char * loc);
 
    /// ring buffer of events
@@ -56,12 +64,12 @@ public:
 
 protected:
    /// print the event
-   void print(int & flags, ostream & out, const Value & val,
+   /// @param flags     accumulated display flags (modified in place)
+   /// @param out       output stream
+   /// @param val       APL value this event belongs to
+   /// @param previous  preceding history entry for context, or null
+   void print(int & flags, ostream & out, const cValue & val,
                const VH_entry * previous) const;
-
-   /// the Value (if any) to which this event belongs. APL errors thrown do
-   /// not have one.
-   const Value * val;
 
    /// the event number
    VH_event event;
@@ -77,6 +85,11 @@ protected:
 
    /// the line number in the testcase file
    int           testcase_line;
+
+   /// the Value (if any) to which this event belongs. APL errors thrown do
+   /// not have one.
+   const cValue * val;
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif // __VALUEHISTORY_HH_DEFINED__

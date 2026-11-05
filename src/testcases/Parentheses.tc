@@ -1,0 +1,49 @@
+⍝ Parentheses.tc
+⍝ ----------------------------------
+
+⍝@ test3.
+
+      ⍝ regression (Blake McBride, Bugs28 #61, 2026-08-11): "( )" with
+      ⍝ nothing between the parentheses raised a raw SYNTAX ERROR directly
+      ⍝ from Parser::collect_value_groups() (Parser.cc), before the
+      ⍝ statement had an SI entry -- same failure mode as the unbalanced-
+      ⍝ paren bug already fixed for Bugs27 #49, just for a BALANCED but
+      ⍝ EMPTY pair instead. Symptom depended on context: at top level, the
+      ⍝ raw throw got attributed to the PREVIOUS statement's SI instead of
+      ⍝ this one; via ⍎, the caret display was lost entirely. Fixed the
+      ⍝ same way as Bugs27 #49: an early, ErrorCode-returning pre-check in
+      ⍝ Parser::parse_statement(), before any step that could throw raw.
+      ⍝
+      1+1
+2
+      ()
+SYNTAX ERROR+
+
+      ⍝ ⍎ now correctly shows the failed statement and carets (same as
+      ⍝ any other ⍎-detected SYNTAX ERROR), instead of losing them.
+      ⍝
+      ⍎'()'
+SYNTAX ERROR+
+      ⍎'()'
+      ^^
+
+      ⍝ the failed ⍎ leaves a suspended SI entry, same as any other failed
+      ⍝ execution (e.g. ⍎'1 2+') -- clear it before continuing.
+      ⍝
+      )SIC
+
+      ⍝ same check for a few equivalent forms
+      ⍝
+      1()
+SYNTAX ERROR+
+
+      ( )
+SYNTAX ERROR+
+
+      ()+1
+SYNTAX ERROR+
+
+      A←()
+SYNTAX ERROR+
+
+      ⍝ ==================================

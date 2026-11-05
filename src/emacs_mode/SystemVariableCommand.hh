@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "sysvar" network command: report the names of every ⎕-system
+/// variable and system function, one per line
 class SystemVariableCommand : public NetworkCommand {
 public:
+    /// constructor
     SystemVariableCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

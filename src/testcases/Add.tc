@@ -1,6 +1,8 @@
 ⍝ Add.tc
 ⍝ ══════
 
+⍝@ test3.
+
       5+1 2 3
 6 7 8
       1 2 3+4 5 6
@@ -30,7 +32,7 @@
 3 3 3 3 3
 4 4 4 4 4
 
-   (4 3 5⍴1)+[1 2]  4 3⍴⍳3
+      (4 3 5⍴1)+[1 2]  4 3⍴⍳3
 2 2 2 2 2
 3 3 3 3 3
 4 4 4 4 4
@@ -51,4 +53,72 @@
 2 3 4 5 6
 2 3 4 5 6
 2 3 4 5 6
+
+      ⍝ Integer overflow → float promotion (Cell::sum_overflow(),
+      ⍝ IntCell::bif_add_ii()). ⎕PP←17 so the promoted (float) results
+      ⍝ print with enough digits to be unambiguous.
+      ⍝
+      ⎕PP←17
+
+      ⍝ boundary: sum is exactly ⎕IO's largest int64 value, stays integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      9223372036854775806+1
+9223372036854775807
+      ]FILE_CTL SKIP_APL2   ⍝ 26⎕CR is a GNU-only type-introspection extension
+      26⎕CR 9223372036854775806+1
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ one more: sum overflows int64, promoted to float
+      ⍝
+      ⍝ regression (Blake McBride, Bugs12.md #11a, 2026-08-06): the two
+      ⍝ overflow tests below (and the negative-boundary pair further down)
+      ⍝ used to compute a+b (here and in Subtract.tc's a-b) *before*
+      ⍝ checking for overflow -- signed overflow is UB, so a compiler
+      ⍝ would have been entitled to assume it never happens and delete
+      ⍝ the float fallback. IntCell::bif_add_ii()/bif_subtract_ii() now
+      ⍝ compute via uint64_t (well-defined wraparound) first.
+      ⍝
+      9223372036854775807+1
+9.2233720368547758E18
+      ]FILE_CTL SKIP_APL2
+      26⎕CR 9223372036854775807+1
+32
+      ]FILE_CTL NO_SKIP
+
+      ⍝ boundary: sum is exactly the smallest int64 value, stays integer
+      ]FILE_CTL SKIP_APL2   ⍝ 64-bit integers (IBM APL2: 32 bit)
+      ¯9223372036854775807+¯1
+¯9223372036854775808
+      ]FILE_CTL SKIP_APL2
+      26⎕CR ¯9223372036854775807+¯1
+16
+      ]FILE_CTL NO_SKIP
+
+      ⍝ one more negative: sum overflows int64, promoted to float
+      ¯9223372036854775808+¯1
+¯9.2233720368547758E18
+      ]FILE_CTL SKIP_APL2
+      26⎕CR ¯9223372036854775808+¯1
+32
+      ]FILE_CTL NO_SKIP
+
+      ⎕PP←10
+
+      ⍝ Regression (Blake McBride, LanguageVariances.md #7, 2026-08-10):
+      ⍝ a non-numeric axis fell through to Cell::get_near_int()'s own
+      ⍝ generic DOMAIN ERROR instead of the AXIS ERROR that apl2lrm.txt's
+      ⍝ "Conditions for Axis Specification" (p.45) requires whenever the
+      ⍝ bracket data isn't "the proper type".
+      ⍝
+      M←2 3⍴⍳6
+      M+['a']1 2
+AXIS ERROR
+      M+['a']1 2
+      ^^
+
+      ⍝ leaves an )SI entry for the failed immediate execution above;
+      ⍝ clear it so a clean )SI carries into whatever test3 runs next.
+      ⍝
+      )SIC
 

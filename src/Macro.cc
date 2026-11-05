@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,13 +25,34 @@
 
 #include "Assert.hh"
 #include "Macro.hh"
+#include "UCS_string.hh"
+#include "Workspace.hh"
 
 Macro * Macro::all_macros[MAC_COUNT];
+Symbol * Macro::mue_symbols[MARG_COUNT + 1];
+bool Macro::mue_ready = false;
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+void
+Macro::init()
+{
+   // mue_symbols[0] (Macro_arg_num 0) is intentionally left at its
+   // default-zero-initialised value (static storage duration, no
+   // explicit initialiser) -- see its comment in Macro.hh.
+
+   loop(n, MARG_COUNT)   // argument/local-var symbols μ1 .. μMARG_COUNT
+      {
+        UCS_string name;
+        name << UNI_MUE << int(n + 1);
+        mue_symbols[n + 1] = Workspace::lookup_symbol(name);
+      }
+
+   mue_ready = true;
+}
+//════════════════════════════════════════════════════════════════════════════
 Macro::Macro(Macro_num num, const UTF8_string & text)
    : UserFunction(UCS_string(text), LOC, "Macro::Macro()",
-                  false, true), macro_number(num)
+                  true), macro_number(num)
 {
 // CERR << "MACRO: " << endl << text;
 
@@ -39,17 +60,27 @@ Macro::Macro(Macro_num num, const UTF8_string & text)
 
    if (error_info || (error_line != -1))   // something went wrong
       {
-        CERR << endl << "*** Fatal error in macro #" << macro_number << endl;
-        if (error_info)         CERR << "error_info: " << error_info << endl;
-        if (error_line != -1)   CERR << "error_line: " << error_line << endl;
+        // this constructor runs for every global Macro::NAME object at
+        // static-init time (see static_Objects.cc) -- CERR itself may not
+        // yet be safe to use here (see StreamBuffers.hh), so use get_CERR().
+        get_CERR() << endl << "*** Fatal error in macro #" << macro_number << endl;
+        if (error_info)         get_CERR() << "error_info: " << error_info << endl;
+        if (error_line != -1)   get_CERR() << "error_line: " << error_line << endl;
         exit(1);
       }
 }
-//----------------------------------------------------------------------------
-Macro::~Macro()
+//────────────────────────────────────────────────────────────────────────────
+bool
+Macro::is_macro_name(const Symbol * sym)
 {
+   loop(m, MAC_COUNT)
+      {
+        if (all_macros[m] && all_macros[m]->get_header().FUN() == sym)
+           return true;
+      }
+   return false;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 Macro *
 Macro::get_macro(Macro_num num)
 {
@@ -57,12 +88,16 @@ Macro::get_macro(Macro_num num)
    Assert(num < MAC_COUNT);
    return all_macros[num];
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Macro::unmark_all_macros()
 {
 #define mac_def(name, _txt) get_macro(MAC_ ## name)->unmark_all_values();
 #include "Macro.def"
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
+Macro::~Macro()
+{
+}
+//════════════════════════════════════════════════════════════════════════════
 

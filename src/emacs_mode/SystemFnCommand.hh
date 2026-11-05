@@ -26,10 +26,17 @@
 
 #include "NetworkCommand.hh"
 
+//════════════════════════════════════════════════════════════════════════════
+/// the "sysfn" network command: report the names of every `)` system
+/// command and user command, one per line
 class SystemFnCommand : public NetworkCommand {
 public:
+    /// constructor
     SystemFnCommand( std::string name_in ) : NetworkCommand( name_in ) {};
+
+    /// see NetworkCommand::run_command()
     virtual void run_command( NetworkConnection &conn, const std::vector<std::string> &args );
 };
+//════════════════════════════════════════════════════════════════════════════
 
 #endif

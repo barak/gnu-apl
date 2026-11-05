@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2025  Dr. Jürgen Sauermann
+    Copyright © 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #define __UNICODE_HH_DEFINED__
 
 #ifndef __COMMON_HH_DEFINED__
-# error This file shall NOT be #included directly, but by #including Common.hh
+#  error This file shall NOT be #included directly, but by #including Common.hh
 #endif
 
 #include "Common.hh"
@@ -63,8 +63,8 @@ enum Unicode
    UNI_PAD_r_VALUE   = UNI_PAD_U5,   // value separator
    UNI_PAD_b_ROW     = UNI_PAD_U6,   // pad to max_row_height
    UNI_PAD_r_MAX     = UNI_PAD_U7,   // pad to max_spacing
-   UNI_PAD_l_DEPTH   = UNI_PAD_U8,   // depth indicator
-   UNI_PAD_r_DEPTH   = UNI_PAD_U9,   // depth indicator
+   UNI_PAD_l_DEPTH   = UNI_PAD_U8,   // (left) depth indicator
+   UNI_PAD_r_DEPTH   = UNI_PAD_U9,   // (right) depth indicator
 
    UNI_PAD_y_AXIS    = UNI_PAD_L0,   // interdimensional spacing (rank > 2)
    UNI_PAD_r_oCol    = UNI_PAD_L1,   // pad new line to column width
@@ -108,18 +108,21 @@ enum Unicode
 };
 
 /// value 0-15 of hex digit, or -1 if uni not in "023456789ABCDEFabcdef"
+/// @param uni Unicode character to convert
 extern int nibble(Unicode uni);
 
 /// value 0-63 of base64 digit, or -1 if uni not base64 (RFC 4648)
+/// @param uni Unicode character to convert
 extern int sixbit(Unicode uni);
 
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 /// return true iff \b uni is a padding character (used internally).
+/// @param uni Unicode character to test
 inline bool is_iPAD_char(Unicode uni)
 {
    return ((uni > UNI_iPAD_U2) && (uni <= UNI_PAD_r_NOTCHAR))    // ³ ¹
        || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 
 #endif // __UNICODE_HH_DEFINED__

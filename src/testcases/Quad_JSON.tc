@@ -1,6 +1,8 @@
 ⍝ Quad_JSON
 
       ⍝ error cases...
+⍝@ test3.
+
 
       ⍝ extra token
       ⎕JSON ' 33 44 '
@@ -20,7 +22,102 @@ DOMAIN ERROR+
       )MORE
 ⎕JSON B: Got '5' when expecting ',' at 4↓B
 
-)SIC
+      )SIC
+
+      ⍝ invalid escape sequences (Blake McBride, Bugs21 #4a) --------
+      ⍝ RFC 8259 permits exactly \" \\ \/ \b \f \n \r \t (and \uXXXX,
+      ⍝ tested separately above); any other 1-character escape used
+      ⍝ to be silently accepted and decoded as the literal character
+      ⍝ itself. Now rejected.
+
+      ⎕JSON '["a\xb"]'
+DOMAIN ERROR+
+      ⎕JSON '["a\xb"]'
+      ^
+      )MORE
+⎕JSON B: invalid escape sequence \x at 3↓B
+
+      )SIC
+
+      ⎕JSON '["a\qb"]'
+DOMAIN ERROR+
+      ⎕JSON '["a\qb"]'
+      ^
+      )MORE
+⎕JSON B: invalid escape sequence \q at 3↓B
+
+      )SIC
+
+      ⍝ the already-valid 1-character escapes still all work
+      ⍝
+      ⎕JSON ' "a\\b"'
+a\b
+
+      ⎕JSON ' "a\/b"'
+a/b
+
+      ⎕UCS ⎕JSON ' "a\bb"'
+97 8 98
+
+      ⎕UCS ⎕JSON ' "a\fb"'
+97 12 98
+
+      ⎕UCS ⎕JSON ' "a\nb"'
+97 10 98
+
+      ⎕UCS ⎕JSON ' "a\rb"'
+97 13 98
+
+      ⎕UCS ⎕JSON ' "a\tb"'
+97 9 98
+
+      ⍝ leading zeros in numbers (Blake McBride, Bugs21 #4b) --------
+      ⍝ RFC 8259: int = zero / (digit1-9 *DIGIT) -- a leading zero
+      ⍝ used to be silently accepted with the extra digits kept.
+
+      ⎕JSON '[0123]'
+DOMAIN ERROR+
+      ⎕JSON '[0123]'
+      ^
+      )MORE
+⎕JSON B: malformed number (leading zero) at 1↓B
+
+      )SIC
+
+      ⎕JSON '[01]'
+DOMAIN ERROR+
+      ⎕JSON '[01]'
+      ^
+      )MORE
+⎕JSON B: malformed number (leading zero) at 1↓B
+
+      )SIC
+
+      ⎕JSON '[-01]'
+DOMAIN ERROR+
+      ⎕JSON '[-01]'
+      ^
+      )MORE
+⎕JSON B: malformed number (leading zero) at 1↓B
+
+      )SIC
+
+      ⍝ a lone "0" (not followed by further digits) is still fine
+      ⍝
+      ⎕JSON '[0]'
+0
+
+      ⎕JSON '[0.5]'
+0.5
+
+      ⎕JSON '[00]'
+DOMAIN ERROR+
+      ⎕JSON '[00]'
+      ^
+      )MORE
+⎕JSON B: malformed number (leading zero) at 1↓B
+
+      )SIC
 
       ⍝ number
       ⎕JSON '33'
@@ -46,37 +143,37 @@ he"lo
       ⎕JSON '"a\uD834\uDD1Eb"'
 a𝄞b
 
-   ⍝ JSON array
+      ⍝ JSON array
       ⎕JSON '[1, 2, .3, 3E4, 5.6E¯7, -1 ]'
 1 2 0.3 30000 5.6E¯7 ¯1
 
 
-   ⍝ JSON object
-   ⎕JSON 36 ⎕CR """
-{ "a": 1,
-  "b": 2,
-  "c": "ccc",
-  "dd" : 3,
-  "Ee" : 3E4,
-  "f" : 5.6E¯7,
-  "G:" :  -1
-}
-"""
-.dd: 3
-
-.f:  5.6E¯7
+      ⍝ JSON object
+      ⎕JSON 36 ⎕CR """
+      { "a": 1,
+      "b": 2,
+      "c": "ccc",
+      "dd" : 3,
+      "Ee" : 3E4,
+      "f" : 5.6E¯7,
+      "G:" :  -1
+      }
+      """
+.Ee: 30000
 
 .G:: ¯1
 
-.Ee: 30000
+.a:  1
+
+.b:  2
 
 .c:  ┌→──┐
      │ccc│
      └───┘
 
-.b:  2
+.dd: 3
 
-.a:  1
+.f:  5.6E¯7
 
       ⍝ JSON literals
       ⍝
@@ -123,24 +220,24 @@ a𝄞b
 
       J←'{ "a": 1,"b": 2,"c": "ccc","dd": 3, "Ee": 3E4, "f": 5.6E¯7, "G": -1 }'
       ⊃35 ⎕CR 2 ⎕JSON ⎕JSON J
-{ "dd": 3,     
-  "G": -1,     
-  "f": 5.6e-07,
-  "Ee": 30000, 
-  "c": "ccc",  
-  "b": 2,      
-  "a": 1 }     
+{ "dd": 3,                    
+  "G": -1,                    
+  "f": 5.6000000000000004e-07,
+  "Ee": 30000,                
+  "c": "ccc",                 
+  "b": 2,                     
+  "a": 1 }                    
 
       ⍝ same with sorted members
       ⍝
       ⊃35 ⎕CR 3 ⎕JSON ⎕JSON J
-{ "G": -1,     
-  "a": 1,      
-  "b": 2,      
-  "c": "ccc",  
-  "f": 5.6e-07,
-  "Ee": 30000, 
-  "dd": 3 }    
+{ "Ee": 30000,                 
+  "G": -1,                     
+  "a": 1,                      
+  "b": 2,                      
+  "c": "ccc",                  
+  "dd": 3,                     
+  "f": 5.6000000000000004e-07 }
 
       ⍝ inverses of more examples above...
       ⍝
@@ -148,7 +245,7 @@ a𝄞b
 33
 
       2 ⎕JSON ⎕JSON '33.300'
-33.3
+33.299999999999997
 
       2 ⎕JSON ⎕JSON ' "hello"'
 "hello"
@@ -166,25 +263,25 @@ a𝄞b
 "𝄞"
 
       ⊃35 ⎕CR 2 ⎕JSON ⎕JSON '[1, 2, .3, 3E4, 5.6E¯7, -1 ]'
-[ 1, 2, 0.3, 30000, 5.6e-07, -1 ]
+[ 1, 2, 0.29999999999999999, 30000, 5.6000000000000004e-07, -1 ]
 
       ⊃35 ⎕CR 2 ⎕JSON ⎕JSON 36 ⎕CR """
-{ "a": 1,
-  "b": 2,
-  "c": "ccc",
-  "dd" : 3,
-  "Ee" : 3E4,
-  "f" : 5.6E¯7,
-  "G:" :  -1
-}
-"""
-{ "dd": 3,     
-  "f": 5.6e-07,
-  "G:": -1,    
-  "Ee": 30000, 
-  "c": "ccc",  
-  "b": 2,      
-  "a": 1 }     
+      { "a": 1,
+      "b": 2,
+      "c": "ccc",
+      "dd" : 3,
+      "Ee" : 3E4,
+      "f" : 5.6E¯7,
+      "G:" :  -1
+      }
+      """
+{ "dd": 3,                    
+  "f": 5.6000000000000004e-07,
+  "G:": -1,                   
+  "Ee": 30000,                
+  "c": "ccc",                 
+  "b": 2,                     
+  "a": 1 }                    
 
       ⍝ regression
       ⍝
@@ -208,3 +305,15 @@ OK      - no duplicate parents
 
 
 
+      ⍝ Regression (Blake McBride, Bugs22 #6): ⎕JSON accepted raw
+      ⍝ (unescaped) control characters U+0000..U+001F inside a JSON
+      ⍝ string, which RFC 8259 §7 forbids.
+      ⍝
+      ⎕JSON ('["a',(⎕UCS 10),'b"]')
+DOMAIN ERROR+
+      ⎕JSON('["a',(⎕UCS 10),'b"]')
+      ^
+      )SIC
+
+      ⎕JSON '["ab"]'
+ ab 

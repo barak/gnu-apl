@@ -1,0 +1,314 @@
+⍝ apl2lrm.tc
+⍝ ----------------------------------
+⍝ Regression tests distilled from Blake McBride's "GNU APL Language
+⍝ Variances" report (comparing GNU APL against the IBM APL2 Language
+⍝ Reference Manual, devel_doc/apl2lrm.txt). Each section is one report
+⍝ finding (#N, matching the report's own numbering). FIXED sections
+⍝ lock in the corrected behavior; SETTLED / DOES-NOT-REPRODUCE
+⍝ sections lock in GNU APL's confirmed, deliberate current behavior so
+⍝ any future accidental change is caught. Full rationale behind each
+⍝ verdict is in the "GNU APL bug tracker" memory file (not part of
+⍝ this repo).
+
+⍝@ test3.
+
+⍝ #1 (V1) -- real numbers with integral values, LRM p.13/18.
+⍝ FIXED 2026-08-11: an explicit decimal point now keeps float storage
+⍝ even when the fractional part is all zeros (Tokenizer.cc, dot_seen).
+      ⎕PP←4
+      456789
+456789
+      456789.0
+4.568E5
+      2 2⍴23 .0056 34566.0 .00000056
+2.300E1 5.6E¯3
+3.457E4 5.6E¯7
+      ⎕PP←10
+
+⍝ #22 -- ⎕AI has 5 items instead of 4, LRM p.269.
+⍝ SETTLED do-not-fix: the 5th item is a deliberate GNU APL extension.
+      ⍴⎕AI
+5
+
+⍝ #23 -- ⎕AT always returns a matrix (LRM says vector for vector R),
+⍝ LRM p.270. SETTLED do-not-fix: GNU APL extension, analogous to
+⍝ IBM's own "1-element vector is scalar" convention.
+      ⍴1 ⎕AT '⎕FX'
+1 3
+      ⍴⍴1 ⎕AT '⎕FX'
+2
+
+⍝ #25 -- ⎕EX cannot expunge system variables, LRM p.289.
+⍝ SETTLED do-not-fix: "this is a feature not a bug" -- avoids the
+⍝ notorious ⎕IO←1-after-⎕EX footgun.
+      (⎕EX '⎕IO'),(⎕EX '⎕CT'),(⎕EX '⎕PP'),(⎕EX '⎕RL'),(⎕EX '⎕FC'),(⎕EX '⎕PR'),(⎕EX '⎕LX')
+0 0 0 0 0 0 0
+
+⍝ #26 -- ⎕FX accepts an invalid character as a function line,
+⍝ LRM p.292. CHECKED 2026-08-11: does NOT reproduce, GNU APL already
+⍝ matches the LRM (returns the offending row index, never establishes
+⍝ the function).
+      ⎕FX 'Z←FN R' 'Z←1+R×2' ⎕AV[1]
+3
+      ⎕NC 'FN'
+0
+
+⍝ #31 -- ⎕RL domain, LRM p.322.
+⍝ FIXED 2026-08-11: ⎕RL's displayed/stored value is now masked to 63
+⍝ bits (always non-negative); negative assignment is rejected with
+⍝ DOMAIN ERROR (GNU APL keeps its native 64-bit generator internally,
+⍝ scaled up from APL2's documented ¯2+2*31 rather than clamped down).
+      ⎕RL←¯1
+DOMAIN ERROR+
+      ⎕RL←¯1
+      ^  ^
+      )MORE
+⎕RL must be a non-negative integer; GNU APL's valid range is 0 to 9223372036854775807 (2*63-1) -- wider than APL2's documented ¯2+2*31, scaled up to GNU APL's native 64-bit integers (see LanguageVariances.md #31)
+
+      ⎕RL←0
+      ⎕RL
+0
+
+⍝ #32 -- ⎕CT is silently clamped to 1E¯9, LRM p.275.
+⍝ SETTLED do-not-fix: the LRM only *discourages* (doesn't forbid)
+⍝ ⎕CT>1E¯9; GNU APL enforces the discouraged limit as a hard clamp.
+      ⎕CT←0.5
+      ⎕CT
+1E¯9
+      ⎕CT←1E¯9
+
+⍝ #33 -- implicit-argument variables (⎕CT, ⎕FC, ⎕IO, ⎕PP, ⎕PR, ⎕RL)
+⍝ are validated at assignment rather than at next implicit use, LRM
+⍝ pp.275,291,297,315. SETTLED do-not-fix: fail fast beats a deferred
+⍝ error surfacing far from the actual mistake.
+      ⎕IO←5
+DOMAIN ERROR
+      ⎕IO←5
+      ^  ^
+      ⎕IO←1
+      ⎕PP←0
+DOMAIN ERROR
+      ⎕PP←0
+      ^  ^
+      ⎕PP←10
+
+⍝ #34 -- ⎕TF transfer forms, LRM p.337-338.
+⍝ (a) 2⎕TF escaping ∊: already fine (⎕AV now includes ∊, fixed as a
+⍝ side effect of finding #36).
+      ⊣⎕FX 'Z←E1 R' 'Z←0∊R'
+      2 ⎕TF 'E1'
+⎕FX 'Z←E1 R' 'Z←0∊R'
+⍝ (b) redundant N⍴ reshape + (c) double space in 1⎕TF: both FIXED
+⍝ 2026-08-11 (Quad_TF.cc, omit_reshape / formatter space fix).
+      A←'ABC' ⋄ 2 ⎕TF 'A'
+A←'ABC'
+      A←1 2 3 ⋄ 2 ⎕TF 'A'
+A←1 2 3
+      A←' Don''t ' ⋄ 2 ⎕TF 'A'
+A←' Don''t '
+      A3←2 3⍴1⌽⍳6 ⋄ 1 ⎕TF 'A3'
+NA3 2 2 3 2 3 4 5 6 1
+      )ERASE A A3 E1
+
+⍝ #44 -- SI WARNING is not issued when editing a function that
+⍝ appears in the state indicator, LRM pp.359,466. SETTLED do-not-fix:
+⍝ GNU APL actually blocks the edit outright with DEFN ERROR (stricter
+⍝ than the LRM's allow+warn, not the report's "allow silently") --
+⍝ a defensible safety property (never let an interactive edit
+⍝ invalidate in-flight execution state).
+      ⊣⎕FX 'Z←F44 X' 'Z←10÷X'
+      F44 0
+DOMAIN ERROR
+F44[1]  Z←10÷X
+          ^ ^
+      ∇F44[1]Z←20÷X∇
+DEFN ERROR+
+      ∇F44[1]Z←20÷X∇
+                   ^
+      )SIC
+      )ERASE F44
+
+⍝ #45/#46 -- ∇-editor bracket delete/display commands ([∆N M...],
+⍝ [⎕N M...], [∆N-], etc.), LRM pp.389-392. Originally left as a documented
+⍝ gap; SUPPORTED since 2026-10-08 (Nabla::Line_set): the list forms
+⍝ [∆n1 n2 ...] and [⎕n1 n2 ...] and the open-ended ranges [∆n-], [⎕n-].
+⍝ Still checked from the earlier fix (2026-08-11): an invalid bracket
+⍝ command on the opening line (e.g. [2⎕3 4]) gives a clean DEFN ERROR
+⍝ and leaves the existing function intact (⎕CR below).
+      )ERASE MEAN
+      ∇Z←MEAN B
+      Z←1
+      Z←2
+      Z←3
+      Z←4
+      Z←5
+      ∇
+      ∇MEAN[∆1 3]∇
+      ⎕CR 'MEAN'
+Z←MEAN B 
+      Z←2
+      Z←4
+      Z←5
+      ∇MEAN[2⎕3 4]∇
+DEFN ERROR+
+      ∇MEAN[2⎕3 4]∇
+                  ^
+      ⎕CR 'MEAN'
+Z←MEAN B 
+      Z←2
+      Z←4
+      Z←5
+      )ERASE MEAN
+
+⍝ #28 -- ⎕ES with an event code that has no defined ⎕ET text prints a
+⍝ message, LRM p.284 ("no message is reported"). FIXED 2026-08-11:
+⍝ Quad_ES's "unknown major/minor" branch (QuadFunction.cc) no longer
+⍝ builds the "Unknown error (major N, minor M) in ⎕ES B" diagnostic
+⍝ text; Error::print_em() (Error.cc) skips an empty message line
+⍝ entirely rather than printing a blank one, matching the LRM's exact
+⍝ (message-less) display. ⎕ET/⎕EM are otherwise unaffected -- ⎕EM
+⍝ stays a fixed 3-row matrix, just with row 1 blank (narrower now that
+⍝ its longest row no longer includes the removed message text).
+      )ERASE RECIP
+      ∇Z←RECIP A
+      ⎕ES(0=A)/13 17
+      Z←÷A
+      ∇
+      RECIP 0
+      RECIP 0
+      ^
+      ⎕ET
+13 17
+      )SIC
+      )ERASE RECIP
+
+⍝ #35 -- 1⎕TF of a nested variable, LRM p.338 ("1 ⎕TF is not
+⍝ supported for any of these cases, and returns an empty result").
+⍝ FIXED 2026-08-11: Quad_TF::tf1()'s numeric-array branch
+⍝ (Quad_TF.cc) now returns Str0(LOC) (empty string) when it meets a
+⍝ nested/pointer cell it can't represent in the migration/N-record
+⍝ format, matching the character-array branch's existing convention
+⍝ for the same situation -- instead of a null Value_P that made the
+⍝ shared eval_AB() fallback throw DOMAIN ERROR.
+      A8←(1 2)(3 4)
+      Z←1 ⎕TF 'A8'
+      Z≡''
+1
+      ⍴Z
+0
+      )ERASE A8
+
+⍝ #37 -- ⎕AF has no domain check, LRM p.268 ("Integers in R must be
+⍝ nonnegative and less than 2*31"). FIXED 2026-08-11: Quad_AF::eval_B()
+⍝ (QuadFunction.cc) now rejects a negative or ≥2*31 index with DOMAIN
+⍝ ERROR before calling Quad_AV::indexed_at() -- previously the index
+⍝ was silently passed through to indexed_at()'s *unsigned* uint32_t
+⍝ parameter (¯1 wraps to 4294967295) and, being outside ⎕AV's real
+⍝ 256-entry range either way, just fell through to the same "not in
+⍝ ⎕AV" ◌ placeholder used for legitimate mid-range gaps -- no error at
+⍝ all. An index in [256, 2*31), while still unmapped to a real ⎕AV
+⍝ entry, is NOT an error per the LRM's own domain statement, so it
+⍝ still returns ◌ (unchanged, see ⎕AF 300 below).
+      ⎕AF ¯1
+DOMAIN ERROR
+      ⎕AF ¯1
+      ^
+      ⎕AF(2*31)
+DOMAIN ERROR
+      ⎕AF(2⋆31)
+      ^
+      ⎕AF(¯1+2*31)
+◌
+      ⎕AF 300
+◌
+      )SIC
+
+⍝ #41 -- ⎕SVC/⎕SVS of an unused name gives VALUE ERROR, LRM p.323 (the
+⍝ manual's own example applies ⎕SVC to a name *before* it exists and
+⍝ gets 0 0 0 0). FIXED 2026-08-11: Quad_SVC::eval_B()/Quad_SVS::eval_B()
+⍝ (Quad_SVx.cc) treated an undefined name the same as any other
+⍝ undefined-name reference (VALUE ERROR) instead of "exists, not
+⍝ shared" -- trivially true for a name that was never even defined.
+⍝ Both now skip the Svar_DB lookup and push four 0s directly when the
+⍝ symbol doesn't exist, mirrored in both functions.
+      ⎕SVC 'CTL102'
+0 0 0 0
+      ⎕SVS 'CTL102'
+0 0 0 0
+
+⍝ #47 -- ∇-display omits the time stamp, LRM pp.346,349 ("When the
+⍝ defined operation is displayed with )EDITOR 1, its time stamp and
+⍝ the offset from Greenwich Mean Time ... are also displayed").
+⍝ FIXED 2026-08-11: Nabla::execute_show()'s closing-∇ print
+⍝ (Nabla.cc) now appends the function's creation time stamp (reusing
+⍝ Quad_TZ::print_timestamp(), the same helper already used for
+⍝ )SAVE/)DUMP's "SAVED"/"DUMPED" messages) whenever displaying an
+⍝ already-established function (function_existed) with a valid
+⍝ creation time -- a function still being defined for the first time
+⍝ in the current editing session keeps the old bare "    ∇" (nothing
+⍝ meaningful to show yet). 2⎕AT already reported this timestamp
+⍝ correctly; only the [⎕] display was missing it.
+      )ERASE APL2LRM47
+      ∇Z←APL2LRM47 B
+      Z←B+1
+      ∇
+      ∇APL2LRM47[⎕]∇
+    ∇
+[0]   Z←APL2LRM47 B
+[1]         Z←B+1
+    ∇  ³
+      )ERASE APL2LRM47
+
+⍝ #49 -- message texts, LRM pp.462-469. The comma-vs-colon typo in the
+⍝ )SAVE-of-CLEAR-WS message was fixed 2026-08-11 (Workspace.cc,
+⍝ Cmd_WS.cc); "BAD COMMAND" for an unrecognized system command was
+⍝ changed to match the LRM's own "INCORRECT COMMAND" 2026-08-13
+⍝ (Command.cc, the unknown-)command fallback -- the other ~17 BAD
+⍝ COMMAND sites are a different case, malformed arguments to a KNOWN
+⍝ command, not covered by this item). The remaining 2 sub-differences
+⍝ (qualified SYSTEM LIMIT, non-APL2 lexical error texts) are
+⍝ intentionally left as-is -- more specific/helpful wording, not a
+⍝ correctness issue, consistent with #28's message-text philosophy.
+⍝ )CLEAR first: an earlier testcase may have left a )WSID (--TR).
+      )CLEAR
+CLEAR WS
+      )SAVE
+NOT SAVED, THIS WS IS CLEAR WS+
+
+⍝ #43 -- )SI/)SIS suspension marker uses ⋆ (U+22C6) instead of the
+⍝ LRM's * (p.356). FIXED 2026-08-11: StateIndicator::list()
+⍝ (StateIndicator.cc) had two literal-string occurrences -- "⋆" for a
+⍝ suspended immediate-execution statement (PM_STATEMENT_LIST) and
+⍝ "⋆⋆  " for a nested ⍎-execute context (PM_EXECUTE, not shown in the
+⍝ report's own example but the same convention) -- both swapped to
+⍝ "*"/"**  ". Deliberately did NOT touch ⋆ as the ordinary power/
+⍝ exponent operator glyph (e.g. R⋆2) elsewhere, only the two SI-marker
+⍝ literals. This was a widely-exercised display path -- also fixed
+⍝ the same stale "⋆" baked into pre-existing )SI/)SIS-related tests
+⍝ (Macro.tc, Quad_LC.tc, Quad_FX.tc, Quad_EX.tc, SaveLoad.tc), each
+⍝ confirmed unaffected in their own unrelated R⋆2-style power-operator
+⍝ lines.
+      )ERASE F
+      ∇Z←F X
+      Z←10÷X
+      ∇
+      F 0
+DOMAIN ERROR
+F[1]  Z←10÷X
+        ^ ^
+      )SIS
+F[1]  Z←10÷X
+        ^ ^
+*  F 0
+   ^
+      )SIC
+      )ERASE F
+
+⍝ ==================================
+
+
+      ⍝ restore the default for the testcases that follow (see --TR)
+      ⍝
+      ⎕CT←1E¯13
+
+

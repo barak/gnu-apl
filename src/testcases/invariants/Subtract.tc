@@ -1,0 +1,33 @@
+⍝ Subtract.tc
+⍝ ═══════════
+
+⍝@ test4.
+
+      ⎕IO←1
+
+      ⍝ Precond: A and B numeric
+      ⍝ inv: A-B ←→ -(B-A)   (swapping operands negates the result,
+      ⍝ even across int→float promotion)
+      A ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      (A-B) ≡ -(B-A)
+1
+
+      ⍝ inv: A-B ←→ A+-B   (subtract = add the negation)
+      (A-B) ≡ A+-B
+1
+
+      ⍝ Precond: Big sits at the int64 boundary so that Big-Small
+      ⍝ always overflows and is promoted to float
+      ⍝ (Cell::diff_overflow(), IntCell::bif_subtract_ii()); Small is
+      ⍝ small enough to be exactly double-representable, so adding it
+      ⍝ back to the float difference is exact
+      ⍝ inv: Big ←→ (Big-Small)+Small
+      Small ← ¯1-999∣|⎕RVAL 0     ⍝ negative: Big-Small overflows upward
+      Big ← 9223372036854775807
+      Big ≡ (Big-Small)+Small
+1
+      Small ← 1+999∣|⎕RVAL 0     ⍝ positive: Big-Small overflows downward
+      Big ← ¯9223372036854775808
+      Big ≡ (Big-Small)+Small
+1

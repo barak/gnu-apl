@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2026  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,27 +26,30 @@
    // and the native function has become a wrapper to ⎕FIO
    //
 
+#include "../Native_interface.hh"
 #include "../Quad_FIO.hh"
 
 class NativeFunction;
 
 enum { SMALL_BUF = Quad_FIO::SMALL_BUF };
 
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 extern "C" void * get_function_mux(const char * function_name);
 static Fun_signature get_signature();
+static int get_ABI_version();
 static bool close_fun(Cause cause,          const NativeFunction * caller);
-static Token eval_B  (Value_P B,            const NativeFunction * caller);
-static Token eval_AB (Value_P A, Value_P B, const NativeFunction * caller);
-static Token eval_XB (Value_P X, Value_P B, const NativeFunction * caller);
-static Token eval_AXB(Value_P A, Value_P X,
-                      Value_P B,            const NativeFunction * caller);
+static Token eval_B  (const cValue * B,                           const NativeFunction * caller);
+static Token eval_AB (const cValue * A, const cValue * B,          const NativeFunction * caller);
+static Token eval_XB (const cValue * X, const cValue * B,          const NativeFunction * caller);
+static Token eval_AXB(const cValue * A, const cValue * X, const cValue * B,            const NativeFunction * caller);
 
 void *
 get_function_mux(const char * function_name)
 {
    if (!strcmp(function_name, "get_signature"))
       return reinterpret_cast<void *>(&get_signature);
+   if (!strcmp(function_name, "get_ABI_version"))
+      return reinterpret_cast<void *>(&get_ABI_version);
    if (!strcmp(function_name, "close_fun"))
       return reinterpret_cast<void *>(&close_fun);
    if (!strcmp(function_name, "eval_B"))
@@ -59,7 +62,7 @@ get_function_mux(const char * function_name)
       return reinterpret_cast<void *>(&eval_AXB);
    return 0;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 /// a mandatory function that returns the signature of the eval_XXX()
 /// function(s) provided by this library.
 ///
@@ -68,7 +71,15 @@ get_signature()
 {
    return SIG_Z_A_F2_B;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+/// a mandatory function returning the ABI contract version (see
+/// Native_interface.hh) that this library was compiled against.
+int
+get_ABI_version()
+{
+   return NATIVE_ABI_VERSION;
+}
+//════════════════════════════════════════════════════════════════════════════
 /// an optional function that is called when the native function in the
 /// APL interpreter is about to be removed. Return true if the caller shall
 /// dlclose() this library
@@ -77,7 +88,7 @@ close_fun(Cause cause, const NativeFunction * caller)
 {
    return true;
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 static Token
 list_functions(ostream & out)
 {
@@ -171,34 +182,35 @@ list_functions(ostream & out)
 
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-eval_B(Value_P B, const NativeFunction * caller)
+eval_B(const cValue * B, const NativeFunction * caller)
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (!B->get_cravel(0).is_integer_cell())     return list_functions(COUT);
+   Cell cache;
+   if (!B->get_cfirst(cache).is_integer_cell())   return list_functions(COUT);
 
-   return Quad_FIO::fun.eval_B(B);
+   return Quad_FIO::fun.eval_B(*B);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
+eval_AB(const cValue * A, const cValue * B, const NativeFunction * caller)
 {
-   return Quad_FIO::fun.eval_AB(A, B);
+   return Quad_FIO::fun.eval_AB(*A, *B);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
+eval_XB(const cValue * X, const cValue * B, const NativeFunction * caller)
 {
-   return Quad_FIO::fun.eval_XB(X, B);
+   return Quad_FIO::fun.eval_XB(*X, *B);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 Token
-eval_AXB(const Value_P A, const Value_P X, const Value_P B,
+eval_AXB(const cValue * A, const cValue * X, const cValue * B,
          const NativeFunction * caller)
 {
-   return Quad_FIO::fun.eval_AXB(A, X, B);
+   return Quad_FIO::fun.eval_AXB(*A, *X, *B);
 }
-//-----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 

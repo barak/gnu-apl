@@ -25,12 +25,14 @@
 #include "Function.hh"
 #include "Quad_TF.hh"
 #include "Symbol.hh"
+#include "Sys.hh"
 #include "Tokenizer.hh"
 #include "Token_string.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
+#include "u8_string.hh"
 
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -45,15 +47,13 @@ UCS_string fname = args.front();
 const LibRef_name lib_name(LIB0, fname);
 const UTF8_string filename = LibPaths::get_filename(lib_name, true, ".atf", 0);
 
-FILE * in = fopen(filename.c_str(), "r");
-   if (in == 0)   // open failed: try filename.atf unless already .atf
+FileReader in(filename.c_str());
+   if (!in)   // open failed: try filename.atf unless already .atf
       {
-        const UTF8_string fname_utf8(fname);
-        CERR << ")IN " << fname_utf8
-             << " failed: " << strerror(errno) << endl;
+        CERR << ")IN " << fname << " failed: " << strerror(errno) << endl;
 
         MORE_ERROR() << "command )IN: could not open file "
-                     << fname_utf8.c_str() << " for reading: "
+                     << fname << " for reading: "
                      << strerror(errno);
         return;
       }
@@ -65,7 +65,7 @@ transfer_context tctx(protection);
 
    for (;;)
       {
-        const int cc = fgetc(in);
+        const int cc = in.fgetc();
         if (cc == EOF)   break;
         if (idx == 0 && cc == 0x0A)   // optional LF
            {
@@ -92,9 +92,35 @@ transfer_context tctx(protection);
         CERR << "BAD record charset (neither ASCII nor EBCDIC)" << endl;
         break;
       }
-   fclose(in);
+
+   // )PIN: LRM p.447 "If a name conflict does occur, the object from the
+   // transfer file is listed in a NOT COPIED: message" (Bugs35 #64)
+   //
+   if (tctx.not_copied.size())
+      {
+        out << "NOT COPIED:";
+        loop(n, tctx.not_copied.size())   out << " " << tctx.not_copied[n];
+        out << endl;
+      }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
+bool
+Cmd_IN::transfer_context::is_protected(const UCS_string & name) const
+{
+   if (!protection || name.size() == 0)   return false;
+
+bool exists = true;   // system variables always exist
+   if (!Avec::is_quad(name[0]))
+      {
+        const Symbol * sym = Workspace::lookup_existing_symbol(name);
+        exists = sym && sym->get_NC() != NC_UNUSED_USER_NAME;
+      }
+   if (!exists)   return false;
+
+   if (!not_copied.contains(name))   not_copied.push_back(name);
+   return true;
+}
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::transfer_context::process_record(const UTF8 * record,
                                           const UCS_string_vector & objects)
@@ -104,25 +130,36 @@ const char sub_type = record[1];
 
    if (rec_type == '*')   // comment or similar
       {
+        // parsing the *(...) timestamp record is a side effect, not a log
+        // message, and must run unconditionally: it used to be nested
+        // inside Log(LOG_command_IN), which expands to 'if (x)'
+        // (Logging.hh:60), and LOG_command_IN is off in every release
+        // build (tools/check_src requires every Logging.def facility to
+        // be shipped off) -- so )IN never restored a function's/variable's
+        // creation timestamp written by )OUT, even though )OUT wrote the
+        // *(YYYY MM DD hh mm ss uuuuuu) record correctly (Blake McBride,
+        // Bugs16 #4).
+        //
+        if (sub_type == '(')   // timestamp
+           {
+             YMDhmsu t(now());   // fallback if sscanf() != 7
+             if (7 == u8::sscanf(record + 1,
+                             "(%d %d %d %d %d %d %d)",
+                             &t.year, &t.month, &t.day,
+                             &t.hour, &t.minute, &t.second,
+                             &t.micro))
+                {
+                  timestamp = t.get();
+                }
+           }
+
         Log(LOG_command_IN)
            {
              const char * stype = " *** bad sub-record of *";
              switch(sub_type)
                 {
                   case ' ': stype = " comment";     break;
-                  case '(': {
-                              stype = " timestamp";
-                              YMDhmsu t(now());   // fallback if sscanf() != 7
-                              if (7 == sscanf(charP(record + 1),
-                                              "(%d %d %d %d %d %d %d)",
-                                              &t.year, &t.month, &t.day,
-                                              &t.hour, &t.minute, &t.second,
-                                              &t.micro))
-                                  {
-                                    timestamp = t.get();
-                                  }
-                            }
-                            break;
+                  case '(': stype = " timestamp";   break;
                   case 'I': stype = " imbed";       break;
                 }
 
@@ -173,7 +210,7 @@ const char sub_type = record[1];
              << "*** bad record type '" << rec_type << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 uint32_t
 Cmd_IN::transfer_context::get_nrs(UCS_string & name, Shape & shape) const
 {
@@ -210,7 +247,7 @@ int rank = 0;
 
    return idx;
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::numeric_1TF(const UCS_string_vector & objects) const
 {
@@ -219,21 +256,31 @@ Shape shape;
 int idx = get_nrs(var_name, shape);
 
    if (objects.size() && !objects.contains(var_name))   return;
+   if (var_name.size() == 0)   return;   // malformed record: empty object name
+   if (is_protected(var_name))   return;   // )PIN
 
 Symbol * sym = 0;
    if (Avec::is_quad(var_name.front()))   // system variable.
       {
+        // a record for a system function (⎕FIO, ⎕FX, ...) or for an
+        // unknown ⎕-name failed an Assert() (Bugs34 #24): skip it
+        //
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
-        if (t.get_ValueType() == TV_SYM)   sym = t.get_sym_ptr();
-        else                               Assert(0 && "Bad system variable");
+        if (len != var_name.ssize() || t.get_ValueType() != TV_SYM)
+           {
+             CERR << ")IN: " << var_name
+                  << " is not a system variable (record skipped)" << endl;
+             return;
+           }
+        sym = t.get_sym_ptr();
       }
    else                            // user defined variable
       {
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
-   
+
    Log(LOG_command_IN)
       {
         CERR << endl << var_name << " rank " << shape.get_rank() << " IS '";
@@ -245,7 +292,8 @@ Token_string tos;
    {
      UCS_string data1(data, idx);
      Tokenizer tokenizer(PM_EXECUTE, LOC, false);
-     if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
+     try   { tokenizer.tokenize(data1, tos); }
+     catch (const Error &)   { return; }
    }
  
    if (tos.ssize() != shape.get_volume())   return;
@@ -262,14 +310,16 @@ const ShapeItem ec = Z->element_count();
         else if (tag == TOK_REAL)     Z->next_ravel_Float(tok.get_flt_val());
         else if (tag == TOK_COMPLEX)  Z->next_ravel_Complex(tok.get_cpx_real(),
                                                             tok.get_cpx_imag());
-        else FIXME;
+        else return;   // e.g. a name or string token: malformed record,
+                        // reject it the same way the other malformed
+                        // records in this file already are (above).
       }
    Z->check_value(LOC);
 
    Assert(sym);
    sym->assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::chars_1TF(const UCS_string_vector & objects) const
 {
@@ -278,14 +328,24 @@ Shape shape;
 int idx = get_nrs(var_name, shape);
 
    if (objects.size() && !objects.contains(var_name))   return;
+   if (var_name.size() == 0)   return;   // malformed record: empty object name
+   if (is_protected(var_name))   return;   // )PIN
 
 Symbol * sym = 0;
    if (Avec::is_quad(var_name.front()))   // system variable.
       {
+        // a record for a system function (⎕FIO, ⎕FX, ...) or for an
+        // unknown ⎕-name failed an Assert() (Bugs34 #24): skip it
+        //
         int len = 0;
         const Token t = Workspace::get_quad(var_name, len);
-        if (t.get_ValueType() == TV_SYM)   sym = t.get_sym_ptr();
-        else                               Assert(0 && "Bad system variable");
+        if (len != var_name.ssize() || t.get_ValueType() != TV_SYM)
+           {
+             CERR << ")IN: " << var_name
+                  << " is not a system variable (record skipped)" << endl;
+             return;
+           }
+        sym = t.get_sym_ptr();
       }
    else                            // user defined variable
       {
@@ -324,7 +384,7 @@ ShapeItem padded = 0;
    Assert(sym);
    sym->assign(Z, false, LOC);
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
@@ -335,18 +395,18 @@ UCS_string var_or_fun;
 
    // data1 is: VARNAME←data...
    //
-   if (objects.size())
-      {
-        UCS_string var_name;
-        loop(d, data1.size())
-           {
-             const Unicode uni = data1[d];
-             if (uni == UNI_LEFT_ARROW)   break;
-             var_name << uni;
-           }
+   {
+     UCS_string var_name;
+     loop(d, data1.size())
+        {
+          const Unicode uni = data1[d];
+          if (uni == UNI_LEFT_ARROW)   break;
+          var_name << uni;
+        }
 
-        if (!objects.contains(var_name))   return;
-      }
+     if (objects.size() && !objects.contains(var_name))   return;
+     if (is_protected(var_name))   return;   // )PIN
+   }
 
    var_or_fun = Quad_TF::tf2_inverse(data1);
 
@@ -355,7 +415,7 @@ UCS_string var_or_fun;
         CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//────────────────────────────────────────────────────────────────────────────
 void
 Cmd_IN::transfer_context::function_2TF(const UCS_string_vector & objects)const
 {
@@ -368,12 +428,13 @@ UCS_string fun_name;
    ++idx;
 
    if (objects.size() && !objects.contains(fun_name))   return;
+   if (is_protected(fun_name))   return;   // )PIN
 
 UCS_string statement;
    while (idx < data.ssize())   statement << data[idx++];
    statement << UNI_LF;
 
-UCS_string fun_name1 = Quad_TF::tf2_inverse(statement);
+UCS_string fun_name1 = Quad_TF::tf2_inverse(statement, true);
    if (fun_name1.size() == 0)   // tf2_inverse() failed
       {
         CERR << "inverse 2 ⎕TF failed for the following APL statement: "
@@ -399,7 +460,7 @@ Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
             << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
       }
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
 void
 Cmd_IN::transfer_context::add(const UTF8 * str, int len)
 {
@@ -412,17 +473,12 @@ Cmd_IN::transfer_context::add(const UTF8 * str, int len)
    DOMAIN_ERROR;
 #endif
 
+   // the ATF codes of * ^ ~ are kept as the ASCII characters, so that
+   // strings come back unchanged. In APL code (i.e. outside strings and
+   // comments of a function line) they become ⋆ ∧ ∼ later on, see
+   // Quad_TF::ATF_principal_chars() (Bugs37 #7).
+   //
 const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
-   loop(l, len)
-      {
-        const UTF8 utf = str[l];
-        switch(utf)
-           {
-             case '^': data << UNI_AND;              break;   // ~ → ∼
-             case '*': data << UNI_STAR_OPERATOR;    break;   // * → ⋆
-             case '~': data << UNI_TILDE_OPERATOR;   break;   // ~ → ∼
-             default:  data << Unicode(cp_to_uni_map[utf]);
-           }
-      }
+   loop(l, len)   data << Unicode(cp_to_uni_map[str[l]]);
 }
-//----------------------------------------------------------------------------
+//════════════════════════════════════════════════════════════════════════════
