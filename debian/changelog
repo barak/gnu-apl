@@ -1,4 +1,4 @@
-gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
+gnu-apl (2.0+svn3894-1) unstable; urgency=medium
 
   * New upstream snapshot of SVN trunk r3894, imported from upstream's
     git mirror of SVN by new script debian/import-trunk, which removes
@@ -34,7 +34,7 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
     paths used by APnnn.tc and ZZ64_Regression.tc at the installed
     files, and run APnnn.tc, NativeFunctions.tc and SaveLoad.tc
 
- -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
+ -- Barak A. Pearlmutter <bap@debian.org>  Thu, 05 Nov 2026 15:25:47 +0000
 
 gnu-apl (2.0-4) unstable; urgency=medium
 
