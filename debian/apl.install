@@ -11,7 +11,9 @@ usr/lib/*/apl/lib_*.so*
 usr/lib/*/apl/wslib3
 usr/lib/*/apl/wslib4
 usr/lib/*/apl/wslib5
+usr/lib/*/apl/workspaces
 usr/share/apl/integral.py
+usr/share/bash-completion/completions/apl
 usr/share/doc/apl
 usr/share/info/apl.info
 usr/share/info/apl-library.info

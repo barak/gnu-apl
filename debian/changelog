@@ -23,6 +23,7 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
     build or install HOWTOs/Bible
   * Patch configure to locate pkg-config with PKG_PROG_PKG_CONFIG, so
     that it finds the host's pkg-config when cross compiling
+  * Install the new demo workspaces, bash completion and libapl.pc
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 
