@@ -3,3 +3,4 @@
 0003-install-dirs-at-make-time.patch
 0004-Quad_FIO-screen-size-no-tty.patch
 0005-no-Bible-preview.patch
+0006-pkg-config-for-host.patch

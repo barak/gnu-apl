@@ -1,0 +1,78 @@
+From: "Barak A. Pearlmutter" <barak+git@pearlmutter.net>
+Date: Thu, 5 Nov 2026 08:30:00 +0000
+Subject: locate pkg-config for the host system when cross compiling
+
+configure looks for pkg-config with AC_PATH_PROG, in three places
+(bash-completion, Python, GTK), which finds the build system's
+pkg-config.  When cross compiling this reports the build system's
+libraries and directories instead of the host's.
+
+Either use AC_PATH_TOOL, or PKG_PROG_PKG_CONFIG from pkg.m4, which
+also checks the pkg-config version.  The latter is done here; pkg.m4
+must then be available to aclocal at autoreconf time.
+
+PKG_PROG_PKG_CONFIG needs AC_CANONICAL_HOST, which must not run before
+--with-mingw has set host_alias, so pkg-config is located once, just
+after LT_INIT, and the Python check moves there from
+m4/apl_TARGETs.m4.  A missing pkg-config now leaves PKG_CONFIG empty
+rather than "no".
+
+Forwarded: no
+---
+--- a/configure.ac
++++ b/configure.ac
+@@ -127,6 +127,16 @@
+ #
+ LT_INIT([dlopen])
+ 
++# locate pkg-config for the host, i.e. <host>-pkg-config when cross
++# compiling.  This must follow AC_CANONICAL_HOST (in LT_INIT), so that
++# --with-mingw can set host_alias first (see m4/apl_TARGETs.m4).
++#
++PKG_PROG_PKG_CONFIG
++if apl_YES($apl_TARGET_PYTHON) && test -n "$PKG_CONFIG" &&
++   $PKG_CONFIG --exists python3; then
++   PYTHON_CFLAGS=`$PKG_CONFIG --cflags python3`
++fi
++
+ apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
+ 
+ 
+@@ -833,7 +843,6 @@
+ # on a system without bash-completion -- completion simply starts working
+ # automatically if bash-completion is installed later).
+ #
+-AC_PATH_PROG([PKG_CONFIG], [pkg-config], [])
+ if test -n "$PKG_CONFIG" && "$PKG_CONFIG" --exists bash-completion 2>/dev/null
+ then
+    bashcompletiondir=`"$PKG_CONFIG" --variable=completionsdir bash-completion`
+--- a/m4/apl_TARGETs.m4
++++ b/m4/apl_TARGETs.m4
+@@ -98,12 +98,7 @@
+ 
+ if apl_YES($apl_TARGET_PYTHON); then
+    AC_DEFINE([apl_TARGET_PYTHON], [1], [Define if building lib_gnu_apl.so])
+-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
+-    if apl_NNO($PKG_CONFIG); then             # we have pkg-config
+-       if $PKG_CONFIG --exists python3; then   # and pkg-config knows python3
+-            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
+-       fi
+-   fi
++   # PYTHON_CFLAGS is set in configure.ac, after pkg-config is located
+ fi
+ AM_CONDITIONAL(apl_TARGET_PYTHON, apl_YES($apl_TARGET_PYTHON))
+ AC_MSG_RESULT([$apl_TARGET_PYTHON])
+--- a/m4/check_GTK.m4
++++ b/m4/check_GTK.m4
+@@ -28,9 +28,8 @@
+ 
+    # user allows GTK...
+ 
+-   # check for pkg-config
+-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)   # locate pkg-config
+-if apl_NO($PKG_CONFIG); then               # pkg-config missing
++   # check for pkg-config (located in configure.ac)
++if test -z "$PKG_CONFIG"; then             # pkg-config missing
+    AC_MSG_CHECKING([for pkg-config (GTK prerequisite)])
+    AC_MSG_RESULT([no])
+    return

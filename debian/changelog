@@ -21,6 +21,8 @@ gnu-apl (2.0+svn3894-1) UNRELEASED; urgency=medium
   * Exclude HOWTOs/Bible/Bible-Preview.pdf, an excerpt of a book with
     neither license nor sources, and patch HOWTOs/Makefile.am to not
     build or install HOWTOs/Bible
+  * Patch configure to locate pkg-config with PKG_PROG_PKG_CONFIG, so
+    that it finds the host's pkg-config when cross compiling
 
  -- Barak A. Pearlmutter <bap@debian.org>  Wed, 04 Nov 2026 22:22:20 +0000
 
