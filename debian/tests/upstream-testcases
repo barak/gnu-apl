@@ -8,20 +8,28 @@ cp -r "$OLDPWD/src/testcases" .
 
 # Set up the environment that upstream's "make test" provides:
 # interpreter id 1010 as the first command line options (⎕AI, ⎕ARG),
-# a private $HOME, and library 0 ($PWD/workspaces) for )SAVE and )LOAD,
-# containing ASSERT.apl.
+# a private $HOME, no preferences file, and the libraries below
+# testcases/libroot, with the installed copies of the library files
+# that make test copies there.
 export HOME="$AUTOPKGTEST_TMP"
-mkdir -p workspaces
-cp "$(apl --show_lib_dir)/wslib5/ASSERT.apl" workspaces/
+libdir=$(apl --show_lib_dir)
+cp "$libdir/wslib5/ASSERT.apl" testcases/libroot/workspaces/
+cp "$libdir/wslib5/FILE_IO.apl" "$libdir/wslib5/FILE_IO1.apl" \
+   testcases/libroot/wslib5/
+
+# Some testcases use paths in the build tree: APnnn.tc starts a second
+# interpreter as ./apl, and ZZ64_Regression.tc loads
+# ./native/.libs/lib_template_F0.so.  Point them at the installed files.
+ln -s "$(command -v apl)" apl
+mkdir -p native/.libs
+ln -s "$libdir"/lib_template_*.so native/.libs/
 
 # Testcases that cannot work against the installed package:
-# APnnn.tc runs a helper script that is not in the source tarball,
-# NativeFunctions.tc and SaveLoad.tc need the lib_template_*.so native
-# function examples and Quad_FIO.tc needs tools/TLV_server, none of
-# which are installed, and ZZZZ.tc checks for leaks after all other
-# testcases ran in the same interpreter.
+# Quad_FIO.tc and Quad_FIO1.tc need tools/TLV_server, which is not
+# installed, and ZZZZ.tc checks for leaks after all other testcases ran
+# in the same interpreter.
 skip="
-APnnn.tc NativeFunctions.tc Quad_FIO.tc SaveLoad.tc ZZZZ.tc
+Quad_FIO.tc Quad_FIO1.tc ZZZZ.tc
 "
 
 # The expected output of these assumes x87 80-bit long double: with a
@@ -38,7 +46,8 @@ for tc in testcases/*.tc; do
     case " $(echo $skip) " in
         *" $name "*) skipped=$((skipped+1)); continue ;;
     esac
-    if timeout 300 apl --id 1010 --noCIN --noColor -q -T "$tc" \
+    if timeout 300 apl --id 1010 --noPrefs --libroot testcases/libroot \
+            --noCIN --noColor -q -T "$tc" \
             > "$tc.out" 2>&1 < /dev/null; then
         pass=$((pass+1))
     else
