@@ -14,6 +14,8 @@ gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
     sources, the stylesheet and upstream's notes for Claude Code in
     /usr/share/doc/apl; the HTML version of the library manual, which
     upstream no longer builds, is dropped (the info version remains)
+  * Build-depend on libgsl-dev, enabling ⎕MX and the GSL-based extras
+    of ⌹
 
  -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 22:54:09 +0000
 
