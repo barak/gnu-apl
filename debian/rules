@@ -47,6 +47,11 @@ execute_after_dh_auto_install:
 	@echo "APL workspace files are library files loaded via )LOAD, not standalone scripts;"
 	@echo "ensure they are not executable"
 	find debian/tmp/usr/lib -name "*.apl" -executable -exec chmod --changes 644 {} +
+	@echo "From the doc directory, drop copies of the man and info pages (installed"
+	@echo "in their own places), the Texinfo sources, the stylesheet (included in"
+	@echo "the HTML manuals), and upstream's notes for Claude Code"
+	cd debian/tmp/usr/share/doc/apl && rm -f --verbose \
+	    apl.1 apl.info libapl.info apl.texi libapl.texi apl-info.css CLAUDE.md
 
 execute_after_dh_installinfo:
 	-rm -f --verbose debian/apl/usr/share/info/dir.gz

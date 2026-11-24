@@ -2,3 +2,6 @@
 # fonts belong in a separate fonts-* package.
 usr/share/fonts/truetype/apl/GNU_APL.ttf
 usr/share/fonts/truetype/apl/COPYRIGHT_NOTICE
+# Texinfo sources of Bill Daly's library manual, and a second copy of
+# apl-library.info, which is installed in /usr/share/info.
+usr/lib/*/apl/doc/DALY/*

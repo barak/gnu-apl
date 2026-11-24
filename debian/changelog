@@ -9,6 +9,11 @@ gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
     in any directory
   * autopkgtest: run the active testcases of upstream's new test suites
     in src/testsuites (extra, main, regression and invariants)
+  * Do not install the Texinfo sources of Bill Daly's library manual
+    below /usr/lib, nor copies of the man and info pages, the Texinfo
+    sources, the stylesheet and upstream's notes for Claude Code in
+    /usr/share/doc/apl; the HTML version of the library manual, which
+    upstream no longer builds, is dropped (the info version remains)
 
  -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 22:54:09 +0000
 
