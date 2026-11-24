@@ -1,7 +1,1 @@
-0001-doc-info-html.patch
-0002-no-debian-subdir.patch
-0003-install-dirs-at-make-time.patch
-0004-Quad_FIO-screen-size-no-tty.patch
-0005-no-Bible-preview.patch
-0006-pkg-config-for-host.patch
-0007-vpath-builds-anywhere.patch
+0001-no-Bible-preview.patch

@@ -1,3 +1,15 @@
+gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
+
+  * New upstream snapshot of SVN trunk r3908
+  * Drop patches applied upstream, or replaced by upstream's own changes:
+    info and HTML manuals (upstream now rebuilds them when makeinfo is
+    available), debian/ subdirectory (upstream's packaging is now in
+    deb/), installation directories at make time, ⎕FIO screen size
+    without a terminal, pkg-config for the host, and out-of-tree builds
+    in any directory
+
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 22:54:09 +0000
+
 gnu-apl (2.0+svn3894-1) unstable; urgency=medium
 
   * New upstream snapshot of SVN trunk r3894, imported from upstream's
