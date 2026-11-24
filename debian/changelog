@@ -7,6 +7,8 @@ gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
     deb/), installation directories at make time, ⎕FIO screen size
     without a terminal, pkg-config for the host, and out-of-tree builds
     in any directory
+  * autopkgtest: run the active testcases of upstream's new test suites
+    in src/testsuites (extra, main, regression and invariants)
 
  -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 22:54:09 +0000
 

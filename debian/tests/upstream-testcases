@@ -1,10 +1,12 @@
 #!/bin/sh
-# Run the upstream src/testcases/*.tc files against the installed
-# interpreter, each in a fresh interpreter so one failure does not
-# cascade into the following files.
+# Run the upstream test suites below src/testsuites against the installed
+# interpreter: the active testcases (those listed in zzzz_selection) of
+# the suites that upstream's "make test" runs, plus the invariants, each
+# in a fresh interpreter so one failure does not cascade into the
+# following ones.
 set -u
 cd "$AUTOPKGTEST_TMP"
-cp -r "$OLDPWD/src/testcases" .
+cp -r "$OLDPWD/src/testcases" "$OLDPWD/src/testsuites" .
 
 # Set up the environment that upstream's "make test" provides:
 # interpreter id 1010 as the first command line options (⎕AI, ⎕ARG),
@@ -29,7 +31,7 @@ ln -s "$libdir"/lib_template_*.so native/.libs/
 # installed, and ZZZZ.tc checks for leaks after all other testcases ran
 # in the same interpreter.
 skip="
-Quad_FIO.tc Quad_FIO1.tc ZZZZ.tc
+main/Quad_FIO.tc main/Quad_FIO1.tc regression/ZZZZ.tc
 "
 
 # The expected output of these assumes x87 80-bit long double: with a
@@ -37,24 +39,30 @@ Quad_FIO.tc Quad_FIO1.tc ZZZZ.tc
 # integers such as 2⋆70 are formatted with more correct digits.
 case "$(dpkg --print-architecture)" in
     amd64|i386) ;;
-    *) skip="$skip Format_by_spec.tc ZZZ0_Standard_20x.tc" ;;
+    *) skip="$skip main/Format_by_spec.tc regression/ZZZ0_Standard_20x.tc" ;;
 esac
 
 pass=0; fail=0; skipped=0; failed=""
-for tc in testcases/*.tc; do
-    name=${tc#testcases/}
-    case " $(echo $skip) " in
-        *" $name "*) skipped=$((skipped+1)); continue ;;
-    esac
-    if timeout 300 apl --id 1010 --noPrefs --libroot testcases/libroot \
-            --noCIN --noColor -q -T "$tc" \
-            > "$tc.out" 2>&1 < /dev/null; then
-        pass=$((pass+1))
-    else
-        fail=$((fail+1)); failed="$failed $name"
-        echo "FAIL: $name"
-        cat "$tc.log" 2>/dev/null | tail -n 40
-    fi
+for suite in extra main regression invariants; do
+    # zzzz_selection: one testcase per line; blank lines and lines
+    # starting with # or ⍝ are ignored, and so are surrounding blanks
+    for name in $(sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+                      -e '/^#/d' -e '/^⍝/d' -e '/^$/d' \
+                      "testsuites/$suite/zzzz_selection"); do
+        tc="testsuites/$suite/$name"
+        case " $(echo $skip) " in
+            *" $suite/$name "*) skipped=$((skipped+1)); continue ;;
+        esac
+        if timeout 300 apl --id 1010 --noPrefs --libroot testcases/libroot \
+                --noCIN --noColor -q -T "$tc" \
+                > "$tc.out" 2>&1 < /dev/null; then
+            pass=$((pass+1))
+        else
+            fail=$((fail+1)); failed="$failed $suite/$name"
+            echo "FAIL: $suite/$name"
+            cat "$tc.log" 2>/dev/null | tail -n 40
+        fi
+    done
 done
 
 echo "passed: $pass  failed: $fail  skipped: $skipped"
