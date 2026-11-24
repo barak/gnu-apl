@@ -73,18 +73,17 @@ struct Format_sub
       { return format.size(); }
 
    /// Fill buf at position x,y with data according to fmt
-   /// return true if all digits in \b ucs are 0 (ignoring separators)
-   /// @param ucs the formatted digits (with separators)
-   static bool zero_digits(const UCS_string & ucs);
-
    /// @param data digit string for the fractional part
-   UCS_string insert_fract_commas(const UCS_string & data) const;
+   /// @param zero_value true if the item is 0 (a 9 field is then blank)
+   UCS_string insert_fract_commas(const UCS_string & data,
+                                  bool zero_value) const;
 
    /// Fill buf at position x,y with data according to fmt
    /// @param data digit string for the integer part
    /// @param overflow output flag set if the field is too narrow
+   /// @param zero_value true if the item is 0 (a 9 field is then blank)
    UCS_string insert_int_commas(const UCS_string & data,
-                                bool & overflow) const;
+                                bool & overflow, bool zero_value) const;
 
    /// set flt_mask according to the digits in member \b format
    /// return the number of digits from '1' to '4' (including)
@@ -154,16 +153,19 @@ public:
         /// @param data_int digit string for the integer part
         /// @param negative true if the value is negative
         /// @param overflow output flag set if the field is too narrow
+        /// @param zero_value true if the item is 0
         UCS_string format_left_side(const UCS_string data_int, bool negative,
-                                    bool & overflow);
+                                    bool & overflow, bool zero_value);
 
         /// format the fract part, exponent, and right decorator (everything
         /// right of the decimal dot)
         /// @param data_fract digit string for the fractional part
         /// @param negative true if the value is negative
         /// @param data_expo digit string for the exponent part
+        /// @param zero_value true if the item is 0
         UCS_string format_right_side(const UCS_string data_fract, bool negative,
-                                     const UCS_string data_expo);
+                                     const UCS_string data_expo,
+                                     bool zero_value);
 
         Format_sub left_deco;    ///< the left decorator
         Format_sub int_part;     ///< the integer part

@@ -41,27 +41,9 @@
 Bif_F12_FORMAT   Bif_F12_FORMAT::fun;       // ⍕
 
 //════════════════════════════════════════════════════════════════════════════
-bool
-Format_sub::zero_digits(const UCS_string & ucs)
-{
-   // return true if all digits in ucs are 0, ignoring the separators (⎕FC[2])
-   // and print-as-blank positions (⎕FC[5]) inserted into ucs. A 9 field is
-   // blanked for a zero value even with separators, e.g. '9,999'⍕0 (LRM
-   // p. 142, Bugs37 #37).
-   //
-   loop(u, ucs.size())
-      {
-        const Unicode uni = ucs[u];
-        if (uni == UNI_0)                      continue;
-        if (uni == UNI_SPACE)                  continue;
-        if (uni == Workspace::get_FC(1))       continue;
-        return false;
-      }
-   return true;
-}
-//────────────────────────────────────────────────────────────────────────────
 UCS_string
-Format_sub::insert_fract_commas(const UCS_string & data) const
+Format_sub::insert_fract_commas(const UCS_string & data,
+                                bool zero_value) const
 {
 UCS_string ucs;
 int d = 0;
@@ -91,13 +73,14 @@ int d = 0;
             }
       }
 
-   if ((flt_mask & BIT_9) && zero_digits(ucs))   ucs.clear();
+   if ((flt_mask & BIT_9) && zero_value)   ucs.clear();
 
    return ucs;
 }
 //────────────────────────────────────────────────────────────────────────────
 UCS_string
-Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
+Format_sub::insert_int_commas(const UCS_string & data, bool & overflow,
+                              bool zero_value) const
 {
 size_t fill_pos = -1;
 Unicode fill_char = UNI_SPACE;
@@ -180,7 +163,7 @@ size_t d = data.size();
          else                             overflow = true;
       }
 
-   if ((flt_mask & BIT_9) && zero_digits(ucs))   ucs.clear();
+   if ((flt_mask & BIT_9) && zero_value)   ucs.clear();
 
    ucs.reverse();
    return ucs;
@@ -292,6 +275,16 @@ fractional_part:
       {
         const Unicode cc = format[f++];
         if (cc == UNI_7)          exponent_pending = true;
+
+        // a field has (at most) one decimal point (LRM p. 140). A second
+        // one printed an internal diagnostic (Bugs39 #70)
+        //
+        if (cc == UNI_FULLSTOP)
+           {
+             MORE_ERROR() << "A⍕B: a field of A (the format) has more than "
+                             "one decimal point";
+             DOMAIN_ERROR;
+           }
 
         if (is_picture_char(cc))
            {
@@ -501,11 +494,20 @@ const bool negative = is_negative && !shown_as_0;
         DOMAIN_ERROR;
       }
 
-const UCS_string left = format_left_side(data_int, negative, overflow);
+   // LRM p. 142, 9: "If the value of the corresponding item of R is 0, the
+   // position is all blanks" -- the value, not the digits of a part, e.g.
+   // '9,999.99'⍕0.5 is 0,000.50 (Bugs38 #22)
+   //
+const bool zero_value = cell.is_integer_cell() ? cell.get_int_value() == 0
+                                               : cell.get_real_value() == 0.0;
+
+const UCS_string left = format_left_side(data_int, negative, overflow,
+                                         zero_value);
    if (overflow)   return UCS_string(out_size(), Workspace::get_FC(3));
    Assert(left.ssize() == (left_deco.out_len + int_part.out_len));
 
-const UCS_string right = format_right_side(data_fract, negative, data_expo);
+const UCS_string right = format_right_side(data_fract, negative, data_expo,
+                                           zero_value);
    Assert(right.ssize() == (fract_part.out_len + expo_deco.out_len +
                            exponent.out_len + right_deco.out_len));
 
@@ -611,7 +613,8 @@ uint64_t int_val = 0;
         int_val = iv < 0 ? -uint64_t(iv) : uint64_t(iv);
       }
 const APL_Float real_val = cell.get_real_value();
-const APL_Float value = real_val < 0.0 ? -real_val : real_val;
+// fabs(): also for -0.0 (e.g. 0×¯1.5), which printed as -0 (Bugs38 #49)
+const APL_Float value = fabs(real_val);
 
 char data_buf[101];
 char * fract_end = 0;
@@ -773,9 +776,11 @@ const int ilen = int_end - &data_buf[0];
 //────────────────────────────────────────────────────────────────────────────
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_left_side(const UCS_string data_int,
-                                               bool negative, bool & overflow)
+                                               bool negative, bool & overflow,
+                                               bool zero_value)
 {
-const UCS_string data = int_part.insert_int_commas(data_int, overflow);
+const UCS_string data = int_part.insert_int_commas(data_int, overflow,
+                                                   zero_value);
 
    if (overflow)   return UCS_string();
 
@@ -803,14 +808,16 @@ UCS_string ucs;
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_right_side(const UCS_string data_fract,
                                                 bool negative,
-                                                const UCS_string data_expo)
+                                                const UCS_string data_expo,
+                                                bool zero_value)
 {
 int pad_count = 0;
 UCS_string ucs;
 
    if (fract_part.out_len)
       {
-        const UCS_string data = fract_part.insert_fract_commas(data_fract);
+        const UCS_string data = fract_part.insert_fract_commas(data_fract,
+                                                               zero_value);
         Assert(fract_part.size() >= data.size());
         pad_count += fract_part.size() - data.size();
 
@@ -897,16 +904,41 @@ const ShapeItem len_A = A.element_count();
 
    if (shape_B.get_volume() == 0)   // empty B
       {
+        // with a 1- or 2-item A every column has the same width, so only
+        // the first column is computed (and multiplied by cols_B below).
+        // A loop over every column hung for e.g. 5⍕0 1E15⍴0 (Bugs39 #7).
+        //
+        const ShapeItem cols_computed = len_A <= 2 && cols_B > 1 ? 1 : cols_B;
         ShapeItem W = 0;
-        loop(c, cols_B)
+        loop(c, cols_computed)
            {
              // width (unlike the non-empty-B path's
              // format_one_col_by_spec(), which enforces width>=0) was
              // used completely unvalidated here -- a negative width
              // silently produced a Value with a negative shape item.
              // ¯5 2 ⍕ 0 3⍴0 gave ⍴Z == 0 ¯15 instead of DOMAIN_ERROR.
-             const APL_Integer w = (len_A <= 2) ? A.get_near_int(0)
-                                                : A.get_near_int(2*c);
+             //
+             // The same limits as in format_one_col_by_spec() for a
+             // non-empty B, and a one-number A is the precision (whose
+             // magnitude is then used as the width of the empty column),
+             // e.g. ¯5⍕ is E-format. W must not overflow (Bugs38 #50).
+             //
+             APL_Integer w = 0;
+             APL_Integer p = 0;
+             if (len_A == 1)        p = A.get_near_int(0);
+             else if (len_A == 2) { w = A.get_near_int(0);
+                                    p = A.get_near_int(1); }
+             else                 { w = A.get_near_int(2*c);
+                                    p = A.get_near_int(2*c + 1); }
+
+             if (p > 1000 || p < -1000)
+                {
+                  MORE_ERROR() << "A⍕B: precision " << p
+                               << " is too far from 0 (expecting ¯1000..1000)";
+                  DOMAIN_ERROR;
+                }
+             if (len_A == 1)   w = p < 0 ? -p : p;
+
              if (w < 0)
                 {
                   MORE_ERROR() << "A⍕B: width " << w
@@ -914,7 +946,23 @@ const ShapeItem len_A = A.element_count();
                                << ") is negative";
                   DOMAIN_ERROR;
                 }
-             W += w;
+             if (w > 0x7FFFFFFF)
+                {
+                  MORE_ERROR() << "A⍕B: width " << w << " is too large";
+                  DOMAIN_ERROR;
+                }
+             if (__builtin_add_overflow(W, w, &W))
+                {
+                  MORE_ERROR() << "A⍕B: the result is too wide";
+                  DOMAIN_ERROR;
+                }
+           }
+
+        if (cols_computed != cols_B &&   // same width w = W for every column
+            __builtin_mul_overflow(W, cols_B, &W))
+           {
+             MORE_ERROR() << "A⍕B: the result is too wide";
+             DOMAIN_ERROR;
            }
 
         Shape shape_Z = shape_B.without_last_axis();
@@ -1277,6 +1325,28 @@ const ShapeItem rows = B.get_rows();
    //
 UCS_string_vector col_formats;
    split_example_into_columns(all_formats, col_formats);
+
+   // an empty B with a single field: an empty result, without building the
+   // (possibly huge) per-column tables below (Bugs39 #58)
+   //
+   if (col_formats.size() == 1 && cols > 1 && B.element_count() == 0)
+      {
+        const Format_LIFER check(col_formats[0]);   // DOMAIN ERROR if bad
+        ShapeItem width;
+        if (__builtin_mul_overflow(ShapeItem(all_formats.size()), cols,
+                                   &width))
+           {
+             MORE_ERROR() << "A⍕B: the result is too wide";
+             DOMAIN_ERROR;
+           }
+        Shape shape_Z(B.get_shape());
+        shape_Z.set_last_shape_item(width);
+        Value_P Z(shape_Z, LOC);
+        Z->set_proto_Spc();
+        Z->check_value(LOC);
+        return Z;
+      }
+
    if (col_formats. size() == 1)
       {
         const UCS_string f = all_formats;
@@ -1340,6 +1410,12 @@ Shape shape_Z(B.get_shape());
    shape_Z.set_last_shape_item(all_formats.size());
 
 Value_P Z(shape_Z, LOC);
+   if (Z->is_empty())   // Bugs38 #11: e.g. '5'⍕1E15 0⍴0 looped 1E15 times
+      {
+        Z->set_proto_Spc();
+        Z->check_value(LOC);
+        return Z;
+      }
 
    try
       {

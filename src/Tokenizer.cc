@@ -798,8 +798,8 @@ Unicode_source src(input);
                              const int dot = line_2.size() + src.get_pos();
                              line_2 << input;
                              error.set_error_line_2(line_2, dot, dot);
-                             if (StateIndicator * si = Workspace::SI_top())
-                                StateIndicator::get_error(si) = error;
+                             // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+                             StateIndicator::get_error(Workspace::SI_top()) = error;
                              throw error;
                            }
                         else

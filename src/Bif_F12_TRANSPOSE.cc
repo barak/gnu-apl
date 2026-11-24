@@ -63,7 +63,7 @@ const APL_Integer qio = Workspace::get_IO();
         const ShapeItem ar = shape_A.get_shape_item(r);
         if (ar < 0 || ar >= B.get_rank())
            {
-             MORE_ERROR() << "A⍉B: A[" << (r + qio) << "] = " << (ar + qio)
+             MORE_ERROR() << "A⍉B: A[" << (r + qio) << "] = " << A.get_near_int(r)
                           << " is not a valid axis of B (expecting "
                           << qio << "≤A[" << (r + qio) << "]<"
                           << (B.get_rank() + qio) << ")"
@@ -179,6 +179,7 @@ Bif_F12_TRANSPOSE::transpose(const Shape & sh_A, cValue_R B)
                    Z->next_ravel_Cell(B.get_cravel(rZ + cZ*cols_B, cache));
                  }
            }
+        if (Z->is_empty())   Z->set_default(B, LOC);   // Bugs39 #86
         Z->check_value(LOC);
         return Z;
       }

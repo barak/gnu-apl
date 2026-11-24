@@ -1,0 +1,14 @@
+⍝ Reciprocal.tc
+⍝ ═════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: B and Z numeric nonzero
+      ⍝ inv: ÷B ←→ 1÷B
+      B ← 0.5+|⎕RVAL 1 (,5) (,0 0 1 0 0)     ⍝ nonzero positive reals
+      (÷B) ≡ 1÷B
+1
+      B ← ⎕RVAL 1 (,4) (,0 1 0 0 0)
+      B ← B+(B=0)                              ⍝ avoid zero
+      (÷B) ≡ 1÷B
+1

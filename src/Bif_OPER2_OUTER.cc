@@ -197,6 +197,16 @@ cFunction_P RO = _RO.get_function();
         DOMAIN_ERROR;
       }
 
+   // check RO up front, not only when it is called (which never happens
+   // for an empty A or B), like A f.g B (Bugs38 #105)
+   //
+   if (RO->get_fun_valence() != 2 || !RO->has_dyadic_form())   // Bugs40 #56
+      {
+        MORE_ERROR() << "A∘.g B : Bad function " << RO->get_name()
+                     << " (expecting a dyadic function)";
+        VALENCE_ERROR;
+      }
+
 Value_P Z(A.get_shape() + B.get_shape(), LOC);
 
    // is_empty() checked BEFORE the scalar fast path below: that fast
@@ -213,7 +223,13 @@ Value_P Z(A.get_shape() + B.get_shape(), LOC);
         Value_P Fill_A = Bif_F12_TAKE::first(A);
         Value_P Fill_B = Bif_F12_TAKE::first(B);
 
-        Value_P Z1 = RO->eval_fill_AB(*Fill_A, *Fill_B).get_apl_val();
+        // like f¨ (Bif_OPER1_EACH.cc): the fill function of a defined RO,
+        // or of a derived RO whose chain contains one (or a macro, e.g.
+        // +⍤0), is the identity (LRM Figure 20, Bugs38 #75)
+        //
+        Value_P Z1 = RO->contains_defined()   // Bugs40 #55
+                   ? Fill_B
+                   : RO->eval_fill_AB(*Fill_A, *Fill_B).get_apl_val();
 
         // Bugs28 #37: Z1 (RO's fill result, e.g. A f¨B's enclosed fill
         // item for a non-scalar RO like ,) can itself be a non-scalar
@@ -321,6 +337,13 @@ Value_P RO_B;
          }
 
       if (result.get_tag() == TOK_ERROR)   return result;
+
+      if (result.get_tag() == TOK_VOID)   // e.g. ⎕ES '' (Bugs40 #9)
+         {
+           MORE_ERROR() << "∘." << RO->get_name() << ": " << RO->get_name()
+                        << " returned no result";
+           VALUE_ERROR;
+         }
 
         Q1(result);   FIXME;
       }

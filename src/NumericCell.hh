@@ -116,6 +116,16 @@ protected:
    /// @param A left operand cell (N in N!K)
    ErrorCode real_binomial(Cell * Z, const Cell * A) const;
 
+   /// Z←A!B computed from lgamma() of 1+A, 1+B, and 1+B-A (for Γ values
+   /// that overflow, Bugs39 #36)
+   static ErrorCode log_binomial(Cell * Z, APL_Float r_1_A, APL_Float r_1_B,
+                                 APL_Float r_1_B__A);
+
+   /// return true if a binomial computed from the log-Γ values with the
+   /// magnitudes \b lg1, \b lg2, and \b lg3 is accurate (Bugs40 #22)
+   static bool log_binomial_accurate(APL_Float lg1, APL_Float lg2,
+                                     APL_Float lg3);
+
    /// return the greatest common divisor of complex a and b
    /// @param z   result complex GCD
    /// @param a   first complex operand
@@ -133,6 +143,10 @@ protected:
    /// @param a   first floating-point operand
    /// @param b   second floating-point operand
    /// @param qct comparison tolerance ⎕CT
+   /// true iff x is (exactly) a pole of Γ, i.e. 0, ¯1, ¯2, ... (Bugs38 #18)
+   static bool is_pole(APL_Float x)
+      { return x <= 0.0 && x == nearbyint(x); }
+
    static ErrorCode flt_gcd(APL_Float & z, APL_Float a, APL_Float b,
                             double qct);
 

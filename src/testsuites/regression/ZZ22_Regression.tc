@@ -1,0 +1,97 @@
+⍝ ZZ22_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+      FUNS←,⊃⎕INP 'END-OF-INP'
+Add Add∆days    Ail Aln CAL CCJ CJ  CR∆Lines    CS  CSV∆Parse   CSV∆dequote
+Catc    Catr    Change  Clear   Convt   Ctit    DATETIME    DIV Date    Delete
+Dtfmt   Dyofwk  EHN ER  Ealn    Edit    Editf   Eoi Err Estart  Expd    Expnd
+E∆  E∆Add   E∆Ail   E∆CJ    E∆CS    E∆Change    E∆Clear E∆Copy  E∆Ctit  E∆DIV
+E∆Delete    E∆EHN   E∆ER    E∆Ealn  E∆EditLine  E∆Eoi   E∆LP    E∆LPH   E∆Lck
+E∆List  E∆Move  E∆New   E∆O E∆Omega E∆PI    E∆Parse E∆Pim   E∆Pin   E∆Pis
+E∆Piv   E∆RND   E∆RS    E∆Replace   E∆Revert    E∆SS    E∆Save  E∆Screen
+E∆VI    E∆Vck   FILE_IO Fcj Ffns    Fld Flj Fn  Fnslist Fnslist2    Frj Iota
+JUL LJ  LS  Lck Lcn Lhf List    Lst L∆bt    L∆pt    Mmofyr  Move    Mul New N∆s
+O   Omega   Open∆Printer    Out PI  Parse   Parse2  Pg  Pic Picd    Pid Pim Pin
+Pis Piv Pnt Print∆Function  RJ  RND RS  Rank    Rep Replace Rev Roman   Romanu
+Rot Rpt Rptc    Rpts    Rst Screen  Sink    Sort    Sort1   Sort2   Srl Subscn
+Time    Tmfmt   To  Today   Trunc   UL  UL2 UL3 Unique  VI  Vck auto    box
+unbox   ∆  ∆1  ∆2  ∆3  ∆4  ∆DT ∆DT2    ∆LLP    ∆LP ∆LPH    ∆RD ∆SS
+'END-OF-INP'
+
+      L←1++\FUNS=' '     ◊ FUNS←L⊂FUNS   ⍝ partition FUNS
+      L←∼(⊂,' ')≡¨FUNS   ◊ FUNS←L/FUNS   ⍝ remove ' ' items in FUNS
+      FUNS←{(⍵≠' ')/⍵} ¨ FUNS            ⍝ remove ' ' in every item of FUNS
+      ⊣{ 0 0⍴⎕FX ⍵ } ¨ FUNS              ⍝ ⎕FX every item of FUNS
+
+      )FNS
+Add             Add∆days        Ail         Aln             CAL
+CCJ             CJ              CR∆Lines    CS              CSV∆Parse
+CSV∆dequote     Catc            Catr        Change          Clear
+Convt           Ctit            DATETIME    DIV             Date
+Delete          Dtfmt           Dyofwk      EHN             ER
+Ealn            Edit            Editf       Eoi             Err
+Estart          Expd            Expnd       E∆              E∆Add
+E∆Ail           E∆CJ            E∆CS        E∆Change        E∆Clear
+E∆Copy          E∆Ctit          E∆DIV       E∆Delete        E∆EHN
+E∆ER            E∆Ealn          E∆EditLine  E∆Eoi           E∆LP
+E∆LPH           E∆Lck           E∆List      E∆Move          E∆New
+E∆O             E∆Omega         E∆PI        E∆Parse         E∆Pim
+E∆Pin           E∆Pis           E∆Piv       E∆RND           E∆RS
+E∆Replace       E∆Revert        E∆SS        E∆Save          E∆Screen
+E∆VI            E∆Vck           FILE_IO     Fcj             Ffns
+Fld             Flj             Fn          Fnslist         Fnslist2
+Frj             Iota            JUL         LJ              LS
+Lck             Lcn             Lhf         List            Lst
+L∆bt            L∆pt            Mmofyr      Move            Mul
+New             N∆sO            Omega       Open∆Printer    Out
+PI              Parse           Parse2      Pg              Pic
+Picd            Pid             Pim         PinPis          Piv
+Pnt             Print∆Function  RJ          RND             RS
+Rank            Rep             Replace     Rev             Roman
+Romanu          Rot             Rpt         Rptc            Rpts
+Rst             Screen          Sink        Sort            Sort1
+Sort2           Srl             Subscn      Time            Tmfmt
+To              Today           Trunc       UL              UL2
+UL3             Unique          VI          Vck             auto
+box             unbox           ∆           ∆1              ∆2
+∆3              ∆4              ∆DT         ∆DT2            ∆LLP
+∆LP             ∆LPH            ∆RD         ∆SS
+
+
+      )FNS C
+CAL     CCJ     CJ      CR∆Lines    CS      CSV∆Parse   CSV∆dequote
+Catc    Catr    Change  Clear       Convt   Ctit
+
+
+      )FNS -Cha
+Add     Add∆days    Ail             Aln     CAL     CCJ     CJ  CR∆Lines
+CS      CSV∆Parse   CSV∆dequote     Catc    Catr    Change
+
+
+      )FNS UL2-
+UL2     UL3     Unique  VI      Vck     auto    box     unbox   ∆       ∆1  ∆2
+∆3      ∆4      ∆DT     ∆DT2    ∆LLP    ∆LP     ∆LPH    ∆RD     ∆SS
+
+      )FNS Fcj-Parse2
+Fcj     Ffns            Fld     Flj     Fn      Fnslist     Fnslist2    Frj
+Iota    JUL             LJ      LS      Lck     Lcn         Lhf         List
+Lst     L∆bt            L∆pt    Mmofyr  Move    Mul         New         N∆sO
+Omega   Open∆Printer    Out     PI      Parse   Parse2
+
+
+      )CLEAR
+CLEAR WS
+
+⍝ ==================================
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+

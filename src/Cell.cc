@@ -356,6 +356,39 @@ exact_numeric_compare(const Cell & ca, const Cell & cb)
         return 0;
       }
 
+   // complex: exactly, real part then imaginary part. The tolerant
+   // ca.compare(cb) is not transitive, so ⍋ and ⍒ depended on the order
+   // of the items (Bugs40 #54)
+   //
+   if (ca.is_numeric() && cb.is_numeric())
+      {
+        // an IntCell exactly (like above), e.g. 9007199254740993 vs.
+        // 9007199254740992J0
+        //
+        if (ca.is_integer_cell() || cb.is_integer_cell())
+           {
+             const bool a_is_int = ca.is_integer_cell();
+             const APL_Integer i = a_is_int ? ca.get_int_value()
+                                            : cb.get_int_value();
+             const APL_Float   f = a_is_int ? cb.get_real_value()
+                                            : ca.get_real_value();
+             const int cr = Cell::compare_int_float(i, f);
+             if (cr)   return a_is_int ? cr : -cr;
+           }
+        else
+           {
+             const APL_Float ra = ca.get_real_value();
+             const APL_Float rb = cb.get_real_value();
+             if (ra < rb)   return -1;
+             if (ra > rb)   return 1;
+           }
+        const APL_Float ia = ca.get_imag_value();
+        const APL_Float ib = cb.get_imag_value();
+        if (ia < ib)   return -1;
+        if (ia > ib)   return 1;
+        return 0;
+      }
+
    return ca.compare(cb);   // COMP_LT(-1)/COMP_EQ(0)/COMP_GT(1) compatible
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -408,6 +441,7 @@ Cell::is_near_int(APL_Float value)
    // has been rounded off. However, they may not fit into an int64_t,
    // and if that is the concern then use is_near_int64_t() below.
 
+   if (isnan(value))        return false;   // Bugs39 #32
    if (value > LARGE_INT)   return true;
    if (value < SMALL_INT)   return true;
 
@@ -422,8 +456,9 @@ const APL_Float diff = value - result;
 bool
 Cell::is_near_int64_t(APL_Float value)
 {
-   if (value > LARGE_INT)   return false;
-   if (value < SMALL_INT)   return false;
+   // NOTE: the negated comparisons also return false for a NaN (Bugs39 #32)
+   if (!(value <= LARGE_INT))   return false;
+   if (!(value >= SMALL_INT))   return false;
 
 const APL_Float result = nearbyint(value);
 const APL_Float diff = value - result;
@@ -436,8 +471,8 @@ const APL_Float diff = value - result;
 APL_Integer
 Cell::near_int(APL_Float value)
 {
-   if (value >= LARGE_INT)   DOMAIN_ERROR;
-   if (value <= SMALL_INT)   DOMAIN_ERROR;
+   if (!(value < LARGE_INT))   DOMAIN_ERROR;   // also NaN
+   if (!(value > SMALL_INT))   DOMAIN_ERROR;   // also NaN
 
 const APL_Float result = nearbyint(value);
 const APL_Float diff = value - result;

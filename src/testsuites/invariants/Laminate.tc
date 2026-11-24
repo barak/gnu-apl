@@ -1,0 +1,15 @@
+⍝ Laminate.tc
+⍝ ═══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: X fractional scalar between axes; implicit ⎕IO
+      ⍝ inv: ⍴⍴Z ←→ 1+(⍴⍴A)⌈⍴⍴B
+      A ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← A,[0.5]B
+      (⍴⍴Z) ≡ 1+(⍴⍴A)⌈⍴⍴B
+1
+      ⍝ inv: ⍴Z ←→ (2,⍴A)[⍋0.5,⍳⍴⍴A]   for A=B same shape
+      (⍴Z) ≡ (2,⍴A)[⍋0.5,⍳⍴⍴A]
+1

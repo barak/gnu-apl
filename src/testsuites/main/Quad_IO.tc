@@ -1,0 +1,80 @@
+⍝ Quad_IO.tc
+⍝ ----------------------------------
+
+      R←34 18 24
+      P←'FOUR' 'TO' 'GO'
+
+      ⎕IO←1   ⍝ 11111111111111111111111111111111
+
+      R[1]
+34
+
+      ⎕RL←555777
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      5?10
+6 7 2 9 4
+
+      RR←?10⍴10000
+      RR
+1660 8424 5322 5209 9906 9283 4328 9132 1178 5892
+
+      ⍋RR
+9 1 7 4 3 10 2 8 6 5
+
+      ⍒RR
+5 6 8 2 10 3 4 7 1 9
+
+      ]FILE_CTL NO_SKIP
+      I←⍳10
+      I
+1 2 3 4 5 6 7 8 9 10
+
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      I⍳⍒RR
+5 6 8 2 10 3 4 7 1 9
+
+      ]FILE_CTL NO_SKIP
+      2⊃P
+TO
+
+
+      ⎕IO←0   ⍝ 00000000000000000000000000000000
+      R[1]
+18
+
+      R[0]
+34
+
+      ⎕RL←555777
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      5?10
+5 6 1 8 3
+
+      RR←?10⍴10000
+      RR
+1659 8423 5321 5208 9905 9282 4327 9131 1177 5891
+
+      ⍋RR
+8 0 6 3 2 9 1 7 5 4
+
+      ⍒RR
+4 5 7 1 9 2 3 6 0 8
+
+      ]FILE_CTL NO_SKIP
+      I←⍳10
+      I
+0 1 2 3 4 5 6 7 8 9
+
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      I⍳⍒RR
+4 5 7 1 9 2 3 6 0 8
+
+      ]FILE_CTL NO_SKIP
+      2⊃P
+GO
+
+      ⍝ ==================================
+
+      ⎕IO←1
+
+

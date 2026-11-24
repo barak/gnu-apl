@@ -711,10 +711,17 @@ vector<ShapeItem> ends;
          //
          const Token & tok_Q = tos[src_Q];
 
+         // Also not if Q is ] or ) (the end of an indexed or parenthesized
+         // value that strands with A, e.g. V[1] 2 ⍴ 5 or (1+2) 2 ⍴ 5), or a
+         // dyadic operator (A is its right operand), Bugs40 #43.
+         //
+         const TokenClass tc_Q = src_Q >= 0 ? tok_Q.get_Class() : TC_END;
          const bool is_dyadic =
                tos[src_AQ].get_Class() == TC_VALUE &&        // AQ is a Value,
                src_Q >= 0                          &&        // Q is valid, and
-               ! ((1 << tok_Q.get_Class()) & TCG_MAY_GLUE);  // Q is not sticky
+               ! ((1 << tc_Q) & TCG_MAY_GLUE)      &&        // Q is not sticky
+               tc_Q != TC_R_BRACK && tc_Q != TC_R_PARENT && tc_Q != TC_OPER2 &&
+               tc_Q != TC_INDEX;   // e.g. V[1], collapsed to one token
 
          const bool is_monadic =
                ((1 << tos[src_AQ].get_Class()) & TCG_NO_A);   // A not a Value
@@ -1432,6 +1439,13 @@ bool progress = false;
              default: continue;   // nex token
            }
 
+        // a parenthesized value right of a dyadic operator is its entire
+        // right operand, e.g. (0) or (0 1) in -⍤(0 1) 5 6: do not strand it
+        // with the argument that follows (Bugs40 #74)
+        //
+        if (tos[t].get_tag() == TOK_APL_VALUE1 && t > 0 &&
+            tos[t - 1].get_Class() == TC_OPER2)   continue;
+
         // at this point, t is the first item. Collect subsequenct items.
         //
         for (to = t + 1; to < tos.ssize(); ++to)
@@ -1747,6 +1761,25 @@ walk_back_LO_start(const Token_string & tos, int pos_LO)
 
          while (pos_LO > 0 && tos[pos_LO].get_Class() == TC_OPER1)
             --pos_LO;
+
+         // but not onto a token that cannot end a left operand, e.g. ← ; ◊
+         // or [ in Z←⌿⍤0 B or V[1;⌿⍤0 1] (Bugs40 #100)
+         //
+         if (pos_LO < start)   switch(tos[pos_LO].get_Class())
+            {
+              case TC_ASSIGN:
+              case TC_R_ARROW:
+              case TC_L_BRACK:
+              case TC_END:
+              case TC_RETURN:
+              case TC_L_PARENT:
+              case TC_L_CURLY:
+              case TC_COLON:   // a label, e.g. L:⌿⍤0 B (Bugs41 #75)
+                   ++pos_LO;
+                   break;
+
+              default: break;
+            }
 
          if (pos_LO > 0 && tos[pos_LO - 1].get_Class() == TC_OPER2)
             pos_LO -= 2;   // skip G (right operand) and the operator itself
@@ -2145,7 +2178,8 @@ bool progress = false;
                    const Symbol * subfun_symbol = tos[t + 2].get_sym_ptr();
                    const UCS_string sub_name = subfun_symbol->get_name();
                    const sAxis axis = topfun->subfun_to_axis(sub_name);
-                   if (axis < 0)   topfun->bad_subfun_name_ERROR(sub_name);
+                   if (axis == SUBFUN_NOT_FOUND)
+                      topfun->bad_subfun_name_ERROR(sub_name);
 
                    // valid axis. replace: topfun . subfun with topfun [subfun]
                    //
@@ -2162,7 +2196,8 @@ bool progress = false;
                    const UCS_string sub_name = subfun_symbol->get_name();
                    const Function * topfun = tos[t].get_function();
                    const sAxis axis = topfun->subfun_to_axis(sub_name);
-                   if (axis < 0)   topfun->bad_subfun_name_ERROR(sub_name);
+                   if (axis == SUBFUN_NOT_FOUND)
+                      topfun->bad_subfun_name_ERROR(sub_name);
 
                    // valid axis. replace: ⎕SQL.subfun with either
                    // ⎕SQL[subfun] or with ⎕SQL[subfun;DB]
@@ -2269,13 +2304,26 @@ Parser::mark_lsymb(Token_string & tos)
                   // would otherwise show the statement of an earlier
                   // error (Bugs37 #42). tos is (still) in source order.
                   //
-                  int lpar = (ass - 1) - tos[ass - 1].get_int_val2();
-                  if (lpar < 0 || tos[lpar].get_Class() != TC_L_PARENT)
-                     lpar = ass - 1;
+                  // scan for the matching ( rather than using the
+                  // bracket distance of ), which is stale after values
+                  // were collapsed or (V) was removed (Bugs38 #110)
+                  //
+                  int lpar = ass - 1;
+                  int depth = 0;
+                  for (int p = ass - 1; p >= 0; --p)
+                      {
+                        const TokenClass tc = tos[p].get_Class();
+                        if (tc == TC_R_PARENT)        ++depth;
+                        else if (tc == TC_L_PARENT && --depth == 0)
+                           {
+                             lpar = p;
+                             break;
+                           }
+                      }
                   Error error(E_LEFT_SYNTAX_ERROR, LOC);
                   tos.build_error_line_2(error, lpar, ass);
-                  if (StateIndicator * si = Workspace::SI_top())
-                     StateIndicator::get_error(si) = error;
+                  // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+                  StateIndicator::get_error(Workspace::SI_top()) = error;
                   throw error;
                 }
 
@@ -2341,7 +2389,7 @@ bool TOK_VOID_inserted = false;
               const Symbol * symbol = tos[t+1].get_sym_ptr();   // subfun name
               cFunction_P fun = tos[t-1].get_function();
               const sAxis axis = fun->subfun_to_axis(symbol->get_name());
-              if (axis != -1)   // subfunction is valid
+              if (axis != SUBFUN_NOT_FOUND)   // subfunction is valid
                  {
                    Value_P function_axis = IntScalar(axis, LOC);
                    Token tok_axis(TOK_AXIS, function_axis);
@@ -2622,6 +2670,30 @@ bool progress = false;   // per iteration progress
                // check for case 2.
                //
                if (closing != (t + 2))   continue;
+
+               // but not for the right operand of a dyadic operator that is
+               // followed by a value, e.g. -⍤(0) 5: the parentheses separate
+               // the operand from the argument (fix_RANK_syntax() leaves
+               // them for Prefix::reduce_A_B__()). Without them the operand
+               // and the argument were merged into one literal (Bugs40 #74)
+               //
+               // Also when followed by another (, e.g. -⍤(0)(5), and after
+               // an outer pair that case 1 has removed, e.g. -⍤((0)) 5
+               // (Bugs41 #45)
+               //
+               ShapeItem prev = t - 1;   // the token left of (, skipping
+               while (prev >= 0 && tos[prev].get_Class() == TC_VOID)   --prev;
+               ShapeItem next = t + 3;   // the token right of ), skipping
+               while (next < tos.ssize() && tos[next].get_Class() == TC_VOID)
+                     ++next;
+               if (prev >= 0 && tos[prev].get_Class() == TC_OPER2 &&
+                   next < tos.ssize() &&
+                   (tos[next].get_Class() == TC_VALUE    ||
+                    tos[next].get_Class() == TC_LIT_ITEM ||
+                    tos[next].get_Class() == TC_LIT_GRP  ||
+                    tos[next].get_Class() == TC_L_PARENT))
+                  continue;
+
 
 
                // case 2. We have tos[t] = ( X ) ...

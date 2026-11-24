@@ -1,0 +1,34 @@
+⍝ Quad_PW.tc
+⍝ ----------------------------------
+
+      ⎕PW
+80
+
+      W←'SUPERCALIFRAGILISTIC|EXPIALIDOCIOUS'
+      ρW
+35
+
+      ⎕PW←30
+      W
+SUPERCALIFRAGILISTIC|EXPIALIDO
+      CIOUS
+
+      ⍝ rows folded together ----------------------------------
+
+      2 36ρ'AAaBBbCCcDDdEEeFFfGGgHHhIIiJJjKKkLLl'
+AAaBBbCCcDDdEEeFFfGGgHHhIIiJJj
+      KKkLLl
+AAaBBbCCcDDdEEeFFfGGgHHhIIiJJj
+      KKkLLl
+
+      ⍝ numbers folded before ⎕PW reached ----------------------------------
+      2 3∘.⍟10 20 30
+3.321928095 4.321928095
+      4.906890596
+2.095903274 2.726833028
+      3.095903274
+
+      ⍝ ==================================
+
+      ⎕PW←80
+

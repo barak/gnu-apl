@@ -1,0 +1,618 @@
+⍝ Bugs38_A.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 severity A items (#1 - #15): crashes, hangs,
+⍝ assertions, and session loss.
+
+
+
+
+
+
+      ⍝ Bugs38 #1: ⎕FIO[57] checks B before fork(): an error must not continue
+      ⍝ in the forked child as a second interpreter
+
+
+
+
+
+      H←⎕FIO[57] '/bin/true',(⎕UCS 0),'x'
+DOMAIN ERROR+
+      H←⎕FIO[57]'/bin/true',(⎕UCS 0),'x'
+        ^
+
+
+      )MORE
+⎕FIO: path contains a NUL character (⎕UCS 0)
+
+
+
+
+      ⍝ Bugs38 #2: a ; inside a lambda is only valid in its trailing ;NAME list
+      ⍝ (other ; created lambdas that )SAVE wrote but )LOAD could not read)
+
+
+
+
+
+      N38←{⍵;(X)}
+SYNTAX ERROR+
+      N38←{⍵;(X)}
+            ^
+
+
+      N38←{⍵;1}
+SYNTAX ERROR+
+      N38←{⍵;1}
+            ^
+
+
+      N38←{⍵;}
+SYNTAX ERROR+
+      N38←{⍵;}
+            ^
+
+
+      N38←{X←⍵;Y ⋄ X}
+SYNTAX ERROR+
+      N38←{X←⍵;Y◊X}
+              ^
+
+
+      N38←{X←⍵ ⋄ X+1;Y;Z}
+
+
+
+
+
+      N38 5
+6
+
+
+
+
+      M38←{{⍵+1;Q} ⍵;P}
+
+
+
+
+
+      M38 3
+4
+
+
+
+
+      ⍝ Bugs38 #3: a selective specification into the member table of a
+      ⍝ structured variable is a DOMAIN ERROR (like S[I;J]←B, Bugs37 #2)
+
+
+
+
+
+      )ERASE S38
+
+
+
+
+
+      S38.a←1 2 3 ⋄ S38.b←'xy'
+
+
+
+
+
+      (↑S38)←7
+DOMAIN ERROR+
+      (↑S38)←7
+        ^   ^
+
+
+      )MORE
+(f S)←B: the member table of a structured variable cannot be assigned.
+      Use S.member←B or S['member']←B instead.
+
+
+
+      (S38[1;1])←'q'
+DOMAIN ERROR+
+      (S38[1;1])←'q'
+       ^  ^
+
+
+      (,S38)←⍳16
+DOMAIN ERROR+
+      (,S38)←⍳16
+        ^   ^
+
+
+      (⊃S38)←0
+DOMAIN ERROR+
+      (⊃S38)←0
+        ^   ^
+
+
+      ((⊂1 1)⊃S38)←7
+DOMAIN ERROR+
+      ((⊂1 1)⊃S38)←7
+              ^   ^
+
+
+      (8 2↑S38)←8 2⍴5
+DOMAIN ERROR+
+      (8 2↑S38)←8 2⍴5
+           ^   ^
+
+
+      (,S38)[1]←5
+DOMAIN ERROR+
+      (,S38)[1]←5
+       ^
+
+
+      (⌽S38)←8 2⍴0
+DOMAIN ERROR+
+      (⌽S38)←8 2⍴0
+        ^   ^
+
+
+      (16⍴S38)←0
+DOMAIN ERROR+
+      (16⍴S38)←0
+          ^   ^
+
+
+      (2⌷[2]S38)←0
+DOMAIN ERROR+
+      (2⌷[2]S38)←0
+            ^   ^
+
+
+      S38.a
+1 2 3
+
+
+
+
+      S38.b
+xy
+
+
+
+
+      (⌽S38.a)←4 5 6
+
+
+
+
+
+      S38.a
+6 5 4
+
+
+
+
+      )ERASE S38
+
+
+
+
+
+      ⍝ Bugs38 #4: ⊃B of a non-scalar B with a structured-variable item is an
+      ⍝ ordinary array (only ⊃⊂S is the structured variable S itself)
+
+
+
+
+
+      )ERASE S38
+
+
+
+
+
+      S38.a←1 2 3 ⋄ S38.b←'xy'
+
+
+
+
+
+      ⍴T38←⊃S38 (1 2 3)
+2 8 3
+
+
+
+
+      V38←⊃S38 S38
+
+
+
+
+
+      V38[;1;1]
+0 0
+
+
+
+
+      V38≡⍎2 ⎕TF 'V38'
+1
+
+
+
+
+      W38←⊃⊂S38
+
+
+
+
+
+      W38.a
+1 2 3
+
+
+
+
+      )ERASE S38 T38 V38 W38
+
+
+
+
+
+      ⍝ Bugs38 #5, #6: a ⎕WA margin that leaves too little memory for the next
+      ⍝ statements is rejected, also INT64_MAX (used to overflow the check)
+
+
+
+
+
+      ⎕SYL[32;2]←9223372036854775807
+DOMAIN ERROR+
+      ⎕SYL[32;2]←9223372036854775807
+      ^         ^
+
+
+      )MORE
+⎕WA safety margin 9223372036854775807 in ⎕SYL[32;2] is too large (it leaves no free workspace memory)
+
+
+
+
+      ⎕SYL[32;2]←9223372036854000000
+DOMAIN ERROR+
+      ⎕SYL[32;2]←9223372036854000000
+      ^         ^
+
+
+      1+1
+2
+
+
+
+
+      ⍝ Bugs38 #7: dyadic ⎕SVO with 'NAME SURROGATE': NAME must be a valid user
+      ⍝ name (no FIXME exit, no symbol S.m), and a row has at most 2 names
+
+
+
+
+
+      1001 ⎕SVO '⎕IO yy'
+0
+
+
+
+
+      1001 ⎕SVO 'S.m yy'
+0
+
+
+
+
+      1001 ⎕SVO '⍺ y'
+0
+
+
+
+
+      1001 ⎕SVO '1x zz'
+0
+
+
+
+
+      1001 ⎕SVO 'x1 y z'
+0
+
+
+
+
+      ⎕NC 'S.m'
+0
+
+
+
+
+      ⍝ Bugs38 #8: a branch used as a function argument in a lambda ({1+→0})
+      ⍝ is a DEFN ERROR (it used to end the session)
+
+
+
+
+
+      {1+→0}0
+DEFN ERROR+
+
+
+
+
+      )MORE
+→ is not allowed in λ expression 
+
+
+
+
+      {1/→2}0
+DEFN ERROR+
+
+
+
+
+      {⊢→0}0
+DEFN ERROR+
+
+
+
+
+      ⎕EC '{1+→0}0'
+ 0  0 2817  DEFN ERROR+                       
+                  {1+→0}0                     
+                  ^                           
+            → is not allowed in λ expression  
+
+
+      {⍵[1]→0}5 6
+
+
+
+
+
+      ⍝ Bugs38 #9: a legacy bool-packed workspace value (flg 0x10) has a
+      ⍝ Cell-sized ravel, so that indexed assignment of any type works
+
+
+
+
+
+      )COPY LEGACY38 B38L
+SAVED ³
+
+
+
+
+      10↑B38L
+1 0 0 1 0 0 1 0 0 1
+
+
+
+
+      B38L[1]←5
+
+
+
+
+
+      B38L[2]←0.5
+
+
+
+
+
+      B38L[3]←'x'
+
+
+
+
+
+      10↑B38L
+5 0.5 x 1 0 0 1 0 0 1
+
+
+
+
+      +/B38L=1
+33
+
+
+
+
+      )ERASE B38L
+
+
+
+
+
+      ⍝ Bugs38 #10: 12 ⎕CR of a malformed nested CDR record whose item decodes
+      ⍝ to a simple scalar: no assertion
+
+
+
+
+
+      ⎕IO←0
+
+
+
+
+
+      C←11 ⎕CR ⊂⊂1 2
+
+
+
+
+
+      C[77]←⎕UCS 0
+
+
+
+
+
+      ≡Z←12 ⎕CR C
+0
+
+
+
+
+      C←11 ⎕CR 1 'a'
+
+
+
+
+
+      C[44]←⎕UCS 6
+
+
+
+
+
+      Z←12 ⎕CR C
+DOMAIN ERROR+
+      Z←12 ⎕CR C
+        ^  ^
+
+
+      )MORE
+CDR nested APV (type 6) at offset 32 has rank 0
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      ⍝ Bugs38 #11: , ⌽ ⊖ / ⌿ and A⍕B of an empty array with huge non-empty
+      ⍝ axes return at once (they looped over the non-empty axes)
+
+
+
+
+
+      X←1E15 0⍴0
+
+
+
+
+
+      ⍴X,X
+1000000000000000 0
+
+
+
+
+      ⍴1⌽X
+1000000000000000 0
+
+
+
+
+      ⍴⊖X
+1000000000000000 0
+
+
+
+
+      ⍴⌽[1]X
+1000000000000000 0
+
+
+
+
+      ⍴0/X
+1000000000000000 0
+
+
+
+
+      ⍴'5'⍕X
+1000000000000000 0
+
+
+
+
+      ⍴(1 1⍴1)⌽X
+1000000000000000 0
+
+
+
+
+      ⍴1E15⌿3 0⍴0
+3000000000000000 0
+
+
+
+
+      ⍴¯1E15⌿3 0⍴0
+3000000000000000 0
+
+
+
+
+      Y←1E7 1E7 0⍴0
+
+
+
+
+
+      ⍴0/[2]Y
+10000000 0 0
+
+
+
+
+      ⍝ Bugs38 #13: f⍣N with an N that is not a 64-bit integer is a DOMAIN ERROR
+      ⍝ (1E19 used to become negative, i.e. the inverse, or hang)
+
+
+
+
+
+      (⌽⍣1E19)⍳3
+DOMAIN ERROR+
+      (⌽⍣1E19)⍳3
+      ^
+
+
+      )MORE
+f⍣N B: N is too large (not a 64-bit integer)
+
+
+
+
+      (-⍣1E19)5
+DOMAIN ERROR+
+      (-⍣1E19)5
+      ^
+
+
+      (÷⍣1E300)2
+DOMAIN ERROR+
+      (÷⍣1E300)2
+      ^
+
+
+      (-⍣¯9223372036854775808)5
+DOMAIN ERROR+
+      (-⍣¯9.223372036854776E18)5
+      ^
+
+
+      (-⍣¯3)5
+¯5
+
+
+
+
+      )SIC
+

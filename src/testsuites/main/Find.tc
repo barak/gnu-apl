@@ -1,0 +1,76 @@
+⍝ Find.tc
+⍝ ----------------------------------
+
+      ⍝ character compatibility
+
+      1 ⋸ 1 2 3
+1 0 0
+      1 ⍷1 2 3
+1 0 0
+
+      'AB'⍷'ABABABABA'
+1 0 1 0 1 0 1 0 0
+
+      1 2 3⍷1 2 3 4 1 2 3
+1 0 0 0 1 0 0
+
+      H←4 5ρ'ABCABA'
+      H
+ABCAB
+AABCA
+BAABC
+ABAAB
+
+      K←2 3ρ'BCAABC'
+      K
+BCA
+ABC
+
+      K⍷H
+0 1 0 0 0
+0 0 1 0 0
+0 0 0 0 0
+0 0 0 0 0
+
+      ⍝ rank of A smaller than rank of B ----------------------------------
+
+      'BA'⍷H
+0 0 0 0 0
+0 0 0 0 0
+1 0 0 0 0
+0 1 0 0 0
+
+      ⍝ rank of A greater than rank of B ----------------------------------
+
+      Q←2 3ρ'ABCABB'
+      Q
+ABC
+ABB
+
+      Q⍷'ABCABB'
+0 0 0 0 0 0
+
+      ⍝ nested arrays ----------------------------------
+
+      S←'GO' 'ON' 'GO' 'TO'
+      S
+ GO ON GO TO 
+      ρS
+4
+      ≡S
+2
+      'GO' 'TO'⍷S
+0 0 1 0
+      'GOTO'⍷S
+0 0 0 0
+
+      ⍝ ⍷ instead of ⍷ ----------------------------------
+      'GO' 'TO'⍷S
+0 0 1 0
+
+      ⍝ deleting multiple blanks ----------------------------------
+
+      S←'AB    DEF'
+      (∼'  '⍷S)/S
+AB DEF
+

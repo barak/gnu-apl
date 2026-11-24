@@ -93,8 +93,13 @@ AC_DEFUN([AX_LIB_SQLITE3],
         saved_CPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $ac_sqlite3_cppflags"
 
+        dnl link (not only compile): the header alone can be present without
+        dnl a usable library, e.g. in a -m32 build on a 64-bit host.
+        saved_LIBS="$LIBS"
+        LIBS="$LIBS $ac_sqlite3_ldflags"
+
         AC_LANG_PUSH(C++)
-        AC_COMPILE_IFELSE(
+        AC_LINK_IFELSE(
             [
             AC_LANG_PROGRAM([[@%:@include <sqlite3.h>]],
                 [[
@@ -103,6 +108,7 @@ AC_DEFUN([AX_LIB_SQLITE3],
 #else
 #  error SQLite version is too old
 #endif
+                  return sqlite3_libversion_number() > 0 ? 0 : 1;
                 ]]
             )
             ],
@@ -113,12 +119,13 @@ AC_DEFUN([AX_LIB_SQLITE3],
             ],
             [
             AC_MSG_RESULT([not found])
-            succees="no"
+            success="no"
             ]
         )
         AC_LANG_POP([C++])
 
         CPPFLAGS="$saved_CPPFLAGS"
+        LIBS="$saved_LIBS"
 
         if test "$success" = "yes"; then
 

@@ -186,7 +186,8 @@ DLX_Node::get_col_type(const Cell & cell)
       }
    if (cell.is_numeric())
       {
-        switch(cell.get_int_value())
+        if (!cell.is_near_int())   return Col_INVALID;   // e.g. 1.5
+        switch(cell.get_near_int())   // near-int: Bugs38 #98
            {
              case 0:   return Col_NULL;
              case 1:   return Col_PRIMARY;
@@ -607,7 +608,11 @@ DLX_Node * item = right;
 
    if (item != this)   // matrix not empty: select shortest column
       {
-        ShapeItem col_size = 2*cols;
+        // a column has at most rows items, so that a primary column is
+        // always chosen (not the first column, which may be a secondary
+        // one, as with the former start value 2*cols, Bugs39 #44)
+        //
+        ShapeItem col_size = rows + 1;
         for (DLX_Node * i = right; i != this; i = i->right)
             {
               if (headers[i->col].col_type != Col_PRIMARY)   continue;
@@ -698,16 +703,44 @@ DLX_Root_Node::preset(cValue_R A_steps, ShapeItem stepsIdx, ShapeItem step_count
                       cValue_R B_mat)
 {
 const int qio = Workspace::get_IO();
+std::vector<bool> covered(headers.size(), false);   // by an earlier step
    loop(a, step_count)
       {
-        const APL_Integer row = A_steps.get_int_value(stepsIdx++) - qio;
+        const APL_Integer given = A_steps.get_near_int(stepsIdx++);
+        const APL_Integer row = Cell::minus_IO(given, qio);
         if (row < 0 || row >= rows)
            {
-             MORE_ERROR() << "bad row: " << row;
+             // the row as given, not row (Bugs40 #95)
+             MORE_ERROR() << "(¯4,R) ⎕DLX B: step row " << given
+                          << " is not a row of B (expecting " << qio
+                          << "≤R<" << (rows + qio) << ")";
              DOMAIN_ERROR;
            }
 
-        bool found_a = false;
+        // the step row must have a '1' or '2' item, and none of its columns
+        // may have been covered by an earlier step (i.e. the row was not
+        // chosen or eliminated before), Bugs39 #14
+        //
+        bool has_items = false;
+        loop(b, nodes.size())
+           {
+             const DLX_Node & n = nodes[b];
+             if (n.row != row)   continue;
+             has_items = true;
+             if (covered[n.col])
+                {
+                  MORE_ERROR() << "(¯4,R) ⎕DLX B: step row "
+                               << (row + qio) << " is not available (it was"
+                                  " chosen or eliminated by an earlier step)";
+                  DOMAIN_ERROR;
+                }
+           }
+        if (!has_items)
+           {
+             MORE_ERROR() << "(¯4,R) ⎕DLX B: step row " << (row + qio)
+                          << " has no 1 or 2";
+             DOMAIN_ERROR;
+           }
 
         // find a '1' or '2' item in row
         //
@@ -716,7 +749,9 @@ const int qio = Workspace::get_IO();
              const DLX_Node & n = nodes[b];
              if (n.row == row)   // found '1' or '2'
                 {
-                  found_a = true;
+                  covered[n.col] = true;
+                  for (DLX_Node * j = n.right; j != &n; j = j->right)
+                      covered[j->col] = true;
                   Log(LOG_Quad_DLX)
                      n.print_RC(CERR << "Covering column " << n.col
                                      << " of rightmost item ") << endl;
@@ -734,7 +769,6 @@ const int qio = Workspace::get_IO();
                   break;   // next row a
                 }
            }
-        Assert(found_a);
       }
 
    // construct return value
@@ -787,7 +821,7 @@ Quad_DLX::eval_AB(cValue_R A, cValue_R B) const
    if (A.element_count() < 1)   LENGTH_ERROR;
 
    if (B.get_rank() != 2)   RANK_ERROR;
-const APL_Integer a0 = A.get_int_value(0);
+const APL_Integer a0 = A.get_near_int(0);   // near-int: Bugs38 #98
 
    if (a0 < -4)   DOMAIN_ERROR;
    if (a0 == -4)   // perform some dance steps with the constraints matrix

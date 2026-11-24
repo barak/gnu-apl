@@ -1,0 +1,49 @@
+⍝ Execute_Each.tc
+⍝ ----------------------------------
+
+      ⍎¨'00'
+0 0
+
+      ⍎¨"00" "11"
+0 11
+
+      ⍎¨ "00" "11"
+0 11
+
+      ⍎¨ '0 '     
+VALUE ERROR in macro ⍎¨
+      ⍎¨'0 '
+      ^
+      →
+
+      ⍎¨ ' 0'
+VALUE ERROR in macro ⍎¨
+      ⍎¨' 0'
+      ^
+      →
+
+      ⍎¨ "00" "⍟0"
+DOMAIN ERROR in macro ⍎¨
+      ⍎¨'00' '⍟0'
+      ^
+      →
+
+      ⍎¨ "00" "⍟0" "0"
+DOMAIN ERROR in macro ⍎¨
+      ⍎¨'00' '⍟0' (,'0')
+      ^
+      →
+
+      ⍎¨ "00" "→5"    
+DOMAIN ERROR: →N in macro ⍎¨
+      ⍎¨'00' '→5'
+      ^
+      →
+
+      ⍎¨ "00" "→" 
+DOMAIN ERROR: → in macro ⍎¨
+      ⍎¨'00' (,'→')
+      ^
+      →
+
+

@@ -110,6 +110,14 @@ public:
         apl_val = new_value;
       }
 
+   /// return true if \b this ValueStackItem holds a reference to its lambda
+   bool get_owns_lambda() const
+      { return owns_lambda; }
+
+   /// mark \b this ValueStackItem as holding a reference to its lambda
+   void set_owns_lambda()
+      { owns_lambda = true; }
+
    /// set function to \b fun
    /// @param fun  function pointer to store
    void set_function(cFunction_P fun)
@@ -131,26 +139,30 @@ public:
 protected:
    /// constructor: ValueStackItem for an unused symbol
    ValueStackItem()
-   : name_class(NC_UNUSED_USER_NAME)
+   : name_class(NC_UNUSED_USER_NAME),
+     owns_lambda(false)
       { memset(&sym_val, 0, sizeof(sym_val)); }
 
    /// constructor: ValueStackItem for a label (function line)
    /// @param lab  function line number for the label
    ValueStackItem(Function_Line lab)
-   : name_class(NC_LABEL)
+   : name_class(NC_LABEL),
+     owns_lambda(false)
       { sym_val.label = lab; }
 
    /// constructor: ValueStackItem for a variable
    /// @param val  APL value to hold
    ValueStackItem(Value_P val)
    : apl_val(val),
-     name_class(NC_VARIABLE)
+     name_class(NC_VARIABLE),
+     owns_lambda(false)
    {}
 
    /// constructor: ValueStackItem for a shared variable
    /// @param key  shared variable key
    ValueStackItem(SV_key key)
-   : name_class(NC_SYSTEM_VAR)
+   : name_class(NC_SYSTEM_VAR),
+     owns_lambda(false)
       { sym_val.sv_key = key; }
 
    /// the possible "values" of a symbol
@@ -168,6 +180,7 @@ protected:
         memset(&sym_val, 0, sizeof(sym_val));
         if (!!apl_val)   apl_val.reset();
         name_class = NC_UNUSED_USER_NAME;
+        owns_lambda = false;
       }
 
    /// the (current) value of this symbol (unless variable)
@@ -178,6 +191,11 @@ protected:
 
    /// the (current) name class (like ⎕NC, unless shared variable)
    NameClass name_class;
+
+   /// true if the lambda in \b this item was bound by )LOAD with a reference
+   /// that pop() releases (operands like ⍶ are otherwise bound without a
+   /// reference, Bugs39 #89)
+   bool owns_lambda;
 };
 //════════════════════════════════════════════════════════════════════════════
 /// Base class for variables, defined functions, and distinguished names
@@ -246,6 +264,20 @@ public:
    const int value_stack_size() const
       { return value_stack.size(); }
 
+   /// )COPY: move the local levels (all but the global level 0) of \b this
+   /// symbol to \b locals, so that the global level is the top level that
+   /// )COPY replaces (LRM p. 423, Bugs38 #24)
+   /// @param locals  receives the local levels
+   void hide_locals(std::vector<ValueStackItem> & locals)
+      { while (value_stack.size() > 1)
+           { locals.push_back(value_stack.back());   value_stack.pop_back(); } }
+
+   /// undo hide_locals()
+   /// @param locals  the local levels from hide_locals()
+   void restore_locals(std::vector<ValueStackItem> & locals)
+      { while (locals.size())
+           { value_stack.push_back(locals.back());   locals.pop_back(); } }
+
    /// call the monitor callback function (if any) with event \b ev
    /// @param ev  symbol event to report
    void call_monitor_callback(Symbol_Event ev)
@@ -278,6 +310,12 @@ public:
 
    /// return a reason why this symbol cant become a defined function
    const char * cant_be_defined() const;
+
+   /// return true if every character of \b text can be written as UTF-8
+   static bool is_UTF8_text(const UCS_string & text);
+
+   /// an APL expression (as in 10 ⎕CR) whose value is the string \b text
+   static UCS_string CR10_text(const UCS_string & text);
 
    /// dump this symbol to out
    /// @param out  output stream
@@ -405,6 +443,15 @@ public:
    /// push a function onto the stack of \b this \b Symbol
    /// @param function  function pointer to push
    virtual void push_function(cFunction_P function);
+
+   /// bind \b fun to level \b level of the stack of \b this \b Symbol
+   void set_function_at(int level, cFunction_P fun)
+      { value_stack[level].set_function(fun); }
+
+   /// mark the lambda on top of the stack of \b this \b Symbol as bound by
+   /// )LOAD with a reference that pop() releases (Bugs39 #89)
+   void set_top_owns_lambda()
+      { if (value_stack.size())   value_stack.back().set_owns_lambda(); }
 
    /// push a label onto the stack of \b this \b Symbol
    /// @param label  function line number for the label

@@ -1,0 +1,35 @@
+⍝ ZZ35_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+      4 ⎕CR facs←(1⍴2) (2 2)
+┏→━━━━━━━━┓
+┃┏→┓ ┏→━━┓┃
+┃┃2┃ ┃2 2┃┃
+┃┗∼┛ ┗∼━━┛┃
+┗ϵ━━━━━━━━┛
+
+      )OUT TEST3
+
+      )CLEAR
+CLEAR WS
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )IN TEST3
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+      ⍝ ==================================
+

@@ -110,7 +110,7 @@ Value_P Z1(min_MN, N, LOC);   // Z1 is U
   loop(col, N)
      {
        if (col < row)   Z1->next_ravel_Number(0.0);   // below diag: U is 0
-       else             Z1->next_ravel_Number(gsl_matrix_get(B, row, col));
+       else             Z1->next_ravel_Float(gsl_matrix_get(B, row, col));
      }
   Z1->check_value(LOC);
 
@@ -118,7 +118,7 @@ Value_P Z2(M, min_MN, LOC);   // Z2 is L
   loop(row, M)
   loop(col, min_MN)
      {
-       if (col < row)        Z2->next_ravel_Number(gsl_matrix_get(B, row, col));
+       if (col < row)        Z2->next_ravel_Float(gsl_matrix_get(B, row, col));
        else if (col > row)   Z2->next_ravel_Number(0.0);
        else                  Z2->next_ravel_Number(1.0);
      }
@@ -249,7 +249,7 @@ Value_P Z1(M, N, LOC);   // Z[1] lower triangular matrix L
   loop(row, M)
   loop(col, N)
       {
-        Z1->next_ravel_Number(gsl_matrix_get(L, row, col));
+        Z1->next_ravel_Float(gsl_matrix_get(L, row, col));
   //    else              Z1->next_ravel_Number(0.0);
       }
   Z1->check_value(LOC);
@@ -257,7 +257,7 @@ Value_P Z1(M, N, LOC);   // Z[1] lower triangular matrix L
 
 Value_P Z0(M, M, LOC);   // Z[0] is the orthogonal M×M matrix Q
   loop(row, M)
-  loop(col, M)   Z0->next_ravel_Number(gsl_matrix_get(Q, row, col));
+  loop(col, M)   Z0->next_ravel_Float(gsl_matrix_get(Q, row, col));
   Z0->check_value(LOC);
 
   // 2. Invert Z1 to get Z2. L is inverted in place. The non-zero triangle
@@ -280,7 +280,7 @@ Value_P Z0(M, M, LOC);   // Z[0] is the orthogonal M×M matrix Q
 
 Value_P Z2(N, N, LOC);   // Z[2] is the inverse of L
   loop(row, N)
-  loop(col, N)    Z2->next_ravel_Number(gsl_matrix_get(Li, row, col));
+  loop(col, N)    Z2->next_ravel_Float(gsl_matrix_get(Li, row, col));
   Z2->check_value(LOC);
   gsl_matrix_free(Li);   Li = 0;
 
@@ -345,7 +345,7 @@ Value_P Z1(N, N, LOC);   // Z2 is the upper triangle N×N matrix R
            {
              const double tmp = gsl_matrix_get(B, row, col);
              gsl_matrix_set(R, row, col, tmp);
-             Z1->next_ravel_Number(tmp);
+             Z1->next_ravel_Float(tmp);
            }
       }
   Z1->check_value(LOC);
@@ -363,7 +363,7 @@ Value_P Z2(N, N, LOC);   // Z[2] is the N×N matrix Ri
            }
         else
            {
-             Z2->next_ravel_Number(gsl_matrix_get(R, row, col));
+             Z2->next_ravel_Float(gsl_matrix_get(R, row, col));
            }
       }
   Z2->check_value(LOC);
@@ -378,7 +378,7 @@ Value_P Z2(N, N, LOC);   // Z[2] is the N×N matrix Ri
 
 Value_P Z0(M, M, LOC);   // Z[0] is the orthogonal M×M matrix Q
   loop(row, M)
-  loop(col, M)   Z0->next_ravel_Number(gsl_matrix_get(Q, row, col));
+  loop(col, M)   Z0->next_ravel_Float(gsl_matrix_get(Q, row, col));
   Z0->check_value(LOC);
   gsl_matrix_free(Q);   Q = 0;
 

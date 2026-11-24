@@ -155,6 +155,12 @@ const ShapeItem len_B = B.element_count();
                  {
                    Cell & cell_Z0 = Z->get_wproto();
                    cell_A.init_other(&cell_Z0, *Z, LOC);
+
+                   // init_other() shares the value of A (and of every
+                   // variable that shares it with A): isolate it before
+                   // to_type() changes it (Bugs40 #50)
+                   //
+                   cell_Z0.isolate(LOC);
                    cell_Z0.get_pointer_value()->to_type(false);
                  }
               else if (cell_A.is_character_cell())

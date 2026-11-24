@@ -1,0 +1,21 @@
+⍝ DropAxis.tc
+⍝ ═══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A integer; X∊⍳⍴⍴B
+      ⍝ inv: (⍴Z)[,X] ←→ 0⌈(⍴B)[,X]-|A
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      ⍝ inv: A↓B ←→ A↓[⍳⍴⍴B]B
+      B ← ⎕RVAL 2 (5 6) (,0 1 0 0 0)
+      A ← 2∣⎕RVAL 0                          ⍝ drop 0 or 1 along axis 1
+      Z ← A↓[1]B
+      ((⍴Z)[1]) ≡ 0⌈(⍴B)[1]-|A
+1
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ inv: A↓B ←→ A↓[⍳⍴⍴B]B for vectors
+      B ← ⎕RVAL 1 (,6) (,0 1 0 0 0)
+      A ← 2∣⎕RVAL 0
+      (A↓B) ≡ A↓[⍳⍴⍴B]B
+1

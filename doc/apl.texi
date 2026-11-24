@@ -538,6 +538,9 @@ the interpreter is compared with the expected output in the testcase file(s)
 and differences are marked. In addition a summary file is created that tells
 whether or not each of the testcases was successful.
 
+A testcase argument of the form @code{@@file} is not a testcase but a list of
+testcases: @code{-T @@file} does the same as @code{--TL file} (see below).
+
 The expected output in a testcase file can contain the following wildcards,
 for output that may legitimately differ (e.g. the last digit of a number
 on different floating point hardware, or a time):
@@ -598,6 +601,43 @@ Normally, when the interpreter is run with the @code{T} option,
 an existing summary.log file is overwritten without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overwriting it.
+
+@item
+@code{--TL file ...}
+
+Run one or more lists of testcases (test suites). Every @code{file} is either a text file
+that contains the names of testcase files, one per line, or a directory (a
+test suite directory) that contains such a text file named
+@code{zzzz_selection}. Every testcase file is run as if it were given with the
+@code{-T} option, in the order of the list. Empty lines and lines starting
+with @code{#} or @code{⍝} are ignored, and so are leading and trailing
+blanks. Relative file names are relative to the directory of the list
+file, and the log files of the testcases are written next to them (as
+with @code{-T}). For example, a directory @code{my_suite} containing the
+testcases @code{Add.tc} and @code{Minus.tc} and a file
+@code{my_suite/zzzz_selection} containing:
+
+@example
+# the arithmetic testcases
+Add.tc
+Minus.tc
+@end example
+
+is run with:
+
+@example
+apl --TL my_suite
+@end example
+
+The test suites of GNU APL itself are the subdirectories of
+@code{src/testsuites} (see the file README there).
+Like @code{-T}, @code{--TL} takes several arguments: all files up to the
+next option or @code{--}, e.g. @code{apl --TL suite1 suite2 suite3}. The
+test suites run in the order given. @code{--TL} can be combined with
+@code{-T} and can be given more than once. @code{-T @@my_suite} is the same
+as @code{--TL my_suite}. Since @code{-T} takes all remaining arguments (up
+to @code{--}) as testcase files, @code{--TL} must then be given before
+@code{-T}.
 
 @item
 @code{-v}, @code{--version},
@@ -2331,11 +2371,23 @@ contains a description of all possible color settings.
 Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥,
 and > (but not of = or ≠) are integer or real numbers. As a consequence,
 the argument(s) of ⍋ or ⍒ (which require comparison) must also be a vector
-of integer or real numbers.
+of integer or real numbers, and so must the arguments of dyadic ⌈ and ⌊.
 
 In contrast, GNU APL also allows the comparison of characters and numbers or
 the comparison of complex numbers according to the following, more general,
-rules.
+rules. The same rules (and therefore the same order) are used by <, ≤, ≥,
+and >, by ⍋ and ⍒, by dyadic ⍸, and (for numbers) by dyadic ⌈ and ⌊, which
+return the greater or the smaller one of A and B, respectively:
+
+@example
+      ⍋2J1 2 2J¯1 1J5
+4 3 2 1
+      1J1⌈2
+2
+      2J¯1⌊2
+2J¯1
+@end example
+
 
 Let A and B be two APL values to be compared. The final result of comparing
 A and B is the first verdict (i.e. either A < B, or A > B, or A = B)
@@ -2603,8 +2655,31 @@ variables C and D like this:
       SUM ← @{ ⍺ + ⍵ ;C;D @}
 
       ⎕CR 'SUM'
-λ←⍺ λ1 ⍵;C;D 
-λ← ⍺ + ⍵     
+λ←⍺ λ1 ⍵;C;D
+λ← ⍺ + ⍵
+@end example
+
+Like in the header of a normal defined function, blanks may be used instead
+of semicolons between the local variables (IBM APL2 allows this in the
+argument of @b{⎕FX}), so @code{@{ ⍺ + ⍵ ;C D @}} also localizes C and D.
+The semicolons are the proper format, though: @b{⎕CR} (and @b{)SAVE} etc.)
+show the local variables of the above with semicolons, i.e. ;C;D.
+
+Only the variables that are listed as local variables are localized; in
+particular, assigning a value to a system variable inside a lambda body does
+@b{not} localize it. System variables like @b{⎕IO} or @b{⎕PS} can be
+localized in lambdas exactly like in normal defined functions. When a defined
+function or a lambda is called, its localized system variables are
+initialized to their default values (e.g. @b{⎕IO} to 1 and @b{⎕PS} to 0 0)
+and not to the value that they had before the call. In contrast, IBM APL2
+leaves localized system variables without a value until they are assigned.
+
+@example
+      ⎕IO←0
+      @{ ⍵ + ⎕IO ;⎕IO @} 0
+1
+      ⎕IO
+0
 @end example
 
 If a named lambda is created inside a defined function, then the name of the
@@ -5350,7 +5425,7 @@ purpose.
 
 @b{⎕CC B} returns all characters of character class(es) @b{B}. If @b{B} is an
 integer scalar then the result is a character vector, If @b{B} is an integer
-vector then the result is a nested vector of integer vectors, with one item
+vector then the result is a nested vector of character vectors, with one item
 per character class.
 
 @example
@@ -5377,7 +5452,7 @@ abcdefghijklmnopqrstuvwxyz
 ╙─╨─╜╚═╩═╝
 
       ⍝ Some mathematical symbols
-      ⎕CC 8
+      ⎕CC 9
 ⎲⎛⎞⎡⎤⎧⎫
 ⎳⎜⎟⎢⎥⎨⎬
 ↔⎝⎠⎣⎦⎮⎮
@@ -5389,21 +5464,21 @@ character classes for @b{⎕CC}:
 
 @example
       ⎕CC ⍬
-      ⎕CC   1:  digits 0-9 (same as ⎕CC 10)
-      ⎕CC   2:  uppercase characters A-Z (same as ⎕CC 26)
+      ⎕CC   1:  Digits 0-9 (same as ⎕CC 10)
+      ⎕CC   2:  UPPERCASE CHARACTERS A-Z (same as ⎕CC 26)
       ⎕CC   3:  lowercase characters a-z (same as ⎕CC ¯26)
-      ⎕CC   4:  ASCII characters (same as ⎕CC 127)
-      ⎕CC   5:  superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )
+      ⎕CC   4:  ASCII characters (same as ⎕CC 128)
+      ⎕CC   5:  Superscripts ( ²³¹ʲᵏᵐᵗ⁰ⁱ⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ )
       ⎕CC   6:  subscripts ( ᵢ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎ₖₘₙⱼ )
-      ⎕CC   7:  line drawing characters
-      ⎕CC   8:  octal digits 0-7
-      ⎕CC   9:  some mathematical symbols
-      ⎕CC  10:  decimal digits 0-9
+      ⎕CC   7:  Line drawing characters
+      ⎕CC   8:  Octal digits 0-7
+      ⎕CC   9:  Some mathematical symbols
+      ⎕CC  10:  Decimal digits 0-9
       ⎕CC  16:  UPPERCASE HEXADECIMAL DIGITS 0-9 A-F
-      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 A-F a-f
+      ⎕CC ¯16:  lowercase hexadecimal digits 0-9 a-f
       ⎕CC  17:  Hexadecimal Digits 0-9 A-F a-f
       ⎕CC  26:  UPPERCASE CHARACTERS A-Z
-      ⎕CC ¯26:  lowercase characters A-Z
+      ⎕CC ¯26:  lowercase characters a-z
       ⎕CC  33:  base32 encoding (RFC 4648)
       ⎕CC  48:  greek characters A-Ω α-ω
       ⎕CC  52:  characters A-Z a-z
@@ -5419,7 +5494,9 @@ In many cases is the character class number easy to remember because:
       the class, e.g. @b{26} for @b{A-Z}, @b{52} for @b{A-Z and a-z},
 @item negative numbers are the lowercase variants of the uppercase class,
       e.g. @b{26} for @b{A-Z} and @b{¯26}  for @b{a-z}, and
-@item @b{2*class} is the mixed case of the uppercase @b{class}.
+@item @b{2×class} is (for letters) the mixed case of the uppercase @b{class},
+      e.g. @b{52} for @b{A-Z and a-z} (but @b{17} for the mixed case
+      hexadecimal digits).
 @end itemize
 
 @c ----------------------------------------------------------------------------
@@ -5437,9 +5514,12 @@ is contained in one of the character classes @b{B} and @b{0} if not.
 0 1 1 1
 
        (⎕CC 7) ⎕CC 7
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1 1 1
 @end example
 
 For most classes this lookup is an optimized constant time operation (for
@@ -6715,9 +6795,10 @@ operations are selected through the use of the axis specifier @b{x}:
           A ⎕MX[12] B      (dyadic)  Histogram
           A ⎕MX[13] B      (dyadic)  Print
             ⎕MX[14] B      (monadic) Set RNG seed
+        (A) ⎕MX[15] B      (nomadic) Correlation
 @end example
 
-(These may by shown by entering @b{⎕MX} '' or @b{⎕MX}[0]0 on the APL command line.)
+(These may be shown by entering @b{⎕MX} '' or @b{⎕MX} ⍬ on the APL command line.)
 In the function list above, @b{A} indicates a mandatory left argument,
 while (@b{A}) indicates an optional left argument. The right argument @b{B}
 of @b{⎕MX[X]} is always mandatory.
@@ -6779,7 +6860,7 @@ two isomorphic real or complex vectors where ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A 
 
 @example
       (⍳8) ⎕MX[3] 4j4+⍳8
-0.2515670406J0.09930859532
+0.4715439237
 @end example
 
 @c ............................................................................
@@ -6938,8 +7019,8 @@ of the squares of the elements equals 1:
 1
 @end example
 
-If the magnitude of the argument is zero, the operation returns an all-zero
-result with the same shape as the argument.
+If the magnitude of the argument is zero, then the argument has no direction
+and the operation gives a DOMAIN ERROR.
 
 
 @c ............................................................................
@@ -7036,6 +7117,19 @@ In dyadic form, it computes the covariance of the argument vectors:
 
 In dyadic form, ⍴⍴A = 1, ⍴⍴B = 1, and ⍴A = ⍴B.
 
+The covariance is the sample covariance, i.e. for vectors A and B with
+N items:
+
+@example
+      (+/(A-(+/A)÷N)×B-(+/B)÷N)÷N-1
+@end example
+
+and (⎕MX[11] B)[I;J] is the same as B[I;] ⎕MX[11] B[J;]. At least 2
+samples are needed. For complex arguments, the real and the imaginary
+parts are treated as separate sample sets: the real part of the result
+is the covariance of the real parts of A and B, and the imaginary part
+of the result is the covariance of the imaginary parts of A and B.
+
 Sample variance can be computed by supplying the same argument on the
 left and right:
 
@@ -7044,6 +7138,65 @@ left and right:
       A ⎕MX[11] A ⍝ or ⎕MX[11]⍨ A
 36.67777778 
 @end example
+
+The covariance depends on the scale of the samples (multiplying A by 10
+multiplies the covariance by 10). See @b{⎕MX}[15] (Correlation) below
+for a measure that is independent of the scale.
+
+@c ............................................................................
+@node Correlation
+@subsection Correlation
+
+The correlation operation, @b{⎕MX}[15], is nomadic and takes the same
+arguments as the covariance operation, @b{⎕MX}[11]. It computes the
+(Pearson) correlation coefficient instead of the covariance, i.e. the
+covariance divided by the product of the standard deviations of the two
+sample sets. A correlation coefficient lies between ¯1 and 1: 1 means
+that the samples lie on a straight line with a positive slope, ¯1 that
+they lie on a straight line with a negative slope, and 0 that they are
+not linearly related at all. Unlike the covariance, the correlation does
+not change if a sample set is multiplied by a positive number.
+
+In monadic form, it computes the correlation of each row of B with every
+other row of B. The diagonal of the result is therefore 1. For the
+matrix B from the covariance example above:
+
+@example
+      ⎕PP←10
+      ⎕MX[15] B
+ 1             0.8821359145 ¯0.9786290052
+ 0.8821359145  1            ¯0.9471678676
+¯0.9786290052 ¯0.9471678676  1
+@end example
+
+The result can also be computed from the covariance matrix C:
+
+@example
+      C←⎕MX[11] B
+      C÷∘.×⍨(1 1⍉C)*0.5
+ 1             0.8821359145 ¯0.9786290052
+ 0.8821359145  1            ¯0.9471678676
+¯0.9786290052 ¯0.9471678676  1
+@end example
+
+In dyadic form, it computes the correlation of the argument vectors:
+
+@example
+      1 2 3 4 ⎕MX[15] 2 4 5 9
+0.9647638212
+      1 2 3 4 ⎕MX[15] 8 6 4 2
+¯1
+@end example
+
+Complex arguments are treated like in the covariance operation: the real
+and the imaginary parts of the result are the correlations of the real
+and of the imaginary parts of the arguments, respectively. A part that
+is 0 in all samples (such as the imaginary part of real arguments) is
+ignored, so that real arguments give a real result.
+
+The correlation is not defined for a sample set whose samples are all
+equal (and whose standard deviation is therefore 0). In that case, a
+DOMAIN ERROR is raised.
 
 @c ............................................................................
 @node Histograms
@@ -8269,7 +8422,7 @@ formats 'string' and 'position/length', but not of the result of output formats
 The output formats ⊂ and / are related like this:
 
 @example
-      A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
+      A ⎕RE['/'] B   ←→   0 ≠ A  A ⎕RE['⊂'] B
 @end example
 
 
@@ -8283,7 +8436,7 @@ raise an error if no match is found. This can be achieved with the E flag:
 @example
        4 ⎕CR 'g..' ⎕RE[''] '__foo___fun____fox'
 ┏⊖┓
-┃0┃
+┃ ┃
 ┗━┛
        'g..' ⎕RE['E'] '__foo___fun____fox'
 DOMAIN ERROR+
@@ -11113,7 +11266,9 @@ Always qualified inline, e.g. @code{SYSTEM LIMIT (rank)}
 Generic @code{ENTRY ERROR} / @code{SYNTAX ERROR} @tab
 IR @tab
 More specific text, e.g. @code{Non-APL character}, @code{Bad number},
-@code{No string end found}
+@code{No string end found}, in immediate execution. In @b{⍎}, @b{⎕EA},
+@b{⎕EB} and @b{⎕EC} they are @code{SYNTAX ERROR} (@b{⎕ET} 2 2) like in
+IBM APL2, with the specific text in @code{)MORE}
 @end multitable
 
 @c ============================================================================
@@ -12495,7 +12650,7 @@ The top-level directory of the GNU APL project has a structure like this:
 @example
     apl-2.0/
     ├── build
-    ├── debian
+    ├── deb
     ├── doc
     ├── erlang
     ├── gnu-apl.d
@@ -12603,13 +12758,15 @@ Re-creating the ./configure script requires:
 @item running autoreconf
 @end itemize
 
-@node The sub-directories debian and debian_tmp
-@section The sub-directories debian and debian_tmp
+@node The sub-directories deb and debian_tmp
+@section The sub-directories deb and debian_tmp
 
-These sub-directories are templates for building Debian
-packages that contain GNU APL. Sub-directory debian_tmp is initially empty and
-acts as a scratch directory inside which the interpreter is being compiled
-when a Debian package is built.
+Sub-directory deb contains the templates for building Debian packages that
+contain GNU APL (@b{make DEB}). It is not named debian because that name is
+reserved for the Debian maintainers of GNU APL; @b{make DEB} copies it to
+debian in its copy of the sources. Sub-directory debian_tmp is initially
+empty and acts as a scratch directory inside which the interpreter is being
+compiled when a Debian package is built.
 
 @node The sub-directory tools
 @section The sub-directory tools

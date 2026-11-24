@@ -1,0 +1,20 @@
+⍝ Depth.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z is a simple scalar nonneg integer
+      ⍝ inv: ⍴Z ←→ empty (⍳0)
+      ⍝ inv: ⍴⍴Z ←→ ,0   (scalar result)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ≡B
+      (⍴Z) ≡ ⍳0
+1
+      (⍴⍴Z) ≡ ,0
+1
+      ⍝ Simple scalar has depth 0
+      ≡⎕RVAL 0
+0
+      ⍝ Simple vector has depth 1
+      ≡⎕RVAL 1 (,4) (,0 1 0 0 0)
+1

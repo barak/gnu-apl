@@ -13,7 +13,7 @@
 # archived into culprits.tar.gz for emailing to bug-apl@gnu.org.
 #
 # Usage: (from the src/ directory; './apl' must already be built)
-#   ./Automated_Test_Report.sh [--svn-bisect] [logdir] [selection]
+#   ./Automated_Test_Report.sh [--svn-bisect] [suite|logdir] [selection]
 #
 # --svn-bisect, if given (anywhere on the command line), additionally
 # searches backward through SVN history (see Step "bisect SVN history"
@@ -24,12 +24,15 @@
 # on by request, since collecting this information was explicitly said
 # to not be time critical.
 #
-# logdir defaults to "testcases" and must contain the .tc files to run --
-# e.g. "testcases" (-> 'make test's set) or "testcases_3" (-> 'make test3's
-# set). This script runs every *.tc file in logdir itself (see Step 1) to
-# produce a fresh summary.log there; it does NOT read/trust one left behind
-# by an earlier, separate 'make test'/'make test3' invocation, since that
-# could be stale relative to the current build, sources, or SVN revision.
+# suite is a test suite directory (see testsuites/README), e.g.
+# "testsuites/main" (the default) or "testsuites/regression", or its
+# zzzz_selection file; the active testcases listed in it are run (with --TL),
+# and summary.log and the culprits* files go into the suite directory.
+# Alternatively, a logdir can be given: every *.tc file in it is run (with
+# -T). This script runs the testcases itself (see Step 1) to produce a
+# fresh summary.log; it does NOT read/trust one left behind by an earlier,
+# separate 'make test'/'make test3' invocation, since that could be stale
+# relative to the current build, sources, or SVN revision.
 #
 # selection is only used when summary.log has more than one failing
 # testcase (see step 2b below): a 1-based number picking which one to
@@ -232,7 +235,7 @@ MACHINE_TAG=${MACHINE_TAG//[^A-Za-z0-9._-]/_}
 
 # how long (seconds) any single apl invocation below is given before being
 # treated as hung rather than just slow -- generous on purpose (a full
-# testcases_3 run, or a from-scratch rebuild's own test, can legitimately
+# testsuites/test3 run, or a from-scratch rebuild's own test, can legitimately
 # take a while on a slow machine), overridable via the environment for a
 # machine known to need more (or less).
 : "${AUTOMATED_TEST_REPORT_TIMEOUT:=300}"
@@ -452,22 +455,43 @@ DEGRADED=no
 step "run the test suite fresh, to produce an up-to-date summary.log"
 
 action "check the command line for an explicit logdir argument"
+SUITE=""   # the selection file of a test suite (instead of a logdir)
+ARG=testsuites/main
 if (( $# > 0 )); then
    boundary "an argument was given: '$1'"
-   LOGDIR=$1
+   ARG=${1%/}
 else
-   boundary "no argument was given"
-   LOGDIR=testcases
+   boundary "no argument was given: test suite $ARG"
 fi
-consequence "logdir = '$LOGDIR'"
+if [[ -f "$SRC_DIR/$ARG/zzzz_selection" ]]; then   # a test suite directory
+   SUITE=$ARG/zzzz_selection
+   LOGDIR=$ARG
+elif [[ -f "$SRC_DIR/$ARG" ]]; then           # the selection file of a suite
+   SUITE=$ARG
+   LOGDIR=$(dirname "$ARG")
+else                                          # a directory of .tc files
+   LOGDIR=$ARG
+fi
+consequence "logdir = '$LOGDIR'${SUITE:+ (test suite, selection $SUITE)}"
 
 SUMMARY=$SRC_DIR/$LOGDIR/summary.log
 CULPRITS_LOG=$SRC_DIR/$LOGDIR/culprits.log
 
 action "check whether '$LOGDIR' exists and contains testcases (*.tc) to run"
-shopt -s nullglob
-tc_files=("$LOGDIR"/*.tc)
-shopt -u nullglob
+if [[ -n "$SUITE" ]]; then   # the testcases listed in the suite (like --TL)
+   tc_files=()
+   while IFS= read -r line || [[ -n "$line" ]]; do
+      line=${line%$'\r'}
+      line="${line#"${line%%[![:space:]]*}"}"   # leading blanks
+      line="${line%"${line##*[![:space:]]}"}"   # trailing blanks
+      [[ -z "$line" || "$line" == "#"* || "$line" == "⍝"* ]] && continue
+      tc_files+=("$LOGDIR/$line")   # relative to the suite directory
+   done < "$SRC_DIR/$SUITE"
+else
+   shopt -s nullglob
+   tc_files=("$LOGDIR"/*.tc)
+   shopt -u nullglob
+fi
 if [[ -d "$SRC_DIR/$LOGDIR" ]] && (( ${#tc_files[@]} > 0 )); then
    boundary "found ${#tc_files[@]} .tc file(s) in '$LOGDIR'"
    consequence "logging this run to $CULPRITS_LOG"
@@ -493,12 +517,11 @@ exec > >(tee "$CULPRITS_LOG.new") 2>&1
 # one never touches the user-facing culprits.log itself.
 trap 'rm -f "$CULPRITS_LOG.new"' EXIT
 
-# apl -T unconditionally truncates the hardcoded path "testcases/summary.log"
-# (relative to CWD) as soon as -T is parsed, regardless of which files -T
-# actually names (UserPreferences.cc). Since the fresh run below (and every
-# apl invocation further down) uses -T, that would otherwise silently wipe
-# out testcases/summary.log even when LOGDIR is something else (e.g.
-# testcases_3). Back it up now, before that first -T invocation, and
+# apl -T truncates the summary.log in the directory of its first testcase
+# (IO_Files::init_summary(); it used to truncate the hardcoded path
+# testcases/summary.log, whatever files -T named). Since the fresh run below
+# may run testcases from testcases/, keep testcases/summary.log of an
+# earlier 'make test' safe anyway: back it up now, before that first run, and
 # restore it on exit, however this script ends. Also clean up
 # culprits.log.new on any exit that doesn't reach its rename to
 # culprits.log (e.g. this script aborting early) -- it is our own scratch
@@ -530,8 +553,12 @@ action "run every .tc file in '$LOGDIR' (as 'make test'/'make test3'" \
        "run_apl_hang_safe's own header comment for why"
 run_home=$(mktemp -d)
 run_log=$SRC_DIR/$LOGDIR/culprits_run1.log
+if [[ -n "$SUITE" ]]; then run_args=(--TL "$SUITE")
+else                       run_args=(-T "${tc_files[@]}")
+fi
 run_apl_hang_safe run_rc "$run_log" "$AUTOMATED_TEST_REPORT_TIMEOUT" \
-   "$run_home" ./apl --id 1010 --noPrefs --libroot testcases/libroot -T "${tc_files[@]}"
+   "$run_home" ./apl --id 1010 --noPrefs --libroot testcases/libroot \
+   "${run_args[@]}"
 rm -rf "$run_home"
 
 if [[ "$run_rc" == hung ]]; then
@@ -1796,7 +1823,7 @@ add_artifact()
    fi
 }
 
-target_log=$SRC_DIR/$LOGDIR/$target.log
+target_log=$SRC_DIR/$target_path.log
 
 action "add $target.log, the failing testcase's own diff/output log," \
        "recorded by the original run"

@@ -202,8 +202,8 @@ const ShapeItem count = nz_element_count();
        Cell cache;
        const Cell & cell = get_cravel(c, cache);
        const CellType ctype = cell.get_cell_type();
-       if (ctype & (CT_CHAR | CT_INT | CT_FLOAT))   continue;
-       if (cell.is_near_real())                     continue;
+       // complex numbers are ordered too, like by < (Bugs38 #124)
+       if (ctype & (CT_CHAR | CT_INT | CT_FLOAT | CT_COMPLEX))   continue;
        if (cell.is_pointer_cell() &&
            cell.get_pointer_value()->can_be_compared())   continue;
        return false;
@@ -553,7 +553,7 @@ ShapeItem valid_rows = 0;
              if (name_cell.get_int_value() != 0)   // invalid unused
                 {
                    MORE_ERROR() << "invalid member name in row "
-                                << r << " (integer)";
+                                << (r + Workspace::get_IO()) << " (integer)";
                    DOMAIN_ERROR;
                 }
            }
@@ -566,14 +566,14 @@ ShapeItem valid_rows = 0;
                   if (!v->is_char_string())   // no.
                      {
                        MORE_ERROR() << "invalid member name in row "
-                                    << r << " (nested non-string)";
+                                    << (r + Workspace::get_IO()) << " (nested non-string)";
                       DOMAIN_ERROR;
                      }
                 }
              else if (!name_cell.is_character_cell())   // unexpected type
                      {
                        MORE_ERROR() << "invalid member name in row "
-                                    << r << " (type)";
+                                    << (r + Workspace::get_IO()) << " (type)";
                        DOMAIN_ERROR;
                      }
            }
@@ -612,10 +612,9 @@ ShapeItem count = ec;
                    // otherwise the Lval cell points to a cell and was
                    // counted correctly
                  }
-              else   // invalid Lval cel
-                 {
-                   count--;   // deduct the Lval cell
-                 }
+              // otherwise a placeholder without a target (a fill position
+              // of an over-take or expand), which is a (non-storing)
+              // position like for , (LRM p. 119, Bugs41 #60)
             }
        }
 
@@ -715,9 +714,9 @@ cValue::enlist_left(Value & Z) const
          else if (cell.is_lval_cell())
             {
               Cell * target = cell.get_lval_value();
-              if (target == 0)
+              if (target == 0)   // a fill position, see get_enlist_count()
                  {
-                   CERR << "0-pointer at " LOC << endl;
+                   Z.next_ravel_Lval(0, 0);   // Bugs41 #60
                  }
               else if (target->is_pointer_cell())
                  {
@@ -795,8 +794,10 @@ cValue::enlist_right(Value & Z) const
             }
          else if (cell.is_lval_cell() && cell.get_lval_value() == 0)
             {
-              // invalid/placeholder LvalCell -- deducted from
-              // get_enlist_count() already, so not written here either.
+              // a placeholder LvalCell (fill position), counted by
+              // get_enlist_count() (Bugs41 #60)
+              //
+              Z.next_ravel_Lval(0, 0);
             }
          else if (cell.is_lval_cell() &&
                   cell.get_lval_value()->is_pointer_cell())
@@ -1401,11 +1402,11 @@ AxesBitmap ret = 0;
               AXIS_ERROR;
             }
 
-         const APL_Integer axis = cX.get_near_int() - qio;
+         const APL_Integer axis = Cell::minus_IO(cX.get_near_int(), qio);
          if (axis < 0)
             {
               MORE_ERROR() << where << ": X[" << (e + qio)
-                           << "] = " << (axis + qio)
+                           << "] = " << cX.get_near_int()
                            << " is not a valid axis (expecting "
                            << qio << "≤X[" << (e + qio) << "]<"
                            << (rank_B + qio) << ")." << io_note;
@@ -1415,7 +1416,7 @@ AxesBitmap ret = 0;
          if (axis >= rank_B)
             {
               MORE_ERROR() << where << ": X[" << (e + qio)
-                           << "] = " << (axis + qio)
+                           << "] = " << cX.get_near_int()
                            << " is not a valid axis (expecting "
                            << qio << "≤X[" << (e + qio) << "]<"
                            << (rank_B + qio) << ")." << io_note;
@@ -1425,7 +1426,7 @@ AxesBitmap ret = 0;
          if (ret & 1 << axis)   // aready set
             {
               MORE_ERROR() << where << ": X[" << (e + qio)
-                           << "] = " << (axis + qio)
+                           << "] = " << cX.get_near_int()
                            << " is a duplicate axis.";
               AXIS_ERROR;
             }
@@ -1648,7 +1649,7 @@ const APL_Integer qio = Workspace::get_IO();
 // into the valid range instead of being rejected (confirmed: ⌽[4294967298]M
 // silently reversed axis 2 -- 4294967298 truncated to 32 bits -- instead
 // of raising AXIS_ERROR).
-const APL_Integer axis = val->get_near_int(0) - qio;
+const APL_Integer axis = Cell::minus_IO(val->get_near_int(0), qio);
 
    // axis is a plain (32-bit) signed int here while max_axis is the
    // (16-bit) signed sRank, so "axis >= max_axis" alone is a signed
@@ -1662,11 +1663,11 @@ const APL_Integer axis = val->get_near_int(0) - qio;
         // like an off-by-one mistake if the reader assumes the (far
         // more common) ⎕IO=1; call that out explicitly rather than
         // silently -- but only when it actually explains the error.
-        const APL_Integer axis_at_1 = val->get_near_int(0) - 1;
+        const APL_Integer axis_at_1 = Cell::minus_IO(val->get_near_int(0), 1);
         const char * io_note = (qio == 0 && axis_at_1 >= 0
                                 && axis_at_1 < APL_Integer(max_axis))
                               ? " Note: ⎕IO=0." : "";
-        MORE_ERROR() << where << ": X = " << (axis + qio)
+        MORE_ERROR() << where << ": X = " << val->get_near_int(0)
                      << " is not a valid axis (expecting " << qio
                      << "≤X<" << (max_axis + qio) << ")." << io_note;
         AXIS_ERROR;
@@ -1689,7 +1690,7 @@ const APL_Integer qio = Workspace::get_IO();
 
 Shape shape;
      loop(x, xlen)
-        shape.add_shape_item(val->get_near_int(x) - qio);
+        shape.add_shape_item(Cell::minus_IO(val->get_near_int(x), qio));
 
    return shape;
 }

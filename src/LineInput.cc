@@ -313,7 +313,11 @@ LineHistory::search(UCS_string &cur_line)
     } while(!found);
 
     if( !found ) {
-        idx = hist_lines.size()-1;
+        // no match: leave the typed line unchanged (the caller reports
+        // "hit top of history") instead of returning hist_lines[current_line],
+        // e.g. the placeholder line xxx (Bugs40 #104)
+        last_search_line = hist_lines.size()-1;
+        return 0;
     }
 
     last_search_line = idx;
@@ -703,7 +707,19 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
       {
         UTF8_string file_line;
         bool file_eof = false;
+        IO_Files::nabla_reading = mode == LIM_Nabla;
+        IO_Files::apl_reading = mode == LIM_Quote_Quad ? "⍞"
+                              : mode == LIM_Quad_Quad  ? "⎕"
+                              : mode == LIM_Quad_INP   ? "⎕INP" : 0;
         IO_Files::get_file_line(file_line, file_eof);
+        IO_Files::nabla_reading = false;
+        IO_Files::apl_reading = 0;
+
+        if (IO_Files::abandon_apl_read)   // testcase ended (Bugs40 #2)
+           {
+             IO_Files::abandon_apl_read = false;
+             INTERRUPT;
+           }
 
         if (!file_eof)
            {
@@ -850,7 +866,12 @@ const APL_time_us from = now();
        {
          bool _eof = false;
          LineInput::get_terminal_line(mode, prompt, line, _eof, hist);
-         if (!_eof)   break;
+
+         // a line after a ^D: the ^D was only a warning (see below), the
+         // line is real input. eof stayed true, so that the ∇-editor
+         // dropped the line (Bugs40 #51)
+         //
+         if (!_eof)   { eof = false;   break; }
 
          ++control_D_count;
 

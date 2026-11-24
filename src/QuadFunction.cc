@@ -84,6 +84,25 @@ Quad_STOP  Quad_STOP ::fun;   // S∆
 Quad_TRACE Quad_TRACE::fun;   // T∆
 
 //════════════════════════════════════════════════════════════════════════════
+/// true if \b line (row 1 of ⎕EM) already has the )MORE marker +, either at
+/// its end or right after the error name, e.g. LENGTH ERROR+ in macro ⍎¨
+/// (like Error::add_MORE_indicator(), Bugs41 #66)
+static bool
+has_MORE_marker(const UCS_string & line)
+{
+   if (line.size() && line.back() == UNI_PLUS)   return true;
+
+const UTF8_string line_utf(line);
+#define err_def(c, _txt, _maj, _min)                                       \
+   { const char * name = Error::error_name(E_ ## c);                       \
+     const size_t len = strlen(name);                                     \
+     if (len && line_utf.size() > len &&                                  \
+         !strncmp(line_utf.c_str(), name, len) && line_utf[len] == '+')   \
+        return true; }
+#include "Error.def"
+   return false;
+}
+//════════════════════════════════════════════════════════════════════════════
 Token
 Quad_AF::eval_B(cValue_R B) const
 {
@@ -128,7 +147,7 @@ Value_P Z(B.get_shape(), LOC);
                   else           Z->next_ravel_Int(pos);
                   continue;
                 }
-             if (B.is_integer_cell(v))
+             if (B.is_near_int(v))   // not only IntCell (Bugs38 #98)
                 {
                   const APL_Integer idx = B.get_near_int(v);
                   if (idx < 0 || idx >= (APL_Integer(1) << 31))   DOMAIN_ERROR;
@@ -240,14 +259,19 @@ const APL_time_us start = now();
    if (B.get_rank() > 0)                 RANK_ERROR;
    if (!B.is_real_cell(0))   DOMAIN_ERROR;
 
-const APL_time_us end = start + 1000000 * B.get_real_value(0);
-   if (end < start)                           DOMAIN_ERROR;
-   if (end > start + 31*24*60*60*1000000LL)   DOMAIN_ERROR;   // > 1 month
+   // check B as a double before converting it to APL_time_us (Bugs38 #93)
+const APL_Float seconds = B.get_real_value(0);
+   if (!(seconds >= 0.0))              DOMAIN_ERROR;   // also NaN
+   if (seconds > 31*24*60*60)          DOMAIN_ERROR;   // > 1 month
+
+const APL_time_us end = start + APL_time_us(1000000 * seconds);
 
 bool need_LF = false;
-   while (now() < end)
+   for (APL_time_us t = now(); t < end; t = now())
        {
-         usleep(20000);
+         // at most 20 ms, but not beyond end (Bugs38 #130)
+         const APL_time_us step = end - t;
+         usleep(step < 20000 ? step : 20000);
          if (InterruptContext::attention_is_raised())   need_LF = true;   // first ^C
          if (InterruptContext::interrupt_is_raised())                     // second ^C
             {
@@ -345,6 +369,7 @@ Value_P Z2(2, LOC);
     Z2->next_ravel_Int(Error::error_minor(E_DOMAIN_ERROR));
    Z2->check_value(LOC);
 
+   pb.pad_to_spaces();   // blanks, not pad characters (Bugs38 #89)
 Value_P Z3(pb, LOC);
 
 Value_P Z(3, LOC);
@@ -518,8 +543,7 @@ Value_P Z(3, LOC);
         // Appending a second one unconditionally gave e.g. "DOMAIN
         // ERROR++".
         //
-        if (more_info.size() &&
-            (line_1.size() == 0 || line_1.back() != UNI_PLUS))
+        if (more_info.size() && !has_MORE_marker(line_1))   // Bugs41 #66
            line_1 << UNI_PLUS;
 
         PrintBuffer pb;
@@ -533,12 +557,47 @@ Value_P Z(3, LOC);
             Z2->next_ravel_Int(Error::error_minor(ec));
         Z2->check_value(LOC);
 
+        pb.pad_to_spaces();   // blanks, not pad characters (Bugs38 #89)
         Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
 
         Z->next_ravel_0();
         Z->next_ravel_Pointer(Z2.get());
         Z->next_ravel_Pointer(Z3.get());
 
+        Z->check_value(LOC);
+        register_EB_B_failure(*Z3, true);
+
+        Token tok_Z(TOK_APL_VALUE1, Z);
+        result.move_from(tok_Z, LOC);
+        return;
+      }
+
+   // a value that already has the maximum depth cannot become an item of
+   // Z. Report that as an error result (rather than throwing SYSTEM LIMIT
+   // here, at the end of the ⎕EC context, which escaped to the top level
+   // and left ⎕EC's frame on the SI, Bugs39 #12).
+   //
+   if (result.get_ValueType() == TV_VAL && result.get_apl_val() &&
+       !result.get_apl_val()->is_simple_scalar() &&
+       1 + result.get_apl_val()->compute_depth() > MAX_DEPTH)
+      {
+        Value_P Z2(2, LOC);
+        Z2->next_ravel_Int(Error::error_major(E_SYS_LIMIT_NESTING));
+        Z2->next_ravel_Int(Error::error_minor(E_SYS_LIMIT_NESTING));
+        Z2->check_value(LOC);
+
+        PrintBuffer pb;
+        pb.append_ucs(UCS_string(UTF8_string(
+                                 Error::error_name(E_SYS_LIMIT_NESTING))));
+        pb.append_ucs(UCS_string(UTF8_string(
+                      "      (the result of ⎕EC B is nested too deeply)")));
+        pb.append_ucs(UCS_string());
+        pb.pad_to_spaces();
+        Value_P Z3(pb, LOC);
+
+        Z->next_ravel_0();
+        Z->next_ravel_Pointer(Z2.get());
+        Z->next_ravel_Pointer(Z3.get());
         Z->check_value(LOC);
         register_EB_B_failure(*Z3, true);
 
@@ -684,6 +743,7 @@ const int top_depth_before = top->get_safe_execution_depth();
                    Z2->next_ravel_Int(Error::error_minor(ec));
                    Z2->check_value(LOC);
 
+               pb.pad_to_spaces();   // blanks, not pad characters (Bugs38 #89)
                Value_P Z3(pb, LOC);
                Value_P Z(3, LOC);
                Z->next_ravel_0();
@@ -727,12 +787,23 @@ const int top_depth_before = top->get_safe_execution_depth();
 
 ExecuteList * fun = 0;
 Error fix_error(E_SYNTAX_ERROR, LOC);   // fallback if nothing better is caught
+
+   // the error of the caller (e.g. one recorded by ⎕EA), which a fix error
+   // of B must not replace: it is only in the result of ⎕EC (LRM p. 280:
+   // "The current value of ⎕ET is not affected", Bugs40 #68)
+   //
+Error caller_error(E_NO_ERROR, LOC);
+   if (const Error * werr = Workspace::get_error())   caller_error = *werr;
+
    try {
          fun = ExecuteList::fix(statement_B, LOC);
          if (fun == 0)   // fix() caught the real error and stashed it away
             {
-              if (const Error * werr = Workspace::get_error())
-                 fix_error = *werr;
+              if (Error * werr = Workspace::get_error())
+                 {
+                   fix_error = *werr;
+                   *werr = caller_error;
+                 }
             }
        }
      catch (Error & err)      { fix_error = err; }
@@ -761,10 +832,27 @@ Error fix_error(E_SYNTAX_ERROR, LOC);   // fallback if nothing better is caught
         // would make Z3 inconsistent in rank between fix-time and
         // run-time errors).
         //
-        const ErrorCode ec = fix_error.get_error_code();
+        // A syntax error is SYNTAX ERROR (⎕ET 2 2) like in ⍎ and ⎕EA (APL2
+        // LRM, ⎕ES example); its specific reason goes into )MORE, which
+        // is then folded into Z3 like for run-time errors (Bugs38 #73).
+        //
+        ErrorCode ec = fix_error.get_error_code();
+        if (Error::error_major(ec) == Error::error_major(E_SYNTAX_ERROR) &&
+            ec != E_SYNTAX_ERROR)
+           {
+             if (Workspace::more_error().size() == 0)
+                MORE_ERROR() << Error::error_name(ec);
+             ec = E_SYNTAX_ERROR;
+           }
+        const UCS_string more_info = Workspace::more_error();
+        Workspace::more_error().clear();
+
+        UCS_string line_1((UTF8_string(Error::error_name(ec))));
+        if (more_info.size() && !has_MORE_marker(line_1))   // Bugs41 #66
+           line_1 << UNI_PLUS;
 
         PrintBuffer pb;
-        pb.append_ucs(UTF8_string(Error::error_name(ec)));
+        pb.append_ucs(line_1);
 
         // the fix() error has no statement line: show B itself, like the
         // run-time errors do (Blake McBride, Bugs32 #24)
@@ -783,12 +871,14 @@ Error fix_error(E_SYNTAX_ERROR, LOC);   // fallback if nothing better is caught
            }
         pb.append_ucs(line_2);
         pb.append_ucs(line_3);
+        if (more_info.size())   append_more_error(pb, more_info);
 
         Value_P Z2(2, LOC);
             Z2->next_ravel_Int(Error::error_major(ec));
             Z2->next_ravel_Int(Error::error_minor(ec));
             Z2->check_value(LOC);
 
+        pb.pad_to_spaces();   // blanks, not pad characters (Bugs39 #64)
         Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
         Value_P Z(3, LOC);
         Z->next_ravel_0();              // return code = error
@@ -804,7 +894,8 @@ Error fix_error(E_SYNTAX_ERROR, LOC);   // fallback if nothing better is caught
 
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
-   Workspace::push_SI(fun, LOC);
+   try   { Workspace::push_SI(fun, LOC); }   // e.g. the SI depth limit
+   catch (...)   { delete fun;   throw; }      // (Bugs39 #66)
    Workspace::SI_top()->set_safe_execution_depth();
 
    return Token(TOK_SI_PUSHED);
@@ -837,18 +928,21 @@ Quad_ENV::eval_B(cValue_R B) const
 
 const ShapeItem ec_B = B.element_count();
 
-std::vector<const char *> evars;
-
+   // the environment strings are UTF-8 encoded, like file names etc.
+   // (Bugs38 #58), and B can only match within an environment string
+   //
+std::vector<UCS_string> evars;
    for (char **e = environ; *e; ++e)
        {
-         const char * env = *e;
+         const UCS_string env{UTF8_string(*e)};
+         if (ec_B > env.ssize())   continue;
 
          // check if env starts with B.
          //
          bool match = true;
          loop(b, ec_B)
             {
-              if (B.get_char_value(b) != Unicode(env[b]))
+              if (B.get_char_value(b) != env[b])
                  {
                    match = false;
                    break;
@@ -863,21 +957,13 @@ Value_P Z(sh_Z, LOC);
 
    loop(e, evars.size())
       {
-        const char * env = evars[e];
-        UCS_string ucs;
-        while (*env)
-           {
-             if (*env != '=')   ucs << Unicode(*env++);
-             else               break;
-           }
-        ++env;   // skip '='
+        const UCS_string & env = evars[e];
+        ShapeItem eq = 0;
+        while (eq < env.ssize() && env[eq] != UNI_EQUAL)   ++eq;
 
-        Value_P varname(ucs, LOC);
-
-        ucs.clear();
-        while (*env)   ucs << Unicode(*env++);
-
-        Value_P varval(ucs, LOC);
+        Value_P varname(UCS_string(env, 0, eq), LOC);
+        const ShapeItem vstart = eq < env.ssize() ? eq + 1 : eq;
+        Value_P varval(UCS_string(env, vstart, env.size() - vstart), LOC);
 
         Z->next_ravel_Pointer(varname.get());
         Z->next_ravel_Pointer(varval.get());
@@ -915,6 +1001,42 @@ Quad_ES::eval_AB(cValue_R A, cValue_R B) const
         //
         MORE_ERROR() << text;
         msg << UNI_PLUS;
+        const Token ret = event_simulate(&msg, CLONE(&B, LOC), error);
+        if (error.get_error_code() == E_NO_ERROR)   return ret;
+
+        throw error;
+      }
+
+   // likewise the macro Z__EXEC_EACH_B re-signals the error of an item of
+   // ⍎¨B as (⊃μ11) ⎕ES μ10 with the ⎕EM-like matrix of the item. Report
+   // its message and its )MORE info (rows 4...) as ⍎ does (Bugs40 #97).
+   //
+   if (A.get_rank() == 2 &&
+       Workspace::SI_top()->get_executable()->get_exec_ufun() ==
+       Macro::get_macro(Macro::MAC_Z__EXEC_EACH_B))
+      {
+        UCS_string msg;
+        EB_B_failure_text(A, msg);   // msg: row 1 without a trailing +
+
+        UCS_string more;
+        const ShapeItem cols = A.get_cols();
+        for (ShapeItem r = 3; r < A.get_rows(); ++r)
+            {
+              UCS_string line;
+              loop(c, cols)   line << A.get_char_value(r*cols + c);
+              line.map_pad();
+              line.remove_trailing_whitespaces();
+              if (more.size())   more << UNI_LF;
+              more << line;
+            }
+
+        Error error(E_NO_ERROR, LOC);
+        if (more.size())
+           {
+             MORE_ERROR() << more;
+             if (!has_MORE_marker(msg))   msg << UNI_PLUS;   // Bugs41 #66
+           }
+        msg << " in macro ⍎¨";
         const Token ret = event_simulate(&msg, CLONE(&B, LOC), error);
         if (error.get_error_code() == E_NO_ERROR)   return ret;
 
@@ -1665,8 +1787,9 @@ Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
                 }
              else                          // char scalar
                 {
-                  if (e)   esc2 = cell.get_pointer_value()->get_UCS_ravel();
-                  else     esc1 = cell.get_pointer_value()->get_UCS_ravel();
+                  // e.g. '>' in '<?apl' '>' ⎕INP 'END' (Bugs38 #59)
+                  if (e)   esc2 = UCS_string(1, cell.get_char_value());
+                  else     esc1 = UCS_string(1, cell.get_char_value());
                 }
            }
 
@@ -2158,7 +2281,7 @@ const APL_Integer b = B.get_near_int(0);
 const ShapeItem len = Workspace::SI_entry_count();
 
    if (b < 1)   DOMAIN_ERROR;
-   if (b > 4)   DOMAIN_ERROR;
+   if (b > 6)   DOMAIN_ERROR;   // 5 and 6 as for A ⎕SI B (Bugs38 #97)
 
    // at this point we should not fail...
    //

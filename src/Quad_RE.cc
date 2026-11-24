@@ -22,6 +22,8 @@
 */
 
 #include "PointerCell.hh"
+#include <memory>
+
 #include "Quad_RE.hh"
 #include "Workspace.hh"
 
@@ -173,14 +175,28 @@ deep_value(int idx, const PCRE2_SIZE * ovector, int count, const int * parents,
 
 ShapeItem ini = B ? 1 : 2;
 Value_P Z(ini + child_count[idx], LOC);
+
+   // a group with sub-groups that did not participate in the match, e.g.
+   // group 1 of (a(b)?)?c for c (Bugs38 #55): the same placeholder as above
+   //
+const bool unset = idx >= real_count || ovector[2*idx] == PCRE2_UNSET;
    if (B)
       {
-        const PCRE2_SIZE start = ovector[2*idx];
-        const PCRE2_SIZE end = ovector[2*idx + 1];
-        const UCS_string item(*B, start, end - start);
+        UCS_string item;
+        if (!unset)
+           {
+             const PCRE2_SIZE start = ovector[2*idx];
+             const PCRE2_SIZE end = ovector[2*idx + 1];
+             item = UCS_string(*B, start, end - start);
+           }
         Value_P sub_value(item, LOC);
         sub_value->check_value(LOC);
         Z->next_ravel_Pointer(sub_value.get());
+      }
+   else if (unset)
+      {
+        Z->next_ravel_Int(-1);
+        Z->next_ravel_Int(0);
       }
    else
       {
@@ -200,10 +216,33 @@ Value_P Z(ini + child_count[idx], LOC);
    return Z;
 }
 //────────────────────────────────────────────────────────────────────────────
+/// the next match of A in B, starting at B_offset, with the PCRE2 protocol
+/// for a global match: after an empty match (after_empty), first look for
+/// a non-empty match at the same position, and advance by one character
+/// only if there is none, like Perl does (Bugs38 #56). Return 0 at the end
+/// of B.
+static RegexpMatch *
+match_next(const Regexp & A, const UCS_string & B, ShapeItem & B_offset,
+           bool after_empty)
+{
+   if (after_empty)
+      {
+        RegexpMatch * rem = new RegexpMatch(A.get_code(), B, B_offset,
+                                       PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED);
+        if (rem->is_match())   return rem;
+        delete rem;
+        ++B_offset;
+        if (B_offset > B.ssize())   return 0;   // end of B
+      }
+
+   return new RegexpMatch(A.get_code(), B, B_offset);
+}
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::regex_results(const Regexp & A, const Flags & X, const UCS_string & B)
 {
 ShapeItem B_offset = 0;   // updated by XXX_result() functions
+bool after_empty = false;   // the previous match was empty (Bugs38 #56)
 
    switch(X.get_result_type())
       {
@@ -211,10 +250,12 @@ ShapeItem B_offset = 0;   // updated by XXX_result() functions
         case RST_partition: return partition_result(A, X, B);
 
         case RST_string:    if (X.get_global())   break;   // continue below
-                                return string_result(A, X, B, B_offset);
+                                return string_result(A, X, B, B_offset,
+                                                     after_empty);
 
         case RST_pos_len:   if (X.get_global())   break;   // continue below
-                                return index_result (A, X, B, B_offset);
+                                return index_result (A, X, B, B_offset,
+                                                     after_empty);
 
         default:           FIXME;
       }
@@ -249,11 +290,11 @@ std::vector<Value_P> matches;
          switch(X.get_result_type())
             {
               case RST_string:
-                   ZZ = string_result(A, X, B, B_offset);
+                   ZZ = string_result(A, X, B, B_offset, after_empty);
                    break;
 
               case RST_pos_len:
-                   ZZ = index_result(A, X, B, B_offset);
+                   ZZ = index_result(A, X, B, B_offset, after_empty);
                    break;
 
               default:           FIXME;
@@ -281,7 +322,7 @@ Quad_RE::partition_result(const Regexp & A, const Flags & X,
 const PCRE2_SIZE len = B.size();
 Value_P Z(len, LOC);
 
-PCRE2_SIZE B_offset = 0;
+ShapeItem B_offset = 0;   // ShapeItem for match_next()
 ShapeItem match_id_partition = 1;
 ShapeItem match_id_compress  = 1;
 bool any_match = false;
@@ -297,13 +338,15 @@ ShapeItem & match_id = X.get_result_type() == RST_partition
    // for every match.
    //
 PCRE2_SIZE last_end = 0;
-   for (; B_offset < len; ++match_id_partition)
+bool after_empty = false;   // the previous match was empty (Bugs38 #56)
+   for (; B_offset <= ShapeItem(len); ++match_id_partition)
        {
-         RegexpMatch rem(A.get_code(), B, B_offset);
-         if (!rem.is_match())   break;
+         std::unique_ptr<RegexpMatch> rem(match_next(A, B, B_offset,
+                                                     after_empty));
+         if (!rem || !rem->is_match())   break;
          any_match = true;
 
-         const PCRE2_SIZE * ovector = rem.get_ovector();
+         const PCRE2_SIZE * ovector = rem->get_ovector();
          const PCRE2_SIZE start = ovector[0];
          const PCRE2_SIZE end   = ovector[1];
 
@@ -315,10 +358,11 @@ PCRE2_SIZE last_end = 0;
 
          if (!X.get_global())   break;
 
-         // a zero-width match does not advance end/start; force progress
-         // to avoid an infinite loop (standard PCRE2 NOTEMPTY_ATSTART idiom).
+         // after a zero-width match, match_next() looks for a non-empty
+         // match at the same position first (Bugs38 #56)
          //
-         B_offset = (end == start) ? end + 1 : end;
+         after_empty = (end == start);
+         B_offset = end;
        }
 
    // this function drives its own (single-call) global search internally,
@@ -343,10 +387,11 @@ PCRE2_SIZE last_end = 0;
 //────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::string_result(const Regexp & A, const Flags & X,
-                       const UCS_string & B, ShapeItem & B_offset)
+                       const UCS_string & B, ShapeItem & B_offset,
+                       bool & after_empty)
 {
-RegexpMatch rem(A.get_code(), B, B_offset);
-   if (!rem.is_match())
+std::unique_ptr<RegexpMatch> rem_p(match_next(A, B, B_offset, after_empty));
+   if (!rem_p || !rem_p->is_match())
       {
         // Bugs10 #11 (Blake McBride): B_offset is still its initial 0 iff
         // this is the very first call for this ⎕RE invocation -- the g
@@ -370,9 +415,9 @@ RegexpMatch rem(A.get_code(), B, B_offset);
 
    // rem is a match
    //
-const PCRE2_SIZE * ovector = rem.get_ovector();
+const PCRE2_SIZE * ovector = rem_p->get_ovector();
    B_offset = ovector[1];
-   if (0 && rem.num_matches() == 1)   // simple match
+   if (0 && rem_p->num_matches() == 1)   // simple match
       {
         // single string
         //
@@ -385,10 +430,10 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
         return Z;
       }
 
-   // a zero-width match does not advance ovector[1]; force progress to
-   // avoid an infinite loop (standard PCRE2 NOTEMPTY_ATSTART idiom).
+   // a zero-width match does not advance ovector[1]; the next call then
+   // uses the PCRE2 NOTEMPTY_ATSTART idiom (see match_next())
    //
-   if (ovector[1] == ovector[0])   ++B_offset;
+   after_empty = ovector[1] == ovector[0];   // see match_next()
 
 // num_matches() (== pcre2_match's own return value, "the number of
 // pairs that have been set") tells us how much of ovector is safe to
@@ -403,11 +448,23 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
 // (the alternative that didn't match) reported in ovector as [-1,-1]
 // (real_count includes it), while 'a|b' matched against 'a' never even
 // allocates group 2 in real_count at all (total_count still does).
-const uint32_t real_count  = rem.num_matches();
-const uint32_t total_count = rem.get_ovector_count();
+const uint32_t real_count  = rem_p->num_matches();
+const uint32_t total_count = rem_p->get_ovector_count();
 vector<int> parents(total_count, -1);   // no parents
 vector<int> ccount(total_count, 0);     // 0 children
 
+   // the structure of the pattern, if known (Bugs38 #55)
+   //
+   if (A.get_group_parents().size() == total_count)
+      {
+        loop(o, total_count)
+           {
+             parents[o] = A.get_group_parents()[o];
+             if (o)   ++ccount[parents[o]];
+           }
+      }
+   else   // derive the structure from the spans of this match
+      {
    for (int o = real_count - 1; o >= 0; --o)
        {
          const PCRE2_SIZE ostart = ovector[2*o];
@@ -441,6 +498,7 @@ vector<int> ccount(total_count, 0);     // 0 children
          parents[o] = 0;
          ++ccount[0];
        }
+      }
 
    return deep_value(0, ovector, total_count,
                      parents.data(), ccount.data(), &B, real_count);
@@ -448,10 +506,11 @@ vector<int> ccount(total_count, 0);     // 0 children
 //────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_RE::index_result(const Regexp & A, const Flags & X,
-                      const UCS_string & B, ShapeItem & B_offset)
+                      const UCS_string & B, ShapeItem & B_offset,
+                      bool & after_empty)
 {
-RegexpMatch rem(A.get_code(), B, B_offset);
-   if (!rem.is_match())
+std::unique_ptr<RegexpMatch> rem_p(match_next(A, B, B_offset, after_empty));
+   if (!rem_p || !rem_p->is_match())
       {
         // same first_call treatment as string_result() (Bugs10 #11): the
         // g early-return below ends a global search once at least one
@@ -471,13 +530,13 @@ RegexpMatch rem(A.get_code(), B, B_offset);
 
    // rem is a match
    //
-const PCRE2_SIZE * ovector = rem.get_ovector();
+const PCRE2_SIZE * ovector = rem_p->get_ovector();
    B_offset = ovector[1];
 
-   // a zero-width match does not advance ovector[1]; force progress to
-   // avoid an infinite loop (standard PCRE2 NOTEMPTY_ATSTART idiom).
+   // a zero-width match does not advance ovector[1]; the next call then
+   // uses the PCRE2 NOTEMPTY_ATSTART idiom (see match_next())
    //
-   if (ovector[1] == ovector[0])   ++B_offset;
+   after_empty = ovector[1] == ovector[0];   // see match_next()
 
 // num_matches() (== pcre2_match's own return value, "the number of
 // pairs that have been set") tells us how much of ovector is safe to
@@ -492,11 +551,23 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
 // (the alternative that didn't match) reported in ovector as [-1,-1]
 // (real_count includes it), while 'a|b' matched against 'a' never even
 // allocates group 2 in real_count at all (total_count still does).
-const uint32_t real_count  = rem.num_matches();
-const uint32_t total_count = rem.get_ovector_count();
+const uint32_t real_count  = rem_p->num_matches();
+const uint32_t total_count = rem_p->get_ovector_count();
 vector<int> parents(total_count, -1);   // no parent
 vector<int> ccount(total_count,   0);   // 0 children
 
+   // the structure of the pattern, if known (Bugs38 #55)
+   //
+   if (A.get_group_parents().size() == total_count)
+      {
+        loop(o, total_count)
+           {
+             parents[o] = A.get_group_parents()[o];
+             if (o)   ++ccount[parents[o]];
+           }
+      }
+   else   // derive the structure from the spans of this match
+      {
    for (int o = real_count - 1; o >= 0; --o)
        {
          const PCRE2_SIZE ostart = ovector[2*o];
@@ -530,6 +601,7 @@ vector<int> ccount(total_count,   0);   // 0 children
          parents[o] = 0;
          ++ccount[0];
        }
+      }
 
    return deep_value(0, ovector, total_count,
                      parents.data(), ccount.data(), 0, real_count);

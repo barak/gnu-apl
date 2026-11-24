@@ -64,6 +64,13 @@ public:
    Prefix_PC end_PC() const
       { return Prefix_PC(size()); }
 
+   /// return true if \b tok can be the name of a lambda's local variable
+   static bool is_local_name(const Token & tok);
+
+   /// return true if the ; at(s) starts a list ;A B;C... of local names
+   /// that ends with } (if in_curly) or at the end of \b this string
+   bool is_locals_tail(ShapeItem s, bool in_curly) const;
+
    /// check that every [, (, resp. { has a matching ], ), resp. },
    /// and no invalid combination like [ ( ] ) is present. Throws an
    /// Error (full statement text + carets, same visual convention as

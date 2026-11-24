@@ -1,0 +1,1498 @@
+⍝ Bugs38_B.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 severity B items (#16 - #68): wrong results and
+⍝ silent data loss.
+
+
+
+
+
+
+      ⍝ Bugs38 #16: float GCD/LCM must not iterate on the rounding noise of
+      ⍝ fmod() (0.3∨1E5 was 2.8E¯16), also at ⎕CT←0
+
+
+
+
+
+      0.3∨1E5
+0.1
+
+
+
+
+      0.3∧1E5
+300000
+
+
+
+
+      1.2∨1E5
+0.4
+
+
+
+
+      (÷3)∨1E¯5
+3.333333333E¯6
+
+
+
+
+      (÷3)∧1E¯5
+1
+
+
+
+
+      1E¯11∧1
+1
+
+
+
+
+      1.5∨2.5
+0.5
+
+
+
+
+      ⎕CT←0
+
+
+
+
+
+      0.1∨0.3
+0.1
+
+
+
+
+      0.2∧1
+1
+
+
+
+
+      ⎕CT←1E¯13
+      ⍝ Bugs38 #17: a quotient beyond the double range means "multiple"
+
+
+
+
+
+      1∧1E¯320
+1
+
+
+
+
+      1E¯320∧1
+1
+
+
+
+
+      1E¯11∧1E¯320
+1E¯11
+
+
+
+
+      1E19∧1E¯300
+1E19
+
+
+
+
+      1E300∨1E¯11
+1E¯11
+
+
+
+
+      ⍝ Bugs38 #18: only an exact pole of Γ is a pole in A!B (1E¯11 away from it
+      ⍝ the result is finite)
+
+
+
+
+
+      ⎕PP←12
+
+
+
+
+
+      0.5!¯0.99999999999
+¯31830985984.5
+
+
+
+
+      ¯0.99999999999!0.5
+6.66666721835E¯12
+
+
+
+
+      0.5J0!¯0.99999999999J0
+¯31830985984.5
+
+
+
+
+      ¯0.99999999999J0!0.5J0
+6.66666721835E¯12
+
+
+
+
+      1.5!¯0.49999999999
+¯1.33333344362E¯11
+
+
+
+
+      0.5!¯0.5
+0
+
+
+
+
+      ¯1!0.5
+0
+
+
+
+
+
+      ¯1E19!0.5
+0
+
+
+
+
+      ¯1E19!¯1
+¯1
+
+
+
+
+      1E19!1E19
+1
+
+
+
+
+      1E19J0!1E19
+1
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ Bugs38 #21: the ∇-editor prompt after [∆N] or [⎕N] is never an
+      ⍝ existing line (the next line used to replace an inserted line)
+
+
+
+
+
+      ∇Z←F21_38
+Z←1
+Z←Z,2
+[1.1] Z←Z,11
+[∆1]
+Z←Z,99
+∇
+
+
+
+
+
+      ⎕CR 'F21_38'
+Z←F21_38
+Z←Z,11  
+Z←Z,99  
+Z←Z,2   
+
+      ∇Z←G21_38
+Z←1
+Z←Z,2
+[1.1] Z←Z,11
+[⎕1]
+    ∇
+[0]   Z←G21_38
+[1]   Z←1
+Z←Z,99
+∇
+
+
+
+
+
+      ⎕CR 'G21_38'
+Z←G21_38
+Z←1     
+Z←Z,11  
+Z←Z,99  
+Z←Z,2   
+
+      ⍝ Bugs38 #22: format by example: a 9 field is blank if the VALUE of the
+      ⍝ item is 0 (LRM p. 142), not if the digits of its integer part are 0
+
+
+
+
+
+      '9,999.99'⍕0.5
+0,000.50
+
+
+
+
+      '0,559.99'⍕0.5
+0,000.50
+
+
+
+
+      '99,999.55'⍕0.5
+00,000.5 
+
+
+
+
+      '9,999.99'⍕0.05 0 1.5
+0,000.05        0,001.50
+
+
+
+
+      '9999.99'⍕0.5
+0000.50
+
+
+
+
+      '9,999'⍕0 1 1000
+     0,0011,000
+
+
+
+
+      ⍝ Bugs38 #27: ⎕FIO[48] on a pipe returns a multi-byte UTF-8 lookahead to the
+      ⍝ pipe (fseek() fails on a pipe)
+
+
+
+
+
+      H←⎕FIO[24] 'printf "12äb 34"'
+
+
+
+
+
+      '%d' ⎕FIO[48] H
+12
+
+
+
+
+      '%c' ⎕FIO[48] H
+ä
+
+
+
+
+      '%c' ⎕FIO[48] H
+b
+
+
+
+
+      ⎕FIO[25] H
+0
+
+
+
+
+
+      H←⎕FIO[24] 'printf "12 34 56"'
+
+
+
+
+
+      '%d%n' ⎕FIO[48] H
+12 2
+
+
+
+
+      '%d%n' ⎕FIO[48] H
+34 3
+
+
+
+
+      ⎕FIO[25] H
+0
+
+
+
+
+      H←⎕FIO[24] 'printf "ab€cd"'
+
+
+
+
+
+      'ab%n' ⎕FIO[48] H
+2
+
+
+
+
+      ⎕FIO[25] H
+0
+
+
+
+
+      ⍝ Bugs38 #28: ⎕FIO[55] (sscanf) converts like C's sscanf() (and like ⎕FIO[48]
+      ⍝ on a file): unconverted characters stay in the input, %o %i %x use C's
+      ⍝ bases and prefixes
+
+
+
+
+
+      '%f%f' ⎕FIO[55] '1.2.3'
+1.2 0.3
+
+
+
+
+      '%f%n' ⎕FIO[55] '1.2.3'
+1.2 3
+
+
+
+
+      '%o%n' ⎕FIO[55] '42'
+34 2
+
+
+
+
+      '%i %i' ⎕FIO[55] '017 0x1f'
+15 31
+
+
+
+
+      '%x' ⎕FIO[55] '0x1f'
+31
+
+
+
+
+      '%d %d' ⎕FIO[55] '¯12 +34'
+¯12 34
+
+
+
+
+      '%5d%d' ⎕FIO[55] '1234567'
+12345 67
+
+
+
+
+      '%d%n%c' ⎕FIO[55] '  7x'
+7 3 x
+
+
+
+
+      ⍝ Bugs38 #29: (f⍤k)B pads a simple scalar cell result with its fill (a
+      ⍝ blank for a character), like ⊃
+
+
+
+
+
+      R←({⍵⊃'x' 'yz'}⍤0) 1 2
+
+
+
+
+
+      2 ⎕TF 'R'
+R←2 2⍴'x yz'
+
+
+
+
+      R≡⊃{⍵⊃'x' 'yz'}¨1 2
+1
+
+
+
+
+      2 ⎕TF 'R'⊣R←30 ⎕CR 'x' 'yz'
+R←2 2⍴'x yz'
+
+
+
+
+      ⍝ Bugs38 #30: (F) A g B binds as (F)(A g B) also for a defined operator with
+      ⍝ a value RO and for a defined function or lambda with a literal axis
+
+
+
+
+
+      ⎕FX 'Z←(F OPV30 N) B' 'Z←(F⍣N) B'
+OPV30
+
+
+
+
+      ⎕FX 'Z←(F OPX30)[X] B' 'Z←F[X] B'
+OPX30
+
+
+
+
+      ⎕FX 'Z←AVG30[X] B' 'Z←(+/[X]B)÷(⍴B)[X]'
+AVG30
+
+
+
+
+      (⌽ OPV30 1) 2 3⍴⍳6
+3 2 1
+6 5 4
+
+
+
+      (⌽OPX30[1]) 2 3⍴⍳6
+4 5 6
+1 2 3
+
+
+
+      (AVG30[1]) 2 3⍴⍳6
+2.5 3.5 4.5
+
+
+
+
+      ({+/[χ]⍵}[1]) 2 3⍴⍳6
+5 7 9
+
+
+
+
+      Z←(⌽ OPV30 1) 2 3⍴⍳6
+
+
+
+
+
+      Z
+3 2 1
+6 5 4
+
+
+
+      V←10 20 30
+
+
+
+
+
+      (V[2]) + 1
+21
+
+
+
+
+      ⍝ Bugs38 #31: f⍤[X]y combines the results with ⊃[X] also for an empty or a
+      ⍝ scalar frame (and checks X)
+
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+
+      ⍴(⌽⍤[1]1)0 3⍴0
+3 0
+
+
+
+
+      ⍴(⌽⍤[1]1)2 0 3⍴0
+3 2 0
+
+
+
+
+      ⍴(0 3⍴0)(,⍤[1]1)0 3⍴0
+6 0
+
+
+
+
+      ⍴(⌽⍤[99]1)0 3⍴0
+AXIS ERROR+
+      ⍴(⌽⍤[99]1)0 3⍴0
+       ^
+
+
+      (⌽⍤[1]2)M
+AXIS ERROR+
+      (⌽⍤[1]2)M
+      ^       ^
+
+
+      (⌽⍤[99]1)5
+AXIS ERROR+
+      (⌽⍤[99]1)5
+      ^        ^
+
+
+      (⍳3)(,⍤[9]1)⍳3
+AXIS ERROR+
+      (⍳3)(,⍤[9]1)⍳3
+      ^            ^
+
+
+      (⌽⍤[1.5]1)M
+AXIS ERROR+
+      (⌽⍤[1.5]1)M
+      ^         ^
+
+
+      )MORE
+⊃[X]B: X[1] is not integral.
+
+
+
+
+      (⌽⍤[1]1)M
+3 6
+2 5
+1 4
+
+
+      ⍝ Bugs38 #32: A⊂B with a 1-element A and an empty B axis has no partitions
+
+
+
+
+
+      ⍴1⊂⍳0
+0
+
+
+
+
+      ⍴1⊂3 0⍴0
+3 0
+
+
+
+
+      ⍴1⊂[1]0 3⍴0
+0 3
+
+
+
+
+      ⍴(1 1⍴1)⊂⍳0
+0
+
+
+
+
+
+      'abc'⍋3 0⍴''
+1 2 3
+
+
+
+
+      'abc'⍒5 0⍴''
+1 2 3 4 5
+
+
+
+
+      ''⍋5 0⍴''
+1 2 3 4 5
+
+
+
+
+      'abc'⍒3 2⍴'aabbaa'
+2 1 3
+
+
+
+
+      ⍝ Bugs38 #34: A f¨B checks the shapes of A and B also for a defined f
+      ⍝ without a result (before calling f at all)
+
+
+
+
+
+      ⎕FX 'A NR34 B' '⎕←A B'
+NR34
+
+
+
+
+      1 2 3 NR34¨ 4 5
+LENGTH ERROR+
+      1 2 3 NR34¨4 5
+      ^     ^
+
+
+      )MORE
+A f¨B: expecting ⍴A = ⍴B (or A or B with 1 element); ⍴A is 3, ⍴B is 2
+
+
+
+
+      (2 2⍴1) NR34¨ 1 4⍴5
+LENGTH ERROR+
+      (2 2⍴1)NR34¨1 4⍴5
+      ^      ^
+
+
+      1 2 NR34¨ 3 4 5
+LENGTH ERROR+
+      1 2 NR34¨3 4 5
+      ^   ^
+
+
+      ⍬ NR34¨ 1 2
+LENGTH ERROR+
+      ⍬NR34¨1 2
+      ^^
+
+
+      1 NR34¨ 4 5
+1 4
+1 5
+
+
+
+
+
+      ⎕FX 'Z←F35 B' 'Z←B'
+F35
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←⌽¨''
+Z←''
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←F35¨''
+Z←''
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'' ,¨''
+Z←0⍴(⊂2⍴'  ')
+
+
+
+
+      (⌽¨'')≡''
+1
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←-¨''
+Z←0⍴0
+
+
+
+
+      ⍝ Bugs38 #36: an axis between a dyadic operator (other than ⍤) and its
+      ⍝ right operand is an AXIS ERROR (it used to become the right operand)
+
+
+
+
+
+      ⎕FX 'Z←(F OPV36 N) B' 'Z←N+F B'
+OPV36
+
+
+
+
+      (- OPV36 10) 5
+5
+
+
+
+
+      (- OPV36[2] 10) 5
+AXIS ERROR+
+      (-OPV36[2]10)5
+       ^^
+
+
+      )MORE
+F D[X] G: the dyadic operator OPV36 has no axis
+
+
+
+
+      A←1
+
+
+
+
+
+      (-⍣[A]1) 5
+AXIS ERROR+
+      (-⍣[A]1)5
+       ^^
+
+
+      2(+⍣[A]1)5
+AXIS ERROR+
+      2(+⍣[A]1)5
+        ^^
+
+
+      ⍝ Bugs38 #37: 3 ⎕TF gives the CDR bytes as characters 0...255 (like 11 ⎕CR)
+
+
+
+
+
+      V←0.1
+
+
+
+
+
+      ∧/(⎕UCS 3 ⎕TF 'V')<256
+1
+
+
+
+
+      (3 ⎕TF 'V')≡11 ⎕CR V
+1
+
+
+
+
+      12 ⎕CR 3 ⎕TF 'V'
+0.1
+
+
+
+
+      W←'Ä'
+
+
+
+
+
+      ⎕UCS 16↑16↓3 ⎕TF 'W'
+196 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+
+
+
+
+
+      ⍝ Bugs38 #42: A⊥B is exact if the result fits into int64, also with leading
+      ⍝ zero digits whose weight overflows
+
+
+
+
+
+      10⊥0 0,18⍴9
+999999999999999999
+
+
+
+
+      2⊥0 0,62⍴1
+4611686018427387903
+
+
+
+
+      2⊥0,63⍴1
+9223372036854775807
+
+
+
+
+      0 10 10⊥5 6 7
+567
+
+      ⍝ Bugs38 #43: the packed complex + - × give DOMAIN ERROR for non-finite
+      ⍝ results (like the per-cell path)
+
+
+
+
+
+      Z←(12⍴1E308J1)+12⍴1E308J1
+DOMAIN ERROR
+      Z←(12⍴1E308J1)+12⍴1E308J1
+        ^           ^
+
+
+      W←(12⍴1E200J1E200)×12⍴1E200J1E200
+DOMAIN ERROR
+      W←(12⍴1E200J1E200)×12⍴1E200J1E200
+        ^               ^
+
+
+      (12⍴1E308J1)-12⍴¯1E308J1
+DOMAIN ERROR
+      (12⍴1E308J1)-12⍴¯1E308J1
+      ^           ^
+
+
+      (∊1E308J1)+∊1E308J1
+DOMAIN ERROR
+      (ϵ1E308J1)+ϵ1E308J1
+      ^         ^
+
+
+      (12⍴1J1)×12⍴2J3
+¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5 ¯1J5
+
+
+
+
+      ⍝ Bugs38 #44: A⋆B with B the int64 minimum (-B overflowed)
+
+
+
+
+
+      M←¯9223372036854775807-1
+
+
+
+
+
+      2*M
+0
+
+
+
+
+      0.5*M
+DOMAIN ERROR
+      0.5⋆M
+      ^  ^
+
+
+      ¯2*M
+0
+
+
+
+
+      3J1*M
+0
+
+
+
+
+      0J1*M
+1
+
+      ⍝ Bugs38 #45: complex ∧ (LCM) rejects a non-finite result
+
+
+
+
+
+      1E308J1∧7E307J1
+DOMAIN ERROR
+      1E308J1∧7E307J1
+      ^      ^
+
+
+
+
+      ⍝ but beyond 2⋆53 (where doubles are not exact integers) 2 divides
+      ⍝ 1E308J1 tolerantly, like 3 divides 1E308 in 3∧1E308 (Bill Heagy,
+      ⍝ 32-bit x87: the complex GCD no longer depends on the FPU)
+      ⍝
+      2∧1E308J1
+1E308
+
+
+      1E¯320J0∧1
+1
+
+
+
+
+      2J1∧3J4
+3J4
+
+
+
+
+      ⍝ Bugs38 #46: monadic complex | and × at the ends of the double range
+
+
+
+
+
+      |1.7E308J1.7E308
+DOMAIN ERROR
+      ∣1.7E308J1.7E308
+      ^
+
+
+      ⎕PP←6
+
+
+
+
+
+      ×1.7E308J1.7E308
+0.707107J0.707107
+
+
+
+
+      ×5E¯324J5E¯324
+0.707107J0.707107
+
+
+
+
+      |×5E¯324J5E¯324
+1
+
+
+
+
+      ⎕PP←10
+      ⍝ Bugs38 #47: A|B with a float B that is tolerantly a multiple of A is 0
+      ⍝ (like for an integer B)
+
+
+
+
+
+      1E¯5|3 3.0
+0 0
+
+
+
+
+      1E¯5|0.5+2.5
+0
+
+
+
+
+      1E¯5|3J0
+0
+
+
+
+
+      1E¯11|¯1 ¯1.0
+0 0
+
+
+
+
+      1E¯5|¯1 ¯1.0 ¯1J0
+0 0 0
+
+
+
+
+      1E¯5|¯3 ¯3.0 12345 12345.0 99999.0
+0 0 0 0 0
+
+
+
+
+      ⍝ the value of B decides, not its cell type
+      ⍝
+      AR47←0.1 0.2 0.3 0.01 0.05 1E¯3 1E¯4 1E¯5 1E¯9 1E¯11 0.025
+      AR47←AR47,-AR47
+      BR47←1 3 7 12345 99999 1000000 1000 ¯1 ¯3 ¯1000 ¯7
+
+
+      (AR47∘.|BR47) ≡ AR47∘.|BR47×1.0
+1
+
+
+      (AR47∘.|BR47) ≡ AR47∘.|BR47+0J1-0J1
+1
+
+
+      CT47←⎕CT ◊ ⎕CT←0
+
+
+      (AR47∘.|BR47) ≡ AR47∘.|BR47×1.0
+1
+
+
+      ⎕CT←CT47
+
+
+
+
+      ⍝ but only rounding errors are ignored, not genuine fractions
+      ⍝
+      7|1E15+0.5
+6.5
+
+
+
+
+      ⍝ Bugs38 #48: a negative (or imaginary) base with a large non-integral
+      ⍝ exponent: the phase is computed from 2|B (exactly)
+
+
+
+
+
+      ¯1*1E15+0.5
+0J1
+
+
+
+
+      ¯1*1E15+0.25
+0.7071067812J0.7071067812
+
+
+
+
+      0J1*1E15+0.5
+0.7071067812J0.7071067812
+
+
+
+
+      ¯8*÷3
+1J1.732050808
+
+      ⍝ Bugs38 #49: format by example of a negative zero (0×¯1.5) is that of 0
+
+
+
+
+
+      Z←0×¯1.5
+
+
+
+
+
+      ('99.99'⍕Z)≡'99.99'⍕0
+1
+
+
+
+
+      '0.00'⍕Z
+0.00
+
+
+
+
+      ' ¯10.00'⍕0 1 2×¯1.5
+   0.00  ¯1.50  ¯3.00
+
+
+
+
+      ' ¯1.00'⍕0 1 2×¯1.5
+   .00 ¯1.50 ¯3.00
+
+
+
+
+      '0000.00'⍕Z
+0000.00
+
+
+
+
+      ⍝ Bugs38 #50: A⍕B with an empty B checks A like for a non-empty B (and the
+      ⍝ total width does not overflow)
+
+
+
+
+
+      Z←4611686018427387904⍕0 3⍴0
+DOMAIN ERROR+
+      Z←4611686018427387904⍕0 3⍴0
+        ^                  ^
+
+
+      ⍴4611686018427387904 2⍕0 2⍴0
+DOMAIN ERROR+
+      ⍴4611686018427387904 2⍕0 2⍴0
+       ^                    ^
+
+
+      ⍴1E10 2⍕0 2⍴0
+DOMAIN ERROR+
+      ⍴10000000000 2⍕0 2⍴0
+       ^            ^
+
+
+      )MORE
+A⍕B: width 10000000000 is too large
+
+
+
+
+      ⍴¯5⍕0 3⍴0
+0 15
+
+
+
+
+      ⍴5 2⍕0 3⍴0
+0 15
+
+      ⍝ Bugs38 #51: N f/B with N the int64 minimum
+
+
+
+
+
+      N←¯1-9223372036854775807
+
+
+
+
+
+      N+/⍳3
+DOMAIN ERROR+
+      N+/⍳3
+      ^^
+
+
+      )MORE
+A f/B resp. A f⌿B: A = ¯9223372036854775808 overflows on negation
+
+
+
+
+      N+/5
+DOMAIN ERROR+
+      N+/5
+      ^^
+
+
+      ⍝ Bugs38 #52: A ⎕CC 33 and A ⎕CC 65 agree with A∊⎕CC 33 resp. 65
+
+
+
+
+
+      (⎕UCS 0 50 306 562 317 256 1) ⎕CC 33
+0 1 0 0 0 0 0
+
+
+
+
+      (⎕UCS 0 43 299 303 317 256 1) ⎕CC 65
+0 1 0 0 0 0 0
+
+
+
+
+      U←⎕UCS ¯1+⍳70000
+
+
+
+
+
+      +/(U ⎕CC 33)≠U∊⎕CC 33
+0
+
+
+
+
+      +/(U ⎕CC 65)≠U∊⎕CC 65
+0
+
+      ⍝ Bugs38 #53: the identity elements of ⊤∧ ⊤≠ ⊤= are those of the 64-bit
+      ⍝ operations
+
+
+
+
+
+      ⊤∧/⍬
+¯1
+
+
+
+
+      ⊤≠/⍬
+0
+
+
+
+
+      ⊤=/⍬
+¯1
+
+
+
+
+      X←5
+
+
+
+
+
+      X ⊤≠ ⊤≠/⍬
+5
+
+
+
+
+      X ⊤∧ ⊤∧/⍬
+5
+
+
+
+
+      X ⊤= ⊤=/⍬
+5
+
+
+
+
+      ⍝ Bugs38 #54: monadic ⊤∧ accepts exact integers (also 0) and returns integers
+
+
+
+
+
+      ⊤∧ 0.5×0
+0
+
+
+
+
+      ⊤∧ 2.0 0.0 3.0
+2 0 3
+
+
+
+
+      ⊤∧ 0J0
+0
+
+
+
+
+      ⊤∧ 2.5J0×2
+5
+
+
+
+
+      26 ⎕CR ⊤∧ 1.1÷1.1
+16
+
+      ⍝ Bugs38 #55: the nesting of a ⎕RE result is that of the groups in the
+      ⍝ pattern (not of the spans of the match)
+
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)b' ⎕RE 'axb'
+Z←2⍴'axb' (2⍴'ax' (1⍴'x'))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)b' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(c?))b' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(?=(ab))(a)' ⎕RE 'ab'
+Z←3⍴(1⍴'a') 'ab' (1⍴'a')
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)b' ⎕RE['↓'] 'ab'
+Z←3⍴0 2 (3⍴0 1 (¯1 0))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(b)?)?c' ⎕RE 'c'
+Z←2⍴(1⍴'c') (2⍴('') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(\()(x)' ⎕RE '(x'
+Z←3⍴'(x' (1⍴'(') (1⍴'x')
+
+
+
+
+      ⍝ Bugs38 #56: ⎕RE['g'] after an empty match looks for a non-empty match at
+      ⍝ the same position (like Perl and PCRE2)
+
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'|a' ⎕RE['g'] 'a'
+Z←3⍴('') (1⍴'a') ('')
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'x*?' ⎕RE['g'] 'xx'
+Z←5⍴('') (1⍴'x') ('') (1⍴'x') ('')
+
+
+
+
+      '|a' ⎕RE['/g'] 'aaa'
+1 1 1
+
+
+
+
+      'a|' ⎕RE['/g'] 'aaa'
+1 1 1
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'x*' ⎕RE['g'] 'axxb'
+Z←4⍴('') 'xx' ('') ('')
+
+
+
+
+      ⍝ Bugs38 #59: dyadic ⎕INP with a one-character end escape
+
+
+
+
+
+      Q←'<?apl' '>' ⎕INP 'END-OF-⎕INP'
+a<?apl 1+1 >b
+END-OF-⎕INP
+
+
+
+
+
+      2 ⎕TF 'Q'
+Q←1⍴(⊂3⍴'a2b')
+
+
+
+
+
+
+      ⍝ Bugs38 #60: ⎕XML accepts processing instructions with any target, also
+      ⍝ inside an element and after the root element
+
+
+
+
+
+      Z←⎕XML '<?mso-application progid="Word.Document"?><a/>'
+
+
+
+
+
+      ⎕XML Z
+<?mso-application progid="Word.Document"?><a/>
+
+
+
+
+      Z←⎕XML '<a><?xml-stylesheet href="s"?></a>'
+
+
+
+
+
+      ⎕XML Z
+<a><?xml-stylesheet href="s"?></a>
+
+
+
+
+      Z←⎕XML '<a/><?pi?>'
+
+
+
+
+
+      ⎕XML Z
+<a/><?pi?>
+
+
+
+
+      )SIC
+

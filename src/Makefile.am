@@ -5,8 +5,15 @@
 # integral.py is a support script that ⌹ (matrix divide, see Bif_F12_DOMINO.cc)
 # pipes through python3.  It is data, not an executable, so it is installed
 # below $(pkgdatadir) rather than in $(bindir).  PythonPipe.cc locates it via
-# apl_DIR__pkgdata (from config.h, i.e. ./configure --datarootdir).
+# apl_DIR__pkgdata (from AM_CPPFLAGS below).
 dist_pkgdata_DATA = integral.py
+
+# installation directories, expanded at make time (see configure.ac)
+AM_CPPFLAGS = -Dapl_DIR__bin='"$(bindir)"'             \
+              -Dapl_DIR__doc='"$(docdir)"'             \
+              -Dapl_DIR__sysconf='"$(sysconfdir)"'     \
+              -Dapl_DIR__pkglib='"$(pkglibdir)"'       \
+              -Dapl_DIR__pkgdata='"$(pkgdatadir)"'
 
 EXTRA_DIRS =
 if ! apl_TARGET_ANDROID
@@ -66,7 +73,7 @@ EXTRA_DIST = testcases_fuzz/FORMAT_FUZZ.tc testcases_fuzz/FORMAT_AV.tc
 dist_noinst_SCRIPTS = Automated_Test_Report.sh verify_TM3_exit.sh \
                       verify_tcp_port.sh verify_old_multi_line_strings.sh
 
-DIST_SUBDIRS = $(SUBDIRS) testcases
+DIST_SUBDIRS = $(SUBDIRS) testcases testsuites
 
 datadir = @datadir@
 localedir = $(datadir)/locale
@@ -365,6 +372,12 @@ apl_LDADD = $(LIBS)
 TEST_LIBROOT = testcases/libroot
 APL_TEST     = ./apl --id 1010 --noPrefs --libroot $(TEST_LIBROOT)
 
+# all testcases of make test: the test suites extra, main and regression
+# (see testsuites/README). regression comes last because its last testcase,
+# ZZZZ.tc, shuts down the shared variable server (APserver) that the AP
+# testcases in extra need. summary.log goes into testsuites/extra.
+TEST_ALL     = --TL testsuites/extra testsuites/main testsuites/regression
+
 # library files that the testcases take from the master copies (the files
 # that 'make install' installs), so that the testcases test those files.
 # All other files below $(TEST_LIBROOT) are separate copies for the testcases.
@@ -388,44 +401,46 @@ $(TEST_LIBROOT)/wslib5/FILE_IO1.apl: $(top_srcdir)/wslib5/FILE_IO1.apl
 
 # run all testcases, continue after errors
 #
-# NB: the glob is *\.tc (escaped dot), not *tc -- an unescaped *tc also
+# NB: a glob is *\.tc (escaped dot), not *tc -- an unescaped *tc also
 # matches any stray non-.tc file ending in "tc" (e.g. a typo'd filename
 # with a comma instead of a period), silently running it as its own
 # testcase against whatever stale content it happens to contain.
 test: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testcases/*\.tc; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) $(TEST_ALL); \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
 # run all testcases, stop after the first error
 test1: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) --TM 3 -T testcases/*\.tc; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) --TM 3 $(TEST_ALL); \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
 test2: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) --TR -T testcases/*\.tc; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) --TR $(TEST_ALL); \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
 # run testcases related to APs
 testAP: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testcases/AP*\.tc; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testsuites/extra/AP*\.tc; \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
 # run the ⎕GTK TLV round-trip regression test (requires X display and GTK support)
 testGTK: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testcases/ZZ02_GTK.tc; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testsuites/regression/ZZ02_GTK.tc; \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
-# run all testcases, except slow ones
+# run all testcases, except slow ones (the test suites testsuites/main and
+# testsuites/regression; summary.log goes into testsuites/main)
 test3: all $(TEST_LIBROOT_COPIES)
 	H=$$(mktemp -d); \
-	HOME=$$H $(APL_TEST) -T testcases_3/*\.tc; \
+	HOME=$$H $(APL_TEST) --TL testsuites/main testsuites/regression; \
 	RC=$$?; rm -rf "$$H"; stty sane; \
 	if [ $$RC -ne 0 ]; then \
 	  D=/tmp/apl-test3-$$(date +%Y%m%d_%H%M%S); \
 	  mkdir "$$D"; \
-	  cp testcases_3/summary.log "$$D/"; \
-	  awk '$$1+0>0 && NF==4 {print $$4 ".log"}' testcases_3/summary.log \
-	    | xargs -r cp -t "$$D"; \
+	  cp testsuites/main/summary.log "$$D/"; \
+	  awk '/^ *[0-9]+ / && $$2 != "assert," { e = $$1 + 0 } \
+	       $$NF ~ /\.tc$$/ { if (e > 0) print $$NF ".log"; e = 0 }' \
+	      testsuites/main/summary.log | xargs -r cp -t "$$D"; \
 	  echo "$(MAKE): $$RC failure(s) -- logs saved to $$D"; \
 	fi
 
@@ -433,72 +448,22 @@ test3: all $(TEST_LIBROOT_COPIES)
 # the command line option, so 'make test' cannot run them)
 testPARENS: all $(TEST_LIBROOT_COPIES)
 	H=$$(mktemp -d); HOME=$$H $(APL_TEST) \
-	  --strict_IBM_APL2_formatting parentheses -T testcases/parentheses/*\.tc; \
+	  --strict_IBM_APL2_formatting parentheses -T testsuites/extra/FORMAT_PARENS.tc; \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
 # run the testcases for STRICT_IBM_APL2_FORMATTING yes, i.e. testcases whose
 # expected output is that of IBM APL2 (they need the command line option)
 testSTRICT: all $(TEST_LIBROOT_COPIES)
 	H=$$(mktemp -d); HOME=$$H $(APL_TEST) \
-	  --strict_IBM_APL2_formatting yes -T testcases/strict/*\.tc; \
+	  --strict_IBM_APL2_formatting yes -T testsuites/extra/FORMAT_CPLX.tc \
+	     testsuites/extra/FORMAT_STRICT.tc; \
 	RC=$$?; rm -rf "$$H"; exit $$RC
 
-# run only invariant testcases
+# run only invariant testcases (the test suite testsuites/invariants)
 test4: all $(TEST_LIBROOT_COPIES)
-	H=$$(mktemp -d); HOME=$$H $(APL_TEST) -T testcases/invariants/*\.tc || true; \
+	H=$$(mktemp -d); HOME=$$H $(APL_TEST) --TL testsuites/invariants || true; \
 	rm -rf "$$H"
 	stty sane
-
-# Create/refresh testcases_3/ and testcases_4/ symlink directories from ⍝@ markers.
-# install-data-hook calls this so 'make install' (typically run as root, e.g.
-# 'sudo make install' -- needed for /etc and friends) sets them up; chown
-# restores ownership to match the src directory so the symlinks stay owned
-# by the actual user, not root. This must run LAST: it used to run before
-# the ln -sf loops below, so it could only fix ownership of entries that
-# already existed -- any symlink created or refreshed by those loops
-# afterward was left root-owned again, since the recipe is still running
-# under the same 'sudo make install' invocation at that point.
-.PHONY:	install-testlinks
-install-data-hook: install-testlinks
-install-testlinks:
-	$(MKDIR_P) testcases_3 testcases_4
-	for f in testcases/*.tc; do \
-	  name=$$(basename "$$f"); \
-	  if head -10 "$$f" | grep -q '@ test3\.'; then \
-	    ln -sf "../testcases/$$name" "testcases_3/$$name"; \
-	  fi; \
-	  if head -10 "$$f" | grep -q '@ test4\.'; then \
-	    ln -sf "../testcases/$$name" "testcases_4/$$name"; \
-	  fi; \
-	done
-	for f in testcases/invariants/*.tc; do \
-	  name=$$(basename "$$f"); \
-	  if head -10 "$$f" | grep -q '@ test4\.'; then \
-	    ln -sf "../testcases/invariants/$$name" "testcases_4/$$name"; \
-	  fi; \
-	done
-	chown -R "$$(stat -c '%u:%g' .)" testcases_3 testcases_4
-
-# Bootstrap testcases_3/ from scratch (same ⍝@ test3. marker selection as
-# install-testlinks above), for a fresh checkout/tarball that cannot
-# portably carry symlinks in SVN/git. Unlike install-testlinks -- which
-# always refreshes, and only ever runs as a side effect of 'make install'
-# (typically as root) -- this is meant to be run directly and is a strict
-# no-op if testcases_3 already exists, so it never touches or refreshes a
-# directory that is already set up (and possibly hand-modified since).
-.PHONY:	test3_symlinks
-test3_symlinks:
-	if [ -d testcases_3 ]; then \
-	  echo "test3_symlinks: testcases_3 already exists, doing nothing"; \
-	else \
-	  $(MKDIR_P) testcases_3; \
-	  for f in testcases/*.tc; do \
-	    name=$$(basename "$$f"); \
-	    if head -10 "$$f" | grep -q '@ test3\.'; then \
-	      ln -sf "../testcases/$$name" "testcases_3/$$name"; \
-	    fi; \
-	  done; \
-	fi
 
 perf: apl $(TEST_LIBROOT_COPIES)
 	$(APL_TEST) --TM 3 -T testcases/Performance.pt

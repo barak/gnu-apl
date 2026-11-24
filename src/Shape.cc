@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <limits>
 #include "Shape.hh"
 #include "Value.hh"
 
@@ -37,7 +38,7 @@ const ShapeItem len_A = A.element_count();
 
    loop(a, len_A)
       {
-        add_shape_item(A.get_near_int(a) - qio_A);
+        add_shape_item(Cell::minus_IO(A.get_near_int(a), qio_A));
       }
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -51,7 +52,7 @@ const ShapeItem len_A = A.element_count();
 
    loop(a, len_A)
       {
-        add_shape_item(A.get_near_int(a) - qio_A);
+        add_shape_item(Cell::minus_IO(A.get_near_int(a), qio_A));
       }
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -61,6 +62,9 @@ Shape ret;
    loop(r, rho_rho)
       {
         const ShapeItem len = rho[r];
+        // -len overflows for the int64 minimum (Bugs38 #92): that length
+        // is not representable anyway
+        if (len == std::numeric_limits<ShapeItem>::min())   WS_FULL;
         if (len < 0)   ret.add_shape_item(- len);
         else           ret.add_shape_item(  len);
       }

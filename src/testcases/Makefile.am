@@ -1,26 +1,25 @@
 
 # testcases that may be of interest
 
-SUBDIRS      = invariants
-DIST_SUBDIRS = invariants
-
-# testcases for STRICT_IBM_APL2_FORMATTING parentheses (make testPARENS)
-# and yes (make testSTRICT)
-#
-EXTRA_DIST = parentheses/FORMAT_PARENS.tc \
-             strict/FORMAT_CPLX.tc \
-             strict/FORMAT_STRICT.tc
-
 # the library root of the testcases (make test etc. run ./apl --libroot
 # testcases/libroot). Not installed. Its files workspaces/ASSERT.apl,
 # wslib5/FILE_IO.apl, and wslib5/FILE_IO1.apl are copied from the master
 # copies in ../../wslib5/ by src/Makefile (TEST_LIBROOT_COPIES); the files
 # below are separate copies for the testcases.
 #
-EXTRA_DIST += libroot/workspaces/DIJKSTRA.atf           \
+# accept_tc.py accepts the result of a failed testcase (see
+# ../testsuites/README), Bugs39 #106
+#
+dist_noinst_SCRIPTS = accept_tc.py
+
+EXTRA_DIST  = libroot/workspaces/DIJKSTRA.atf           \
+              libroot/workspaces/B38_BADIO.atf          \
+              libroot/workspaces/B38_BADNAMES.atf       \
               libroot/workspaces/DOMINO-APL.apl         \
               libroot/workspaces/FORMAT_FUZZ.apl        \
               libroot/workspaces/GPROF_LOOP.apl         \
+              libroot/workspaces/LEGACY38.xml           \
+              libroot/workspaces/LEGACY39.xml           \
               libroot/workspaces/Performance.apl        \
               libroot/workspaces/Performance.gnuplot    \
               libroot/workspaces/TEST3.atf              \
@@ -39,302 +38,10 @@ EXTRA_DIST += libroot/workspaces/DIJKSTRA.atf           \
 #
 dist_noinst_DATA =                              \
         0000_OBSOLETE_TESTCASES                 \
-        AAA0_Global_Settings.tc                 \
-        AAA1.tc                                 \
-        AAA2.tc                                 \
-        AAA3.tc                                 \
-        AAA4_Function_headers.tc                \
-        Add.tc                                  \
-        AllExpressions.tc                       \
-        AllPrimitives.tc                        \
-        And.tc                                  \
-        AP100.tc                                \
-        AP210.tc                                \
-        APnnn.tc                                \
         APnnn_1011.sh                           \
         APnnn_1011.tc2                          \
-        apl2lrm.tc                              \
-        Binding.tc                              \
-        Branch.tc                               \
-        Binomial.tc                             \
-        BobSmithChars.tc                        \
-        Boolean.tc                              \
-        Bracket_Index.tc                        \
-        Bugs35_Workspace.tc                     \
-        Bugs37_A.tc                             \
-        Bugs37_B.tc                             \
-        Bugs37_CD.tc                            \
-        Bugs37_Workspace.tc                     \
-        Catenate.tc                             \
-        Catenate_with_Axis.tc                   \
-        Ceiling.tc                              \
-        Circle_Functions.tc                     \
-        Clone.tc                                \
-        Cloning.tc                              \
-        Commute.tc                              \
-        Compress.tc                             \
-        Compress_with_axis.tc                   \
-        Conjugate.tc                            \
-        CopyOnWrite.tc                          \
-        COPY.tc                                 \
-        Coverage.tc                             \
-        Deal.tc                                 \
-        Decode.tc                               \
-        Depth.tc                                \
-        Direction.tc                            \
-        Disclose.tc                             \
-        Disclose_with_axis.tc                   \
-        Divide.tc                               \
-        Domino_stress.tc                        \
-        Drop.tc                                 \
-        Drop_with_axis.tc                       \
-        DumpLoad.tc                             \
-        Each_dyadic.tc                          \
-        Each_monadic.tc                         \
-        Enclose.tc                              \
-        Enclose_with_axis.tc                    \
-        Encode.tc                               \
-        Enlist.tc                               \
-        Execute_Each.tc                         \
-        Execute_NEXTFILE.tc                     \
-        Execute.tc                              \
-        Expand.tc                               \
-        Expand_with_axis.tc                     \
-        Exponential.tc                          \
-        Factorial.tc                            \
-        File_IO_1.tc                            \
-        File_IO.tc                              \
-        Fill.tc                                 \
-        Find.tc                                 \
-        First.tc                                \
-        Floor.tc                                \
-        Format_by_example.tc                    \
-        Format_by_spec.tc                       \
-        Format.tc                               \
-        FORMAT_COLS.tc                          \
-        FORMAT_RANK.tc                          \
-        FORMAT_SCALE.tc                         \
-        Grade_down.tc                           \
-        Grade_down_with_collating_sequence.tc   \
-        Grade_up.tc                             \
-        Grade_up_with_collating_sequence.tc     \
-        IfElse.tc                               \
-        Index_Of.tc                             \
-        Index.tc                                \
-        Index_with_axis.tc                      \
-        Inner_product.tc                        \
-        Intersection.tc                         \
-        Interval.tc                             \
-        Interval_Index.tc                       \
-        Lambda.tc                               \
-        Laminate.tc                             \
-        Logarithm.tc                            \
-        Macro.tc                                \
-        Macros.tc                               \
-        Magnitude.tc                            \
-        Match.tc                                \
-        MatrixDivide.tc                         \
-        MatrixInverse.tc                        \
-        MatrixProduct.tc                        \
-        Maximum.tc                              \
-        Member.tc                               \
-        Minimum.tc                              \
-        Multiply.tc                             \
-        MultiLineStrings.tc                     \
-        MultiLineLiterals.tc                    \
-        Nabla.tc                                \
-        NativeFunctions.tc                      \
-        NaturalLogarithm.tc                     \
-        Negative.tc                             \
-        Numbers.tc                              \
-        Oper_negative.tc                        \
-        OperPower.tc                            \
-        Oper_userfun.tc                         \
-        Optimization.tc                         \
-        Or.tc                                   \
-        OuterProduct.tc                         \
-        Parallel.tc                             \
-        Parentheses.tc                          \
-        Partition.tc                            \
-        Partition_with_axis.tc                  \
-        Pick.tc                                 \
-        PiTimes.tc                              \
-        Polynomials.tc                          \
-        Power.tc                                \
-        Prototype.tc                            \
-        Quad_AF.tc                              \
-        Quad_AI.tc                              \
-        Quad_ARG.tc                             \
-        Quad_AT.tc                              \
-        Quad_AV.tc                              \
-        Quad_CR10.tc                            \
-        Quad_CR.tc                              \
-        Quad_CT.tc                              \
-        Quad_DL.tc                              \
-        Quad_DLX.tc                             \
-        Quad_EA.tc                              \
-        Quad_EB.tc                              \
-        Quad_EC.tc                              \
-        Quad_EM.tc                              \
-        Quad_ES.tc                              \
-        Quad_ES_issuer.tc                       \
-        Quad_ET.tc                              \
-        Quad_EX.tc                              \
-        Quad_FC.tc                              \
-        Quad_FIO.tc                             \
-        Quad_FIO1.tc                            \
-        Quad_FX.tc                              \
-        Quad_INP.tc                             \
-        Quad_JSON.tc                            \
-        Quad_IO.tc                              \
-        Quad_LC.tc                              \
-        Quad_L.tc                               \
-        Quad_LX.tc                              \
-        Quad_MAP.tc                             \
-        Quad_MX.tc                              \
-        Quad_NC.tc                              \
-        Quad_NL.tc                              \
-        Quad_PLOT.tc                            \
-        Quad_PNG.tc                             \
-        Quad_PP.tc                              \
-        Quad_PR.tc                              \
-        Quad_PW.tc                              \
-        Quad_RL.tc                              \
-        Quad_R.tc                               \
-        Quad_RE.tc                              \
-        Quad_RVAL.tc                            \
-        Quad_SQL_postgres.tc                    \
-        Quad_SQL_sqlite.tc                      \
-        Quad_SVE.tc                             \
-        Quad_SYL.tc                             \
-        Quad.tc                                 \
-        Quad_TC.tc                              \
-        Quad_TF.tc                              \
-        Quad_TS.tc                              \
-        Quad_TZ.tc                              \
-        Quad_UCS.tc                             \
-        Quad_UL.tc                              \
-        Quad_WA.tc                              \
-        Quad_X.tc                               \
-        Quad_XML.tc                             \
-        Quote_quad.tc                           \
-        Rank.tc                                 \
-        Ravel.tc                                \
-        Ravel_with_axis.tc                      \
-        Reciprocal.tc                           \
-        Reduce_N_wise.tc                        \
-        Reduce_N_wise_with_axis.tc              \
-        Reduce.tc                               \
-        Reduce_with_axis.tc                     \
-        Relational_functions.tc                 \
-        Replicate.tc                            \
-        Replicate_with_axis.tc                  \
-        Reshape.tc                              \
-        Residue.tc                              \
-        Reverse.tc                              \
-        Reverse_with_axis.tc                    \
-        Roll.tc                                 \
-        Rotate.tc                               \
-        Rotate_with_axis.tc                     \
-        SaveLoad.tc                             \
-        Scalar_function.tc                      \
-        Scan.tc                                 \
-        Scan_with_axis.tc                       \
-        Shape.tc                                \
-        Stop.tc                                 \
-        Structured_variable.tc                  \
-        Subtract.tc                             \
-        Take.tc                                 \
-        Take_with_axis.tc                       \
-        Tokenizer.tc                            \
-        Trace.tc                                \
-        Transpose_reversed_axes.tc              \
-        Transpose.tc                            \
-        Union.tc                                \
-        UserCommand.tc                          \
-        Without.tc                              \
-        Zilde.tc                                \
-        ZZ01_Invariants.tc                      \
-        ZZ02_GTK.tc                             \
-        ZZ03_Regression.tc                      \
-        ZZ04_Regression.tc                      \
-        ZZ05_Regression.tc                      \
-        ZZ06_Regression.tc                      \
-        ZZ07_Regression.tc                      \
-        ZZ08_Regression.tc                      \
-        ZZ09_Regression.tc                      \
-        ZZ10_Regression.tc                      \
-        ZZ11_Regression.tc                      \
-        ZZ13_Regression.tc                      \
-        ZZ14_Regression.tc                      \
-        ZZ15_Regression.tc                      \
-        ZZ16_Regression.tc                      \
-        ZZ17_Regression.tc                      \
-        ZZ18_Regression.tc                      \
-        ZZ19_Regression.tc                      \
-        ZZ20_Regression.tc                      \
-        ZZ21_Regression.tc                      \
-        ZZ22_Regression.tc                      \
-        ZZ23_Regression.tc                      \
-        ZZ24_Regression.tc                      \
-        ZZ25_Regression.tc                      \
-        ZZ26_Regression.tc                      \
-        ZZ27_Regression.tc                      \
-        ZZ28_Regression.tc                      \
-        ZZ29_Regression.tc                      \
-        ZZ30_Regression.tc                      \
-        ZZ31_Regression.tc                      \
-        ZZ32_Regression.tc                      \
-        ZZ33_Regression.tc                      \
-        ZZ34_Regression.tc                      \
-        ZZ35_Regression.tc                      \
-        ZZ36_Regression.tc                      \
-        ZZ37_Regression.tc                      \
-        ZZ38_Regression.tc                      \
-        ZZ39_Regression.tc                      \
-        ZZ40_Regression.tc                      \
-        ZZ41_Regression.tc                      \
-        ZZ42_Regression.tc                      \
-        ZZ43_Regression.tc                      \
-        ZZ44_Regression.tc                      \
-        ZZ45_Regression.tc                      \
-        ZZ46_Regression.tc                      \
-        ZZ47_Regression.tc                      \
-        ZZ48_Regression.tc                      \
-        ZZ49_Regression.tc                      \
-        ZZ50_Regression.tc                      \
-        ZZ51_Regression.tc                      \
-        ZZ52_Regression.tc                      \
-        ZZ53_Regression.tc                      \
-        ZZ54_Regression.tc                      \
-        ZZ55_Regression.tc                      \
-        ZZ56_Regression.tc                      \
-        ZZ57_Regression.tc                      \
-        ZZ58_Regression.tc                      \
-        ZZ59_Regression.tc                      \
-        ZZ60_Regression.tc                      \
-        ZZ61_Regression.tc                      \
-        ZZ62_Regression.tc                      \
-        ZZ63_Regression.tc                      \
-        ZZ64_Regression.tc                      \
-        ZZ65_Regression.tc                      \
-        ZZ66_Regression.tc                      \
-        ZZ67_Regression.tc                      \
-        ZZ68_Regression.tc                      \
-        ZZ69_Regression.tc                      \
-        ZZ70_Regression.tc                      \
-        ZZ71_Regression.tc                      \
-        ZZ72_Regression.tc                      \
-        ZZ73_Regression.tc                      \
-        ZZ74_Regression.tc                      \
-        ZZZ0_Standard_08x.tc                    \
-        ZZZ0_Standard_09x.tc                    \
-        ZZZ0_Standard_10x.tc                    \
-        ZZZ0_Standard_20x.tc                    \
-        ZZZ2_PROBLEMS.tc                        \
-        ZZZZ.tc                                 \
         Performance.pt
 
 tar:
-	tar cvzf testcases.tgz *.tc *.pt
+	tar cvzf testcases.tgz *.pt
 

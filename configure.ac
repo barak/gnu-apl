@@ -127,6 +127,22 @@ AC_PROG_CC
 #
 LT_INIT([dlopen])
 
+# locate pkg-config for the host, i.e. <host>-pkg-config when cross
+# compiling.  This must follow AC_CANONICAL_HOST (in LT_INIT), so that
+# --with-mingw can set host_alias first (see m4/apl_TARGETs.m4).
+#
+PKG_PROG_PKG_CONFIG
+if apl_YES($apl_TARGET_PYTHON) && test -n "$PKG_CONFIG" &&
+   $PKG_CONFIG --exists python3; then
+   PYTHON_CFLAGS=`$PKG_CONFIG --cflags python3`
+fi
+
+# makeinfo is optional: doc/apl.info, doc/apl.html etc. are shipped pre-built
+# and rebuilt (from their .texi sources) only if makeinfo is present.
+#
+AC_CHECK_PROG([apl_MAKEINFO], [makeinfo], [yes], [no])
+AM_CONDITIONAL(apl_MAKEINFO, apl_YES($apl_MAKEINFO))
+
 apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
 
@@ -137,14 +153,6 @@ apl_TOPIC([compiler checks])
 # AC_PROG_RANLIB   obsoleted by LT_INIT
 
 AC_USE_SYSTEM_EXTENSIONS
-
-# add the current directory (i.e. from where ./configure was called) to the
-# include path, so that the files created by ./configure are found. This
-# is (only) needed for VPATH builds since otherwise the directory from which
-# ./configure is run is the same as the directory where ./configure places
-# its output files (i.e. directory '.').
-#
-CXXFLAGS="$CXXFLAGS -I `pwd`"
 
 ##############################################################################
 # Checks for various header files.
@@ -471,14 +479,13 @@ AC_MSG_RESULT([$cfg_CTRLD_DEL])
 AC_CONFIG_FILES([Makefile
                  build/Makefile
                  Claude/Makefile
-                 debian/Makefile
-                 debian/source/Makefile
+                 deb/Makefile
+                 deb/source/Makefile
                  doc/Makefile
                  doc/DALY/Makefile
                  erlang/Makefile
                  erlang/apl.erl
                  gnu-apl.d/Makefile
-                 gnu-apl.d/preferences
                  HOWTOs/Makefile
                  HOWTOs/Bible/Makefile
                  rpm/Makefile
@@ -491,7 +498,11 @@ AC_CONFIG_FILES([Makefile
                  src/native/Makefile
                  src/sql/Makefile
                  src/testcases/Makefile
-                 src/testcases/invariants/Makefile
+                 src/testsuites/Makefile
+                 src/testsuites/extra/Makefile
+                 src/testsuites/invariants/Makefile
+                 src/testsuites/main/Makefile
+                 src/testsuites/regression/Makefile
                  support-files/Makefile
                  support-files/fonts/Makefile
                  support-files/105-key-International-Keyboard/Makefile
@@ -763,33 +774,9 @@ AC_MSG_CHECKING([when and where this interpreter was built])
 m4_include([m4/build_date.m4])
 AC_MSG_RESULT([$apl_BUILD_DATE])
 
-# set 'abs_apl_top' to the "real" top-level directory. The "real" top-level
-# directory contains file configure.ac, while the VPATH copies of it do not.
+# the absolute top-level source directory
 #
-if test -f configure.ac; then   # normal build
-   abs_apl_top=`pwd`
-else                            # VPATH build
-   abs_apl_top="not-found"      # assume not found
-   apl_top=`pwd`                # start search at current directory
-   AS_ECHO(["
-   $as_me: VPATH build: locating the real GNU APL top-level directory..."])
-
-   for q in 1 2 3 4; do                    # at most 4 times...
-      if test -f "$apl_top/configure.ac"   # configure.ac exists in $apl_top ?
-      then                                 # yes...
-         AS_ECHO(["$as_me: └── found at: $apl_top"])
-         abs_apl_top="$apl_top"            # and remember the directory
-         break                             # done.
-      else                                 # no...
-         apl_top=`dirname $apl_top`        # move upwards towards /
-      fi
-   done
-
-   if apl_EQ($abs_apl_top, not-found); then
-      abs_apl_top=`pwd`
-      AS_ECHO(["$as_me: └── *** NOT FOUND, using . (i.e. $abs_apl_top)"])
-   fi
-fi
+abs_apl_top=`cd "$srcdir" && pwd`
 
 
 # figure the SVN versions of the interpreter and the (usually older) Archive.cc
@@ -798,7 +785,7 @@ apl_SVNINFO="no-svnversion"
 apl_ARCHIVE_SVNINFO="no-svn"
 SVNPROG=`which svn`
 SVNVERSION=`which svnversion`
-test $SVNVERSION && test -x $SVNVERSION && apl_SVNINFO=`$SVNVERSION`
+test $SVNVERSION && test -x $SVNVERSION && apl_SVNINFO=`$SVNVERSION "$abs_apl_top"`
 
 if test $SVNPROG && test -x $SVNPROG; then
    apl_ARCHIVE_SVNINFO=`$SVNPROG info "$abs_apl_top"/src/Archive.cc \
@@ -821,117 +808,10 @@ AC_DEFINE_UNQUOTED(BUILDTAG,
 AC_DEFINE_UNQUOTED(ARCHIVE_SVN, ["$apl_ARCHIVE_SVNINFO"],
                      [the SVN version of Archive.cc])
 
-# the user may override the install directories, either with --prefix or
-# --exec_prefix (affecting several directories), or by --bindir and friends. 
-# Figure out the details.
-#
-# NOTE that, unfortunately, the variables in ./configure will be quoted:
-#
-# bindir='${exec_prefix}/bin'
-# libdir='${exec_prefix}/lib'
-# datarootdir='${prefix}/share'
-# sysconfdir='${prefix}/etc'
-# docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
-# ...
-#
-# Therefore, to figure if a user has overwritten them with ./configure command
-# line arguments, we need to prevent the expansion of variables in the second
-# argument of apl_EQ() by escaping their leading $. For example (note the \$
-# instead of $):
-#
-# if apl_EQ($bindir, \${exec_prefix}/bin)
-#
-# NOTE also that some ./configure variables will default to "NONE" instead
-#      of "" if the user does not overwrite them:
-#
-# exec_prefix=NONE
-# prefix=NONE
-# program_prefix=NONE
-# program_suffix=NONE
-# x_includes=NONE
-# x_libraries=NONE
-#
-if apl_EQ($prefix, NONE)
-then                                                   # no user --prefix
-   apl_prefix="$ac_default_prefix"                     # default: /usr/local
-else                                                   # --prefix given
-   apl_prefix=$prefix
-   AS_ECHO(["   --prefix overwrite: $apl_prefix"])
-fi
-
-if apl_EQ($exec_prefix, NONE)
-then                                                   # no user --exec_prefix
-   apl_exec_prefix="$apl_prefix"                       # default: PREFIX
-else                                                   # --exec_prefix given
-   apl_exec_prefix=$exec_prefix
-   AS_ECHO(["   --exec_prefix overwrite: $apl_exec_prefix"])
-fi
-
-
-if apl_EQ($bindir, \${exec_prefix}/bin)
-then                                                   # no user --bindir
-   apl_bindir="$apl_exec_prefix/bin"                   # default: EPREFIX/bin
-else                                                   # --bindir given
-   apl_bindir="$bindir"
-   AS_ECHO(["   --bindir overwrite: $apl_bindir"])
-fi
-
-
-if apl_EQ($libdir, \${exec_prefix}/lib)
-then                                                   # no user --libdir
-   apl_libdir="$apl_exec_prefix/lib"                   # default: EPREFIX/lib
-else                                                   # --libdir given
-   apl_libdir="$libdir"
-   AS_ECHO(["   --libdir overwrite: $apl_libdir"])
-fi
-
-
-if apl_EQ($datarootdir, \${prefix}/share)
-then                                                   # no user --datarootdir
-   apl_datarootdir="${apl_prefix}/share"               # default: PREFIX/share
-else                                                   # --datarootdir given
-   apl_datarootdir="${datarootdir}"
-   AS_ECHO(["   --apl_datarootdir overwrite: ${apl_datarootdir}"])
-fi
-
-
-if apl_EQ($docdir, \${datarootdir}/doc/\${PACKAGE_TARNAME})
-then                                                   # no user --docdir
-   apl_docdir="${apl_datarootdir}/doc/apl"             # default
-else                                                   # --docdir given
-   apl_docdir="$docdir"
-   AS_ECHO(["   --docdir overwrite: $apl_docdir"])
-fi
-
-if apl_EQ($localedir, \${datarootdir}/locale)
-then                                                   # no user --localedir
-   apl_localedir="${apl_datarootdir}/locale"           # default
-else                                                   # --localedir given
-   apl_localedir="$localedir"
-   AS_ECHO(["   --localedir overwrite: $apl_localedir"])
-fi
-
-
-if apl_EQ($sysconfdir, \${prefix}/etc)
-then                                                   # no user --sysconfdir
-   apl_sysconfdir="${apl_prefix}/etc"                  # default: PREFIX/etc
-else                                                   # --sysconfdir given
-   apl_sysconfdir="${sysconfdir}"
-   AS_ECHO(["   --sysconfdir overwrite: ${apl_sysconfdir}"])
-fi
-
-AC_DEFINE_UNQUOTED(apl_DIR__bin,         "$apl_bindir",      [--bindir]        )
-AC_DEFINE_UNQUOTED(apl_DIR__datarootdir, "$apl_datarootdir", [--datarootdir]   )
-AC_DEFINE_UNQUOTED(apl_DIR__doc,         "$apl_docdir",      [--docdir]        )
-AC_DEFINE_UNQUOTED(apl_DIR__exec_prefix, "$apl_exec_prefix", [--exec_prefix]   )
-AC_DEFINE_UNQUOTED(apl_DIR__lib,         "$apl_libdir",      [--libdir]        )
-AC_DEFINE_UNQUOTED(apl_DIR__locale,      "$apl_localedir",   [--localedir]     )
-AC_DEFINE_UNQUOTED(apl_DIR__prefix,      "$apl_prefix",      [--prefix]        )
-AC_DEFINE_UNQUOTED(apl_DIR__sysconf,     "$apl_sysconfdir",  [--sysconfdir])
-AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/apl",
-                   [installation directory for GNU APL libraries])
-AC_DEFINE_UNQUOTED(apl_DIR__pkgdata,     "$apl_datarootdir/apl",
-                   [installation directory for GNU APL data files])
+# The installation directories (apl_DIR__bin, apl_DIR__pkglib, ...) are
+# passed to the compiler at make time, see AM_CPPFLAGS in src/Makefile.am
+# and src/APs/Makefile.am, so that they are fully expanded and can be
+# overridden with e.g. make prefix=...
 
 # where to install support-files/apl (bash command-line completion for the
 # "apl" command itself, see that file's own header comment). Prefer asking
@@ -943,7 +823,6 @@ AC_DEFINE_UNQUOTED(apl_DIR__pkgdata,     "$apl_datarootdir/apl",
 # on a system without bash-completion -- completion simply starts working
 # automatically if bash-completion is installed later).
 #
-AC_PATH_PROG([PKG_CONFIG], [pkg-config], [])
 if test -n "$PKG_CONFIG" && "$PKG_CONFIG" --exists bash-completion 2>/dev/null
 then
    bashcompletiondir=`"$PKG_CONFIG" --variable=completionsdir bash-completion`

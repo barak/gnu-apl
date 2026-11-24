@@ -1,0 +1,229 @@
+⍝ Drop.tc
+⍝ ----------------------------------
+
+      ⍝ ----------------------------------
+
+      3↓12 31 45 10 57
+10 57
+      ¯3↓12 31 45 10 57
+12 31
+
+      ⍝ nonscalar right argument ----------------------------------
+
+      A←3 5ρ'STRIPERODEPLANT'
+      B←'STOREFIRSTMIGHTHATER'
+      B←B,'SHEETTHEREMETROERASE'
+      B←3 4 5ρB,'BREADOTHERANVILEVADE'
+      A
+STRIP
+ERODE
+PLANT
+      1 2↓A
+ODE
+ANT
+
+      B
+STORE
+FIRST
+MIGHT
+HATER
+
+SHEET
+THERE
+METRO
+ERASE
+
+BREAD
+OTHER
+ANVIL
+EVADE
+
+      C←¯1 2 ¯2
+      C↓B
+MIG
+HAT
+
+MET
+ERA
+
+      K←3 2 4ρ'ABCDEFGH',(ι8),'abcdefgh'
+      K
+A B C D
+E F G H
+
+1 2 3 4
+5 6 7 8
+
+a b c d
+e f g h
+
+      Z←2 1 3↓K
+      Z
+h
+      ρZ
+1 1 1
+
+      ⍝ dropping none ----------------------------------
+
+      0↓'INTACT'
+INTACT
+      0 2↓3 5ρι15
+ 3  4  5
+ 8  9 10
+13 14 15
+
+      ⍝ overdrop ----------------------------------
+
+      W←5↓23 41 73 26
+      ρW
+0
+
+      H←2 3ρ'ABCDEF'
+      Y←3 1↓H
+      ρY
+0 2
+      M←2 3↓H
+      ρM
+0 0
+
+      ⍝ scalar right argument ----------------------------------
+
+      J←0↓4
+      J
+4
+      ρJ
+1
+      K←0 0 0↓4
+      K
+4
+      ρK
+1 1 1
+
+      ⍝ effect on depth ----------------------------------
+
+      D←'A' 'AN'('ANT' 'ANTE')
+      D
+ A AN   ANT ANTE  
+      ρD
+3
+      ≡D
+3
+      S←¯1↓D
+      S
+ A AN 
+      ≡S
+2
+      T←¯2↓D
+      T
+A
+      ρT
+1
+      ≡T
+1
+
+      ⍝ selective spec ----------------------------------
+
+
+      U←'ABCDE'
+      (2↓U)←ι3
+      U
+AB 1 2 3
+
+      V←3 4ρ'ABCDEFGHIJKL'
+      V
+ABCD
+EFGH
+IJKL
+
+      (1 ¯1↓V)←2 3ρι6
+      V
+A B C D
+1 2 3 H
+4 5 6 L
+
+      )ERASE U V
+
+      ⍝ regression (Blake McBride, Bugs31 #25): (1↓V)←B on a scalar V
+      ⍝ used to be SYNTAX ERROR ("mal-formed selective specification")
+      ⍝ instead of the empty-selection no-op it was before r2127 --
+      ⍝ identical in spirit to the still-working vector over-drop
+      ⍝ (5↓V)←9. Root cause: the scalar-drop branch of Bif_F12_DROP::
+      ⍝ eval_AB() copied B's own LvalCell into Z's prototype, then (for
+      ⍝ the empty, i.e. fully-dropped, case) called to_type(false),
+      ⍝ which rewrites that cell into a plain type-appropriate cell --
+      ⍝ but Z was still separately marked set_left_value(), so
+      ⍝ check_lval_consistency() (now called before assign_cellrefs()'s
+      ⍝ dest_count==0 early return, Bugs30 #29) correctly rejected the
+      ⍝ contradiction. Fixed by using an invalid/placeholder LvalCell(0,0)
+      ⍝ prototype instead of to_type(false) whenever B is itself a left
+      ⍝ value, matching the no-op pattern used elsewhere for "nothing
+      ⍝ real to select".
+      ⍝
+      V←5
+      (1↓V)←9
+      V
+5
+
+      V←5
+      (1↓V)←9 9
+      V
+5
+
+      V←5
+      (1↓V)←⍬
+      V
+5
+
+      V←5
+      (2↓V)←9
+      V
+5
+
+      V←5
+      (¯1↓V)←9
+      V
+5
+
+      ⍝ control: the vector over-drop no-op already worked
+      ⍝
+      V←5
+      (5↓V)←9
+      V
+5
+
+      )ERASE V
+
+      ⍝ regression (Blake McBride, Bugs28 #67, 2026-08-11): A↓[X]B with an
+      ⍝ empty X used to return B unchanged without even looking at A --
+      ⍝ its "no axes" shortcut ran before A was type- or length-checked
+      ⍝ against X, unlike A↑[X]B (Bif_F12_TAKE::eval_AXB), which checks
+      ⍝ first. So e.g. a wrongly-shaped or wrongly-typed A silently did
+      ⍝ nothing instead of failing with LENGTH ERROR like ↑ does.
+      ⍝
+      M←2 3⍴⍳6
+      2↓[⍬]M
+LENGTH ERROR+
+      2↓[⍬]M
+      ^^
+
+      'abc'↓[⍬]M
+LENGTH ERROR+
+      'abc'↓[⍬]M
+      ^    ^
+
+      ⍝ control: ↑ already got this right
+      ⍝
+      2↑[⍬]M
+LENGTH ERROR+
+      2↑[⍬]M
+      ^^
+
+      )SIC
+
+      ⍝ control: matching (empty) A and X still work
+      ⍝
+      ⍬↓[⍬]M
+1 2 3
+4 5 6
+
+      )ERASE M

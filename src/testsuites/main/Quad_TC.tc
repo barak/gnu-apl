@@ -1,0 +1,19 @@
+⍝ Quad_TC.tc
+⍝ ----------------------------------
+
+      ⎕UCS ⎕TC
+8 13 10
+
+
+      '∇' ⎕TC[1] '∣'
+∇∣
+
+      ⍝ ⎕TC[2] doesn't work in testcase files
+
+      'NEW' , ⎕TC[3] , 'LINE', ⎕TC[3] ,'CHARACTER'
+NEW
+LINE
+CHARACTER
+
+      ⍝ ==================================
+

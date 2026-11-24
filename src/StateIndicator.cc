@@ -37,6 +37,7 @@
 //════════════════════════════════════════════════════════════════════════════
 StateIndicator::StateIndicator(const Executable * exec, StateIndicator * _par)
    : executable(exec),
+     owns_lambda(false),
      safe_execution_depth(_par ? _par->safe_execution_depth : 0),
      level(_par ? 1 + _par->get_level() : 0),
      error(E_NO_ERROR, LOC),
@@ -60,6 +61,10 @@ StateIndicator::~StateIndicator()
       {
         const UserFunction * ufun = get_executable()->get_exec_ufun();
         if (ufun)   ufun->pop_local_vars();
+
+        // a lambda restored by )LOAD is owned by its SI entry (Bugs38 #80)
+        if (owns_lambda && ufun && ufun->is_lambda())
+           const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
       }
    else
       {
@@ -345,7 +350,9 @@ StateIndicator::print(ostream & out) const
 
    out << "PC:         " << get_PC() << " (" << executable->get_body().size()
                        << ")";
-   out << " " << executable->get_body()[get_PC()] << endl;
+   if (size_t(get_PC()) < executable->get_body().size())   // not at the end
+      out << " " << executable->get_body()[get_PC()];
+   out << endl;
    out << "Stat:       " << executable->statement_text(get_PC());
    out << endl;
 
@@ -565,6 +572,15 @@ Token result = current_stack.reduce_body();
    return result;
 }
 //────────────────────────────────────────────────────────────────────────────
+bool
+StateIndicator::has_LRX(char which)
+{
+UCS_string function;
+   if (which == 'L')   return current_stack.locate_L(function) != 0;
+   if (which == 'R')   return current_stack.locate_R(function) != 0;
+   return current_stack.locate_X(function) != 0;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 StateIndicator::set_L(Value_P new_value)
 {
@@ -687,6 +703,16 @@ StateIndicator::display_value(Value_P B, bool boxing)
    // whether boxed or not: if B exceeds it then the longest dimension of B
    // is cut in half until B is below the limit.
    //
+   // a structured variable is displayed as its members (.a: 1 ...), not as
+   // its member table (whose free slots are 0 0 rows), neither boxed nor
+   // cut by the print length limit (Bugs38 #71)
+   //
+   if (B->is_member())
+      {
+        B->print(COUT);
+        return;
+      }
+
 Value_P B0 = B;
 const bool truncated = Quad_SYL::print_length_limit &&
                        B->element_count() >= Quad_SYL::print_length_limit;

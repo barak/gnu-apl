@@ -51,6 +51,10 @@ class RavelIterator;
 /** additional functionality for functions with named sub-functions.
     I.e one of ⌹, ⎕CR, ⎕FFT, FIO, ⎕MX, ⎕RVAL, or ⎕SQL.
   */
+/// the result of FunctionGroup::subfun_to_axis() for an unknown name. Not -1
+/// since ⎕FFT has negative function numbers (Bugs38 #95).
+static const sAxis SUBFUN_NOT_FOUND = INT16_MIN;
+
 class FunctionGroup
 {
 protected:
@@ -97,7 +101,7 @@ public:
       { return subfun_count != 0; }
 
    /// return a function number (pseudo-axis) for subfunction \b name,
-   /// or -1 if \b name is not a valid subfunction name
+   /// or SUBFUN_NOT_FOUND if \b name is not a valid subfunction name
    /// @param subfun_name the subfunction name to look up
    sAxis subfun_to_axis(const UCS_string & subfun_name) const;
 
@@ -121,7 +125,7 @@ public:
 
    /// complain about an invalid subfunctioon name
    /// @param number the invalid subfunction number that was requested
-   void bad_subfun_number_ERROR(int number) const GNUC__noreturn;
+   void bad_subfun_number_ERROR(APL_Integer number) const GNUC__noreturn;
 
    /// static texts before and after syntax tables
    enum Legend_type
@@ -335,6 +339,14 @@ public:
    /// return \b true iff \b this function is defined (= has an APL body)
    virtual bool is_defined() const   { return false; }
 
+   /// return \b true iff \b this function is defined or a derived function
+   /// with a defined operator or operand (at any depth). Such functions
+   /// have the identity as fill function (LRM Figure 20), while functions
+   /// derived from primitive operators and functions have the fill
+   /// function of their operand, no matter whether the operator is
+   /// implemented by a macro (Bugs40 #55)
+   virtual bool contains_defined() const   { return is_defined(); }
+
    /// return \b true iff \b this function is a derived function
    virtual bool is_derived() const
       { return false; }
@@ -352,6 +364,10 @@ public:
    virtual bool is_operator() const   { return false; }
 
    virtual bool is_scalar_function() const   { return false; }
+
+   /// return \b true iff the dyadic form of \b this is a scalar function
+   /// (not for ⍷, A~B, and A?B, Bugs40 #40)
+   virtual bool is_scalar_dyadic() const   { return is_scalar_function(); }
 
    /// return axis (non-0 only for derived functions)
    virtual Value_P * locate_X() const

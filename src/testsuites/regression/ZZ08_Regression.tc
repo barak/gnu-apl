@@ -1,0 +1,101 @@
+⍝ ZZZ8_Regression.tc
+⍝ ----------------------------------
+
+      ⍝ glue problem with scalar
+      ⍝ 
+      S←1
+      V1←,1
+      V2←1 2
+      
+
+      4 ⎕CR S 'b'
+┏→━━┓
+┃1 b┃
+┗+━━┛
+
+
+
+
+      4 ⎕CR V1 'b'
+┏→━━━━┓
+┃┏→┓ b┃
+┃┃1┃  ┃
+┃┗∼┛  ┃
+┗ϵ━━━━┛
+
+      4 ⎕CR V2 'b'
+┏→━━━━━━┓
+┃┏→━━┓ b┃
+┃┃1 2┃  ┃
+┃┗∼━━┛  ┃
+┗ϵ━━━━━━┛
+
+      ⍝ example from Elias Mårtenson
+      ⍝ 
+      2 1 ⍴ 10 11
+10
+11
+
+
+      x←2
+      x 1 ⍴ 10 11
+10
+11
+
+
+      value←2   ⍝ 'value' is now assigned the value 2
+      x←2 1     ⍝ x contains the list (2 1)
+      y←value 1 ⍝ y should be the same as x
+      x         ⍝ Let's confirm x's contents
+2 1
+      y         ⍝ y seems to be the same as x here
+2 1
+      x ⍴ 2 1   ⍝ Reshape with x works correctly
+2
+1
+
+      y ⍴ 2 1   ⍝ Reshape with x works correctly
+2
+1
+
+      ⍝ double parentheses example from Elias Mårtenson
+      ⍝
+      (('foo'))
+foo
+
+
+      ⍝ goto example from Elias Mårtenson
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ ⍎ of a bare →N branches into the harness itself
+      ⍎'→3'
+SYNTAX ERROR+
+      →3
+      ^
+      ]FILE_CTL NO_SKIP
+
+      →
+
+
+      ⍝ bad function example from Elias Mårtenson
+      ⍝
+      )ERASE foo zfn
+
+∇r←x zfn y
+  foo
+  r←x+y
+∇
+
+      10 zfn 20
+VALUE ERROR+
+zfn[1]  foo
+        ^
+
+      →
+
+
+      ∇r←x zfn y
+DEFN ERROR+
+      ∇r←x zfn y
+               ^
+
+

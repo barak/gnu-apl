@@ -32,6 +32,9 @@
 class Quad_TF : public QuadFunction
 {
 public:
+   /// overloaded Function::has_monadic_form(): ⎕TF is dyadic only
+   virtual bool has_monadic_form() const   { return false; }   // Bugs40 #56
+
    /// Constructor.
    Quad_TF() : QuadFunction(TOK_Quad_TF) {}
 
@@ -39,6 +42,13 @@ public:
    /// @param A left argument APL value (transfer format number)
    /// @param B right argument APL value (symbol name or data)
    virtual Token eval_AB(cValue_R A, cValue_R B) const;
+
+   /// assign \b value to \b symbol and return true, or return false if
+   /// the assignment failed (e.g. ⎕IO←7), without displaying an error
+   /// @param symbol the symbol to assign
+   /// @param value the new value
+   /// @param clone clone value
+   static bool safe_assign(Symbol & symbol, Value_P value, bool clone);
 
    /// return true if val contains an 1⎕TF or 2⎕TF record
    /// @param maybe_name string to test for transfer-format content

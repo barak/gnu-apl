@@ -77,6 +77,42 @@ class IO_Files
    friend class UserPreferences;
 
 public:
+   /// true if the line requested from get_file_line() is for the ∇-editor
+   static bool nabla_reading;
+
+   /// the APL input (⍞, ⎕, or ⎕INP) that requested the line from
+   /// get_file_line(), or 0 if the line is not for such an input
+   static const char * apl_reading;
+
+   /// set by get_file_line() when a testcase file ended while an APL input
+   /// (⍞, ⎕, or ⎕INP) was pending. That input shall then be abandoned
+   /// (with an INTERRUPT) before the testcase is ended (Bugs40 #2)
+   static bool abandon_apl_read;
+
+   /// the number of APL inputs abandoned in the current testcase file. A
+   /// second one means that the testcase has trapped the INTERRUPT (e.g.
+   /// with ⎕EA in a loop), and the test run is ended (Bugs41 #8)
+   static int abandoned_reads;
+
+   /// end the current testcase after a line error (--TM 5 or 6)
+   static void line_error_done();
+
+   /// finish a test run that is ended by )OFF or --OFF and return the
+   /// exit status (Bugs40 #78)
+   static int finish_tests(int exit_val, bool explicit_code);
+
+   /// stop (and maybe exit) after a testcase file with \b errors errors,
+   /// depending on --TM. Return true if stopped.
+   static bool stop_after_failed_file(int errors);
+
+   /// true if diff_error() has found a line error with --TM 5 or 6
+   static bool line_error_pending;
+
+   /// set by get_file_line() when a testcase file ended inside a ∇-editor
+   /// session or a multi-line string, which shall then be abandoned
+   /// (Bugs39 #52)
+   static bool abandon_input;
+
    /// count an error
    static void reset_errors()
       {
@@ -126,6 +162,12 @@ public:
    /// later captures CERR. No-op if no testcase file is currently being
    /// read.
    static void report_abnormal_exit();
+
+   /// set summary_path to summary.log in the directory of the first
+   /// testcase file, and truncate it
+   /// unless \b append (--TS). Called once, after all -T and --TL options
+   /// were parsed, so that all testcases of a run share one summary.log.
+   static void init_summary(bool append);
 
    /// the file path used by report_abnormal_exit() to persist a raw
    /// backtrace for the testcase file that is executing right now (the
@@ -227,6 +269,7 @@ protected:
    /// true until total error count is printed.
    static bool need_total;
 
+
    /// the number of testcases provided
    static int testcase_count;
 
@@ -257,7 +300,8 @@ protected:
    /// the current test report
    static ofstream current_testreport;
 
-   /// name of the summary file (same directory as first testcase).
+   /// name of the summary file (same directory as first testcase, see
+   /// init_summary()).
    static UTF8_string summary_path;
 
    /// when a .tc file was started

@@ -153,6 +153,14 @@ protected:
 
    /// return the product A×B of polynomilals A and B
    /// @param A left polynomial coefficient array
+
+   /// store a computed polynomial coefficient r + i×0J1 into Z (Bugs40 #27)
+   static void store_coefficient(Value & Z, double r, double i,
+                                 double tiny_r, double tiny_i);
+
+   /// return the largest magnitude of the first count items of V
+   static double max_magnitude(const cValue & V, ShapeItem count);
+
    /// @param B right polynomial coefficient array
    static Value_P polynomial_product(const cValue & A, const cValue & B);
 

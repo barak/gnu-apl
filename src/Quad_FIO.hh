@@ -470,6 +470,10 @@ protected:
    /// eval_XB case 51: mktime
    static Token eval_XB__51(Value_P B);
 
+   /// return V[idx] as an integer in the range min..max, or DOMAIN ERROR
+   static APL_Integer checked_int(const Value & V, ShapeItem idx,
+                                  APL_Integer min, APL_Integer max);
+
    /// eval_XB cases 52+53: localtime / gmtime
    static Token eval_XB__52(Value_P B, APL_Integer function_number);
 

@@ -1,0 +1,2582 @@
+⍝ Bugs41_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs41 )SAVE, )LOAD, )COPY, and )DUMP items.
+
+
+
+
+      ⍝ Bugs41 #5: a <Symbol> that occurs twice in an XML workspace is a corrupt
+      ⍝ file (it released the function of the first one, which was still in use)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      H←{⍵+1}
+
+
+
+
+      L←H
+
+
+
+
+      )WSID B41W5
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W5.xml'
+
+
+
+
+      D←⎕FIO[26] F
+
+
+
+
+      S←(⍸'<Symbol name="H"'⍷D)[1] ◊ B←(S-1)↓D ◊ E←8+(⍸'</Symbol>'⍷B)[1]
+
+
+
+
+      D←((S-1)↑D),(E↑B),(⎕UCS 10),B
+
+
+
+
+      P←18+(⍸'<SymbolTable size="'⍷D)[1] ◊ T←P↓D ◊ K←¯1+T⍳'"'
+
+
+
+
+      D←(P↑D),(⍕1+⍎K↑T),K↓T
+
+
+
+
+      H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W5
+)LOAD B41W5 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Symbol name="H"> occurs twice
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      H←{'old H ',⍕⍵}
+
+
+
+
+      )COPY B41W5
+
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Symbol name="H"> occurs twice
+
+
+      H 1
+old H 1
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W5
+³
+
+
+
+
+      ⍝ Bugs41 #6: a saved restart-PC must be the start of a statement of the body
+      ⍝ (the end of the body was accepted, and →⍬ then read past it)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←SY B' '''sy1''' 'Z←1+(+/)' 'Z←3'
+SY
+
+
+
+      SY 1
+sy1
+SYNTAX ERROR+
+SY[2]  Z←1+(+/)
+              ^
+      )WSID B41W6
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W6.xml' ◊ D←⎕FIO[26] F ◊ P←11+(⍸'restart-PC="'⍷D)[1] ◊ T←P↓D ◊ K←¯1+T⍳'"' ◊ K↑T
+2
+
+
+
+      D←(P↑D),'16',K↓T ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W6
+)LOAD B41W6 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Parser restart-PC="16"> is not the start of a statement
+
+
+      )SI
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←SY B' '''sy1''' 'Z←1+(+/)' 'Z←3'
+SY
+
+
+
+      SY 1
+sy1
+SYNTAX ERROR+
+SY[2]  Z←1+(+/)
+              ^
+      )WSID B41W6
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W6.xml' ◊ D←⎕FIO[26] F ◊ P←11+(⍸'restart-PC="'⍷D)[1] ◊ T←P↓D ◊ K←¯1+T⍳'"' ◊ K↑T
+2
+
+
+
+      D←(P↑D),'7',K↓T ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W6
+)LOAD B41W6 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Parser restart-PC="7"> is not the start of a statement
+
+
+      )SI
+
+
+
+
+      )DROP B41W6
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #7: )SAVE and )LOAD after (1↑↑↑N)←9 into a 3-level nested scalar
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      N←⊂⊂⊂1 2 ◊ (1↑↑↑N)←9
+
+
+
+
+      )WSID B41W7
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B41W7
+³
+
+
+
+      (≡N) (N≡9)
+0 1
+
+
+
+      )DROP B41W7
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #12: an end of file in the )SI part of an XML workspace (e.g. a missing
+      ⍝ </Parser> or </SI-entry>) is a corrupt file (it hung forever)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 1
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W12
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W12.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'</Parser>' '' ◊ P←¯1↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W12
+)LOAD B41W12 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: end of file in Parser
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 1
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W12
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W12.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'</SI-entry>' '<!x>' ◊ P←¯1↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W12
+)LOAD B41W12 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: end of file in SI-entry
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 1
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W12
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W12.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'</Parser>' '<!x>' ◊ P←¯1↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W12
+)LOAD B41W12 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: end of file in Parser
+
+
+      )DROP B41W12
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #13: a ref="true" at level 0 to a ∇-function of another symbol is a
+      ⍝ corrupt file (only a lambda can have a second name)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B+1'
+F
+
+
+
+      G←5
+
+
+
+
+      )WSID B41W13
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W13.xml' ◊ D←⎕FIO[26] F ◊ Q←(⍸'<Symbol name="F"'⍷D)[1] ◊ P←Q+14+(⍸'<Function fid="'⍷Q↓D)[1] ◊ FID←(¯1+(P↓D)⍳'"')↑P↓D ◊ 2↑FID
+0x
+
+
+
+      Q←(⍸'<Symbol name="G"'⍷D)[1] ◊ P←Q+(⍸'<Variable vid="'⍷Q↓D)[1] ◊ K←(P-1)↓D ◊ K←(K⍳'>')↑K ◊ 15↑K
+<Variable vid="
+
+
+
+      D←((P-1)↑D),'<Function fid="',FID,'" ref="true"/>',(P+¯1+⍴K)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W13
+)LOAD B41W13 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Symbol name="G"> refers to the ∇-function F
+
+
+      )COPY B41W13
+
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Symbol name="G"> refers to the ∇-function F
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W13
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #14: a suspended ∇-function whose pc is not in one of its lines (H's
+      ⍝ body line deleted from the file) or that cannot be ⎕FX'ed (F's header deleted)
+      ⍝ is a corrupt )SI
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      ⎕FX 'Z←H B' 'Z←F B'
+H
+
+
+
+      H 1
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W14
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W14.xml' ◊ D←19 ⎕CR ⎕FIO[26] F ◊ P←¯1↑⍸'²Z←F B⁰¹A'⍷D ◊ D←18 ⎕CR ((P-1)↑D),(P+9)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W14
+)LOAD B41W14 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: SI-entry pc=3 out of range (body has 1 tokens)
+
+
+      )SIS
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      ⎕FX 'Z←H B' 'Z←F B'
+H
+
+
+
+      H 1
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W14
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W14.xml' ◊ D←19 ⎕CR ⎕FIO[26] F ◊ P←1↑⍸'²Z←F B⁰¹A'⍷D ◊ D←18 ⎕CR ((P-1)↑D),(P+9)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W14
+)LOAD B41W14 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: SI-entry of F, which is not a defined function
+
+
+      )SIS
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W14
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #15: <Variable vid="-1"/> (a stale variable) on a local level still
+      ⍝ creates that level, so that the )SI frame pops it and not the global level
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      Q←'global'
+
+
+
+
+      ⎕FX 'Z←F B;Q;⎕IO' 'Q←''local'' ◊ ⎕IO←0' 'Z←B÷0'
+F
+
+
+
+      F 1
+DOMAIN ERROR
+F[2]  Z←B÷0
+        ^^
+
+      )WSID B41W15
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W15.xml' ◊ D←19 ⎕CR ⎕FIO[26] F
+
+
+
+
+      ∇Z←ZZ15 NAME;P;K
+
+
+
+
+       P←(⍸('<Symbol name="',NAME,'"')⍷D)[1] ◊ P←P+(⍸'<Variable vid="'⍷P↓D)[2]
+
+
+
+
+       K←(P-1)↓D ◊ K←(K⍳'>')↑K ◊ Z←((P-1)↑D),'<Variable vid="-1"/>',(P+¯1+⍴K)↓D
+
+
+
+
+      ∇
+
+
+
+
+      D←ZZ15 'Q' ◊ D←ZZ15 '⎕IO' ◊ H←'w' ⎕FIO[3] F ◊ N←(18 ⎕CR D) ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W15
+³
+
+
+
+      )SI
+F[2]
+*
+
+
+      )SIC
+
+
+
+
+      Q
+global
+
+
+
+      ⍳3
+1 2 3
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W15
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #16: the )SI entries of a workspace must have the levels of the
+      ⍝ symbols that they localize (here μ1/μ3 of the macro of {⍵÷0}¨); a refused
+      ⍝ )LOAD keeps the macro symbols intact, so that a good file loads later
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      {⍵÷0}¨1 2
+DOMAIN ERROR
+λ1[1]  λ←⍵÷0
+         ^^
+
+      )WSID B41W16
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      G←'testcases/libroot/workspaces/B41W16.xml' ◊ D0←19 ⎕CR ⎕FIO[26] G
+
+
+
+
+      ∇ZZ16 D;H;N
+
+
+
+
+       H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B41W16X.xml' ◊ N←(18 ⎕CR D) ⎕FIO[7] H ◊ ⎕FIO[4] H
+
+
+
+
+      ∇
+
+
+
+
+      P←(⍸'<Symbol name="μ3" stack-size="2">'⍷D0)[1] ◊ ZZ16 ((P+13)↑D0),'QQ',(P+15)↓D0
+0
+
+
+
+      )LOAD B41W16X
+)LOAD B41W16X failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: SI-entry of μ3 with bad symbol-level=1
+
+
+      )LOAD B41W16X
+)LOAD B41W16X failed: DOMAIN ERROR
+
+
+
+      )LOAD B41W16
+³
+
+
+
+      )SI
+λ1[1]
+*
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )CLEAR
+CLEAR WS
+
+
+
+      G←'testcases/libroot/workspaces/B41W16.xml' ◊ D0←19 ⎕CR ⎕FIO[26] G
+
+
+
+
+      ∇ZZ16 D;H;N
+
+
+
+
+       H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B41W16X.xml' ◊ N←(18 ⎕CR D) ⎕FIO[7] H ◊ ⎕FIO[4] H
+
+
+
+
+      ∇
+
+
+
+
+      P←(⍸'<Symbol name="μ1" stack-size="2">'⍷D0)[1] ◊ T←P↓D0 ◊ E←(⍸'</Symbol>'⍷T)[1] ◊ L←(⍸'<Variable'⍷T)[1] ◊ T←((L-1)↑T),(E-1)↓T ◊ ZZ16 ((P+29)↑D0),'1',(P+30)↓(P↑D0),T
+0
+
+
+
+      )LOAD B41W16X
+)LOAD B41W16X failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: a local variable of an SI-entry has no level for it
+
+
+      )LOAD B41W16X
+)LOAD B41W16X failed: DOMAIN ERROR
+
+
+
+      )SIC
+
+
+
+
+      )LOAD B41W16
+³
+
+
+
+      )SI
+λ1[1]
+*
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W16
+³
+
+
+
+      )DROP B41W16X
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #17: a <Symbol> with an unknown ⎕-name or a name that starts with a
+      ⍝ digit is skipped (with a warning); it ended the interpreter
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V←1 2 3
+
+
+
+
+      )WSID B41W17
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W17.xml' ◊ D←19 ⎕CR ⎕FIO[26] F
+
+
+
+
+      P←(⍸'<Symbol name="⎕FC"'⍷D)[1] ◊ D←((P+16)↑D),'X',(P+16)↓D
+
+
+
+
+      P←(⍸'<Symbol name="V"'⍷D)[1] ◊ D←((P+13)↑D),'16',(P+14)↓D
+
+
+
+
+      H←'w' ⎕FIO[3] F ◊ N←(18 ⎕CR D) ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W17
+³
+
+
+
+      )VARS
+
+
+
+
+      ⎕FC
+.,*0_¯
+
+
+
+      )COPY B41W17
+³
+
+
+
+      )VARS
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W17
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #23: an anonymous lambda as the operand (or operator) of a derived
+      ⍝ function on the )SI is restored by )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V←⍳3
+
+
+
+
+      ⎕FX 'Z←F X' 'Z←1 {÷⍵}¨ X'
+F
+
+
+
+      F 0
+VALENCE ERROR
+F[1]  Z←1{÷⍵}¨X
+        ^^
+
+      1 {÷⍵}⍤0 ⊢0
+VALENCE ERROR
+      1({÷⍵})⍤0⊢0
+      ^^
+
+      1 -{⍶ ⍵} 0
+VALENCE ERROR
+      1-{⍶ ⍵}0
+      ^^
+
+      )WSID B41W23
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B41W23
+³
+
+
+
+      V
+1 2 3
+
+
+
+      )SI
+*
+*
+F[1]
+*
+      )SIC
+
+
+
+
+      F 0
+VALENCE ERROR
+F[1]  Z←1{÷⍵}¨X
+        ^^
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W23
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #32: )COPY or )PCOPY of only the second name H of a lambda F (H←F)
+      ⍝ copies the lambda (it silently copied nothing)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←{⍵}
+
+
+
+
+      H←F
+
+
+
+
+      G←{⍵+1}
+
+
+
+
+      K←G
+
+
+
+
+      )WSID B41W32
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W32 H
+³
+
+
+
+      ⎕NL 3
+H
+
+
+
+      H 6
+6
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )PCOPY B41W32 K
+³
+
+
+
+      K 6
+7
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W32 F H
+³
+
+
+
+      )ERASE F
+
+
+
+
+      H 7
+7
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W32
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #33: )COPY ws NAME copies every value reachable from NAME, also a
+      ⍝ sub-value whose recorded parent= is another (not copied) variable
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←1 (2 3) 'xy'
+
+
+
+
+      B←2⊃A
+
+
+
+
+      C←A
+
+
+
+
+      S.a←1 2 ◊ S.b.c←'deep' ◊ S.n←⊂⊂'q' ◊ S.e←0⍴⊂'xy' ◊ S.z←1E¯11 'a'
+
+
+
+
+      T←S
+
+
+
+
+      X←S.b
+
+
+
+
+      R2←S.b.c 1
+
+
+
+
+      U←1 2 3
+
+
+
+
+      D←U U
+
+
+
+
+      E←U 5
+
+
+
+
+      )ERASE U
+
+
+
+
+      )WSID B41W33
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 B
+³
+
+
+
+      B
+2 3
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )PCOPY B41W33 B
+³
+
+
+
+      B
+2 3
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 S
+³
+
+
+
+      S.b.c ◊ S.a ◊ S.z
+deep
+1 2
+1E¯11 a
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 T
+³
+
+
+
+      T.b.c
+deep
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 X
+³
+
+
+
+      X.c
+deep
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 D
+³
+
+
+
+      D
+ 1 2 3  1 2 3 
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W33 E
+³
+
+
+
+      E
+ 1 2 3  5 
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W33
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #34: a λ + digit inside a name of a ∇-header (a function Nλ1, a
+      ⍝ local ;λ1, an operand λ5) does not make )LOAD or )COPY fix it as a lambda
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←M B;λ1' 'λ1←B×2' 'Z←λ1+1'
+M
+
+
+
+      ⎕FX 'Z←Nλ1 B' 'Z←B+100'
+Nλ1
+
+
+
+      ⎕FX 'Z←(λ5 Q) B' 'Z←λ5 B'
+Q
+
+
+
+      ⎕FX 'Z←A Tλ2x B' 'Z←A-B'
+Tλ2x
+
+
+
+      L←{⍺+⍵} ◊ K←{⍵} ◊ O←{⍶ ⍵} ◊ P←{⍺ ⍶ ⍵} ◊ R←{⍺ ⍵}
+
+
+
+
+      )WSID B41W34
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B41W34
+³
+
+
+
+      ⎕CR 'M'
+Z←M B;λ1
+λ1←B×2  
+Z←λ1+1  
+
+      M 3
+7
+
+
+
+      Nλ1 3
+103
+
+
+
+      - Q 3
+¯3
+
+
+
+      5 Tλ2x 3
+2
+
+
+
+      1 L 2
+3
+
+
+
+      K 3
+3
+
+
+
+      - O 3
+¯3
+
+
+
+      1 - P 2
+¯1
+
+
+
+      1 R 2
+1 2
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B41W34 M Nλ1
+³
+
+
+
+      M 3
+7
+
+
+
+      Nλ1 3
+103
+
+
+
+      )DROP B41W34
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #36: a )COPY file that ends inside a """ string abandons the string
+      ⍝ (it swallowed the lines of the caller)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F36←'testcases/libroot/workspaces/B41M36.apl' ◊ ('#!x' 'X←1' 'Y←"""' 'abc') ⎕FIO[56] F36
+22
+
+
+
+      )COPY B41M36.apl
+³
+
+
+
+      'after copy'
+after copy
+
+
+
+      B←2
+
+
+
+
+      B
+2
+
+
+
+      ⎕NC 'Y'
+0
+
+
+
+      X
+1
+
+
+
+      ⎕FIO[19] F36
+0
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #37: )SAVE escapes the WSID in the file, so that a name with > or "
+      ⍝ can be )LOADed again
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←42
+
+
+
+
+      )WSID B41x>y
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B41x>y
+³
+
+
+
+      A
+42
+
+
+
+      )WSID
+IS B41x>y
+
+
+
+      )WSID B41p"q
+WAS B41x>y
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B41p"q
+³
+
+
+
+      )WSID
+IS B41p"q
+
+
+
+      ⍝ Bugs41 #38: )LOAD restores the WSID that )SAVE or )DUMP stored in the file.
+
+
+
+
+      ⍝ A copy of a .xml file keeps the WSID of the original (the WSID is the name
+
+
+
+
+      ⍝ of the workspace, not of the file).
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←'original a'
+
+
+
+
+      )WSID B41a
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B41a.xml' ◊ H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B41b.xml' ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )WSID OTHER
+WAS CLEAR WS
+
+
+
+      )LOAD B41b
+³
+
+
+
+      )WSID
+IS B41a
+
+
+
+      A
+original a
+
+
+
+      ⍝ )DUMP writes a )WSID near the end of the file, which )LOAD executes
+
+
+
+
+      ⍝ silently and )COPY ignores
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←'dumped'
+
+
+
+
+      )WSID B41D38
+WAS CLEAR WS
+
+
+
+      )DUMP B41D38x
+³
+
+
+
+      )WSID OTHER
+WAS B41D38
+
+
+
+      )LOAD B41D38x
+³
+
+
+
+      )WSID
+IS B41D38
+
+
+
+      A
+dumped
+
+
+
+      )WSID KEEP
+WAS B41D38
+
+
+
+      )COPY B41D38x.apl A
+³
+
+
+
+      )WSID
+IS KEEP
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B41D38x.apl'
+0
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )DROP B41x>y
+³
+
+
+
+      )DROP B41p"q
+³
+
+
+
+      )DROP B41a
+³
+
+
+
+      )DROP B41b
+³
+
+
+
+
+      ⍝ Bugs41 #54: )SAVE and )LOAD keep the assignment state of a suspended indexed
+      ⍝ assignment with a partly built index
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V←⍳5
+
+
+
+
+      V[N]←0
+VALUE ERROR+
+      V[N]←0
+        ^
+
+      )WSID B41W54
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B41W54
+³
+
+
+
+      N←2
+
+
+
+
+      →⍳0
+
+
+
+
+      V
+1 0 3 4 5
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←2 3⍴⍳6
+
+
+
+
+      A[V0;2]←9
+VALUE ERROR+
+      A[V0;2]←9
+        ^
+
+      )WSID B41W54
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B41W54
+³
+
+
+
+      V0←1
+
+
+
+
+      →⍬
+
+
+
+
+      A
+1 9 3
+4 5 6
+
+
+      )DROP B41W54
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #55: a refused )COPY leaves the error of a suspended function alone
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      G←'file G'
+
+
+
+
+      ZV←1 2 3
+
+
+
+
+      )WSID B41W55
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B41W55.xml' ◊ P←(⍸'<Variable vid="'⍷D)[2] ◊ D[P+15]←'9' ◊ D[P+16]←'9'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B41W55.xml' ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      ⎕FX 'F' 'Q+1' '''after'''
+F
+
+
+
+      F
+VALUE ERROR+
+F[1]  Q+1
+      ^
+
+      )COPY B41W55
+
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: Variable vid=99 for ZV out of range (0..24)
+
+
+      ⎕ET
+3 1
+
+
+
+      ⎕EM
+VALUE ERROR+
+F[1]  Q+1   
+      ^     
+
+      Q←1
+
+
+
+
+      →⍬
+2
+after
+
+
+      )DROP B41W55
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #57: an index token beyond the <Parser size=…> is a corrupt file (it
+      ⍝ was parked where nothing freed it)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      Q[1;2],⍳3
+VALUE ERROR+
+      Q[1;2],⍳3
+      ^
+
+      )WSID B41W57
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W57.xml' ◊ D←⎕FIO[26] F ◊ T←'<Token pc="-1" tag="0x56020011"/>' ◊ P←(⊃⍸T⍷D)+¯1+⍴T
+
+
+
+
+      D←(P↑D),(⎕UCS 10),'<Token pc="0" tag="0x808" index="vid_1"/>',P↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W57
+³
+
+
+
+      )MORE
+NO )MORE ERROR INFO
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )CLEAR
+CLEAR WS
+
+
+
+      Q[1;2],⍳3
+VALUE ERROR+
+      Q[1;2],⍳3
+      ^
+
+      )WSID B41W57
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W57.xml' ◊ D←⎕FIO[26] F ◊ T←'<Token pc="-1" tag="0x56020011"/>' ◊ P←(⊃⍸T⍷D)+¯1+⍴T
+
+
+
+
+      D←(P↑D),(⎕UCS 10),'<Token pc="0" tag="0x808" index="vid_1,vid_1"/>',P↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W57
+)LOAD B41W57 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: an index beyond the <Parser size="3">
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B41W57
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #58: an assign-pending, action, or error code out of range is a
+      ⍝ corrupt file (no cast of arbitrary numbers to enums)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 3
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W58
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W58.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'assign-pending="0"' 'assign-pending="-1"' ◊ P←↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W58
+)LOAD B41W58 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Parser assign-pending="¯1" action="3">
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 3
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W58
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W58.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'action="' 'action="100' ◊ P←↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W58
+)LOAD B41W58 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Parser assign-pending="0" action="1003">
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←F B' 'Z←B÷0'
+F
+
+
+
+      F 3
+DOMAIN ERROR
+F[1]  Z←B÷0
+        ^^
+
+      )WSID B41W58
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B41W58.xml' ◊ D←⎕FIO[26] F ◊ (OLD NEW)←'<Error code="' '<Error code="-2' ◊ P←↑⍸OLD⍷D
+
+
+
+
+      D←((P-1)↑D),NEW,(P+¯1+⍴OLD)↓D ◊ H←'w' ⎕FIO[3] F ◊ N←D ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )LOAD B41W58
+)LOAD B41W58 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: <Error code="¯2327684">
+
+
+      )DROP B41W58
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #86: )DUMP and )LOAD keep a CR in a string literal of a function
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←ZZ86' ('Z←''a',(⎕UCS 13),'b''')
+ZZ86
+
+
+
+      ⍎'L86←{''a',(⎕UCS 13),'b'',⍵}'
+
+
+
+
+      )DUMP B41D86
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B41D86.apl
+³
+
+
+
+      ⎕UCS ZZ86
+97 13 98
+
+
+
+      ⎕UCS L86 'z'
+97 13 98 122
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B41D86.apl'
+0
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs41 #87: )IN and )PIN report objects that are not in the transfer file
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      A←1 2 3 ◊ B←'xy'
+
+
+
+
+      )OUT B41O87
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )IN B41O87 Q
+NOT FOUND: Q
+
+
+
+      )PIN B41O87 Q A
+NOT FOUND: Q
+
+
+
+      A
+1 2 3
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B41O87.atf'
+0
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )SIC
+
+
+
+

@@ -34,7 +34,7 @@
 ErrorCode
 RealCell::bif_circle_fun(Cell * Z, const Cell * A) const
 {
-   if (!A->is_near_int())   return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())   return E_DOMAIN_ERROR;   // Bugs38 #93
 
    // do_bif_circle_fun() has several cases (e.g. fun 3 = tan, 4, 8, ¯8)
    // that can overflow to Inf for large but perfectly ordinary finite B
@@ -56,7 +56,7 @@ const ErrorCode ret = do_bif_circle_fun(Z, A->get_checked_near_int(), b);
 ErrorCode
 RealCell::bif_circle_fun_inverse(Cell * Z, const Cell * A) const
 {
-   if (!A->is_near_int())   return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())   return E_DOMAIN_ERROR;   // Bugs38 #93
 const APL_Integer fun = A->get_checked_near_int();
 const APL_Float b = get_real_value();   // see bif_circle_fun() above
    switch (fun)
@@ -160,8 +160,13 @@ RealCell::do_bif_circle_fun(Cell * Z, APL_Integer fun, APL_Float b)
                     // b ≤ ¯1 gives the negative root (APL2 LRM Figure
                     // 18, Bugs35 #26), see ComplexCell case -4.
                     //
+                    // (|b|-1)×(|b|+1) is exact near |b| = 1, where
+                    // 1-1÷b² lost half of the digits (Bugs41 #84)
+                    //
                     const double arg = 1.0 - 1.0/(b*b);
-                    const double mag = abs_b * sqrt(arg < 0.0 ? 0.0 : arg);
+                    const double mag = abs_b < 1E150
+                          ? sqrt((abs_b - 1.0)*(abs_b + 1.0))
+                          : abs_b * sqrt(arg < 0.0 ? 0.0 : arg);
                     return FloatCell::zF(Z, b < 0.0 ? 0.0 - mag : mag);
                   }
                return ComplexCell::do_bif_circle_fun(Z, -4, APL_Complex(b));
@@ -179,7 +184,8 @@ RealCell::do_bif_circle_fun(Cell * Z, APL_Integer fun, APL_Float b)
 
         case 0:
              {
-               const APL_Float b2 = 1.0 - b*b;
+               // (1-b)×(1+b), not 1-b×b: exact near |b| = 1 (Bugs41 #84)
+               const APL_Float b2 = (1.0 - b)*(1.0 + b);
                if (b2 >= 0.0)   return FloatCell::zF(Z, sqrt(b2));
                return ComplexCell::do_bif_circle_fun(Z, 0, APL_Complex(b));
              }

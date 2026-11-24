@@ -1,0 +1,445 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+
+<!DOCTYPE Workspace
+[
+    <!ELEMENT Workspace (Function*, Value*, Ravel*, SymbolTable,
+                         Symbol*, Commands?, StateIndicator)>
+    <!ATTLIST Workspace  wsid       CDATA #REQUIRED>
+    <!ATTLIST Workspace  year       CDATA #REQUIRED>
+    <!ATTLIST Workspace  month      CDATA #REQUIRED>
+    <!ATTLIST Workspace  day        CDATA #REQUIRED>
+    <!ATTLIST Workspace  hour       CDATA #REQUIRED>
+    <!ATTLIST Workspace  minute     CDATA #REQUIRED>
+    <!ATTLIST Workspace  second     CDATA #REQUIRED>
+    <!ATTLIST Workspace  timezone   CDATA #REQUIRED>
+    <!ATTLIST Workspace  saving_SVN CDATA #REQUIRED>
+    <!ATTLIST Workspace  syntax     CDATA #IMPLIED>
+
+        <!ELEMENT Value (#PCDATA)>
+        <!ATTLIST Value flg    CDATA #REQUIRED>
+        <!ATTLIST Value vid    CDATA #REQUIRED>
+        <!ATTLIST Value parent CDATA #IMPLIED>
+        <!ATTLIST Value rk     CDATA #REQUIRED>
+        <!ATTLIST Value sh-0   CDATA #IMPLIED>
+        <!ATTLIST Value sh-1   CDATA #IMPLIED>
+        <!ATTLIST Value sh-2   CDATA #IMPLIED>
+        <!ATTLIST Value sh-3   CDATA #IMPLIED>
+        <!ATTLIST Value sh-4   CDATA #IMPLIED>
+        <!ATTLIST Value sh-5   CDATA #IMPLIED>
+        <!ATTLIST Value sh-6   CDATA #IMPLIED>
+        <!ATTLIST Value sh-7   CDATA #IMPLIED>
+
+        <!ELEMENT Ravel (#PCDATA)>
+        <!ATTLIST Ravel vid    CDATA #REQUIRED>
+        <!ATTLIST Ravel bytes  CDATA #IMPLIED>
+        <!ATTLIST Ravel cells  CDATA #IMPLIED>
+        <!ATTLIST Ravel depth  CDATA #IMPLIED>
+
+        <!ELEMENT SymbolTable (Symbol*)>
+        <!ATTLIST SymbolTable size CDATA #REQUIRED>
+
+            <!ELEMENT Symbol (unused-name | Variable | Function|
+                              Label       | Shared-Variable)*>
+            <!ATTLIST Symbol name       CDATA #REQUIRED>
+            <!ATTLIST Symbol stack-size CDATA #REQUIRED>
+
+                <!ELEMENT unused-name EMPTY>
+
+                <!ELEMENT Variable (#PCDATA)>
+                <!ATTLIST Variable vid CDATA #REQUIRED>
+
+                <!ELEMENT Function (UCS*)>
+                <!ATTLIST Function fid             CDATA #REQUIRED>
+                <!ATTLIST Function creation-time   CDATA #IMPLIED>
+                <!ATTLIST Function LO-fid          CDATA #IMPLIED>
+                <!ATTLIST Function OPER-fid        CDATA #IMPLIED>
+                <!ATTLIST Function RO-fid          CDATA #IMPLIED>
+                <!ATTLIST Function AXIS-vid        CDATA #IMPLIED>
+                <!ATTLIST Function exec-properties CDATA #IMPLIED>
+                <!ATTLIST Function stop-lines      CDATA #IMPLIED>
+                <!ATTLIST Function trace-lines     CDATA #IMPLIED>
+                <!ATTLIST Function macro           CDATA #IMPLIED>
+                <!ATTLIST Function tag             CDATA #IMPLIED>
+
+                <!ELEMENT Label (#PCDATA)>
+                <!ATTLIST Label value CDATA #REQUIRED>
+
+                <!ELEMENT Shared-Variable (#PCDATA)>
+                <!ATTLIST Shared-Variable key CDATA #REQUIRED>
+
+        <!ELEMENT UCS (#PCDATA)>
+        <!ATTLIST UCS uni CDATA #REQUIRED>
+
+        <!ELEMENT Commands (Command*)>
+        <!ATTLIST Commands size CDATA #REQUIRED>
+
+            <!ELEMENT Command (#PCDATA)>
+            <!ATTLIST Command name       CDATA #REQUIRED>
+            <!ATTLIST Command mode       CDATA #REQUIRED>
+            <!ATTLIST Command fun        CDATA #REQUIRED>
+
+        <!ELEMENT StateIndicator (SI-entry*)>
+        <!ATTLIST StateIndicator levels CDATA #REQUIRED>
+
+            <!ELEMENT SI-entry ((Execute | Statements | UserFunction),
+                                Parser+, Error?)>
+            <!ATTLIST SI-entry level     CDATA #REQUIRED>
+            <!ATTLIST SI-entry pc        CDATA #REQUIRED>
+            <!ATTLIST SI-entry line      CDATA #REQUIRED>
+
+                <!ELEMENT Error (UCS, UCS)>
+                <!ATTLIST Error code         CDATA #REQUIRED>
+                <!ATTLIST Error left-caret   CDATA #REQUIRED>
+                <!ATTLIST Error right-caret  CDATA #REQUIRED>
+                <!ATTLIST Error show-locked  CDATA #REQUIRED>
+
+                <!ELEMENT Statements (UCS)>
+
+                <!ELEMENT Execute (UCS)>
+
+                <!ELEMENT UserFunction (#PCDATA)>
+                <!ATTLIST UserFunction ufun-name       CDATA #IMPLIED>
+                <!ATTLIST UserFunction macro-num       CDATA #IMPLIED>
+                <!ATTLIST UserFunction lambda-name     CDATA #IMPLIED>
+                <!ATTLIST UserFunction symbol-level    CDATA #IMPLIED>
+
+                <!ELEMENT Parser (Token*, Function*)>
+                <!ATTLIST Parser size           CDATA #REQUIRED>
+                <!ATTLIST Parser assign-pending CDATA #REQUIRED>
+                <!ATTLIST Parser lookahead-high CDATA #REQUIRED>
+                <!ATTLIST Parser action         CDATA #REQUIRED>
+                <!ATTLIST Parser prefix-len     CDATA #IMPLIED>
+                    <!ELEMENT Token (#PCDATA)>
+                    <!ATTLIST Token pc           CDATA #REQUIRED>
+                    <!ATTLIST Token tag          CDATA #REQUIRED>
+                    <!ATTLIST Token char         CDATA #IMPLIED>
+                    <!ATTLIST Token int          CDATA #IMPLIED>
+                    <!ATTLIST Token float        CDATA #IMPLIED>
+                    <!ATTLIST Token real         CDATA #IMPLIED>
+                    <!ATTLIST Token imag         CDATA #IMPLIED>
+                    <!ATTLIST Token sym          CDATA #IMPLIED>
+                    <!ATTLIST Token line         CDATA #IMPLIED>
+                    <!ATTLIST Token vid          CDATA #IMPLIED>
+                    <!ATTLIST Token index        CDATA #IMPLIED>
+                    <!ATTLIST Token fun-id       CDATA #IMPLIED>
+                    <!ATTLIST Token ufun-name    CDATA #IMPLIED>
+                    <!ATTLIST Token symbol-level CDATA #IMPLIED>
+                    <!ATTLIST Token comment      CDATA #IMPLIED>
+
+]>
+
+    <!-- hour/minute/second is )SAVE time in UTC (aka. GMT).
+         timezone is +/- offset to UTC in seconds.
+         local time is UTC + offset -->
+
+<Workspace wsid="LEGACY38" year="2026" month="11" day="5"
+           hour="16" minute="47" second="26" timezone="3600"
+           saving_SVN=" 3891" syntax="1.15.8">
+
+  <!-- system functions and primitives... -->
+  <Function fid="0x5647634C4980" tag="0x41010907"/>   <!-- primitive: ⎕AF -->
+  <Function fid="0x5647634C48E0" tag="0x41090907"/>   <!-- primitive: ⎕AT -->
+  <Function fid="0x5647634C4B00" tag="0x430B0907"/>   <!-- primitive: ⎕CC -->
+  <Function fid="0x5647634CD0C0" tag="0x43080907"/>   <!-- primitive: ⎕CR -->
+  <Function fid="0x5647634C4840" tag="0x44040907"/>   <!-- primitive: ⎕DL -->
+  <Function fid="0x5647634C4CC0" tag="0x44070907"/>   <!-- primitive: ⎕DLX -->
+  <Function fid="0x5647634C47A0" tag="0x45010907"/>   <!-- primitive: ⎕EA -->
+  <Function fid="0x5647634C4700" tag="0x45130907"/>   <!-- primitive: ⎕EB -->
+  <Function fid="0x5647634CD020" tag="0x45030907"/>   <!-- primitive: ⎕EC -->
+  <Function fid="0x5647634C4660" tag="0x45090907"/>   <!-- primitive: ⎕ENV -->
+  <Function fid="0x5647634CCF80" tag="0x450D0907"/>   <!-- primitive: ⎕ES -->
+  <Function fid="0x5647634C45C0" tag="0x45100907"/>   <!-- primitive: ⎕EX -->
+  <Function fid="0x5647634C4D80" tag="0x46070907"/>   <!-- primitive: ⎕FFT -->
+  <Function fid="0x5647634C4E20" tag="0x46060907"/>   <!-- primitive: ⎕FIO -->
+  <Function fid="0x5647634C4EE0" tag="0x46050907"/>   <!-- primitive: ⎕FX -->
+  <Function fid="0x5647634C4FE0" tag="0x47020907"/>   <!-- primitive: ⎕GTK -->
+  <Function fid="0x5647634C5120" tag="0x4D040907"/>   <!-- primitive: ⎕MAP -->
+  <Function fid="0x5647634C6580" tag="0x4D050907"/>   <!-- primitive: ⎕MX -->
+  <Function fid="0x5647634C4520" tag="0x49060907"/>   <!-- primitive: ⎕INP -->
+  <Function fid="0x5647634C4480" tag="0x4E010907"/>   <!-- primitive: ⎕NA -->
+  <Function fid="0x5647634C43E0" tag="0x4E030907"/>   <!-- primitive: ⎕NC -->
+  <Function fid="0x5647634C4340" tag="0x4E040907"/>   <!-- primitive: ⎕NL -->
+  <Function fid="0x5647634C66C0" tag="0x500B0907"/>   <!-- primitive: ⎕PLOT -->
+  <Function fid="0x5647634C67A0" tag="0x500C0907"/>   <!-- primitive: ⎕PNG -->
+  <Function fid="0x5647634C6880" tag="0x53130907"/>   <!-- primitive: ⎕RE -->
+  <Function fid="0x5647634C6940" tag="0x52160907"/>   <!-- primitive: ⎕RVAL -->
+  <Function fid="0x5647634C42A0" tag="0x53040907"/>   <!-- primitive: ⎕SI -->
+  <Function fid="0x5647634C6D00" tag="0x53160907"/>   <!-- primitive: ⎕SQL -->
+  <Function fid="0x5647634C7080" tag="0x530B0907"/>   <!-- primitive: ⎕SVC -->
+  <Function fid="0x5647634C6FE0" tag="0x530D0907"/>   <!-- primitive: ⎕SVO -->
+  <Function fid="0x5647634C6F40" tag="0x530E0907"/>   <!-- primitive: ⎕SVQ -->
+  <Function fid="0x5647634C6EA0" tag="0x530F0907"/>   <!-- primitive: ⎕SVR -->
+  <Function fid="0x5647634C6E00" tag="0x53100907"/>   <!-- primitive: ⎕SVS -->
+  <Function fid="0x5647634C4160" tag="0x53150907"/>   <!-- primitive: ⎕STOP -->
+  <Function fid="0x5647634C7120" tag="0x54030907"/>   <!-- primitive: ⎕TF -->
+  <Function fid="0x5647634C5080" tag="0x4A020907"/>   <!-- primitive: ⎕JSON -->
+  <Function fid="0x5647634C7200" tag="0x58020907"/>   <!-- primitive: ⎕XML -->
+  <Function fid="0x5647634C40C0" tag="0x54080907"/>   <!-- primitive: ⎕TRACE -->
+  <Function fid="0x5647634C4200" tag="0x55010907"/>   <!-- primitive: ⎕UCS -->
+  <Function fid="0x5647634B4620" tag="0x43040907"/>   <!-- primitive: , -->
+  <Function fid="0x5647634B4580" tag="0x43050907"/>   <!-- primitive: ⍪ -->
+  <Function fid="0x5647634B46C0" tag="0x44050907"/>   <!-- primitive: ⌹ -->
+  <Function fid="0x5647634B4BC0" tag="0x46040907"/>   <!-- primitive: ⍕ -->
+  <Function fid="0x5647634B4A80" tag="0x49020907"/>   <!-- primitive: ⍳ -->
+  <Function fid="0x5647634B4D00" tag="0x50010907"/>   <!-- primitive: ⊂ -->
+  <Function fid="0x5647634B4C60" tag="0x50020907"/>   <!-- primitive: ⊃ -->
+  <Function fid="0x5647634B5020" tag="0x53070907"/>   <!-- primitive: ⍋ -->
+  <Function fid="0x5647634B4F80" tag="0x53080907"/>   <!-- primitive: ⍒ -->
+  <Function fid="0x5647634B5160" tag="0x54010907"/>   <!-- primitive: ↑ -->
+  <Function fid="0x5647634B50C0" tag="0x44060907"/>   <!-- primitive: ↓ -->
+  <Function fid="0x5647634B5680" tag="0x43060909"/>   <!-- primitive: ⍨ -->
+  <Function fid="0x5647634B5720" tag="0x45020909"/>   <!-- primitive: ¨ -->
+  <Function fid="0x5647634B5C80" tag="0x52080909"/>   <!-- primitive: / -->
+  <Function fid="0x5647634B5BE0" tag="0x52090909"/>   <!-- primitive: ⌿ -->
+  <Function fid="0x5647634B5DC0" tag="0x53010909"/>   <!-- primitive: \ -->
+  <Function fid="0x5647634B5D20" tag="0x53020909"/>   <!-- primitive: ⍀ -->
+  <Function fid="0x5647634B58E0" tag="0x4908090A"/>   <!-- primitive: . -->
+  <Function fid="0x5647634B5AA0" tag="0x4A010907"/>   <!-- primitive: ∘ -->
+  <Function fid="0x5647634B5A00" tag="0x4F05090A"/>   <!-- primitive: ∘. -->
+  <Function fid="0x5647634B57C0" tag="0x500A090A"/>   <!-- primitive: ⍣ -->
+  <Function fid="0x5647634B5B40" tag="0x5206090A"/>   <!-- primitive: ⍤ -->
+  <Function fid="0x5647634B44E0" tag="0x5A010906"/>   <!-- primitive: ⍬ -->
+  <Function fid="0x5647634B5400" tag="0x45110907"/>   <!-- primitive: ⍎ -->
+  <Function fid="0x5647634B54A0" tag="0x49010907"/>   <!-- primitive: ⌷ -->
+  <Function fid="0x5647634B4760" tag="0x45040907"/>   <!-- primitive: ϵ -->
+  <Function fid="0x5647634B49E0" tag="0x450B0907"/>   <!-- primitive: ≡ -->
+  <Function fid="0x5647634B4940" tag="0x4E080907"/>   <!-- primitive: ≢ -->
+  <Function fid="0x5647634B48A0" tag="0x45060907"/>   <!-- primitive: ⊤ -->
+  <Function fid="0x5647634B4800" tag="0x44010907"/>   <!-- primitive: ⊥ -->
+  <Function fid="0x5647634B4EE0" tag="0x52140907"/>   <!-- primitive: ⌽ -->
+  <Function fid="0x5647634B4E40" tag="0x52150907"/>   <!-- primitive: ⊖ -->
+  <Function fid="0x5647634B5200" tag="0x54050907"/>   <!-- primitive: ⍉ -->
+  <Function fid="0x5647634B4DA0" tag="0x520E0907"/>   <!-- primitive: ⍴ -->
+  <Function fid="0x5647634B5340" tag="0x55040907"/>   <!-- primitive: ∪ -->
+  <Function fid="0x5647634B52A0" tag="0x49070907"/>   <!-- primitive: ∩ -->
+  <Function fid="0x5647634B55E0" tag="0x4C060907"/>   <!-- primitive: ⊣ -->
+  <Function fid="0x5647634B5540" tag="0x520F0907"/>   <!-- primitive: ⊢ -->
+  <Function fid="0x5647634C8600" tag="0x42010907"/>   <!-- primitive: ! -->
+  <Function fid="0x5647634C8060" tag="0x4C080907"/>   <!-- primitive: < -->
+  <Function fid="0x5647634C8380" tag="0x450A0907"/>   <!-- primitive: = -->
+  <Function fid="0x5647634C82E0" tag="0x45140907"/>   <!-- primitive: ⊤= -->
+  <Function fid="0x5647634C73E0" tag="0x55060907"/>   <!-- primitive: ⊤≠ -->
+  <Function fid="0x5647634C8740" tag="0x41040907"/>   <!-- primitive: ∧ -->
+  <Function fid="0x5647634C86A0" tag="0x410E0907"/>   <!-- primitive: ⊤∧ -->
+  <Function fid="0x5647634C7B60" tag="0x4F020907"/>   <!-- primitive: ∨ -->
+  <Function fid="0x5647634C7AC0" tag="0x4F060907"/>   <!-- primitive: ⊤∨ -->
+  <Function fid="0x5647634C8100" tag="0x4C070907"/>   <!-- primitive: ≤ -->
+  <Function fid="0x5647634C7F20" tag="0x4D010907"/>   <!-- primitive: ≥ -->
+  <Function fid="0x5647634C7480" tag="0x55030907"/>   <!-- primitive: ≠ -->
+  <Function fid="0x5647634C8240" tag="0x46020907"/>   <!-- primitive: ⍷ -->
+  <Function fid="0x5647634C7CA0" tag="0x4E070907"/>   <!-- primitive: ⍱ -->
+  <Function fid="0x5647634C7C00" tag="0x4E0A0907"/>   <!-- primitive: ⊤⍱ -->
+  <Function fid="0x5647634C7DE0" tag="0x4E020907"/>   <!-- primitive: ⍲ -->
+  <Function fid="0x5647634C7D40" tag="0x4E090907"/>   <!-- primitive: ⊤⍲ -->
+  <Function fid="0x5647634C78E0" tag="0x50040907"/>   <!-- primitive: ⋆ -->
+  <Function fid="0x5647634C7A20" tag="0x50030907"/>   <!-- primitive: + -->
+  <Function fid="0x5647634C7E80" tag="0x4D020907"/>   <!-- primitive: - -->
+  <Function fid="0x5647634C7700" tag="0x52130907"/>   <!-- primitive: ? -->
+  <Function fid="0x5647634C7340" tag="0x57020907"/>   <!-- primitive: ∼ -->
+  <Function fid="0x5647634C75C0" tag="0x54040907"/>   <!-- primitive: × -->
+  <Function fid="0x5647634C8420" tag="0x44030907"/>   <!-- primitive: ÷ -->
+  <Function fid="0x5647634C8560" tag="0x43020907"/>   <!-- primitive: ○ -->
+  <Function fid="0x5647634C7840" tag="0x52120907"/>   <!-- primitive: ⌈ -->
+  <Function fid="0x5647634C77A0" tag="0x52110907"/>   <!-- primitive: ⌊ -->
+  <Function fid="0x5647634C7660" tag="0x530A0907"/>   <!-- primitive: ∣ -->
+  <Function fid="0x5647634C7FC0" tag="0x4C090907"/>   <!-- primitive: ⍟ -->
+
+  <!-- APL values... -->
+  <Value flg="0x1" vid="0" parent="-1" rk="1" sh-0="21"/>
+  <Value flg="0x1" vid="1" parent="-1" rk="1" sh-0="5"/>
+  <Value flg="0x1" vid="2" parent="-1" rk="1" sh-0="256"/>
+  <Value flg="0x1" vid="3" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="4" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="5" parent="-1" rk="1" sh-0="3"/>
+  <Value flg="0x1" vid="6" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="7" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="8" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="9" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="10" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="11" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="12" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="13" parent="-1" rk="1" sh-0="2"/>
+  <Value flg="0x1" vid="14" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="15" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="16" parent="-1" rk="1" sh-0="0"/>
+  <Value flg="0x1" vid="17" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="18" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="19" parent="-1" rk="1" sh-0="6"/>
+  <Value flg="0x1" vid="20" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="21" parent="-1" rk="0"/>
+  <Value flg="0x1" vid="22" parent="-1" rk="0"/>
+  <Value flg="0x11" vid="23" parent="-1" rk="1" sh-0="100"/>
+
+  <!-- Ravels of APL values... -->
+  <Ravel vid="3" depth="0" cells="³0"/>
+  <Ravel vid="4" depth="0" cells="³0"/>
+  <Ravel vid="6" depth="0" cells="³0"/>
+  <Ravel vid="7" depth="0" cells="³1"/>
+  <Ravel vid="8" depth="0" cells="³0"/>
+  <Ravel vid="9" depth="0" cells="³0"/>
+  <Ravel vid="10" depth="0" cells="³0"/>
+  <Ravel vid="11" depth="0" cells="³16807"/>
+  <Ravel vid="12" depth="0" cells="³0"/>
+  <Ravel vid="14" depth="0" cells="² ⁰"/>
+  <Ravel vid="15" depth="0" cells="³10"/>
+  <Ravel vid="17" depth="0" cells="³0"/>
+  <Ravel vid="18" depth="0" cells="³1"/>
+  <Ravel vid="20" depth="0" cells="⁴1e-13"/>
+  <Ravel vid="21" depth="0" cells="³1"/>
+  <Ravel vid="22" depth="0" cells="³80"/>
+  <Ravel vid="0" depth="1" cells="²SystemVariable.cc:876⁰"/>
+  <Ravel vid="1" depth="1" cells="³-1³0³0³0³0"/>
+  <Ravel vid="2" depth="1" cells="¹0¹1¹2¹3¹4¹5¹6¹7¹8¹9¹A
+    ¹B¹C¹D¹E¹F¹10¹11¹12¹13¹14¹15¹16¹17¹18¹19¹1A¹1B¹1C¹1D¹1E¹1F² !⁰¹22²#$⁰
+    ²%⁰¹26²'()*+,-./0123456789:;⁰¹3C²=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_⁰
+    ²`abcdefghijklmnopqrstuvwxyz{|}~¥€⇄∧∼«⋆⋸⌸²⌼μ⍁»⍣⍅⎕⍞⌹⍆⍤⍇⍈⍊⊤λ⍍⍏£⊥⍶⌶⍐⍑χ⁰
+    ²≢⍖⍗⍘∊⍛⌈⍜⍢∪⍨⍕⍎⍬⍪∣│┤⍟∆∇→╣║╗╝←⌊┐└┴┬├─┼↑↓╔╚╩╦╠═╬≡⍸⍷∵⌷⍂⌻⊢⊣◊┘┌█▄▌▐▀⍺⍹⊂⊃⍝⍲⁰
+    ²⍴⍱⌽⊖○∨⍳⍉ϵ∩⌿⍀≥≤≠×÷⍙∘⍵⍫⍋⍒¯¨ ⁰"/>
+  <Ravel vid="5" depth="1" cells="¹8¹D¹A
+    "/>
+  <Ravel vid="13" depth="1" cells="³0³0"/>
+  <Ravel vid="16" depth="1" cells="² ⁰"/>
+  <Ravel vid="19" depth="1" cells="².,*0_¯⁰"/>
+  <Ravel vid="23" depth="1" cells="⁹49922449922449922449922409"/>
+
+  <!-- Symbol Table -->
+  <SymbolTable size="1">
+    <Symbol name="B38L" stack-size="1">
+      <Variable vid="23"/>
+    </Symbol>
+
+  </SymbolTable>
+
+  <!-- APL system variables... -->
+  <Symbol name="⎕AI" stack-size="1">
+    <Variable vid="1"/>
+  </Symbol>
+
+  <Symbol name="⎕ARG" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⎕AV" stack-size="1">
+    <Variable vid="2"/>
+  </Symbol>
+
+  <Symbol name="⎕EM" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⎕ET" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⎕LC" stack-size="1">
+    <Variable vid="3"/>
+  </Symbol>
+
+  <Symbol name="⎕SVE" stack-size="1">
+    <Variable vid="4"/>
+  </Symbol>
+
+  <Symbol name="⎕TC" stack-size="1">
+    <Variable vid="5"/>
+  </Symbol>
+
+  <Symbol name="⎕TS" stack-size="1">
+    <Variable vid="6"/>
+  </Symbol>
+
+  <Symbol name="⎕UL" stack-size="1">
+    <Variable vid="7"/>
+  </Symbol>
+
+  <Symbol name="⎕WA" stack-size="1">
+    <Variable vid="8"/>
+  </Symbol>
+
+  <Symbol name="⎕CT" stack-size="1">
+    <Variable vid="20"/>
+  </Symbol>
+
+  <Symbol name="⎕FC" stack-size="1">
+    <Variable vid="19"/>
+  </Symbol>
+
+  <Symbol name="⎕IO" stack-size="1">
+    <Variable vid="18"/>
+  </Symbol>
+
+  <Symbol name="⎕L" stack-size="1">
+    <Variable vid="17"/>
+  </Symbol>
+
+  <Symbol name="⎕LX" stack-size="1">
+    <Variable vid="16"/>
+  </Symbol>
+
+  <Symbol name="⎕PP" stack-size="1">
+    <Variable vid="15"/>
+  </Symbol>
+
+  <Symbol name="⎕PR" stack-size="1">
+    <Variable vid="14"/>
+  </Symbol>
+
+  <Symbol name="⎕PS" stack-size="1">
+    <Variable vid="13"/>
+  </Symbol>
+
+  <Symbol name="⎕PW" stack-size="1">
+    <Variable vid="22"/>
+  </Symbol>
+
+  <Symbol name="⎕R" stack-size="1">
+    <Variable vid="12"/>
+  </Symbol>
+
+  <Symbol name="⎕RL" stack-size="1">
+    <Variable vid="11"/>
+  </Symbol>
+
+  <Symbol name="⎕SYL" stack-size="1">
+    <Variable vid="10"/>
+  </Symbol>
+
+  <Symbol name="⎕TZ" stack-size="1">
+    <Variable vid="21"/>
+  </Symbol>
+
+  <Symbol name="⎕X" stack-size="1">
+    <Variable vid="9"/>
+  </Symbol>
+
+  <Symbol name="λ" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⍺" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⍵" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="χ" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⍶" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+  <Symbol name="⍹" stack-size="1">
+    <unused-name/>
+  </Symbol>
+
+
+  <!-- State Indicator -->
+  <StateIndicator levels="0">
+  </StateIndicator>
+
+</Workspace>
+<!-- checksum: crc32=A1CC1CB0 -->
+    

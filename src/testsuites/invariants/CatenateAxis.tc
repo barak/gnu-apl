@@ -1,0 +1,16 @@
+⍝ CatenateAxis.tc
+⍝ ═══════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: X∊⍳(⍴⍴A)⌈⍴⍴B; axes other than X must conform
+      ⍝ inv: ⍴⍴Z ←→ (⍴⍴A)⌈⍴⍴B
+      A ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ← ⎕RVAL 2 (3 2) (,0 1 0 0 0)
+      X ← 2
+      Z ← A,[X]B
+      (⍴⍴Z) ≡ (⍴⍴A)⌈⍴⍴B
+1
+      ⍝ inv: (⍴Z)[X] ←→ (⍴A)[X]+(⍴B)[X]
+      (⍴Z)[X] ≡ (⍴A)[X]+(⍴B)[X]
+1

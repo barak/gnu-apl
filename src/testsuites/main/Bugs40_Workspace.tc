@@ -1,0 +1,1956 @@
+⍝ Bugs40_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs40 )SAVE, )LOAD, )COPY, and )DUMP items.
+
+
+
+
+      ⍝ Bugs40 #1: )SAVE and )LOAD after (1↑↑N)←9 into a nested scalar item
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      N←(⊂⊂1 2) 5 ⋄ (1↑↑N)←9
+
+
+
+
+      )WSID B40W1
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W1
+³
+
+
+
+      N≡9 5
+1
+
+
+
+      )DROP B40W1
+³
+
+
+
+      ⍝ Bugs40 #3: a statement that failed with a SYNTAX ERROR restarts from its
+      ⍝ beginning also after )SAVE and )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'F3' 'A←1' '1+(+/)' 'B←2'
+F3
+
+
+
+      F3
+SYNTAX ERROR+
+F3[2]  1+(+/)
+            ^
+
+      X←+⍣2
+SYNTAX ERROR+
+      X←+⍣2
+          ^
+
+      )WSID B40W3
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W3
+³
+
+
+
+      →⍬
+SYNTAX ERROR+
+      X←+⍣2
+          ^
+
+      →
+
+
+
+
+      →⍬
+SYNTAX ERROR+
+F3[2]  1+(+/)
+            ^
+
+      )SI
+F3[2]
+*
+
+
+      )SIC
+
+
+
+
+      )DROP B40W3
+³
+
+
+
+      ⍝ Bugs40 #4: a second name of a named lambda gets its own reference and
+      ⍝ level 0 of its symbol after )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←{⍵}
+
+
+
+
+      H←F
+
+
+
+
+      )WSID B40W4
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W4
+³
+
+
+
+      )ERASE F
+
+
+
+
+      H 5
+5
+
+
+
+      )ERASE H
+
+
+
+
+      ⎕NC 'H'
+0
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇G;F
+      F←{⍵}
+      1÷0
+      ∇
+
+
+
+
+      G
+DOMAIN ERROR
+G[2]  1÷0
+      ^^
+
+      G
+DOMAIN ERROR
+G[2]  1÷0
+      ^^
+
+      )WSID B40W4
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+      )LOAD B40W4
+³
+
+
+
+      )SI
+G[2]
+*
+G[2]
+*
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      L←{⍵÷0}
+
+
+
+
+      M←L
+
+
+
+
+      L 1
+DOMAIN ERROR
+M[1]  λ←⍵÷0
+        ^^
+
+      )WSID B40W4
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+      )LOAD B40W4
+³
+
+
+
+      )SI
+M[1]
+*
+
+
+      )SIC
+
+
+
+
+      )ERASE M
+
+
+
+
+      ⎕NC 'M'
+0
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W4
+³
+
+
+
+      ⍝ Bugs40 #5: a failed )COPY also restores a function that it had replaced
+      ⍝ by a variable (G is a variable in the file, the vid of ZV is corrupt)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      G←'file G'
+
+
+
+
+      ZV←1 2 3
+
+
+
+
+      )WSID B40W5
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B40W5.xml'
+
+
+
+
+      P←(⍸'<Variable vid="'⍷D)[2]
+
+
+
+
+      D[P+15]←'9' ◊ D[P+16]←'9'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B40W5.xml'
+
+
+
+
+      N←D ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+      ∇Z←G B
+      Z←'old G'
+      ∇
+
+
+
+
+      )COPY B40W5
+
+
+
+
+      ⎕NC 'G'
+3
+
+
+
+      G 1
+old G
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )ERASE G
+
+
+
+
+      G←{'old G ',⍕⍵}
+
+
+
+
+      )COPY B40W5
+
+
+
+
+      G 1
+old G 1
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W5
+³
+
+
+
+      ⍝ Bugs40 #7: a refused )LOAD resets the macro symbols (μ3 of F¨ refers to
+      ⍝ F, which the rollback deletes) and leaks nothing
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇Z←F7 B
+      ∇
+
+
+
+
+      1÷0
+DOMAIN ERROR
+      1÷0
+      ^^
+
+      F7¨⍳2
+VALUE ERROR+
+      F7¨⍳2
+      ^   ^
+
+      )WSID B40W7
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B40W7.xml'
+
+
+
+
+      P←⍸'<SI-entry level="0"'⍷D
+
+
+
+
+      D[P+17]←'7'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B40W7.xml'
+
+
+
+
+      N←D ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+      )LOAD B40W7
+)LOAD B40W7 failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: SI-entry level=7 does not match its position (0) in the )SI stack
+
+
+      V←⍳3
+
+
+
+
+      )WSID B40W7
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W7
+³
+
+
+
+      ⍝ Bugs40 #8: the values of a partly built index on the )SI are not stale
+      ⍝ and can be )SAVEd (several times)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+      M[V0;1+1]
+VALUE ERROR+
+      M[V0;1+1]
+        ^
+
+      2[V0;⍳1]
+VALUE ERROR+
+      2[V0;⍳1]
+        ^
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )WSID B40W8
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W8
+³
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )SAVE
+³
+
+
+
+      →
+
+
+
+
+      V0←2
+
+
+
+
+      →⍬
+5
+
+
+
+      )SIC
+
+
+
+
+      )DROP B40W8
+³
+
+
+
+      ⍝ Bugs40 #10: a <Symbol> whose function header names another function is
+      ⍝ refused (instead of binding the function to both names)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇Z←G10 B
+      Z←'G10'
+      ∇
+
+
+
+
+      )WSID B40W10
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B40W10.xml'
+
+
+
+
+      P←⍸'<Symbol name="G10"'⍷D
+
+
+
+
+      D[P+15]←'H'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B40W10.xml'
+
+
+
+
+      N←D ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+
+      ⎕FX 'Z←G10 B' 'Z←''mine'''
+G10
+
+
+
+      )COPY B40W10
+³
+
+
+
+      ⎕NL 3
+G10
+
+
+
+      G10 1
+mine
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B40W10
+³
+
+
+
+      ⎕NL 3
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W10
+³
+
+
+
+      ⍝ Bugs40 #11: the rollback of a failed )COPY restores ⎕RL (a stray
+      ⍝ </Symbol> after ⎕X, which comes after ⎕RL in the file)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V11←1 2 3
+
+
+
+
+      )WSID B40W11
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      D←19 ⎕CR ⎕FIO[26] 'testcases/libroot/workspaces/B40W11.xml'
+
+
+
+
+      S←'<Symbol name="⎕X" stack-size="1">'
+
+
+
+
+      P←↑⍸S⍷D
+
+
+
+
+      D←((P+¯1+⍴S)↑D),(⎕UCS 10),'</Symbol>',(P+¯1+⍴S)↓D
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B40W11.xml'
+
+
+
+
+      N←(18 ⎕CR D) ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+      ⎕RL←42
+
+
+
+
+      )COPY B40W11
+
+
+
+
+      ⎕RL
+42
+
+
+
+      ⍴?6
+
+
+
+
+      ⎕NC 'V11'
+0
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      ⎕RL←16807
+
+
+
+
+      )DROP B40W11
+³
+
+
+
+      ⍝ Bugs40 #12, #13: a pointer to a value that was not read before (e.g. a
+      ⍝ cycle), to a simple scalar, or a value without <Ravel> is a corrupt file
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      N←1 (2 3)
+
+
+
+
+      X←7
+
+
+
+
+      )WSID B40W12
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B40W12'
+
+
+
+
+      RPL←{P←↑⍸(↑⍺)⍷⍵ ◊ ((P-1)↑⍵),(2⊃⍺),(P+¯1+⍴↑⍺)↓⍵}
+
+
+
+
+      WR←{H←'w' ⎕FIO[3] ⍺ ◊ N←(18 ⎕CR ⍵) ⎕FIO[7] H ◊ ⎕FIO[4] H}
+
+
+
+
+      D←19 ⎕CR ⎕FIO[26] F,'.xml'
+
+
+
+
+      R←(9+↑⍸'cells="³1⁶'⍷D)↓D ◊ NV←(∧\R∊'0123456789')/R
+
+
+
+
+      R←(↑⍸'<Symbol name="X"'⍷D)↓D ◊ R←(4+↑⍸'vid="'⍷R)↓R ◊ XV←(∧\R∊'0123456789')/R
+
+
+
+
+      R←(↑⍸'<Symbol name="N"'⍷D)↓D ◊ R←(4+↑⍸'vid="'⍷R)↓R ◊ NN←(∧\R∊'0123456789')/R
+
+
+
+
+      (F,'A.xml') WR ('cells="³2³3"' ('cells="³2⁶',NV,'"')) RPL D
+0
+
+
+
+      (F,'B.xml') WR (('cells="³1⁶',NV) ('cells="³1⁶',XV)) RPL D
+0
+
+
+
+      (F,'C.xml') WR (('<Ravel vid="',NN,'"') ('<!-- vid="',NN,'"')) RPL D
+0
+
+
+
+      )LOAD B40W12A
+)LOAD B40W12A failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: pointer to an unread value (vid=³
+
+
+      )LOAD B40W12B
+)LOAD B40W12B failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: pointer to a simple value (vid=³
+
+
+      )LOAD B40W12C
+)LOAD B40W12C failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: a Value has no Ravel (vid=³
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W12
+³
+
+
+
+      )DROP B40W12A
+³
+
+
+
+      )DROP B40W12B
+³
+
+
+
+      )DROP B40W12C
+³
+
+
+
+      ⍝ Bugs40 #14: a stray character after ⁰ in a uni= string, or a Token with a
+      ⍝ bad value type, is a corrupt file (instead of ending the interpreter)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇Z←G14 B
+      Z←'G14'
+      ∇
+
+
+
+
+      ∇Z←F14 B
+      Z←1÷B
+      ∇
+
+
+
+
+      F14 0
+DOMAIN ERROR
+F14[1]  Z←1÷B
+          ^^
+
+      )WSID B40W14
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B40W14'
+
+
+
+
+      RPL←{P←↑⍸(↑⍺)⍷⍵ ◊ ((P-1)↑⍵),(2⊃⍺),(P+¯1+⍴↑⍺)↓⍵}
+
+
+
+
+      WR←{H←'w' ⎕FIO[3] ⍺ ◊ N←(18 ⎕CR ⍵) ⎕FIO[7] H ◊ ⎕FIO[4] H}
+
+
+
+
+      D←19 ⎕CR ⎕FIO[26] F,'.xml'
+
+
+
+
+      (F,'A.xml') WR ('Z←''G14''⁰' 'Z←''G14''⁰x') RPL D
+0
+
+
+
+      (F,'B.xml') WR ('tag="0x4105070F"' 'tag="0x41050A0F"') RPL D
+0
+
+
+
+      V←42
+
+
+
+
+      )COPY B40W14A
+
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: unexpected character ⎕UCS 120 in a uni= string (line ³
+
+      V
+42
+
+
+
+      )LOAD B40W14B
+)LOAD B40W14B failed: DOMAIN ERROR
+      )MORE
+workspace file ³
+corrupt workspace: bad Token tag 0x41050A0F (line ³
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W14
+³
+
+
+
+      )DROP B40W14A
+³
+
+
+
+      )DROP B40W14B
+³
+
+
+
+      ⍝ Bugs40 #15: a stack-size larger than the levels in the file, or a level
+      ⍝ of a system variable that has no local levels, is a corrupt file (no hang)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V15←1 2 3
+
+
+
+
+      )WSID B40W15
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B40W15'
+
+
+
+
+      RPL←{P←↑⍸(↑⍺)⍷⍵ ◊ ((P-1)↑⍵),(2⊃⍺),(P+¯1+⍴↑⍺)↓⍵}
+
+
+
+
+      WR←{H←'w' ⎕FIO[3] ⍺ ◊ N←(18 ⎕CR ⍵) ⎕FIO[7] H ◊ ⎕FIO[4] H}
+
+
+
+
+      D←19 ⎕CR ⎕FIO[26] F,'.xml'
+
+
+
+
+      (F,'A.xml') WR ('<Symbol name="V15" stack-size="1">' '<Symbol name="V15" stack-size="2147483647">') RPL D
+0
+
+
+
+      R←(↑⍸'<Symbol name="⎕LX" stack-size="1">'⍷D)↓D ◊ LX←((↑⍸'</Symbol>'⍷R)-1)↑R
+
+
+
+
+      S←'<Symbol name="⎕LX" stack-size="1">' ◊ T←(↑⍸'<Variable'⍷LX)↓LX ◊ T←(↑⍸'/>'⍷T)↑T
+
+
+
+
+      (F,'B.xml') WR (S ('<Symbol name="⎕LX" stack-size="2">','<Variable',T,'/>')) RPL D
+0
+
+
+
+      )LOAD B40W15A
+)LOAD B40W15A failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: Symbol V15 has fewer levels than its stack-size=2147483647 (line ³
+
+
+      )LOAD B40W15B
+)LOAD B40W15B failed: DOMAIN ERROR
+
+
+
+      )MORE
+workspace file ³
+corrupt workspace: ⎕LX has no level 1
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W15
+³
+
+
+
+      )DROP B40W15A
+³
+
+
+
+      )DROP B40W15B
+³
+
+
+
+      ⍝ Bugs40 #24, #25: )DUMP of a long line with a surrogate, and )COPY or
+      ⍝ )PCOPY of the 0 0⍴⎕FX and ⍎'NAME←{...}' lines of such functions
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←H' ('Z←''abcdefghijklmnop',(⎕UCS 56000),'''')
+H
+
+
+
+      ⍎'L←{''a'',(⎕UCS 56000),⍵}'
+
+
+
+
+      )WSID B40W25
+WAS CLEAR WS
+
+
+
+      )DUMP
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B40W25
+³
+
+
+
+      ⍴H
+17
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B40W25 H
+³
+
+
+
+      ⎕UCS H
+97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 56000
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )COPY B40W25 L
+³
+
+
+
+      ⎕UCS L 'c'
+97 56000 99
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )PCOPY B40W25
+³
+
+
+
+      )FNS
+H   L
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ⎕FX 'Z←H' 'Z←''old'''
+H
+
+
+
+      )PCOPY B40W25
+³
+
+
+
+      H
+old
+
+
+
+      )DROP B40W25.apl
+³
+
+
+
+      ⍝ Bugs40 #26: a λ and a digit in the comment of a ∇-header is not a lambda
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇Z←F B ⍝ see λ1
+      Z←B+1
+      ∇
+
+
+
+
+      ∇Z←G B;X ⍝ λ2
+      Z←B+2
+      ∇
+
+
+
+
+      )WSID B40W26
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W26
+³
+
+
+
+      ⎕CR 'F'
+Z←F B ⍝ see λ1
+      Z←B+1   
+
+
+      F 1
+2
+
+
+
+      G 1
+3
+
+
+
+      )DROP B40W26
+³
+
+
+
+      ⍝ Bugs40 #31: an anonymous lambda left on the parser stack by an error
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      V←⍳3
+
+
+
+
+      ⎕FX 'Z←F X' 'Z←1 {÷⍵} X'
+F
+
+
+
+      F 0
+VALENCE ERROR
+F[1]  Z←1{÷⍵}X
+        ^^
+
+      1 {÷⍵} 0
+VALENCE ERROR
+      1{÷⍵}0
+      ^^
+
+      )WSID B40W31
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W31
+³
+
+
+
+      )SI
+*
+F[1]
+*
+
+      V
+1 2 3
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W31
+³
+
+
+
+      ⍝ Bugs40 #36: )DUMP writes a tiny simple item beside nested items
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      B←'abc' 1E¯11
+
+
+
+
+      C←(⊂⍳2),0J1E¯12 ¯5E¯11
+
+
+
+
+      )WSID B40W36
+WAS CLEAR WS
+
+
+
+      )DUMP
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      )LOAD B40W36
+³
+
+
+
+      2⊃B
+1E¯11
+
+
+
+      11○2⊃C
+1E¯12
+
+
+
+      3⊃C
+¯5E¯11
+
+
+
+      )DROP B40W36.apl
+³
+
+
+
+      ⍝ Bugs40 #37: )SAVE writes the index items of a suspended statement with
+      ⍝ one closing quote
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      Q[1;2]
+VALUE ERROR+
+      Q[1;2]
+      ^
+
+      )WSID B40W37
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W37
+³
+
+
+
+      Q←2 2⍴⍳4
+
+
+
+
+      →⍳0
+2
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      C[N]
+VALUE ERROR+
+      C[N]
+        ^
+
+      )WSID B40W37
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W37
+³
+
+
+
+      N←1 ◊ C←5 6
+
+
+
+
+      →⍳0
+5
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W37
+³
+
+
+
+      ⍝ Bugs40 #41: λ← is inserted before the last statement of the lambda itself,
+      ⍝ not after a ◊ of a nested lambda or of a string
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←{{Z←⍵ ⋄ Z} ⍵}
+
+
+
+
+      X←F 4 ◊ X
+4
+
+
+
+      H←{2 {⍺+⍵ ⋄ ⍺×⍵} ⍵}
+
+
+
+
+      X←H 5 ◊ X
+7
+10
+
+
+      G←{⍵,'a⋄b'}
+
+
+
+
+      ⎕CR 'G'
+λ←λ1 ⍵   
+λ←⍵,'a⋄b'
+
+
+      )WSID B40W41
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )LOAD B40W41
+³
+
+
+
+      X←G 'x' ◊ X
+xa⋄b
+
+
+
+      X←F 4 ◊ X
+4
+
+
+
+      )DUMP
+³
+
+
+
+      )LOAD B40W41.apl
+³
+
+
+
+      X←G 'x' ◊ X
+xa⋄b
+
+
+
+      ⎕CR 'G'
+λ←λ1 ⍵   
+λ←⍵,'a⋄b'
+
+
+      )DROP B40W41
+³
+
+
+
+      )DROP B40W41.apl
+³
+
+
+
+      ⍝ Bugs40 #52: a )COPY or )LOAD of a .apl file that ends inside a
+      ⍝ ∇-definition abandons it, the next lines are executed as such
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      ∇Z←FOO
+      Z←42
+      ∇
+
+
+
+
+      )WSID B40W52
+WAS CLEAR WS
+
+
+
+      )DUMP
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B40W52.apl'
+
+
+
+
+      D←19 ⎕CR ⎕FIO[26] F
+
+
+
+
+      D←(¯1+(↑⍸'Z←42'⍷D)+4)↑D
+
+
+
+
+      H←'w' ⎕FIO[3] F ◊ N←(18 ⎕CR D) ⎕FIO[7] H ◊ ⎕FIO[4] H
+0
+
+
+
+      )COPY B40W52
+³
+
+
+
+      B←2
+
+
+
+
+      B
+2
+
+
+
+      )FNS
+
+
+
+
+      )DROP B40W52.apl
+³
+
+
+
+      ⍝ Bugs40 #61: a lambda number beyond the int range in a saved lambda header
+      ⍝ is ignored (no int overflow, no negative λ number)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←{1÷⍵}
+
+
+
+
+      )WSID B40W61
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      F←'testcases/libroot/workspaces/B40W61.xml'
+
+
+
+
+      RPL←{P←↑⍸(↑⍺)⍷⍵ ◊ ((P-1)↑⍵),(2⊃⍺),(P+¯1+⍴↑⍺)↓⍵}
+
+
+
+
+      WR←{H←'w' ⎕FIO[3] ⍺ ◊ N←(18 ⎕CR ⍵) ⎕FIO[7] H ◊ ⎕FIO[4] H}
+
+
+
+
+      D←19 ⎕CR ⎕FIO[26] F
+
+
+
+
+      F WR ('λ←λ1 ⍵' 'λ←λ2147483648 ⍵') RPL D
+0
+
+
+
+      )LOAD B40W61
+³
+
+
+
+      ⎕CR 'F'
+λ←λ0 ⍵
+λ←1÷⍵ 
+
+
+      F 2
+0.5
+
+
+
+      )DROP B40W61
+³
+
+
+
+      ⍝ Bugs40 #72: a )COPY of a lambda releases the function it replaces (but not
+      ⍝ a suspended one)
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      L←{'file L',⍵}
+
+
+
+
+      F←{1÷⍵}
+
+
+
+
+      )WSID B40W72
+WAS CLEAR WS
+
+
+
+      )SAVE
+³
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+      L←{'old L3',⍵}
+
+
+
+
+      )COPY B40W72 L
+³
+
+
+
+      )ERASE L
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      ∇Z←F B
+      Z←'old F'
+      ∇
+
+
+
+
+      )COPY B40W72 F
+³
+
+
+
+      F 4
+0.25
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )ERASE F
+
+
+
+
+      ∇Z←F B
+      Z←1÷B
+      ∇
+
+
+
+
+      F 0
+DOMAIN ERROR
+F[1]  Z←1÷B
+        ^^
+
+      )COPY B40W72 F
+³
+
+
+
+      F 4
+0.25
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+      )DROP B40W72
+³
+
+
+
+      )SIC
+

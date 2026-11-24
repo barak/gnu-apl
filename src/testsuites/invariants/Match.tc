@@ -1,0 +1,18 @@
+⍝ Match.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z Boolean; implicit ⎕CT
+      ⍝ inv: ⍴Z ←→ ⍳0  (result is scalar)
+      ⍝ inv: ⍴⍴Z ←→ ,0
+      A ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← A≡B
+      (⍴Z) ≡ ⍳0
+1
+      (⍴⍴Z) ≡ ,0
+1
+      ⍝ Self-match is always 1
+      A ≡ A
+1

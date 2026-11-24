@@ -144,7 +144,7 @@ public:
               //
               const ShapeItem len = shape.get_shape_item(a);
               new (&get_iterator(a)) AxisIterator(len, weight, a > 0);
-              weight *= len;
+              weight = Shape::mul_wrap(weight, len);   // Bugs38 #91
             }
       }
 
@@ -172,7 +172,7 @@ public:
               //
               const ShapeItem len = shape.get_shape_item(perm_a);
               new (&get_iterator(perm_a)) AxisIterator(len, weight, perm_a);
-              weight *= len;
+              weight = Shape::mul_wrap(weight, len);   // Bugs38 #91
             }
       }
 

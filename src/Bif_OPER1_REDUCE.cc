@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <limits>
 #include "ArgCheck.hh"
 #include "Bif_F12_RHO.hh"
 #include "Bif_OPER1_REDUCE.hh"
@@ -109,6 +110,13 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
                   if (result.get_tag() == TOK_ERROR)
                     throw_apl_error(result.get_ErrorCode(), LOC);
 
+                  if (result.get_tag() == TOK_VOID)   // e.g. ⎕ES (Bugs40 #9)
+                     {
+                       MORE_ERROR() << LO->get_name() << " returned no "
+                                       "result (as the operand of / or \\)";
+                       VALUE_ERROR;
+                     }
+
                   Assert(result.get_Class() == TC_VALUE);
                   Value_P ZZ = result.get_apl_val();
 
@@ -138,10 +146,6 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 Token
 Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
 {
-   // if B is a scalar, then Z is B.
-   //
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
-
    if (!tok_LO.is_function())
       {
         MORE_ERROR() << "f/ B resp. f⌿ B : Bad left argument f"
@@ -159,13 +163,17 @@ cFunction_P LO = tok_LO.get_function();
         DOMAIN_ERROR;
       }
 
-   if (LO->get_fun_valence() != 2)
+   if (LO->get_fun_valence() != 2 || !LO->has_dyadic_form())   // Bugs40 #56
       {
         MORE_ERROR() << LO->get_name() << "/ B resp. "
                      << LO->get_name() << "⌿ B : Bad function "
                      << LO->get_name() << " (expecting a dyadic function)";
         VALENCE_ERROR;   // like A F/ B (Bugs37 #67)
       }
+
+   // if B is a scalar, then Z is B. Checked after LO (Bugs38 #105).
+   //
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (axis >= B->get_rank())
       {
@@ -249,7 +257,7 @@ cFunction_P LO = tok_LO.get_function();
         DOMAIN_ERROR;
       }
 
-   if (LO->get_fun_valence() != 2)
+   if (LO->get_fun_valence() != 2 || !LO->has_dyadic_form())   // Bugs40 #56
       {
         MORE_ERROR() << "A " << LO->get_name() << get_name() << " B : Bad"
                         " function " << LO->get_name()
@@ -279,14 +287,16 @@ const APL_Integer A0 = A->get_near_int(0);
    // anything, and the negation itself needs its own overflow guard
    // (negating APL_Integer's own most negative value overflows the same
    // way).
-const APL_Integer neg_A0 = -A0;
-   if (A0 < 0 && Cell::diff_overflow(neg_A0, 0, A0))
+   // test BEFORE negating: computing -A0 first is itself the overflow
+   // (UB), and the optimiser removed the test (Bugs38 #51)
+   //
+   if (A0 == std::numeric_limits<APL_Integer>::min())
       {
         MORE_ERROR() << "A f/B resp. A f⌿B: A = " << A0
                      << " overflows on negation";
         DOMAIN_ERROR;
       }
-const APL_Integer n_wise = A0 < 0 ? neg_A0 : A0;
+const APL_Integer n_wise = A0 < 0 ? -A0 : A0;
 
    if (B->is_scalar())
       {
@@ -481,12 +491,13 @@ ShapeItem len_A = A.element_count();
    //
 ShapeItem len_Z = 0;
 std::vector<ShapeItem> rep_counts;
-   rep_counts.reserve(len_B);
+APL_Integer single_rep = 0;   // the single a (if len_A == 1)
    if (len_A == 1)   // single a -> a a ... a (len_B times)
       {
+        // rep_counts is filled below, after the empty-Z check (it took
+        // len_B items even for an empty Z, Bugs39 #58)
         len_A = len_B;
-        APL_Integer rep_A = A.get_near_int(0);
-        loop(a, len_A)   rep_counts.push_back(rep_A);
+        const APL_Integer rep_A = single_rep = A.get_near_int(0);
         // -rep_A is UB for rep_A == INT64_MIN, and would overflow anyway.
         if (rep_A == INT64_MIN || Cell::prod_overflow(rep_A, len_B))
            WS_FULL;
@@ -495,6 +506,8 @@ std::vector<ShapeItem> rep_counts;
       }
    else              // normal A
       {
+        rep_counts.reserve(len_A);   // not len_B, before the LENGTH check
+                                     // (Bugs40 #67)
         ShapeItem nonneg_A = 0;   // number of items >= 0 in A
         loop(a, len_A)
            {
@@ -545,6 +558,19 @@ Shape shape_Z(shape_B);
    shape_Z.set_shape_item(axis, len_Z);
 
 Value_P Z(shape_Z, LOC);
+   if (Z->is_empty())   // Bugs38 #11: e.g. 1E15⌿3 0⍴0 looped 1E15 times
+      {
+        Z->set_default(B, LOC);
+        if (B.is_left_value())   Z->set_left_value();
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   if (rep_counts.size() == 0)   // single a (see above)
+      {
+        rep_counts.reserve(len_B);
+        loop(a, len_B)   rep_counts.push_back(single_rep);
+      }
 
 const Shape3 shape_B3(shape_B, axis);
 

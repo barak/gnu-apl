@@ -1,0 +1,22 @@
+⍝ EachDyadic.tc
+⍝ ═════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: LO dyadic function; A and B conformable
+      ⍝ inv: ⍴Z ←→ ⍴B (when ⍴A≡⍴B)
+      ⍝ inv: I⊃Z ←→ (I⊃A) LO I⊃B
+      ⍝ inv: A LO¨ B ←→ A LO B  (when both scalars)
+      A ← ⎕RVAL 1 (,4) (,0 1 0 0 0)
+      B ← ⎕RVAL 1 (,4) (,0 1 0 0 0)
+      Z ← A +¨ B
+      (⍴Z) ≡ ⍴B
+1
+      ⍝ Element-wise: I⊃Z ←→ (I⊃A)+(I⊃B)
+      Z ≡ A + B
+1
+      ⍝ Scalar each: A LO¨ B ←→ A LO B
+      A ← ⎕RVAL 0
+      B ← ⎕RVAL 0
+      (A +¨ B) ≡ A + B
+1

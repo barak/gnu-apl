@@ -1,0 +1,11 @@
+⍝ Quad_ARG.tc
+⍝ ----------------------------------
+
+      ⎕IO←1
+      ⎕ARG[2 3]   ⍝ ⎕ARG[1] might differ: apl .apl or even /usr/local/bin/apl
+ --id 1010 
+
+
+      ⍝ ==================================
+
+

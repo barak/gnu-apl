@@ -375,6 +375,11 @@ protected:
         Vm_UCS     ///< in ⎕UCS(),                  e.g. ⎕UCS(97 98 99)
       };
 
+   /// return true iff \b uni can be written as UTF-8, i.e. it is not a
+   /// surrogate code point and not beyond U+10FFFF (Bugs38 #41)
+   /// @param uni the character
+   static bool is_UTF8_encodable(Unicode uni);
+
    /// return true if Value is a plain string that can be double-quoted
    /// without problems.
    /// @param value APL value to inspect

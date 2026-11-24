@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <limits>
 #include <stdio.h>
 #include <math.h>
 
@@ -513,8 +514,8 @@ IntCell::bif_maximum(Cell * Z, const Cell * A) const
    if (A->is_real_cell() ||
        (A->is_complex_cell() && A->get_imag_value() == 0.0))
       {
-        if (Workspace::get_CT() == 0.0)
-           {
+        // at any ⎕CT (Bugs39 #41)
+        {
              // Bugs31 #8 (Blake McBride): see FloatCell::bif_maximum()
              // -- A->get_real_value() below converts this IntCell's
              // exact int64 through double first, losing precision
@@ -522,16 +523,13 @@ IntCell::bif_maximum(Cell * Z, const Cell * A) const
              // return its ORIGINAL exact value.
              //
              const APL_Float f = A->get_real_value();
-             if (Cell::compare_int_float(value.ival, f) >= 0)
+             if (Cell::compare_int_float(value.ival, f) > 0)
                 return IntCell::zI(Z, value.ival);
              return FloatCell::zF(Z, f);
-           }
-        return FloatCell::bif_maximum_ff(Z, A->get_real_value(),
-                                             APL_Float(value.ival));
+        }
       }
    if (A->is_complex_cell())
-      return ComplexCell::bif_maximum_cc(Z, A->get_complex_value(),
-                                           APL_Complex(value.ival, 0));
+      return ComplexCell::max_min_cc(Z, *A, *this, true);
    return E_DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -547,21 +545,18 @@ IntCell::bif_minimum(Cell * Z, const Cell * A) const
    if (A->is_real_cell() ||
        (A->is_complex_cell() && A->get_imag_value() == 0.0))
       {
-        if (Workspace::get_CT() == 0.0)
-           {
+        // at any ⎕CT (Bugs39 #41)
+        {
              // see IntCell::bif_maximum() above (Bugs31 #8)
              //
              const APL_Float f = A->get_real_value();
-             if (Cell::compare_int_float(value.ival, f) <= 0)
+             if (Cell::compare_int_float(value.ival, f) < 0)
                 return IntCell::zI(Z, value.ival);
              return FloatCell::zF(Z, f);
-           }
-        return FloatCell::bif_minimum_ff(Z, A->get_real_value(),
-                                             APL_Float(value.ival));
+        }
       }
    if (A->is_complex_cell())
-      return ComplexCell::bif_minimum_cc(Z, A->get_complex_value(),
-                                           APL_Complex(value.ival, 0));
+      return ComplexCell::max_min_cc(Z, *A, *this, false);
    return E_DOMAIN_ERROR;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -621,41 +616,11 @@ const APL_Float a = A->get_real_value();
    if (Cell::is_near_int64_t(a) && a == nearbyint(a))
       return IntCell::bif_residue_ii(Z, APL_Integer(a), value.ival);
 
-   // for a genuinely non-integer A near INT64 limit, use float arithmetic
-   if (a > (BIG_INT64_F - 1E10) || a < (1E10 - BIG_INT64_F))
-      return FloatCell::bif_residue_ff(Z, a, APL_Float(value.ival));
-
-   // non-integer float A: use CT tolerance check and near-zero guard
-   // (mirrors the original IntCell::bif_residue for float A)
-   if (a == 0.0)   return IntCell::zI(Z, value.ival);
-   if (value.ival == 0)   return IntCell::z0(Z);
-
-const APL_Float quot = value.ival / a;
-   // same overflow guard as FloatCell::bif_residue_ff(): when |a| is
-   // small enough that B÷a overflows, quot (and qf below) become
-   // +-inf, the ⎕CT tests below compare inf against inf and never
-   // match, and z = B - a*inf silently comes out +-inf instead of 0
-   // (Blake McBride, Bugs23 #4 -- e.g. 1E¯308|2 gave ¯∞).
-   if (!isfinite(quot))        return IntCell::z0(Z);
-   if (fabs(quot) > 4.5E15)    return IntCell::z0(Z);
-const APL_Float qf = floor(quot);
-const double qct = Workspace::get_CT();
-   if (qct != 0)
-      {
-        // a nearby integer of 0 is never a match here either -- same
-        // near-zero-quotient bug and fix as Cell::integral_within(),
-        // whose two branches this duplicates by hand (Blake McBride,
-        // Bugs22 #1).
-        const APL_Float qc = ceil(quot);
-        if (qc != 0.0 && quot > qc - qct)   return IntCell::z0(Z);
-        if (qf != 0.0 && quot < qf + qct)   return IntCell::z0(Z);
-      }
-
-APL_Float z = value.ival - a * qf;
-   if (Cell::is_near_zero(z))   return IntCell::z0(Z);
-   if (a < 0.0 && z > 0.0)   z = z + a;
-   else if (a > 0.0 && z < 0.0)   z = z + a;
-   return FloatCell::zF(Z, z);
+   // a non-integer A: the same residue as for a float B of the same value
+   // (Bugs38 #47: 1E¯5|¯1 was 0 but 1E¯5|¯1.0 was 4.6E¯17, and a hand-made
+   // copy of the float residue here differed in the last digits)
+   //
+   return FloatCell::bif_residue_ff(Z, a, APL_Float(value.ival));
 }
 //════════════════════════════════════════════════════════════════════════════
 ErrorCode
@@ -937,6 +902,16 @@ const APL_Integer i_quot = a / b;
 ErrorCode
 IntCell::bif_power_ii(Cell * Z, APL_Integer a, APL_Integer b)
 {
+   // -b below would overflow for the int64 minimum: use the (exact) double
+   // exponent instead, e.g. 2⋆M underflows to 0 like 2⋆M+1 (Bugs38 #44)
+   //
+   if (b == std::numeric_limits<APL_Integer>::min())
+      {
+        const APL_Float z = pow(APL_Float(a), APL_Float(b));
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        return FloatCell::zF(Z, z);
+      }
+
 const bool invert_Z = b < 0;
    if (invert_Z)   b = -b;
 
@@ -972,8 +947,12 @@ const bool invert_Z = b < 0;
         // negative), which later makes a_2_n wrap to 0 and SIGFPEs on the
         // division at line ~822. pow() handles a negative base directly
         // (correct sign for odd/even b), so go straight to the float path.
-        APL_Float z = pow(APL_Float(a), APL_Float(b));
-        if (invert_Z)   z = 1.0 / z;
+        // pow() with the negative exponent directly: 1÷pow() was 1÷∞ = 0
+        // for e.g. M⋆¯17 although 2⋆¯1071 is a (subnormal) double
+        //
+        const APL_Float z = pow(APL_Float(a), invert_Z ? -APL_Float(b)
+                                                      :  APL_Float(b));
+        if (!isfinite(z))   return E_DOMAIN_ERROR;   // Bugs40 #44
         return FloatCell::zF(Z, z);
       }
 

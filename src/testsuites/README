@@ -1,0 +1,37 @@
+This directory contains the test suites of the GNU APL interpreter, one
+subdirectory per test suite:
+
+   main/         all regular testcases except the slow ones
+   regression/   the ZZ* regression testcases (make test3 runs main and
+                 regression). Its last testcase, ZZZZ.tc, shuts down the
+                 shared variable server; it must run after all others.
+   extra/        slow testcases, and testcases that need a special setup
+                 (make test runs extra, main and regression)
+   invariants/   the APL2 LRM chapter 5 invariant testcases (make test4)
+
+A test suite directory contains its testcases (*.tc), the log files of their
+last run (*.tc.log and summary.log, next to the testcases), and the file
+zzzz_selection (named so that ls shows it last), which lists the active
+testcases, one per line, relative to the test suite directory. .tc files
+that are not listed in zzzz_selection are inactive: they are kept (e.g. for
+documentation) but not run. Empty lines and lines starting with # or ⍝ are
+ignored in zzzz_selection, and so are leading and trailing blanks. The
+testcases run in the order of zzzz_selection.
+
+A test suite is run (from the src/ directory) with:
+
+   ./apl --TL testsuites/main      or      ./apl -T @testsuites/main
+
+(testsuites/main/zzzz_selection can be given instead of testsuites/main). The
+result of a failed testcase is accepted with:
+
+   testcases/accept_tc.py testsuites/main/Add.tc
+
+A new testcase must be listed in the Makefile.am of its test suite (so that
+it goes into the tarball), in zzzz_selection if it shall be run, and added
+to SVN.
+
+The log files of a test suite are removed with 'make clear-log' in its
+directory, those of all test suites with 'make clear-logs' in this
+directory (it runs 'make clear-log' in every subdirectory that has a
+Makefile, so every test suite Makefile.am needs a target clear-log).

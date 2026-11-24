@@ -87,7 +87,8 @@ public:
 
    /// )OFF: clean-up and exit from APL interpreter
    /// @param exit_val  process exit status code
-   static void cmd_OFF(int exit_val);
+   static void cmd_OFF(int exit_val, bool by_OFF = false,
+                       bool explicit_code = false);
 
    /// )OFF [exit_code] with a validated exit_code (0-255)
    /// @param out stream for the BAD COMMAND message
@@ -218,6 +219,10 @@ protected:
         /// @param shape  filled with the array shape from the record
         uint32_t get_nrs(UCS_string & name, Shape & shape) const;
 
+        /// return true iff \b name is a valid user name (Bugs38 #40)
+        /// @param name the object name of an )IN record
+        static bool valid_user_name(const UCS_string & name);
+
         /// process an 'N' (numeric in 1 ⎕TF format) item.
         /// @param objects  list of object names to selectively import (empty = all)
         void numeric_1TF(const UCS_string_vector & objects) const;
@@ -255,6 +260,9 @@ protected:
 
         /// the objects that )PIN did not copy
         mutable UCS_string_vector not_copied;
+
+        /// the objects found in the transfer file (for NOT FOUND:, Bugs41 #87)
+        mutable UCS_string_vector found;
 
         /// the record number
         int recnum;

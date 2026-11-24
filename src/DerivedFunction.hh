@@ -106,6 +106,10 @@ public:
    cFunction_P get_OPER() const
       { return oper; }
 
+   /// return true if a system function (e.g. ⎕ES) is part of this derived
+   /// function (as operator or, recursively, as an operand)
+   bool contains_system_function() const;
+
    /// return the right operand (or 0) of this derived function
    cFunction_P get_RO() const
       {
@@ -125,6 +129,9 @@ public:
 
    /// Overloaded Function::has_result();
    virtual bool has_result() const;
+
+   /// Overloaded Function::get_fun_valence()
+   virtual int get_fun_valence() const;
 
    /// clear the marked bit in values bound to this derived functions (if any).
    void unmark_all_values() const;   // unmark values bound to this operator
@@ -167,6 +174,21 @@ public:
    /// @param A left APL argument value
    /// @param B right APL argument value
    virtual Token eval_fill_AB(cValue_R A, cValue_R B) const;
+
+   /// the operand whose fill function is the fill function of \b this
+   const Function * fill_operand() const;
+
+   /// the fill of f¨ resp. A∘.g B: the fill function of the operand
+   /// applied to the items resp. pairs of items (LRM p. 110, Bugs41 #47)
+   static Value_P each_outer_fill(const Function * fun, bool outer,
+                                  const cValue * A, const cValue & B);
+
+   /// overloaded Function::contains_defined()
+   virtual bool contains_defined() const
+      { return   oper->is_defined()
+        || (left_arg .is_function() && left_arg .get_function()->contains_defined())
+        || (right_arg.is_function() && right_arg.get_function()->contains_defined());
+      }
 
    /// overloaded Function::eval_fill_B(). See eval_fill_AB() above.
    /// @param B right APL argument value
@@ -214,6 +236,9 @@ protected:
    /// precise VALENCE ERROR was possible, not a safety issue). See the
    /// .cc file (avoids a Bif_OPER1_EACH.hh include here).
    virtual bool has_monadic_form() const;
+
+   /// return \b true if oper calls LO dyadically in both forms (Bugs40 #56)
+   bool is_dyadic_LO_oper() const;
 
    /// overloaded Function::has_dyadic_form(). See has_monadic_form().
    virtual bool has_dyadic_form() const;

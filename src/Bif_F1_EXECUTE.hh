@@ -42,6 +42,15 @@ public:
    /// @param B  the right APL argument value
    virtual Token eval_B(cValue_R B) const;
 
+   /// overloaded Function::get_fun_valence(): ⍎ is monadic only, e.g.
+   /// ⍎/B and A ⍎.g B are VALENCE ERROR (Bugs38 #77)
+   virtual int get_fun_valence() const
+      { return 1; }
+
+   /// overloaded Function::has_dyadic_form()
+   virtual bool has_dyadic_form() const
+      { return false; }
+
    /// overloaded Function::eval_fill_B()
    /// @param B  the right APL argument value
    virtual Token eval_fill_B(cValue_R B) const;

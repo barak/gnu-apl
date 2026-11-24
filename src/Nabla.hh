@@ -177,6 +177,10 @@ protected:
    /// set current_line after deleting lines up to \b highest
    void prompt_after_delete(const LineLabel & highest);
 
+   /// the label for a new line after \b lab that is not an existing line
+   /// @param lab the line after which the next line shall be inserted
+   LineLabel free_label_after(const LineLabel & lab) const;
+
    /// edit function line
    const char * execute_edit();
 

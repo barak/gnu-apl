@@ -166,7 +166,10 @@ public:
 
    /// negate \b coefficient
    void negate_coefficient()
-      { coefficient = - coefficient; }
+      { coefficient = - coefficient;
+        if (exact_int && int_coefficient != INT64_MIN)
+           int_coefficient = - int_coefficient;
+        else exact_int = false; }
 
    /// set coefficient (must be called before set_imag())
    /// @param overbar true if the APL overbar negation prefix was present
@@ -241,6 +244,14 @@ public:
 
 protected:
    Complex coefficient;       ///< the coefficient
+
+public:
+   /// the exact coefficient if it was scanned as an integer (a double has
+   /// only 53 bits, e.g. for 9007199254740993, Bugs41 #80)
+   bool exact_int = false;
+
+   /// the exact integer coefficient (if exact_int)
+   APL_Integer int_coefficient = 0;
 
 public:
    vector<int> expos;   ///< the (powers of) the indeterminants
@@ -331,9 +342,14 @@ public:
               Monomial & term = at(t);
               if (term.same_expos(other))   // compatible term
                  {
+                   // the term vanishes if the subtraction cancelled it
+                   // to rounding noise, relative to the coefficients (not
+                   // the absolute 1E¯10, Bugs40 #27)
+                   //
+                   const double scale = abs(term.get_coefficient()) +
+                                        abs(other.get_coefficient());
                    term.subtract_coefficient(other.get_coefficient());
-                   if (Cell::is_near_zero(term.get_coefficient().real()) &&
-                       Cell::is_near_zero(term.get_coefficient().imag()))
+                   if (abs(term.get_coefficient()) <= 16*DBL_EPSILON*scale)
                       {
                         erase(begin() + t);
                       }

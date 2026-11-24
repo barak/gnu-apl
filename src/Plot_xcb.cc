@@ -1469,7 +1469,15 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
        SPRINTF(cc, "%s-XCB %d", w_props.get_caption().c_str(), handle);
        pctx.caption = strdup(cc);
       }
-   if (!pctx.caption)   return vp_props;
+   if (!pctx.caption)
+      {
+        // same as the connection failure above: start_GUI() waits for us
+        //
+        w_props.set_gui_thread_error("could not create the window caption");
+        pctx.connected = false;   // start_GUI() still reads w_props
+        sem_post(Quad_PLOT::expose_sema);   // unleash the interpreter
+        return vp_props;
+      }
 
    {
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
@@ -1513,6 +1521,13 @@ const xcb_get_input_focus_reply_t * focusReply =
    //
    xcb_map_window(pctx.conn, pctx.window);
    xcb_flush(pctx.conn);
+
+   // start_GUI() waits once for every new window: post expose_sema for the
+   // first XCB_EXPOSE event only, not for every later one (e.g. after the
+   // window was uncovered). Otherwise the surplus posts let the next
+   // start_GUI() return before its own window exists (Bugs40 #83).
+   //
+bool expose_posted = false;
 
    // X main loop
    //
@@ -1560,7 +1575,9 @@ const xcb_get_input_focus_reply_t * focusReply =
                        if (w_props.get_auto_close())
                           {
                             // unleash the APL interpreter
-                            sem_post(Quad_PLOT::expose_sema);
+                            if (!expose_posted)
+                               sem_post(Quad_PLOT::expose_sema);
+                            expose_posted = true;
                             pctx.window_goon = false;
                             continue;
                           }
@@ -1584,7 +1601,9 @@ const xcb_get_input_focus_reply_t * focusReply =
                        focusReply = 0;
                     }
                   xcb_flush(pctx.conn);
-                  sem_post(Quad_PLOT::expose_sema);   // unleash the interpreter
+                  if (!expose_posted)   // unleash the interpreter
+                     sem_post(Quad_PLOT::expose_sema);
+                  expose_posted = true;
                   break;
 
              case XCB_UNMAP_NOTIFY:       // 18

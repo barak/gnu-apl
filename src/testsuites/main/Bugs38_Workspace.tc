@@ -1,0 +1,903 @@
+⍝ Bugs38_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 items that )SAVE, )DUMP, or )COPY workspaces.
+⍝ The workspaces are written into the testcase library root
+⍝ (testcases/libroot) and dropped at the end.
+
+
+
+
+
+
+      ⍝ Bugs38 #20: )COPY_ONCE identifies a workspace by its full file name, so
+      ⍝ workspaces with the same name in different directories are different
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      A38←'from 0'
+
+
+
+
+
+      )SAVE B38_CO
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      B38←'from 1'
+
+
+
+
+
+      )SAVE 1 B38_CO
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )COPY_ONCE ./testcases/libroot/workspaces/B38_CO
+NEW )COPY_ONCE workspace: ./testcases/libroot/workspaces/B38_CO
+SAVED ³
+
+
+
+      )COPY_ONCE ./testcases/libroot/wslib1/B38_CO
+NEW )COPY_ONCE workspace: ./testcases/libroot/wslib1/B38_CO
+SAVED ³
+
+
+
+      )COPY_ONCE ./testcases/libroot/workspaces/B38_CO.xml
+
+
+
+
+
+      )VARS
+A38     B38
+
+
+
+
+      )DROP B38_CO
+³
+
+
+
+
+      )DROP 1 B38_CO
+³
+
+
+
+
+
+      (⊂'garbage') ⎕FIO[56] 'testcases/libroot/workspaces/B38_BAD.xml'
+8
+
+
+
+
+      )COPY_ONCE B38_BAD
+NEW )COPY_ONCE workspace: B38_BAD
+
+
+
+
+      )COPY_ONCE B38_BAD
+NEW )COPY_ONCE workspace: B38_BAD
+
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B38_BAD.xml'
+0
+
+
+
+
+
+      ⍝ Bugs38 #23: )COPY and )LOAD of a )DUMPed .apl file leave the session
+      ⍝ variables ⎕PW, ⎕TZ, and ⎕PS alone (like the .xml path)
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←95 ⋄ ⎕PS←1 4 ⋄ ⎕IO←0 ⋄ A38←1
+
+
+
+
+
+      ⎕FX 'Z←F23_38' '⎕PW←77' 'Z←⎕PW'
+┏→━━━━━┓
+┃F23_38┃
+┗━━━━━━┛
+
+
+      )SAVE B38_SV
+³
+
+
+
+
+      )DUMP B38_SV
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←70 ⋄ ⎕PS←0 0
+
+
+
+
+
+      )COPY B38_SV.apl
+DUMPED ³
+
+
+
+
+      ⎕PW ⎕IO A38
+70 0 1
+
+
+
+
+      ⎕PS
+0 0
+
+
+
+
+      ⎕CR 'F23_38'
+Z←F23_38
+ ⎕PW←77 
+ Z←⎕PW  
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←70 ⋄ ⎕PS←0 0
+
+
+
+
+
+      )LOAD B38_SV.apl
+DUMPED ³
+
+
+
+
+      ⎕PW ⎕IO A38
+70 0 1
+
+
+
+
+      ⎕PS
+0 0
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←70 ⋄ ⎕PS←0 0
+
+
+
+
+
+      )COPY B38_SV.xml ⎕PW ⎕TZ ⎕TS ⎕SYL ⎕PS ⎕NLT ⎕IO
+SAVED ³
+
+
+
+
+      ⎕PW ⎕IO
+70 0
+
+
+
+
+      ⎕PS
+0 0
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←70 ⋄ ⎕PS←0 0
+
+
+
+
+
+      )COPY B38_SV.apl ⎕PW ⎕TZ ⎕PS ⎕IO
+DUMPED ³
+
+
+
+
+      ⎕PW ⎕IO
+70 0
+
+
+
+
+      ⎕PS
+0 0
+
+
+
+
+      )DROP B38_SV.xml
+³
+
+
+
+
+      )DROP B38_SV.apl
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕PW←80 ⋄ ⎕PS←0 0
+
+
+
+
+
+      ⍝ Bugs38 #24: XML )COPY replaces the global object, also if the name is
+      ⍝ localized in a suspended function (whose local is not affected)
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F24 X' 'Z←X+1'
+F24
+
+
+
+
+      ⎕FX 'Z←G24 X' 'Z←X+2'
+G24
+
+
+
+
+      A24←'from file'
+
+
+
+
+
+      )SAVE B38_FV
+³
+
+
+
+
+      )DUMP B38_FV
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←T24 F24' 'Z←F24÷0'
+T24
+
+
+
+
+      T24 3
+DOMAIN ERROR
+T24[1]  Z←F24÷0
+          ^  ^
+
+
+      )COPY B38_FV.xml
+SAVED ³
+
+
+
+
+      A24
+from file
+
+
+
+
+      G24 1
+3
+
+
+
+
+      F24
+3
+
+
+
+
+      )SIC
+
+
+
+
+
+      F24 1
+2
+      ⍝ replaced)
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      F24←99
+
+
+
+
+
+      ⎕FX 'Z←T24 F24' 'Z←F24÷0'
+T24
+
+
+
+
+      T24 3
+DOMAIN ERROR
+T24[1]  Z←F24÷0
+          ^  ^
+
+
+      )COPY B38_FV.apl F24
+DUMPED ³
+
+
+
+
+      F24
+3
+
+
+
+
+      )SIC
+
+
+
+
+
+      F24
+99
+
+
+
+
+      )DROP B38_FV.xml
+³
+
+
+
+
+      )DROP B38_FV.apl
+³
+      ⍝ a function (and a lambda a variable), like the .xml )COPY
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F26 X' 'Z←X+1'
+F26
+
+
+
+
+      L26←{⍺+⍵}
+
+
+
+
+
+      V26←1 2 3
+
+
+
+
+
+      W26←2 2⍴⍳4
+
+
+
+
+
+      S26.a←1
+
+
+
+
+
+      )DUMP B38_CP
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      F26←'varF' ⋄ L26←'varL'
+
+
+
+
+
+      ⎕FX 'Z←V26' 'Z←''fnV'''
+V26
+
+
+
+
+      ⎕FX 'Z←W26 X' 'Z←''fnW'''
+W26
+
+
+
+
+      ⎕FX 'Z←S26' 'Z←''fnS'''
+S26
+
+
+
+
+      )COPY B38_CP.apl
+DUMPED ³
+
+
+
+
+      ⎕NC 5 3⍴'F26L26V26W26S26'
+3 3 2 2 2
+
+
+
+
+      F26 1
+2
+
+
+
+
+      1 L26 2
+3
+
+
+
+
+      V26
+1 2 3
+
+
+
+
+      W26
+1 2
+3 4
+
+
+
+      S26.a
+1
+
+
+
+
+      )DROP B38_CP.apl
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+
+      ⍝ Bugs38 #38: a lambda that starts with an empty statement, {⋄⍵+1}, works
+      ⍝ after )SAVE and )LOAD
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      F38←{⋄⍵+1}
+
+
+
+
+
+      F38 1
+2
+
+
+
+
+      )SAVE B38_EL
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B38_EL
+SAVED ³
+
+
+
+
+      F38 1
+2
+
+
+
+
+      )DROP B38_EL
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+
+      ⍝ Bugs38 #40: )IN skips a record whose object name is not a valid name
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )IN B38_BADNAMES.atf
+
+
+
+
+
+      )VARS
+Z38
+
+
+
+
+      Z38
+9
+      ⍝ (a surrogate) as (⎕UCS n)
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      V←⎕UCS 97 55296 98
+
+
+
+
+
+      X←⎕UCS 97 57343 0 7 127 98
+
+
+
+
+
+      10 ⎕CR 'V'
+ V←'a' (⎕UCS 55296) 'b' 
+
+
+
+
+      10 ⎕CR 'X'
+ X←'a' (⎕UCS 57343) (⎕UCS 0) (⎕UCS 7) (⎕UCS 127) 'b' 
+
+
+
+
+      )DUMP B38_SUR
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B38_SUR
+DUMPED ³
+
+
+
+
+      ⎕UCS V
+97 55296 98
+
+
+
+
+      ⎕UCS X
+97 57343 0 7 127 98
+
+
+
+
+      )DROP B38_SUR.apl
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+
+      ⍝ Bugs38 #80: a suspended lambda after )SAVE and )LOAD keeps its name and is
+      ⍝ released with its SI entry
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      {⍵÷0}5
+DOMAIN ERROR
+λ1[1]  λ←⍵÷0
+         ^^
+
+
+      )SAVE B38_LAM
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B38_LAM
+SAVED ³
+
+
+
+
+      )SI
+λ1[1]
+*
+
+
+
+      )SIC
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )DROP B38_LAM
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+
+      ⍝ Bugs38 #84: )IN skips an N or C record with an invalid value (⎕IO←7) and
+      ⍝ continues with the next records
+
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )IN B38_BADIO.atf
+
+
+
+
+
+      )VARS
+A84     B84
+
+
+
+
+      A84 B84
+ 42  1 2 
+
+
+
+
+      ⎕PR
+*
+
+
+
+
+      ⎕IO
+1
+
+
+
+
+      ⎕PR←' '
+      ⍝ Bugs38 #85: inverse 1 ⎕TF of an invalid transfer form gives ''
+
+
+
+
+
+      ⍴1 ⎕TF 'N⎕IO 0 7'
+0
+
+
+
+
+      ⍴1 ⎕TF 'NZ 1 2 1'
+0
+
+
+
+
+      ⍴1 ⎕TF 'N1X 0 5'
+0
+
+
+
+
+      )SIC
+

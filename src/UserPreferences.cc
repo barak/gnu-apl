@@ -24,6 +24,7 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 
 #include "Bif_F12_RHO.hh"
@@ -272,15 +273,22 @@ UserPreferences::usage(const char * prog)
 "                         output format: no, yes, or parentheses (overrides\n"
 "                         the preference STRICT_IBM_APL2_FORMATTING)\n"
 "    --[no]SV             [do not] start APnnn (a shared variable server)\n"
-"    -T testcases ...     run testcases\n"
+"    -T testcases ...     run testcases (@file: like --TL file)\n"
 "    --TM mode            test mode (for -T files):\n"
 "                         0:   exit after last testcase (default)\n"
 "                         1:   exit after last testcase if no error\n"
 "                         2:   continue (don't exit) after last testcase\n"
 "                         3:   stop testcases after first error (don't exit)\n"
 "                         4:   exit after first error\n"
+"                         5:   exit after first failed testcase line\n"
+"                         6:   stop after first failed testcase line (don't exit)\n"
 "    --TR                 randomize order of testfiles\n"
 "    --TS                 append to (rather than override) summary.log\n"
+"    --TL file ...        run the testcases listed in each file (one per\n"
+"                         line, like -T; empty lines and lines starting with\n"
+"                         # or ⍝ are ignored), or in file/zzzz_selection if\n"
+"                         file is a directory (a test suite). The files end\n"
+"                         at the next option or --\n"
 #ifndef WINDOWS
 "    -u UID               run as user UID (root only)\n"
 #endif // WINDOWS
@@ -627,6 +635,68 @@ protected:
    const size_t * next_arg;
 };
 }   // namespace
+//────────────────────────────────────────────────────────────────────────────
+/// add the testcase files listed in a test list (one per line) like -T
+/// would (for --TL list and -T @list). \b list is either the test list file
+/// itself or a directory (a test suite, e.g. testsuites/main) that contains
+/// it as file \b zzzz_selection. Names in the test list are relative to the
+/// directory of the test list file. Empty lines and lines starting with #
+/// or ⍝ are ignored, and so are leading and trailing blanks.
+/// @param list_file  set to the name of the test list file that was read
+/// @return false if the test list file cannot be opened
+static bool
+add_test_list(const char * list, UTF8_string & list_file)
+{
+   list_file = UTF8_string(list);
+struct stat st;
+   if (stat(list, &st) == 0 && S_ISDIR(st.st_mode))   // a test suite
+      {
+        if (list_file.size() && list_file.back() != '/')   list_file << "/";
+        list_file << "zzzz_selection";
+      }
+
+ifstream test_list(list_file.c_str());
+   if (!test_list.is_open())   return false;
+
+   // the directory of the test list file (including the final /), to which
+   // the names in it are relative
+   //
+UTF8_string dir;
+   if (const char * slash = strrchr(list_file.c_str(), '/'))
+      dir = UTF8_string(list_file.c_str(), slash + 1 - list_file.c_str());
+
+std::string line;
+bool first_line = true;
+   while (std::getline(test_list, line))
+      {
+        // skip a UTF-8 BOM at the start of the file (Bugs39 #103)
+        //
+        if (first_line && !line.compare(0, 3, "\xEF\xBB\xBF"))
+           line.erase(0, 3);
+        first_line = false;
+
+        // ignore leading and trailing white space (incl. \r)
+        //
+        const size_t from = line.find_first_not_of(" \t\r");
+        if (from == std::string::npos)   continue;   // empty line
+        const size_t to = line.find_last_not_of(" \t\r");
+        line = line.substr(from, to + 1 - from);
+
+        // ignore comment lines (# or ⍝)
+        //
+        if (line[0] == '#')                         continue;
+        if (!line.compare(0, strlen("⍝"), "⍝"))   continue;
+
+        UTF8_string filename;
+        if (line[0] != '/')   filename = dir;   // relative to the test list
+        filename << UTF8_string(line.c_str());
+        InputFile fam(filename, 0, true, true, false, no_LX);
+        InputFile::files_todo.push_back(fam);
+        InputFile::files_orig.push_back(fam);
+      }
+
+   return true;
+}
 //────────────────────────────────────────────────────────────────────────────
 void
 UserPreferences::parse_args_2(bool logit)
@@ -1059,23 +1129,33 @@ UserPreferences::parse_args_2(bool logit)
                          break;           // inner for
 
                        }
-                    const UTF8_string & filename = expanded_args[a];
+                    // -T @list_file is the same as --TL list_file
+                    //
+                    const char * arg = expanded_args[a];
+
+                    // like --TL: the files end at the next option (they
+                    // swallowed e.g. --TS or --TL as testcases, Bugs39 #77)
+                    //
+                    if (arg[0] == '-' && arg[1])   break;   // next option
+                    if (arg[0] == '@' && arg[1])
+                       {
+                         UTF8_string list_file;
+                         if (!add_test_list(arg + 1, list_file))
+                            {
+                              CERR << "-T " << arg << ": cannot open test "
+                                      "list file " << list_file << " ("
+                                   << strerror(errno) << ")" << endl;
+                              exit(a);
+                            }
+                         continue;   // inner for
+                       }
+
+                    const UTF8_string filename(arg);
                     InputFile fam(filename, 0, true, true, false, no_LX);
                     InputFile::files_todo.push_back(fam);
                     InputFile::files_orig.push_back(fam);
                   }
 
-              // 
-              if (IO_Files::need_total)
-                 {
-                   // truncate summary.log, unless append_summary is desired
-                   //
-                   if (!append_summary)
-                      {
-                        ofstream summary("testcases/summary.log",
-                                         ios_base::trunc);
-                      }
-                 }
               continue;
             }
 
@@ -1141,6 +1221,38 @@ UserPreferences::parse_args_2(bool logit)
          IFOPT( --TS )
             {
               append_summary = true;
+              continue;
+            }
+
+         IFOPT( --TL )   // test lists: files that list testcase files
+            {
+              // like -T, --TL takes several arguments: all test lists up to
+              // the next option or --
+              //
+              if (!val || val[0] == '-')
+                 {
+                   CERR << "--TL without test list file" << endl;
+                   exit(a);
+                 }
+
+              for (; a < expanded_args.size(); ++a)   // inner for
+                  {
+                    const char * list = expanded_args[a];
+                    if (!strcmp(list, "--"))   { ++a;   break; }   // skip --
+                    if (list[0] == '-')   break;   // next option
+
+                    UTF8_string list_file;
+                    if (!add_test_list(list, list_file))
+                       {
+                         CERR << "--TL " << list << ": cannot open test "
+                                 "list file " << list_file << " ("
+                              << strerror(errno) << ")" << endl;
+                         exit(a);
+                       }
+                  }
+
+              do_CONT = false;
+              IO_Files::need_total = true;
               continue;
             }
 
@@ -1246,6 +1358,11 @@ UserPreferences::parse_args_2(bool logit)
       }
 
    if (randomize_testfiles)   InputFile::randomize_files();
+
+   // the summary.log file of the testcases (only now, since --TS may follow
+   // -T or --TL)
+   //
+   if (IO_Files::need_total)   IO_Files::init_summary(append_summary);
 
    /* Note. Let the first line of script.apl be:
 
@@ -1655,7 +1772,7 @@ int line = 0;
 int file_profile = 0;   // the current profile in the preferences file
    for (;;)
        {
-         enum { BUFSIZE = 200 };
+         enum { BUFSIZE = 4000 };   // was 200 (Bugs39 #80)
          char buffer[BUFSIZE + 1];
          const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
@@ -1663,12 +1780,28 @@ int file_profile = 0;   // the current profile in the preferences file
          buffer[BUFSIZE] = 0;
          ++line;
 
+         // a line that is too long: report it and skip its rest (which was
+         // read as the next line before, Bugs39 #80)
+         //
+         if (strlen(buffer) == BUFSIZE - 1 && buffer[BUFSIZE - 2] != '\n')
+            {
+              CERR << "line " << line << " of config file " << filename
+                   << " is too long (ignored)" << endl;
+              char rest[BUFSIZE + 1];
+              while (const char * r = reader.fgets(rest, BUFSIZE))
+                  if (strchr(r, '\n'))   break;
+              continue;
+            }
+
          // skip leading spaces
          //
          while (*s && *s <= ' ')   ++s;
 
          if (*s == 0)     continue;   // empty line
          if (*s == '#')   continue;   // comment line
+
+         // the entire line (s may be modified below)
+         const std::string full_line(s);
 
          char opt[BUFSIZE] = { 0 };
          char arg[BUFSIZE] = { 0 };
@@ -1920,10 +2053,14 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strncasecmp(opt, "LIBREF-", 7))
             {
-              const int lib_ref = atoi(opt + 7);
+              // exactly one digit N (atoi() made e.g. LIBREF-abc library 0,
+              // Bugs39 #80)
+              const bool one_digit = opt[7] >= '0' && opt[7] <= '9' &&
+                                     opt[8] == 0;
+              const int lib_ref = one_digit ? opt[7] - '0' : -1;
               if (lib_ref < 0 || lib_ref > 9)
                  {
-                   CERR << "bad library reference number " << lib_ref
+                   CERR << "bad library reference number in " << opt
                         << " at line " << line << " of config file "
                         << filename << " (ignored)" << endl;
                    continue;
@@ -1932,7 +2069,32 @@ int file_profile = 0;   // the current profile in the preferences file
               // option --libroot overrides the LIBREF-N settings
               if (LibPaths::is_root_from_arg())   continue;
 
-              const UTF8_string arg_utf(arg);
+              // the rest of the line (a path may contain blanks; only its
+              // first word was used, Bugs39 #80)
+              //
+              const char * path = full_line.c_str() + strlen(opt);
+              while (*path && *path <= ' ')   ++path;
+              UTF8_string arg_utf(path);
+
+              // but a # or // after white space starts a comment, like for
+              // the other options (Bugs40 #53)
+              //
+              for (size_t a = 1; a < arg_utf.size(); ++a)
+                  {
+                    // unsigned: a byte of a UTF-8 character (≥ 0x80) is
+                    // no white space (Bugs41 #69)
+                    if (UTF8(arg_utf[a - 1]) > ' ')   continue;
+                    if (arg_utf[a] == '#' ||
+                        (arg_utf[a] == '/' && a + 1 < arg_utf.size() &&
+                         arg_utf[a + 1] == '/'))
+                       {
+                         arg_utf.resize(a);
+                         break;
+                       }
+                  }
+
+              while (arg_utf.size() && arg_utf.back() <= ' ')
+                    arg_utf.pop_back();
               LibPaths::set_lib_dir(LibRef(lib_ref), arg_utf,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
                                         : LibPaths::LibDir::CSRC_PREF_HOME);
@@ -2172,13 +2334,26 @@ FileReader reader(open_user_file("parallel_thresholds",
 int line = 0;
    for (;;)
        {
-         enum { BUFSIZE = 200 };
+         enum { BUFSIZE = 4000 };   // was 200 (Bugs39 #80)
          char buffer[BUFSIZE + 1];
          const char * s = reader.fgets(buffer, BUFSIZE);
          if (s == 0)   break;   // end of file
 
          buffer[BUFSIZE] = 0;
          ++line;
+
+         // a line that is too long: report it and skip its rest (which was
+         // read as the next line before, Bugs39 #80)
+         //
+         if (strlen(buffer) == BUFSIZE - 1 && buffer[BUFSIZE - 2] != '\n')
+            {
+              CERR << "line " << line << " of config file " << filename
+                   << " is too long (ignored)" << endl;
+              char rest[BUFSIZE + 1];
+              while (const char * r = reader.fgets(rest, BUFSIZE))
+                  if (strchr(r, '\n'))   break;
+              continue;
+            }
 
          // skip leading spaces
          //

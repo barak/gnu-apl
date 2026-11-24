@@ -1,0 +1,34 @@
+⍝ ZZ60_Regression.tc
+⍝ ══════════════════
+
+      ⍝ bug-apl@gnu.org, 5/28/2023 (Christian Roberts) ...
+
+      )CLEAR
+CLEAR WS
+
+      ⊢ sample←2 3⍴ 142 1.375974377E¯13 0.264  53 5.267033354E¯14 0.008
+142 1.375974377E¯13 0.264
+ 53 5.267033354E¯14 0.008
+
+      ⊢ test←4 0 7 ¯3 7 ¯4⍕sample   ⍝ hangs ?
+DOMAIN ERROR+
+      ⊢test←4 0 7 ¯3 7 ¯4⍕sample
+            ^            ^
+
+      ⊢ Q←1 3⍴53 5.267033354E¯14 0.008
+53 5.267033354E¯14 0.008
+
+      4 0 7 ¯3 7 ¯4⍕Q
+DOMAIN ERROR+
+      4 0 7 ¯3 7 ¯4⍕Q
+      ^            ^
+
+      7 ¯3⍕5.267033354E¯14
+DOMAIN ERROR+
+      7 ¯3⍕5.267033354E¯14
+      ^   ^
+
+
+      )CLEAR
+CLEAR WS
+

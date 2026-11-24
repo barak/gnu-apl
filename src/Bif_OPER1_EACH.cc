@@ -26,12 +26,27 @@
 #include "Bif_F1_EXECUTE.hh"
 #include "Bif_OPER1_EACH.hh"
 #include "Macro.hh"
+#include "DerivedFunction.hh"
 #include "PointerCell.hh"
+#include "QuadFunction.hh"
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
 Bif_OPER1_EACH Bif_OPER1_EACH::fun;
 
+//════════════════════════════════════════════════════════════════════════════
+/// return true if \b fun is a system function, possibly with an axis
+/// (e.g. ⎕FIO[4]), see Bugs38 #108
+static bool
+is_system_function(const Function * fun)
+{
+   if (dynamic_cast<const QuadFunction *>(fun))   return true;
+
+   // also as part of a derived function, e.g. ⎕ES⍨ (Bugs39 #90)
+   if (const DerivedFunction * dfun = dynamic_cast<const DerivedFunction *>(fun))
+      return dfun->contains_system_function();
+   return false;
+}
 //════════════════════════════════════════════════════════════════════════════
 Token
 Bif_OPER1_EACH::eval_ALB(cValue_R A, Token & _LO, cValue_R B) const
@@ -43,25 +58,24 @@ Bif_OPER1_EACH::eval_ALB(cValue_R A, Token & _LO, cValue_R B) const
         // if the shapes differ then either A or B must be a 1-element
         // value of any rank (scalar extension as for the scalar functions,
         // see Value::is_scalar_extensible(), for every LO, Bugs37 #66).
+        // Also for equal ranks, and for every LO, i.e. also for a defined
+        // LO without a result (Bugs38 #34).
         //
-        if (A.get_rank() != B.get_rank())
+        if      (A.is_scalar_extensible())    ;   // OK
+        else if (B.is_scalar_extensible())    ;   // OK
+        else if (A.get_rank() != B.get_rank())
            {
-             if      (A.is_scalar_extensible())    ;   // OK
-             else if (B.is_scalar_extensible())    ;   // OK
-             else if (A.get_rank() != B.get_rank())
-                {
-                  MORE_ERROR() << "A f¨B: expecting ⍴⍴A = ⍴⍴B (or A or B with"
-                                  " 1 element); ⍴⍴A is "
-                               << A.get_rank() << ", ⍴⍴B is " << B.get_rank();
-                  RANK_ERROR;
-                }
-             else
-                {
-                  MORE_ERROR() << "A f¨B: expecting ⍴A = ⍴B (or A or B with"
-                                  " 1 element); ⍴A is "
-                               << A.get_shape() << ", ⍴B is " << B.get_shape();
-                  LENGTH_ERROR;
-                }
+             MORE_ERROR() << "A f¨B: expecting ⍴⍴A = ⍴⍴B (or A or B with"
+                             " 1 element); ⍴⍴A is "
+                          << A.get_rank() << ", ⍴⍴B is " << B.get_rank();
+             RANK_ERROR;
+           }
+        else
+           {
+             MORE_ERROR() << "A f¨B: expecting ⍴A = ⍴B (or A or B with"
+                             " 1 element); ⍴A is "
+                          << A.get_shape() << ", ⍴B is " << B.get_shape();
+             LENGTH_ERROR;
            }
       }
 
@@ -72,6 +86,12 @@ cFunction_P LO = _LO.get_function();
    // which is incorrect in this context. We use get_signature() instead.
    //
    if ((LO->get_signature() & SIG_DYA) != SIG_DYA)   VALENCE_ERROR;
+   if (!LO->has_dyadic_form())   // e.g. ⎕UCS⍨ (Bugs40 #56)
+      {
+        MORE_ERROR() << "A f¨ B: " << LO->get_name()
+                     << " has no dyadic form";   // Bugs41 #65
+        VALENCE_ERROR;
+      }
 
    // B is a selective-assignment target (an lvalue/cellrefs array) iff
    // its VF_Flags::left_value flag is set (Value::get_cellrefs() sets it
@@ -115,8 +135,6 @@ cFunction_P LO = _LO.get_function();
 
    if (A.is_empty() || B.is_empty())
       {
-        if (!LO->has_result())   return Token(TOK_VOID);
-
         Value_P first_A = Bif_F12_TAKE::first(A);
         Value_P first_B = Bif_F12_TAKE::first(B);
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
@@ -156,10 +174,29 @@ cFunction_P LO = _LO.get_function();
              RANK_ERROR;
            }
 
+        // after the conformance checks above (Bugs38 #34)
+        if (!LO->has_result())   return Token(TOK_VOID);
+
+        // B is a selective-assignment target, e.g. (1↑¨V)←9 for an empty V:
+        // nothing is selected, so (like the monadic branch, Bugs31 #4) return
+        // an empty lvalue no-op placeholder instead of the fill value, which
+        // is no LvalCell (SYNTAX ERROR) or, for ⊃, has no target (Bugs40 #58).
+        //
+        if (B.is_left_value())
+           {
+             const_cast<Value &>(static_cast<const Value &>(B))
+                .neutralize_lval_cells(LOC);   // A empty, B not
+             Value_P Z(shape_Z, LOC);
+             new (&Z->get_wproto()) LvalCell(0, 0);
+             Z->set_left_value();
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+           }
+
         // evaluate the fill function (lrm p. 245)
         //
         Value_P Z1;
-        if (LO->is_defined() || LO->may_push_SI())
+        if (LO->contains_defined())   // Bugs40 #55
            {
              // the fill function of a defined function (or of a derived
              // function whose operand is defined, e.g. F⍤1 for a
@@ -172,21 +209,34 @@ cFunction_P LO = _LO.get_function();
              //
              Z1 = first_B;
            }
-        else if (LO->is_scalar_function())
+        else if (LO->is_scalar_dyadic())   // Bugs40 #40
            {
-             // NOTE: even though eval_ALB is dyadic, we call the monadic
-             //       fill function because it (and not the dyadic fill
-             //       function handles the empty argument case).
+             // lrm p. 107: (↑A) FF (↑B); both items contribute to the
+             // prototype of Z, e.g. (0⍴0)×¨⊂1 2 (Bugs40 #55)
              //
-             Token tok_Z1 = LO->eval_fill_B(*(B.is_empty() ? first_B : first_A));
+             Token tok_Z1 = LO->eval_fill_AB(*first_A, *first_B);
              if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
              Z1 = tok_Z1.get_apl_val();
            }
+        else if (is_system_function(LO))
+           {
+             // system functions have no fill function and must not be
+             // executed (LRM p. 56): e.g. ⎕ES¨'' or ⎕FIO[4]¨⍬ (Bugs38 #108)
+             //
+             Z1 = first_B;
+           }
         else
            {
-             // the fill function is the function itself
+             // the fill function is the function itself, except for a
+             // (primitive) derived function implemented by a macro, e.g.
+             // ×⍤0, which must not be started here (Bugs40 #55)
              //
-             Token tok_Z1 = LO->eval_AB(*first_A, *first_B);
+             // a derived LO (e.g. ∘.+ or ÷¨) has its own fill function,
+             // e.g. that of its operand (LRM p. 110, Bugs41 #47)
+             //
+             Token tok_Z1 = (LO->may_push_SI() || LO->is_derived())
+                          ? LO->eval_fill_AB(*first_A, *first_B)
+                          : LO->eval_AB(*first_A, *first_B);
              if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
              Z1 = tok_Z1.get_apl_val();
            }
@@ -206,7 +256,12 @@ cFunction_P LO = _LO.get_function();
            }
 
         Z->check_value(LOC);
-        Z->to_type(true);
+
+        // only the fill function of a scalar function is numeric (LRM p.
+        // 56); otherwise the fill result keeps its type, e.g. ⌽¨'' ≡ '',
+        // like for ∘.f (Bif_OPER2_OUTER.cc, Bugs28 #37, Bugs38 #35)
+        //
+        Z->to_type(LO->is_scalar_dyadic());   // Bugs40 #40
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -215,12 +270,16 @@ cFunction_P LO = _LO.get_function();
          // the shape of Z is chosen as for a primitive LO (see shape_Z
          // below): ⍴B if A is a scalar, ⍴A if B is a scalar, and otherwise
          // the shape of the argument that is not extended. If both have
-         // 1 element (but neither is a scalar), then A is extended and Z
-         // has the shape of B (Bugs37 #66).
+         // 1 element (but neither is a scalar), then the argument with the
+         // lower rank is extended and Z has the shape of the other, like
+         // for the scalar functions (Bugs20 #5, Bugs37 #66, Bugs38 #106).
          //
-         const bool extend_A = A.is_scalar_extensible() && !B.is_scalar();
+         const bool A_higher = A.get_rank() > B.get_rank();
+         const bool extend_A = A.is_scalar_extensible() && !B.is_scalar() &&
+                               !(B.is_scalar_extensible() && A_higher);
          const bool extend_B = B.is_scalar_extensible() &&
-                               (B.is_scalar() || !A.is_scalar_extensible());
+                               (B.is_scalar() || !A.is_scalar_extensible() ||
+                                A_higher);
 
          Macro * macro = 0;
          if (LO->has_result())
@@ -293,6 +352,9 @@ const int inc_B = B.get_increment();
 const Shape * shape_Z = 0;
    if      (A.is_scalar())      shape_Z = &B.get_shape();
    else if (B.is_scalar())      shape_Z = &A.get_shape();
+   else if (inc_A == 0 && inc_B == 0)   // both 1-element: higher rank wins
+      shape_Z = A.get_rank() > B.get_rank() ? &A.get_shape()   // Bugs38 #106
+                                            : &B.get_shape();
    else if (inc_A == 0)          shape_Z = &B.get_shape();
    else if (inc_B == 0)          shape_Z = &A.get_shape();
    else if (A.same_shape(B))   shape_Z = &B.get_shape();
@@ -344,8 +406,11 @@ Value_P Z;
              // a selective assignment through an over-take of an
              // empty vector, (1 2+¨1↑⍬)←1 2: dereferencing it
              // unconditionally segfaults instead of a clean error.
-             if (dest == 0)   INDEX_ERROR;
-             if (dest->is_pointer_cell())
+             // A target of 0 (an over-take position or a placeholder for an
+             // item of an empty value, e.g. (1↑¨↑V)←9) is passed on as such
+             // (Bugs41 #2) so that LO selects from it like from an item.
+             if (dest == 0)   LO_B = Value::discarded_lval();
+             else if (dest->is_pointer_cell())
                 {
                   Value_P sub = dest->get_pointer_value();
                   LO_B = sub->get_cellrefs(LOC);
@@ -364,6 +429,15 @@ Value_P Z;
 
              if (!Z)
                 ;   // LO without result: nothing to store
+             else if (left_val && vZ->is_scalar() && vZ->get_lval_pick_slot())
+                {
+                  // e.g. (↑¨V)←X where the first item of an item of V is a
+                  // nested scalar: LO selected that slot (wholesale), not
+                  // the cell inside it (Bugs41 #3)
+                  //
+                  Z->next_ravel_Lval(vZ->get_lval_pick_slot(),
+                                     vZ->get_lval_pick_owner());
+                }
              else if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
                 {
                   Cell cache;
@@ -412,6 +486,12 @@ cFunction_P LO = _LO.get_function();
    if (LO->is_operator() &&
        !_LO.is_SLASH_or_BACKSLASH())     SYNTAX_ERROR;
    if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
+   if (!LO->has_monadic_form())   // e.g. ⎕TF⍣1 (Bugs40 #56)
+      {
+        MORE_ERROR() << "f¨ B: " << LO->get_name()
+                     << " has no monadic form";   // e.g. /¨B, Bugs41 #65
+        VALENCE_ERROR;
+      }
 
    // see the dyadic branch (eval_ALB) for the full explanation of both
    // the VF_Flags::left_value test (B.is_left_value(), not a cell-
@@ -472,7 +552,7 @@ cFunction_P LO = _LO.get_function();
         // evaluate the fill function (lrm p. 245)
         //
         Value_P Z1;
-        if (LO != &Quad_EC::fun && (LO->is_defined() || LO->may_push_SI()))
+        if (LO != &Quad_EC::fun && LO->contains_defined())   // Bugs40 #55
            {
              // the fill function of a defined function (or of a derived
              // function whose operand is defined, e.g. F⍤1 for a
@@ -512,11 +592,23 @@ cFunction_P LO = _LO.get_function();
              Value_P sub2 = Idx0_0(LOC);
              Z1->next_ravel_Pointer(sub2.get());
            }
+        else if (is_system_function(LO))
+           {
+             // system functions have no fill function and must not be
+             // executed (LRM p. 56): e.g. ⎕ES¨'' or ⎕FIO[4]¨⍬ (Bugs38 #108)
+             //
+             Z1 = first_B;
+           }
         else
            {
-             // the fill function is the function itself
+             // the fill function is the function itself, except for a
+             // (primitive) derived function implemented by a macro, e.g.
+             // ×⍤0, which must not be started here (Bugs40 #55)
              //
-             Token tok_Z1 = LO->eval_B(*first_B);
+             // see eval_ALB() (Bugs41 #47)
+             Token tok_Z1 = (LO->may_push_SI() || LO->is_derived())
+                                              ? LO->eval_fill_B(*first_B)
+                                              : LO->eval_B(*first_B);
              if (tok_Z1.get_Class() != TC_VALUE)   return tok_Z1;
              Z1 = tok_Z1.get_apl_val();
            }
@@ -537,7 +629,12 @@ cFunction_P LO = _LO.get_function();
         // placeholder, so B here is never a selective-assignment target.
         //
         Z->check_value(LOC);
-        Z->to_type(true);
+
+        // only the fill function of a scalar function is numeric (LRM p.
+        // 56); otherwise the fill result keeps its type, e.g. ⌽¨'' ≡ '',
+        // like for ∘.f (Bif_OPER2_OUTER.cc, Bugs28 #37, Bugs38 #35)
+        //
+        Z->to_type(LO->is_scalar_function());
         return Token(TOK_APL_VALUE1, Z);
       }
 
@@ -619,8 +716,9 @@ Value_P Z;
                   // a selective assignment through an over-take of an
                   // empty vector, (,¨1↑⍬)←,1: dereferencing it
                   // unconditionally segfaults instead of a clean error.
-                  if (dest == 0)   INDEX_ERROR;
-                  if (dest->is_pointer_cell())
+                  // see eval_ALB() (Bugs41 #2)
+                  if (dest == 0)   LO_B = Value::discarded_lval();
+                  else if (dest->is_pointer_cell())
                      {
                        Value_P sub = dest->get_pointer_value();
                        LO_B = sub->get_cellrefs(LOC);
@@ -634,6 +732,13 @@ Value_P Z;
 
                   if (!Z)
                      ;   // LO without result: nothing to store
+                  else if (is_left_val && vZ->is_scalar() &&
+                           vZ->get_lval_pick_slot())
+                     {
+                       // see eval_ALB() (Bugs41 #3)
+                       Z->next_ravel_Lval(vZ->get_lval_pick_slot(),
+                                          vZ->get_lval_pick_owner());
+                     }
                   else if (vZ->is_simple_scalar() ||
                            (is_left_val && vZ->is_scalar()))
                      {

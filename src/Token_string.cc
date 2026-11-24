@@ -50,13 +50,13 @@ const auto throw_unclosed = [&](size_t from)
          : outer.closer == TOK_R_CURLY ? E_UNBALANCED_L_CURLY
                                        : E_UNBALANCED_L_PARENT;
 
-     if (Workspace::more_error().size() == 0)
-        MORE_ERROR() << Error::error_name(ec);
+     // always: an earlier )MORE text belongs to another error (Bugs38 #113)
+     MORE_ERROR() << Error::error_name(ec);
      Error error(ec, LOC);
      build_error_line_2(error, outer.pos, outer.pos);
 
-     if (StateIndicator * si = Workspace::SI_top())
-        StateIndicator::get_error(si) = error;
+     // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+     StateIndicator::get_error(Workspace::SI_top()) = error;
 
      throw error;
    };
@@ -109,8 +109,8 @@ const auto throw_unclosed = [&](size_t from)
         //
         const int lo = expected.size() ? expected.back().pos : int(s);
 
-        if (Workspace::more_error().size() == 0)
-           MORE_ERROR() << Error::error_name(ec);
+        // always: an earlier )MORE text belongs to another error (Bugs38 #113)
+        MORE_ERROR() << Error::error_name(ec);
         Error error(ec, LOC);
         build_error_line_2(error, lo, int(s));
 
@@ -122,8 +122,8 @@ const auto throw_unclosed = [&](size_t from)
         // statement's still-current Executable/prefix state and
         // clobber the message build_error_line_2() just built above.
         //
-        if (StateIndicator * si = Workspace::SI_top())
-           StateIndicator::get_error(si) = error;
+        // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+        StateIndicator::get_error(Workspace::SI_top()) = error;
 
         throw error;
       }
@@ -141,8 +141,10 @@ Token_string::check_semicolons(bool lambda_locals) const
    // a ; is only valid:
    //
    // 1. between [ and ] (an index or axis), or
-   // 2. between { and } (the local variables of a lambda; the lambda body
-   //    itself is checked again when the lambda is created), or
+   // 2. between { and }, but only as the local variables of the lambda
+   //    at the end of its body: {...;A;B} or, like in a ∇-header (LRM
+   //    p. 293), {...;A B} (Bugs39 #81). (Bugs38 #2: other ; inside {...}
+   //    created lambdas that )SAVE wrote but )LOAD could not read), or
    // 3. at the end of a lambda body: ;A;B... (lambda_locals)
    //
    // Otherwise the input is a SYNTAX ERROR before anything in it was
@@ -171,35 +173,70 @@ vector<TokenTag> openers;   // TOK_L_BRACK, TOK_L_PARENT, or TOK_L_CURLY
         // at(s) is a ;
         //
         if (openers.size() && openers.back() == TOK_L_BRACK)   continue;
-        if (openers.size() && openers.back() == TOK_L_CURLY)   continue;
+        if (openers.size() && openers.back() == TOK_L_CURLY &&   // maybe 2.
+            is_locals_tail(s, true))   continue;
 
-        if (lambda_locals && openers.size() == 0)   // maybe 3.
-           {
-             bool locals = true;
-             for (ShapeItem l = s; l < ssize(); l += 2)
-                 {
-                   if (l + 1 >= ssize()                        ||
-                       at(l).get_tag() != TOK_SEMICOL          ||
-                       at(l + 1).get_Class() != TC_SYMBOL)
-                      {
-                        locals = false;
-                        break;
-                      }
-                 }
-             if (locals)   return;
-           }
+        if (lambda_locals && openers.size() == 0 &&   // maybe 3.
+            is_locals_tail(s, false))   return;
 
-        MORE_ERROR() << "; outside of [...] (only an index or an axis"
-                        " can contain ;)";
+        if ((openers.size() && openers.back() == TOK_L_CURLY) ||
+            (lambda_locals && openers.size() == 0))   // in a lambda
+           MORE_ERROR() << "; in {...} is only allowed in the trailing list"
+                           " ;NAME1;NAME2... (or ;NAME1 NAME2...) of local"
+                           " variable names";   // Bugs39 #81, #83
+        else
+           MORE_ERROR() << "; outside of [...] (only an index or an axis"
+                           " can contain ;)";
         Error error(E_SYNTAX_ERROR, LOC);
         build_error_line_2(error, int(s), int(s));
 
         // see all_brackets_closed() above
         //
-        if (StateIndicator * si = Workspace::SI_top())
-           StateIndicator::get_error(si) = error;
+        // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+        StateIndicator::get_error(Workspace::SI_top()) = error;
 
         throw error;
+      }
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Token_string::is_locals_tail(ShapeItem s, bool in_curly) const
+{
+   // at(s) is a ;. Return true if at(s) starts a list of local names
+   // ;A B;C... (each ; followed by one or more names) that ends with the
+   // closing } of the lambda (in_curly) or at the end of this string.
+   //
+   while (s < ssize() && at(s).get_tag() == TOK_SEMICOL)
+      {
+        ++s;   // the ;
+        if (s >= ssize() || !is_local_name(at(s)))   return false;
+        while (s < ssize() && is_local_name(at(s)))   ++s;
+      }
+
+   if (in_curly)   return s < ssize() && at(s).get_tag() == TOK_R_CURLY;
+   return s == ssize();
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Token_string::is_local_name(const Token & tok)
+{
+   // a name that can be a local variable of a lambda: not ⍺, ⍵, ⍶, ⍹, or χ
+   // (which are TC_SYMBOLs as well, Bugs39 #83), and not ⎕, ⍞, or λ, which
+   // ⎕FX rejects in a header as well (Bugs40 #93). System variables (e.g.
+   // ⎕IO) are fine.
+   //
+   if (tok.get_Class() != TC_SYMBOL)   return false;
+   switch(tok.get_tag())
+      {
+        case TOK_ALPHA:
+        case TOK_OMEGA:
+        case TOK_ALPHA_U:
+        case TOK_OMEGA_U:
+        case TOK_CHI:
+        case TOK_Quad_Quad:
+        case TOK_Quad_QUOTE:
+        case TOK_LAMBDA:   return false;
+        default:           return true;
       }
 }
 //────────────────────────────────────────────────────────────────────────────

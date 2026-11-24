@@ -1,0 +1,43 @@
+⍝ ZZ18_Regression
+⍝ ----------------------------------
+
+      ⍝ Bug when assigning variable to result of function call on self
+      ⍝
+      D←5 5 ⍴ 0
+      D[2 3 4;3]←1
+
+∇Z←next D;N
+ N ← (↑+/, ¯1 0 1∘.⊖ ¯1 0 1⌽¨⊂D) - D
+ Z ← (3≠2 3⍳N×D) ∨ 3=N×~D
+∇
+
+
+∇N disploop S
+ →(N=0)/0
+next:
+ S←next S
+ disp ← '.#'[1+S]
+ ⎕DL ÷4
+ N←N-1
+ →next
+∇
+
+      10 disploop D
+INDEX ERROR+
+disploop[4]  disp←'.#'[1+S]
+                  ^   ^
+
+
+      )WSID ZZ18_Regression
+WAS ³
+
+
+      )DROP ZZ18_Regression
+³
+
+      )SAVE
+³
+
+
+      )SIC
+

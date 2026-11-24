@@ -1,0 +1,1641 @@
+⍝ Bugs38_CD.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 severity C and D items (#69 - #130): wrong
+⍝ errors, diagnostics, leaks, undefined behaviour, and minor issues.
+
+
+
+
+
+
+      ⍝ Bugs38 #69: ⎕SYL[3;2] rejects a negative limit and one below a cell
+
+
+
+
+
+      ⎕SYL[3;2]←¯1
+DOMAIN ERROR+
+      ⎕SYL[3;2]←¯1
+      ^        ^
+
+
+      ⎕SYL[3;2]←23
+DOMAIN ERROR+
+      ⎕SYL[3;2]←23
+      ^        ^
+
+
+      ⎕SYL[3;2]
+0
+
+      ⍝ Bugs38 #70: a parse error with an empty SI sets ⎕ET and ⎕EM
+
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⎕FX 'Z←A H70 B' 'Z←A+B'
+H70
+
+
+
+
+      V←1 2
+
+
+
+
+
+      (2 H70 V)←9
+SYNTAX ERROR+
+      (2 H70 V)←9
+      ^        ^
+
+
+      ⎕ET
+2 4
+
+
+
+
+      ⍴⎕EM
+3 17
+
+
+
+
+      (1 2
+Unbalanced left parenthesis+
+      (1 2
+      ^
+
+
+      ⎕ET
+2 2562
+
+
+
+
+      A←1;2
+SYNTAX ERROR+
+      A←1;2
+         ^
+
+
+      ⎕ET
+2 2
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⎕ET
+0 0
+
+
+
+
+      ⍝ Bugs38 #71: a structured variable is displayed by its members, also boxed
+      ⍝ and with a print length limit (not as its member table)
+
+
+
+
+
+      )ERASE S71
+
+
+
+
+
+      S71.a←1
+
+
+
+
+
+      ]BOXING 4
+
+
+
+
+
+      S71
+.a: 1
+
+
+
+
+      ⎕←S71
+.a: 1
+
+
+
+
+      ]BOXING OFF
+
+
+
+
+
+      )ERASE T71
+
+
+
+
+
+      T71←38 ⎕CR 600
+
+
+
+
+
+      T71.a←1
+
+
+
+
+
+      ⎕SYL[28;2]←1000
+
+
+
+
+
+      T71
+.a: 1
+
+
+
+
+      ⎕SYL[28;2]←0
+
+
+
+
+
+      ⍝ Bugs38 #72: a derived function with a value right operand, or a
+      ⍝ parenthesized function, at the right end of a statement is a SYNTAX ERROR
+      ⍝ before anything left of it is executed
+
+
+
+
+
+      B←0
+
+
+
+
+
+      (B←7) +⍣2
+SYNTAX ERROR+
+      (B←7)+⍣2
+             ^
+
+
+      B
+0
+
+
+
+
+      (B←7) -⍤0
+SYNTAX ERROR+
+      (B←7)-⍤0
+             ^
+
+
+      (B←7) +⍤(B←3)
+SYNTAX ERROR+
+      (B←7)+⍤(B←3)
+                 ^
+
+
+      (B←7) (+/)
+SYNTAX ERROR+
+      (B←7)(+/)
+              ^
+
+
+      B
+0
+
+
+
+
+      )MORE
+NO )MORE ERROR INFO
+
+
+
+
+      0 1 2 ⌽⍤0 1 'ABC'
+ABC
+BCA
+CAB
+
+
+      -⍣2 (5 6)
+5 6
+
+
+
+
+      ⍝ Bugs38 #73: ⍎ keeps the class of a fix-time error other than SYNTAX
+      ⍝ ERROR. A syntax error is SYNTAX ERROR (2 2) in ⍎, ⎕EA, ⎕EC and ⎕EB
+      ⍝ (APL2 LRM ⎕ES example); its specific reason is in )MORE
+
+
+
+
+
+      ⍎'{→0}'
+DEFN ERROR+
+      ⍎'{→0}'
+      ^
+
+
+      ⎕ET
+0 2817
+
+
+
+
+      ⍎'(1 2'
+SYNTAX ERROR+
+      ⍎'(1 2'
+      ^^
+
+
+      )MORE
+Unbalanced left parenthesis
+
+
+      ⍎'(1 2'
+SYNTAX ERROR+
+      ⍎'(1 2'
+      ^^
+
+
+      ⎕ET
+2 2
+
+
+      '⎕ET' ⎕EA '(1 2'
+2 2
+
+
+      )MORE
+A ⎕EA B: B failed to execute (Unbalanced left parenthesis)
+
+
+      2↑⎕EC 'A←B)←2)'
+ 0  2 2 
+
+
+      3⊃⎕EC 'A←B)←2)'
+SYNTAX ERROR+               
+      A←B)←2)               
+         ^                  
+Unbalanced right parenthesis
+
+
+      '' ⎕EB '1 ''2'
+SYNTAX ERROR+
+      '' ⎕EB '1 ''2'
+      ^
+
+
+      )MORE
+A ⎕EB B: B failed with SYNTAX ERROR in: '2
+Standard APL string (i.e. '...'): start at column (prompt+3), but no end.
+
+
+
+
+      ⍝ Bugs38 #74: f⍤[X]y ⊢B (the operator is not hidden by the axis)
+
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+
+      ⌽⍤[1]1 ⊢M
+3 6
+2 5
+1 4
+
+
+      X←1
+
+
+
+
+
+      ⌽⍤[X]1 ⊢M
+3 6
+2 5
+1 4
+
+
+      ⍝ Bugs38 #75: A∘.f B with an empty argument and a derived f that contains a
+      ⍝ defined function or a macro: the fill function is the identity
+
+
+
+
+
+      ⎕FX 'Z←A (F OP75) B' 'Z←A F B'
+OP75
+
+
+
+
+      ⍴⍬∘.(+OP75)⍬
+0 0
+
+
+
+
+      ⍴⍬∘.({⍺+⍵}⍣2)⍬
+0 0
+
+
+
+
+      ⍴⍬∘.(+⍤0)⍬
+0 0
+
+      ⍝ Bugs38 #76: A f.g B extends a length-1 inner axis on every path
+
+
+
+
+
+      (⍳3)+.×1 3⍴⍳3
+6 12 18
+
+
+
+
+      (⍳3){⍺+⍵}.×1 3⍴⍳3
+6 12 18
+
+
+
+
+      (2 1⍴7 8)+.×⍳3
+42 48
+
+
+
+
+      (2 1⍴7 8){⍺+⍵}.×3 1⍴⍳3
+42
+48
+
+
+
+      (⍳3)+.×⍳4
+LENGTH ERROR+
+      (⍳3)+.×⍳4
+      ^   ^
+
+
+      ⍝ Bugs38 #77: the monadic-only ⍎ is no operand of / or . (VALENCE ERROR)
+
+
+
+
+
+      ⍎/ ,'3'
+VALENCE ERROR+
+      ⍎/,'3'
+      ^
+
+
+      2 ⍎.+ 3
+VALENCE ERROR+
+      2⍎.+3
+      ^^
+
+
+      ⍎/ ⍳0
+VALENCE ERROR+
+      ⍎/⍳0
+      ^
+
+
+      ⍝ Bugs38 #78, #81: a lambda bound to a local name or to the result (λ←⍶) is
+      ⍝ released when the frame ends (it leaked its body values)
+
+
+
+
+
+      ⎕FX 'MV78 B' '⍝ monadic, no result'
+MV78
+
+
+
+
+      {2+⍵}{⍶ MV78 ⍵} 5
+VALUE ERROR+
+λ2[1]  λ←⍶ MV78 ⍵
+           ^
+
+
+      )SIC
+
+
+
+
+
+      ⎕FX 'Z←T81 N' 'Z←⍎¨N⍴⊂''{Y←{⍵+1} ⋄ Y ⍵;Y}5'''
+T81
+
+
+
+
+      +/T81 100
+600
+
+
+
+
+      ⎕FX 'Z←F81;G' 'G←{⍵×2}' 'Z←G 5'
+F81
+
+
+
+
+      F81
+10
+
+
+
+
+      ⎕FX 'Z←F81;G' 'G←{⍵×3}' 'Z←G 5'
+F81
+
+
+
+
+      F81
+15
+
+
+
+
+      )SIC
+
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ Bugs38 #86: A ⎕FIO[27] B (rename) rejects a NUL in A or B
+
+
+
+
+
+      'testcases/libroot/B38a.txt' ⎕FIO[27] 'testcases/libroot/B38b.txt',(⎕UCS 0),'.bak'
+DOMAIN ERROR+
+      'testcases/libroot/B38a.txt' ⎕FIO[27]'testcases/libroot/B38b.txt',(⎕UCS 0),'.bak'
+      ^                            ^
+
+
+      )MORE
+⎕FIO: path contains a NUL character (⎕UCS 0)
+
+
+
+
+      ('testcases/libroot/B38a.txt',(⎕UCS 0)) ⎕FIO[27] 'testcases/libroot/B38b.txt'
+DOMAIN ERROR+
+      ('testcases/libroot/B38a.txt',(⎕UCS 0))⎕FIO[27]'testcases/libroot/B38b.txt'
+      ^                                      ^
+
+      ⍝ Bugs38 #87: ⎕JSON and ⎕XML reject a function number beyond 32 bits
+
+
+
+      )ERASE S87
+
+
+
+
+
+      S87.a←'xy'
+
+
+
+
+
+      4294967298 ⎕JSON S87
+DOMAIN ERROR+
+      4294967298 ⎕JSON S87
+      ^          ^
+
+
+      )MORE
+A ⎕JSON B: Bad function number A=4294967298
+
+
+
+
+      4294967296 ⎕XML '<a/>'
+DOMAIN ERROR+
+      4294967296 ⎕XML '<a/>'
+      ^          ^
+
+
+      )ERASE S87
+
+
+
+
+
+      ⍝ Bugs38 #88: ,[X]B with a fractional X needs a scalar (or 1-item) X
+
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+
+      ⍴,[1.5 99]M
+AXIS ERROR+
+      ⍴,[1.5 99]M
+       ^
+
+
+      ⍴,[0.5 1]M
+AXIS ERROR+
+      ⍴,[0.5 1]M
+       ^
+
+
+      ⍴,[,1.5]M
+2 1 3
+
+      ⍝ Bugs38 #89: the message matrix of ⎕EC has blanks, not pad characters
+
+
+
+
+
+      (R E M)←⎕EC '1+QQQQQ'
+
+
+
+
+
+      ∪⎕UCS,M
+86 65 76 85 69 32 82 79 49 43 81 94
+
+      ⍝ Bugs38 #90: ⍎¨ when an item changes ⎕IO
+
+
+
+
+
+      ⍎¨'⎕IO←0' '2' '3'
+0 2 3
+
+
+
+
+      ⎕IO
+0
+
+
+
+
+      ⎕IO←1
+
+
+
+
+
+      ⍝ Bugs38 #91, #92: shape products of empty arrays with large axes, and the
+      ⍝ int64 minimum in N↑B and 5⍕N (no undefined behaviour)
+
+
+
+
+
+      X←0 1E7 1E7 1E7⍴0
+
+
+
+
+
+      ⍴⊖X
+0 10000000 10000000 10000000
+
+
+
+
+      ⍴X[;;;1]
+0 10000000 10000000
+
+
+
+
+      ⍴1 1 2 3⍉X
+0 10000000 10000000
+
+
+
+
+      ⍴X⍷X
+0 10000000 10000000 10000000
+
+
+
+
+      N←¯1-9223372036854775807
+
+
+
+
+
+      5⍕N
+¯9223372036854775808.00000
+
+
+
+
+      ⍝ Bugs38 #93: near-integers beyond int64 in ?, ○, ,[X] and ⎕DL
+
+
+
+
+
+      ?1E19
+DOMAIN ERROR
+      ?1E19
+      ^
+
+
+      1E19○1
+DOMAIN ERROR
+      1E19○1
+      ^   ^
+
+
+      1E19○0J1
+DOMAIN ERROR
+      1E19○0J1
+      ^   ^
+
+
+      1 2,[1E19]3
+AXIS ERROR+
+      1 2,[1E19]3
+      ^  ^
+
+
+      )MORE
+A,[X]B: X = 1E19 is not a valid axis
+
+
+
+
+      ⎕DL 1E19
+DOMAIN ERROR
+      ⎕DL 1E19
+      ^
+
+
+      ⍝ Bugs38 #96: ⊤∨ of a complex with a near-zero imaginary part is an integer
+
+
+
+
+
+      26 ⎕CR ⊤∨ 1.1J0÷1.1
+16
+
+
+
+
+      26 ⎕CR ⊤∨ 2J0.00000000000001
+16
+
+
+
+
+      ⍝ Bugs38 #97: monadic ⎕SI 5 and ⎕SI 6
+
+
+
+
+
+      (⍴⎕SI 5)≡⍴⎕SI 1
+1
+
+
+
+
+      ∧/1=⎕SI 6
+1
+
+
+
+
+      ⍝ Bugs38 #98: near-integer floats in ⎕CC, ⎕AF and ⎕DLX
+
+
+
+
+
+      F←0.5×2
+
+
+
+
+
+      ⎕CC F
+0123456789
+
+
+
+
+      'a1' ⎕CC F
+0 1
+
+
+
+
+      ⎕AF 65×F
+A
+
+
+
+
+      ⎕DLX 2 2⍴F 0 0 1
+1 2
+
+
+
+
+      (¯4,F+1) ⎕DLX 2 2⍴1 0 0 1
+1
+0
+
+
+
+      ⎕DLX 2 2⍴1.5 0 0 1
+DOMAIN ERROR+
+      ⎕DLX 2 2⍴1.5 0 0 1
+      ^
+
+
+      )MORE
+Bad B[1;1]: neither integer nor character in ⎕DLX B
+
+
+
+
+      ⍝ Bugs38 #99: ⌹B for a vector B with huge items (no overflow of M×r2)
+
+
+
+
+
+      ⎕PP←17
+
+
+
+
+
+      ⌹1E308 1E308
+4.9999999999999995E¯309 4.9999999999999995E¯309
+
+
+
+
+      ⌹3⍴1E307
+3.3333333333333334E¯308 3.3333333333333334E¯308 3.3333333333333334E¯308
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ Bugs38 #100: ⌹B for a vector B with a huge but finite complex item
+
+
+
+
+
+      ⎕PP←17
+
+
+
+
+
+      ⌹,1.7E308J1.7E308
+2.9411764705882362E¯309J¯2.9411764705882362E¯309
+
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⍝ Bugs38 #101: ⎕SYL[I;2]←B assigns all or nothing
+
+
+
+
+
+      SYL_OLD←⎕SYL[1 2 34;2]
+
+
+
+
+
+      ⎕SYL[1 2;2]←0 3
+DOMAIN ERROR+
+      ⎕SYL[1 2;2]←0 3
+      ^          ^
+
+
+      ⎕SYL[1 2 34;2]≡SYL_OLD
+1
+
+
+
+
+      ⎕SYL[1 34;2]←500 0
+DOMAIN ERROR+
+      ⎕SYL[1 34;2]←500 0
+      ^           ^
+
+
+      ⎕SYL[1 2 34;2]≡SYL_OLD
+1
+
+
+
+
+      ⍝ Bugs38 #102: scalar integer arguments of ⎕FIO functions (no silent ↑)
+
+
+
+
+
+      H←⎕FIO[3] '/etc/passwd'
+
+
+
+
+
+      ⎕FIO[2] 2 3
+LENGTH ERROR
+      ⎕FIO[2]2 3
+      ^
+
+
+      ⎕FIO[50] 1 2
+LENGTH ERROR
+      ⎕FIO[50]1 2
+      ^
+
+
+      2 3 ⎕FIO[6] H
+LENGTH ERROR
+      2 3 ⎕FIO[6]H
+      ^   ^
+
+
+      2 3 ⎕FIO[8] H
+LENGTH ERROR
+      2 3 ⎕FIO[8]H
+      ^   ^
+
+
+      5 6 ⎕FIO[13] H
+LENGTH ERROR
+      5 6 ⎕FIO[13]H
+      ^   ^
+
+
+      ⎕FIO[4] H
+0
+
+
+
+
+      ⍝ Bugs38 #103: ⎕FIO[62] names with an embedded ⎕UCS 0
+
+
+
+
+
+      ⎕FIO[62] 'AF_INET',(⎕UCS 0),'junk'
+DOMAIN ERROR+
+      ⎕FIO[62]'AF_INET',(⎕UCS 0),'junk'
+      ^
+
+
+      ⎕FIO[62] 'AF_INET' 'SOCK_STREAM'
+2 1
+
+
+
+
+      ⍝ Bugs38 #104: an integer index beyond int64 is INDEX ERROR in every path
+
+
+
+
+
+      V←10 20 30 ⋄ M←2 3⍴⍳6
+
+
+
+
+
+      V[1E20]
+INDEX ERROR+
+      V[1E20]
+      ^^
+
+
+      M[1E20;1]
+INDEX ERROR+
+      M[1E20;1]
+      ^^
+
+
+      )MORE
+the index 1E20 is too large for a (signed) 63-bit index
+
+
+
+
+      V[1E20]←1
+INDEX ERROR+
+      V[1E20]←1
+      ^      ^
+
+
+      M[1E20;1]←1
+INDEX ERROR+
+      M[1E20;1]←1
+      ^        ^
+
+
+      1E20⌷V
+INDEX ERROR+
+      1E20⌷V
+      ^   ^
+
+
+      1E20⊃V
+INDEX ERROR+
+      1E20⊃V
+      ^   ^
+
+
+      (⊂1 1E20)⊃M
+INDEX ERROR+
+      (⊂1 1E20)⊃M
+      ^        ^
+
+
+      V[1.5]
+DOMAIN ERROR+
+      V[1.5]
+      ^^
+
+
+      ⍝ Bugs38 #105: the valence of the operand of ∘., f/ and f\ is checked up
+      ⍝ front, also for an empty or scalar B and for derived functions
+
+
+
+
+
+      ∇Z←M_B38_105 B
+
+
+
+
+
+      Z←B
+
+
+
+
+
+      ∇
+
+
+
+
+
+      ∇Z←(F OP1_B38_105) B
+
+
+
+
+
+      Z←F B
+
+
+
+
+
+      ∇
+
+
+
+
+
+      ⍬∘.M_B38_105⍬
+VALENCE ERROR+
+      ⍬∘.M_B38_105⍬
+      ^^
+
+
+      1 2∘.M_B38_105 3 4
+VALENCE ERROR+
+      1 2∘.M_B38_105 3 4
+      ^  ^
+
+
+      )MORE
+A∘.g B : Bad function M_B38_105 (expecting a dyadic function)
+
+
+
+
+      M_B38_105/5
+VALENCE ERROR+
+      M_B38_105/5
+      ^
+
+
+      M_B38_105\5
+VALENCE ERROR+
+      M_B38_105\5
+      ^
+
+
+      +/5
+5
+
+
+
+
+      (-OP1_B38_105)/⍬
+VALENCE ERROR+
+      (-OP1_B38_105)/⍬
+      ^
+
+
+      (⍎¨)/⍬
+VALENCE ERROR+
+      (⍎¨)/⍬
+      ^
+
+
+      (-OP1_B38_105)\⍬
+VALENCE ERROR+
+      (-OP1_B38_105)\⍬
+      ^
+
+
+      (-¨)/1 2 3
+2
+
+
+
+
+      ⍝ Bugs38 #106: dyadic ¨ with two 1-element arguments: the higher rank wins
+
+
+
+
+
+      ⍴(1 1⍴5)+¨,3
+1 1
+
+
+
+
+      ⍴(,3)+¨1 1⍴5
+1 1
+
+
+
+
+      ⍴(1 1⍴5){⍺+⍵}¨,3
+1 1
+
+
+
+
+      ⍴(1 1 1⍴5)+¨1 1⍴3
+1 1 1
+
+
+
+
+      ⍴(1 1 1⍴5){⍺+⍵}¨1 1⍴3
+1 1 1
+
+
+
+
+      ⍝ Bugs38 #107: the + marker of an error whose )MORE text ends with +
+
+
+
+
+
+      (+⍣¯1) 5
+DOMAIN ERROR+
+      (+⍣¯1)5
+      ^
+
+
+      )MORE
+f⍣N B: f has no known inverse (needed for N < 0); f is +
+
+
+
+
+      ⍝ Bugs38 #108: an empty ¨ does not execute a system function
+
+
+
+
+
+      )SIC
+      ⎕ES¨''
+
+
+
+
+
+      ⎕ET
+0 0
+
+
+
+
+      ⎕ES¨⍬
+
+
+
+
+
+      ⍴⎕FIO[4]¨⍬
+0
+
+
+
+
+      ⍝ Bugs38 #109: λ←{…} is a SYNTAX ERROR
+
+
+
+
+
+      λ←{⍵+1}
+SYNTAX ERROR+
+      λ←{⍵+1}
+      ^ ^
+
+
+      )MORE
+λ (the result of a lambda) cannot be a function
+
+
+
+
+      {λ←{⍵+1} ⋄ 7}3
+SYNTAX ERROR+
+λ1[1]  λ←{⍵+1}
+       ^ ^
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs38 #110: the carets of a malformed (…)← go under ( and ←
+
+
+
+
+
+      ⎕FX 'Z←A F_B38_110 B' 'Z←A+B'
+F_B38_110
+
+
+
+
+      V←1 2 3
+
+
+
+
+
+      (1 F_B38_110 V)←9
+SYNTAX ERROR+
+      (1 F_B38_110 V)←9
+      ^              ^
+
+
+      (1 2 F_B38_110 V)←9
+SYNTAX ERROR+
+      (1 2 F_B38_110 V)←9
+      ^                ^
+
+
+      (1 F_B38_110 (V))←9
+SYNTAX ERROR+
+      (1 F_B38_110 V)←9
+      ^              ^
+
+
+      ⍝ Bugs38 #111: a last statement with only locals is empty (no λ←)
+
+
+
+
+
+      {;A}0
+VALUE ERROR+
+      {;A}0
+      ^
+
+
+      {⍵⋄;A}5
+5
+
+
+
+
+      G_B38_111←{⍵ ⋄ ;A}
+
+
+
+
+
+      G_B38_111 5
+5
+
+
+
+
+      {A←⍵+1⋄A;A}3
+4
+
+
+
+
+      ⍝ Bugs38 #112: ⍎ of a statement with leftover tokens has a )MORE text
+
+
+
+
+
+      A←1 2 3
+
+
+
+
+
+      ⍎'A[1]←'
+SYNTAX ERROR+
+      A[1]←
+      ^   ^
+
+
+      )MORE
+non-empty stack at end of statement: TC_RETURN TC_VALUE TC_ASSIGN
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs38 #113: the )MORE text of an unbalanced bracket is not a stale one
+
+
+
+
+
+      X←⎕FX 'Z←G_B38_113' 'Z←⍳¯1;2' ⋄ ⍎'{1'
+SYNTAX ERROR+
+      ⍎'{1'
+      ^^
+
+
+      )MORE
+Unbalanced left curly bracket
+
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs38 #115: inverse 2 ⎕TF of an ignored ⎕L/⎕R/⎕X assignment gives ''
+
+
+
+
+
+      ⍴2 ⎕TF '⎕L←5'
+0
+
+
+
+
+      ⍴2 ⎕TF '⎕X←1'
+0
+
+
+
+
+      ⍝ Bugs38 #116: ⎕PR←B with rank > 1 is a RANK ERROR
+
+
+
+
+
+      ⎕PR←1 1 1⍴'x'
+RANK ERROR+
+      ⎕PR←1 1 1⍴'x'
+      ^  ^
+
+
+      ⎕PR←1 1⍴'q'
+RANK ERROR+
+      ⎕PR←1 1⍴'q'
+      ^  ^
+
+
+      ⍴⍴⎕PR
+0
+
+
+
+
+      ⍝ Bugs38 #117: 38 ⎕CR reports the bad row in ⎕IO terms
+
+
+
+
+
+      X←38 ⎕CR 3 2⍴0 0 'a' 5 (⊂⊂'bc') 6
+DOMAIN ERROR+
+      X←38 ⎕CR 3 2⍴0 0 'a' 5(⊂⊂'bc')6
+        ^  ^
+
+
+      )MORE
+invalid member name in row 3 (nested non-string)
+
+
+
+
+      ⍝ Bugs38 #118: an unknown CDR type is only a DOMAIN ERROR (no CERR line)
+
+
+
+
+
+      C←⎕UCS 0 0 32 32 0 0 0 32 0 0 0 1 9 0 0 0,16⍴0
+
+
+
+
+
+      '0' ⎕EA '12 ⎕CR C'
+0
+
+
+
+
+      ⍝ Bugs38 #119: ⎕RVAL REAL values in APL2 mode are < 1
+
+
+
+
+
+      O8←8 ⎕RVAL 1 ⋄ O3←3 ⎕RVAL 0 0 1 ⋄ O1←1 ⎕RVAL 1 ⋄ O2←2 ⎕RVAL 4000000
+
+
+
+
+
+      S←0 ⎕RVAL 8+⍳8
+
+
+
+
+
+      V←⎕RVAL 0
+
+
+
+
+
+      ∧/V<1
+1
+
+
+
+
+      Z←8 ⎕RVAL O8 ⋄ Z←3 ⎕RVAL O3 ⋄ Z←1 ⎕RVAL O1 ⋄ Z←2 ⎕RVAL O2
+
+
+
+
+
+      ⍝ Bugs38 #120: K!N at the int64 edge
+
+
+
+
+
+      M←¯9223372036854775807-1
+
+
+
+
+
+      2!¯9223372036854775807
+4.253529587E37
+
+
+
+
+      1!M
+¯9223372036854775808
+
+
+
+
+      ⍝ Bugs38 #123: deal A?B with B ≥ 2⋆31
+
+
+
+
+
+      ⎕RL←16807
+
+
+
+
+
+      3?1000000000000
+363942470777 134806674407 210407978419
+
+
+
+
+      ⍝ Bugs38 #124: ⍋ ⍒ ⍸ ⌈ ⌊ order complex numbers like < (real parts
+      ⍝ first, then imaginary parts)
+      ⍝
+      V124←2J1 2 2J¯1 1J5 0J¯3 ¯1 2.5
+
+
+      ⍋V124
+6 5 4 3 2 1 7
+
+
+      ⍒V124
+7 1 2 3 4 5 6
+
+
+      ⍋(1 2J1)(1 1J5)
+2 1
+
+
+      (V124∘.>V124) ≡ V124∘.{(⍋⍺ ⍵)≡2 1}V124
+1
+
+
+      (V124∘.⌈V124) ≡ V124∘.{(⍺ ⍵)[⎕IO+⍺<⍵]}V124
+1
+
+
+      (V124∘.⌊V124) ≡ V124∘.{(⍺ ⍵)[⎕IO+⍺>⍵]}V124
+1
+
+
+      1J1⌈2
+2
+
+
+      2J1⌈2J2
+2J2
+
+
+      2J¯1⌊2
+2J¯1
+
+
+      ⌈/V124
+2.5
+
+
+      ⌊/V124
+¯1
+
+
+      U124←V124[⍋V124] ◊ (U124⍸V124) ≡ +⌿U124∘.≤V124
+1
+
+
+      0J1 2⍸1
+1
+
+
+
+
+      ⍝ Bugs38 #125: ⎕FIO[62] of an empty vector of names, and of ⊂'name'
+
+
+
+
+
+      ⍴⎕FIO[62] 0⍴⊂'AF_INET'
+0
+
+
+
+
+      ⍴⍴⎕FIO[62] ⊂'AF_INET'
+0
+
+
+
+
+      ⍴⍴⎕FIO[62] ''
+2
+
+
+
+
+      )SIC
+
+
+
+
+

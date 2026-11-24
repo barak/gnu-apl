@@ -401,19 +401,26 @@ public:
    /// @param str null-terminated string to parse
    /// @param error receives an error message, or null on success
    static Pixel_X Pixel_X_from_str(const char * str, const char * & error)
-      { error = 0;   return strtoll(str, 0, 10); }
+      { return Pixel_X(integer_from_str(str, INT16_MIN, INT16_MAX, error)); }
 
    /// convert a string to a Pixel
    /// @param str null-terminated string to parse
    /// @param error receives an error message, or null on success
    static Pixel_Y Pixel_Y_from_str(const char * str, const char * & error)
-      { error = 0;   return strtoll(str, 0, 10); }
+      { return Pixel_Y(integer_from_str(str, INT16_MIN, INT16_MAX, error)); }
 
    /// convert a string to a double
    /// @param str null-terminated string to parse
    /// @param error receives an error message, or null on success
-   static double double_from_str(const char * str, const char * & error)
-      { error = 0;   return strtod(str, 0); }
+   static double double_from_str(const char * str, const char * & error);
+
+   /// convert a string to an integer in the range lo...hi. APL's ¯ is a
+   /// minus sign. A malformed or out-of-range number is an error (they
+   /// were parsed with a bare strtoll(), Bugs40 #49)
+   /// @param str null-terminated string to parse
+   /// @param error receives an error message, or null on success
+   static int64_t integer_from_str(const char * str, int64_t lo, int64_t hi,
+                                   const char * & error);
 
    /// convert a string like "#RGB" or "#RRGGB" to a color
    /// @param str null-terminated color string (e.g. "#FF0000")
@@ -424,7 +431,7 @@ public:
    /// @param str null-terminated string to parse
    /// @param error receives an error message, or null on success
    static uint32_t uint32_t_from_str(const char * str, const char * & error)
-      { error = 0;   return strtoll(str, 0, 10); }
+      { return uint32_t(integer_from_str(str, 0, UINT32_MAX, error)); }
 
    /// convert a string to a String
    /// @param str null-terminated string to wrap

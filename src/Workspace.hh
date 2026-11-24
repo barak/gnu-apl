@@ -199,6 +199,10 @@ public:
    static UCS_string & more_error()
       { return the_workspace.more_error_info; }
 
+   /// true if more_error() is only information, e.g. of a ⎕FX that returned
+   /// a line number, and not the explanation of an error (Bugs41 #78)
+   static bool more_is_info;
+
    /// pop ⎕FC
    static void pop_FC()
       {
@@ -250,6 +254,12 @@ public:
    /// @param out output stream for messages
    static void clear_SI(ostream & out);
 
+   /// make sure that every symbol that the )SI entries will pop (their
+   /// local variables, arguments, labels, ...) has the levels for that,
+   /// pushing the missing ones. Return true if levels were missing (a
+   /// corrupt )LOAD, Bugs41 #16)
+   static bool repair_SI_levels();
+
    /// clear the workspace
    /// @param out output stream for messages
    /// @param silent if true, suppress informational output
@@ -265,7 +275,7 @@ public:
    static void flush_expunged();
 
    /// copy objects from another workspace
-   static void copy_WS(ostream & out, ostream & err,
+   static bool copy_WS(ostream & out, ostream & err,
                       const LibRef_name & lib_name,
                        UCS_string_vector & objects, bool protection);
 

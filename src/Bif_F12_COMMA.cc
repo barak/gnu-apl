@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <limits>
 #include <string.h>
 #include "ArgCheck.hh"
 #include "Bif_F12_COMMA.hh"
@@ -74,6 +75,35 @@ const APL_Integer qio = Workspace::get_IO();
    //
    if (!X.is_near_int(0))  // fraction: insert an axis
       {
+        // a complex X (other than e.g. 1.5J0) is not a fraction (Bugs39 #63)
+        //
+        Cell cache;
+        const Cell & x0 = X.get_cfirst(cache);
+        if (!x0.is_numeric() ||
+            !x0.is_near_real())   // near-real: Bugs40 #86
+           {
+             MORE_ERROR() << where << ": X is not real";
+             AXIS_ERROR;
+           }
+
+        // an integral real part with a (relatively small) imaginary part,
+        // e.g. 2J1.5E¯10, is no fraction either (Bugs41 #67)
+        //
+        if (Cell::is_near_int(x0.get_real_value()))
+           {
+             MORE_ERROR() << where << ": X is not integral";
+             AXIS_ERROR;
+           }
+
+        // a fraction is only valid as a scalar (LRM p. 204), e.g. not
+        // ,[1.5 99]M (Bugs38 #88)
+        if (X.element_count() != 1)
+           {
+             MORE_ERROR() << where << ": a fractional axis X must be a"
+                             " scalar or a 1-item vector";
+             AXIS_ERROR;
+           }
+
         if (B.get_rank() == MAX_RANK)
            {
              MORE_ERROR() << where << ": ⍴⍴B (=" << B.get_rank()
@@ -122,10 +152,10 @@ const APL_Integer qio = Workspace::get_IO();
         // this shortcut had no range check on n at all: ,[99]M and
         // ,[¯5]M both silently returned M unchanged instead of
         // AXIS_ERROR.
-        const APL_Integer n = X.get_near_int(0) - qio;
+        const APL_Integer n = Cell::minus_IO(X.get_near_int(0), qio);
         if (n < 0 || n >= B.get_rank())
            {
-             MORE_ERROR() << where << ": X = " << (n + qio)
+             MORE_ERROR() << where << ": X = " << X.get_near_int(0)
                           << " is not a valid axis of B (expecting " << qio
                           << "≤X<" << (B.get_rank() + qio) << ")"
                           << ArgCheck::index_io0_note(n, B.get_rank());
@@ -147,10 +177,23 @@ const APL_Integer qio = Workspace::get_IO();
    //
 const Shape axes(X, qio);
 
+   // X as written (not the 0-based axes, which saturate at ¯2⋆63), for the
+   // )MORE texts below (Bugs41 #77)
+   //
+const ShapeItem len_X = X.element_count();
+const APL_Integer X_first = X.get_near_int(0);
+const APL_Integer X_last  = X.get_near_int(len_X - 1);
+UCS_string X_text;
+   loop(x, len_X)
+      {
+        if (x)   X_text << " ";
+        X_text << ShapeItem(X.get_near_int(x));
+      }
+
 const ShapeItem from = axes.get_first_shape_item();
    if (from < 0)
       {
-        MORE_ERROR() << where << ": X = " << (from + qio)
+        MORE_ERROR() << where << ": X = " << X_first
                      << " is not a valid axis of B (expecting " << qio
                      << "≤X<" << (B.get_rank() + qio) << ")"
                      << ArgCheck::index_io0_note(from, B.get_rank());
@@ -160,7 +203,7 @@ const ShapeItem from = axes.get_first_shape_item();
 const ShapeItem to   = axes.get_last_shape_item();
    if (to >= B.get_rank())
       {
-        MORE_ERROR() << where << ": X = " << (to + qio)
+        MORE_ERROR() << where << ": X = " << X_last
                      << " is not a valid axis of B (expecting " << qio
                      << "≤X<" << (B.get_rank() + qio) << ")"
                      << ArgCheck::index_io0_note(to, B.get_rank());
@@ -179,9 +222,9 @@ const ShapeItem to   = axes.get_last_shape_item();
    //
    if (from > to)
       {
-        MORE_ERROR() << where << ": X = " << axes
+        MORE_ERROR() << where << ": X = " << X_text
                      << " is not ascending (expecting consecutive axes "
-                     << (to + qio) << ".." << (from + qio)
+                     << X_last << ".." << X_first
                      << " listed low to high)";
         AXIS_ERROR;
       }
@@ -194,10 +237,9 @@ ShapeItem count = 1;
       {
         if (axes.get_shape_item(a) != (from + a))
            {
-             MORE_ERROR() << where << ": X = " << axes
+             MORE_ERROR() << where << ": X = " << X_text
                           << " is not contiguous (expecting consecutive"
-                             " axes " << (from + qio) << ".."
-                          << (to + qio) << ")";
+                             " axes " << X_first << ".." << X_last << ")";
              AXIS_ERROR;
            }
         count *= B.get_shape_item(from + a);
@@ -293,7 +335,7 @@ Bif_COMMA::catenate(const char * where, const cValue & A, sAxis axis,
                   }
                else
                   {
-                    shape_Z.add_shape_item(B.get_shape_item(rb) + 1);
+                    shape_Z.add_shape_item(axis_plus_1(where, B.get_shape_item(rb)));
                   }
              }
         }
@@ -349,7 +391,7 @@ Bif_COMMA::catenate(const char * where, const cValue & A, sAxis axis,
                   }
                else
                   {
-                    shape_Z.add_shape_item(A.get_shape_item(ra) + 1);
+                    shape_Z.add_shape_item(axis_plus_1(where, A.get_shape_item(ra)));
                   }
              }
         }
@@ -404,8 +446,16 @@ Shape shape_Z;
             }
          else
             {
-              shape_Z.add_shape_item(A.get_shape_item(r) +
-                                   + B.get_shape_item(r));
+              ShapeItem len_Z;   // not a negative (wrapped) sum (Bugs39 #38)
+              if (__builtin_add_overflow(A.get_shape_item(r),
+                                         B.get_shape_item(r), &len_Z))
+                 {
+                   MORE_ERROR() << where << ": the length of axis "
+                                << (axis + Workspace::get_IO())
+                                << " of the result is too large";
+                   WS_FULL;
+                 }
+              shape_Z.add_shape_item(len_Z);
             }
        }
 
@@ -413,6 +463,18 @@ const Shape3 shape_A3(A.get_shape(), axis);
 
 const ShapeItem slice_a = shape_A3.l() * A.get_shape_item(axis);
 const ShapeItem slice_b = shape_A3.l() * B.get_shape_item(axis);
+
+   // an empty Z: return it before looping over the (possibly huge) h()
+   // of e.g. (1E15 0⍴0),1E15 0⍴0 (Bugs38 #11)
+   //
+   if (shape_Z.get_volume() == 0)
+      {
+        Value_P Z(shape_Z, LOC);
+        if (B.is_empty() && A.get_rank() >= 2)   Z->set_default(A, LOC);
+        else                                     Z->set_default(B, LOC);
+        Z->check_value(LOC);
+        return Z;
+      }
 
 const RavelType rtype = A.get_ravel_type();
 const ShapeItem bpi   = A.packed_bytes_per_item();   // 0 for CELLS or BOOL
@@ -497,7 +559,10 @@ const Shape3 shape_Z3(shape_Z, axis);
 
 ShapeItem idxA = 0;
 ShapeItem idxB = 0;
-   if (A.is_scalar())
+   if (shape_Z.is_empty())   // no cells, but maybe huge h() (Bugs39 #9)
+      {
+      }
+   else if (A.is_scalar())
       {
         if (B.is_scalar())
            {
@@ -570,6 +635,25 @@ Cell cache;
 const Cell & cX = X.get_cfirst(cache);
 const APL_Integer qio = Workspace::get_IO();
 
+   // a complex X (other than e.g. 1.5J0) is neither an integer nor a
+   // fraction (Bugs39 #63)
+   //
+   if (!cX.is_numeric() ||
+       !cX.is_near_real())   // near-real: Bugs40 #86
+      {
+        MORE_ERROR() << where << ": X is not real";
+        AXIS_ERROR;
+      }
+
+   // an integral real part with a (relatively small) imaginary part, e.g.
+   // 2J1.5E¯10, is neither an integer axis nor a fraction (Bugs41 #67)
+   //
+   if (!cX.is_near_int() && Cell::is_near_int(cX.get_real_value()))
+      {
+        MORE_ERROR() << where << ": X is not integral";
+        AXIS_ERROR;
+      }
+
    if (cX.is_near_int())   // catenate along existing axis
       {
         // catenate genuinely needs two conformable arrays sharing an
@@ -596,12 +680,18 @@ const APL_Integer qio = Workspace::get_IO();
         // the valid range instead of being rejected (M,[65537]M
         // silently catenated along axis 0 -- 65537 wrapped to 1, minus
         // ⎕IO -- instead of raising AXIS_ERROR).
-        const APL_Integer wide_axis = cX.get_checked_near_int() - qio;
+        if (!cX.is_near_int64_t())   // Bugs38 #93: X beyond int64
+           {
+             MORE_ERROR() << where << ": X = " << cX.get_real_value()
+                          << " is not a valid axis";
+             AXIS_ERROR;
+           }
+        const APL_Integer wide_axis = Cell::minus_IO(cX.get_checked_near_int(), qio);
         const ShapeItem max_rank = A.get_rank() > B.get_rank()
                                   ? A.get_rank() : B.get_rank();
         if (wide_axis < 0 || wide_axis >= max_rank)
            {
-             MORE_ERROR() << where << ": X = " << (wide_axis + qio)
+             MORE_ERROR() << where << ": X = " << cX.get_checked_near_int()
                           << " is not a valid axis (expecting " << qio
                           << "≤X<" << (max_rank + qio) << ")"
                           << ArgCheck::index_io0_note(wide_axis, max_rank);
@@ -626,13 +716,28 @@ const APL_Float axis = cX.get_real_value() - qio;
    return laminate(where, A, sAxis(axis + 1.0), B);
 }
 //════════════════════════════════════════════════════════════════════════════
+ShapeItem
+Bif_COMMA::axis_plus_1(const char * where, ShapeItem len)
+{
+   // only len + 1 may not overflow: the result of two conforming arrays may
+   // have any axis length up to 2⋆63-1 as well (Bugs39 #38, Bugs40 #87)
+   //
+   if (len == std::numeric_limits<ShapeItem>::max())
+      {
+        MORE_ERROR() << where << ": an axis of the result is too long";
+        WS_FULL;
+      }
+   return len + 1;
+}
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, const cValue & B)
 {
    if (B.is_empty())
       {
         Shape shape_Z = B.get_shape();
-        shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
+        shape_Z.set_shape_item(axis, axis_plus_1("A,B",
+                                                 shape_Z.get_shape_item(axis)));
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {
@@ -685,7 +790,8 @@ Bif_COMMA::append_scalar(const cValue & A, uAxis axis, const Cell & cell_B)
    if (A.is_empty())
       {
         Shape shape_Z = A.get_shape();
-        shape_Z.set_shape_item(axis, shape_Z.get_shape_item(axis) + 1);
+        shape_Z.set_shape_item(axis, axis_plus_1("A,B",
+                                                 shape_Z.get_shape_item(axis)));
         Value_P Z(shape_Z, LOC);
         if (Z->is_empty())
            {

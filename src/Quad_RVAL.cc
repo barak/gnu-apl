@@ -176,7 +176,7 @@ bool need_restore = false;
                  }
               else   // rank as scalar
                  {
-                   Value_P rank = IntScalar(B.get_int_value(0), LOC);
+                   Value_P rank = IntScalar(B.get_near_int(0), LOC);
                    do_eval_AB(1, *rank);
                  }
             }
@@ -189,7 +189,7 @@ bool need_restore = false;
                  }
               else   // shape as scalar: Z← (rank⍴ec_B)⍴random_data
                  {
-                   Value_P rank = IntScalar(B.get_int_value(1), LOC);
+                   Value_P rank = IntScalar(B.get_near_int(1), LOC);
                    do_eval_AB(2, *rank);
                  }
             }
@@ -214,7 +214,7 @@ bool need_restore = false;
                  }
               else   // maxdepth as scalar
                  {
-                   Value_P rank = IntScalar(B.get_int_value(3), LOC);
+                   Value_P rank = IntScalar(B.get_near_int(3), LOC);
                    do_eval_AB(4, *rank);
                  }
             }
@@ -227,7 +227,7 @@ bool need_restore = false;
                  }
               else   // ecount as scalar
                  {
-                   Value_P ec = IntScalar(B.get_int_value(4), LOC);
+                   Value_P ec = IntScalar(B.get_near_int(4), LOC);
                    do_eval_AB(5, *ec);
                  }
             }
@@ -514,6 +514,20 @@ vector<int> old_types = desired_types;
      // both of which it rejects with DOMAIN_ERROR.
    }
 
+   // the shape items are used as int (see choose_integer()), like in
+   // 2 ⎕RVAL B. Only an empty B can have a larger one, e.g. 0 3000000000⍴0,
+   // which was silently truncated (Bugs40 #84)
+   //
+   loop(r, Bref.get_rank())
+      {
+        const ShapeItem item = Bref.get_shape_item(r);
+        if (item > INT_MAX)
+           {
+             MORE_ERROR() << "7 ⎕RVAL B: bad shape item " << item;
+             DOMAIN_ERROR;
+           }
+      }
+
    if (rand17() & 1)   // 50%: scalar
       {
         desired_ranks.clear();
@@ -564,7 +578,7 @@ const int dist_len = dist.size();
         const int desired = dist[0];
         if (desired >= 0)   return desired;   // fixed value
         const int rand = rand17();
-        return rand % (1 - desired);          // = 0 ... |desired|
+        return rand % (1 - int64_t(desired));   // = 0 ... |desired|
       }
 
    // dist is a distribution...
@@ -654,7 +668,7 @@ Value_P Z(N, LOC);
         //
         loop(b, new_N)
             {
-              const APL_Integer byte = B.get_int_value(b);
+              const APL_Integer byte = B.get_near_int(b);
               if ((byte < -256) || (byte >  255))
                  {
                    MORE_ERROR() << "Bad right argument B in 0 ⎕RVAL B,"
@@ -665,7 +679,7 @@ Value_P Z(N, LOC);
         N = new_N;
         loop(b, N)
             {
-               state[b] = B.get_int_value(b);
+               state[b] = B.get_near_int(b);
             }
 #if ! MINGW_SRC
          setstate(state);
@@ -757,12 +771,20 @@ double f;
                             | (uint64_t(rand64) >> 56 & 0x0F) << 48
                             | (uint64_t(rand64) & 0xFFFFFFFFFFFFULL);
         memcpy(&f, &bits, sizeof(f));
-      } while (!isnormal(f));
+      } while (!isnormal(f) || f == 1.0);   // 0 is excluded (Bugs38 #119)
 
    // at this point: 1.0 < f < 2.0
    //
    if (desired_purpose == 1)   // APL2 mode: an IEEE 32-bit (float) value
-      return double(float(f - 1.0));
+      {
+        // truncate (not round) to float, so that the result is < 1.0
+        // (Bugs38 #119)
+        //
+        const double d = f - 1.0;
+        float r = float(d);
+        if (double(r) > d)   r = nextafterf(r, 0.0f);
+        return double(r);
+      }
 
    return f - 1.0;
 }
@@ -796,7 +818,7 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
 
    if (B.element_count())   // set the desired maxdepth
       {
-        const APL_Integer mxd = B.get_int_value(0);
+        const APL_Integer mxd = B.get_near_int(0);
         if (mxd < 0 || mxd > INT_MAX)   // was truncated to int (Bugs34 #30)
            {
              MORE_ERROR() << "bad max.depth";
@@ -823,7 +845,7 @@ Value_P Z = IntScalar(desired_max_ecount, LOC);   // return previous value
 
    if (B.element_count())   // set the limit
       {
-        const APL_Integer ec = B.get_int_value(0);
+        const APL_Integer ec = B.get_near_int(0);
         if (ec < 0)
            {
              MORE_ERROR() << "5 ⎕RVAL B: B must be ≥ 0 (0 = unlimited)";
@@ -850,7 +872,7 @@ Value_P Z = IntScalar(desired_purpose, LOC);   // return previous value
 
    if (B.element_count())   // set the purpose
       {
-        const APL_Integer purpose = B.get_int_value(0);
+        const APL_Integer purpose = B.get_near_int(0);
         if (purpose != 0 && purpose != 1)
            {
              MORE_ERROR() << "8 ⎕RVAL B: B must be 0 or 1";
@@ -881,7 +903,7 @@ Value_P Z(desired_ranks.size(), LOC);
 
    if (B.is_scalar())   // single rank (fixed or equal distribution)
       {
-        ShapeItem rk = B.get_int_value(0);
+        ShapeItem rk = B.get_near_int(0);
 
         if ((rk < -MAX_RANK) || (rk > MAX_RANK))
            {
@@ -907,7 +929,7 @@ Value_P Z(desired_ranks.size(), LOC);
         vector<int>new_ranks;
         loop(b, B.element_count())
             {
-              const APL_Integer rank_b_A = B.get_int_value(b);
+              const APL_Integer rank_b_A = B.get_near_int(b);
               if (rank_b_A > 0x7FFFFFFF)   // Bugs35 #21: not truncated
                  {
                    MORE_ERROR() << "the weight " << rank_b_A << " in a vector right argument B of 1 ⎕RVAL B"
@@ -958,7 +980,7 @@ Value_P Z(MAX_RANK, LOC);
 
         if (B.is_scalar())   // scalar-extend B
            {
-              const APL_Integer len = B.get_int_value(0);
+              const APL_Integer len = B.get_near_int(0);
               loop(b, MAX_RANK)   new_shape.add_shape_item(len);
            }
         else                 // vector B: prepend 1s as needed
@@ -969,7 +991,7 @@ Value_P Z(MAX_RANK, LOC);
 
              // fill lower dimensions with B
               loop(b, len_B)
-                  new_shape.add_shape_item(B.get_int_value(b));
+                  new_shape.add_shape_item(B.get_near_int(b));
            }
 
         // the shape items are used as int (see choose_integer()); a larger
@@ -1036,7 +1058,7 @@ Value_P Z(desired_types.size(), LOC);
         bool B_has_simple = false;
         loop(b, B.element_count())
             {
-              const APL_Integer type_b_A = B.get_int_value(b);
+              const APL_Integer type_b_A = B.get_near_int(b);
               if (type_b_A > 0x7FFFFFFF)   // Bugs35 #21: not truncated
                  {
                    MORE_ERROR() << "the weight " << type_b_A << " in the right argument B of 3 ⎕RVAL B"

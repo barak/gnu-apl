@@ -144,12 +144,6 @@ public:
    /// @param loc caller location for diagnostics
    inline Value_P(const Shape & sh, const char * loc);
 
-   /// constructor: a packed array with shape \b sh
-   /// @param sh   shape of the packed array
-   /// @param bits pointer to the packed bit data
-   /// @param loc  caller location for diagnostics
-   inline Value_P(const Shape & sh, uint64_t * bits, const char * loc);
-
    /// a new vector value from a UCS string
    /// @param ucs the Unicode character string to convert
    /// @param loc caller location for diagnostics

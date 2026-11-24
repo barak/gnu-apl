@@ -46,6 +46,12 @@ public:
 
    static Bif_OPER2_RANK  fun;      ///< Built-in function
 
+   /// the fill function of (A) LO⍤y B for a primitive LO: LO's fill
+   /// function applied to the cells of B (and A) like ⍤ applies LO, and the
+   /// results combined like ⍤ does (Bugs41 #41). A is 0 if monadic
+   static Token fill_ALyB(const Function * LO, const cValue & y,
+                          const cValue * A, const cValue & B);
+
 protected:
    /// overloaded Function::may_push_SI(). f⍤y is implemented via the
    /// Z__LO_RANK_X5_B / Z__A_LO_RANK_X7_B macros (a defined function that
@@ -98,6 +104,14 @@ protected:
    /// @param LO         left operator function argument
    /// @param X          axis specification value
    /// @param B          right value argument
+   /// the empty result of f⍤[X]y B with the (empty) frame \b shape_Z and
+   /// the LO result \b Z1 of one (fill) cell: ⊃[X] shape_Z⍴⊂Z1
+   /// @param X the axis
+   /// @param shape_Z the (empty) frame shape
+   /// @param Z1 the result of LO on a fill cell
+   static Value_P disclose_empty(const Value & X, const Shape & shape_Z,
+                                 const Value & Z1);
+
    /// @param rk_chunk_B  chunk rank for right argument
    static Token do_ALyXB(Value_P A, sRank rk_chunk_A, Token & LO,
                          Value_P X, Value_P B, sRank rk_chunk_B);

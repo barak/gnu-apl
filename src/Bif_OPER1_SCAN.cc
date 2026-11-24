@@ -35,10 +35,6 @@ Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::fun;
 Token
 Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
 {
-   // if B is a scalar, then Z is B.
-   //
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
-
    if (!tok_LO.is_function())
       {
         MORE_ERROR() << "f" << get_name() << " B : Bad left argument f"
@@ -55,12 +51,16 @@ cFunction_P LO = tok_LO.get_function();
         DOMAIN_ERROR;
       }
 
-   if (LO->get_fun_valence() != 2)
+   if (LO->get_fun_valence() != 2 || !LO->has_dyadic_form())   // Bugs40 #56
       {
         MORE_ERROR() << LO->get_name() << get_name() << " B : Bad function "
                      << LO->get_name() << " (expecting a dyadic function)";
         VALENCE_ERROR;   // like A F/ B (Bugs37 #67)
       }
+
+   // if B is a scalar, then Z is B. Checked after LO (Bugs38 #105).
+   //
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (axis >= B->get_rank())
       {
@@ -78,6 +78,17 @@ const ShapeItem m_len = B->get_shape_item(axis);
    // (including the scanned axis, which stays at length 1) rather than
    // dropping the scanned axis as without_axis() would do.
    if (m_len == 1)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
+
+   // an empty B (some other axis is 0) has no cells to compute. This is
+   // checked again (with an explanation) below, but must come before the
+   // associative fast path, whose loops over the non-empty axes hung for
+   // e.g. +⍀1E15 0⍴0 (Bugs39 #8).
+   //
+   // Like the m_len == 0 and m_len == 1 cases above, Z is B (with its
+   // prototype, LRM: (1↑[X]R),...), not a fresh numeric value (Bugs40 #96)
+   //
+   if (B->get_shape().is_empty())
+      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
 const Shape3 shape_Z3(B->get_shape(), axis);
 
@@ -147,11 +158,10 @@ const Shape3 Z3(B->get_shape(), axis);
         // axis), and B being empty means there are no cells to compute
         // -- so unlike the reduce identity-fun path, there's no need to
         // consult LO's identity element (and no risk of a spurious
-        // DOMAIN_ERROR for an LO that doesn't have one).
+        // DOMAIN_ERROR for an LO that doesn't have one). Z keeps B's
+        // prototype (Bugs40 #96).
         //
-        Value_P Z(B->get_shape(), LOC);
-        Z->check_value(LOC);
-        return Token(TOK_APL_VALUE1, Z);
+        return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
       }
 
    if (LO->may_push_SI())   // user defined LO
@@ -206,6 +216,19 @@ std::vector<ShapeItem> rep_counts;
                           << "] = " << rep_A << " is neither 0 nor 1";
              DOMAIN_ERROR;
            }
+      }
+
+   // check +/A before Z is allocated: a non-conforming B with a huge other
+   // axis was WS FULL instead of LENGTH ERROR (Bugs39 #99)
+   //
+   if (ec_A && !B.is_scalar() && shape_B.get_shape_item(axis) != 1 &&
+       ones_A != shape_B.get_shape_item(axis))
+      {
+        MORE_ERROR() << where << ": expecting +/A = (⍴B)["
+                     << (axis + Workspace::get_IO()) << "] = "
+                     << shape_B.get_shape_item(axis) << " (the number of"
+                        " 1s in A); +/A is " << ones_A;
+        LENGTH_ERROR;
       }
 
 Shape shape_Z(shape_B);

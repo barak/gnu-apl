@@ -71,8 +71,12 @@ const bool is_lval_scalar = B.is_scalar() && B.get_cscalar(cache).is_lval_cell()
         // implies that in Value::assign_cellrefs().
         //
         if (is_lval_scalar)
-           if (Cell * target = B.get_cscalar(cache).get_lval_value())
-              Z->set_lval_pick_slot(target, B.get_lval_cellowner());
+           {
+             if (Cell * target = B.get_cscalar(cache).get_lval_value())
+                Z->set_lval_pick_slot(target, B.get_lval_cellowner());
+             else
+                Z->set_lval_discard();   // no target (Bugs41 #2)
+           }
       }
    else                         // B is nested: clone and copy
       {
@@ -266,6 +270,12 @@ vector<Partition> partitions;   // all partitions on the B-axis
 
      if (in_partition)   partitions.back().end = len_A;
    }
+
+   // a 1-element A is extended to the length of the B axis: if that is 0,
+   // then A is empty and there are no partitions (like (0⍴1)⊂⍳0, Bugs38 #32)
+   //
+   if (len_A == 1 && B.get_rank() && B.get_shape_item(axis) == 0)
+      partitions.clear();
 
    // ⍴⍴Z ←→ ⍴⍴B
    // ⍴Z  ←→ (¯1↓⍴B), bm            ( for A ⊂ B )
@@ -461,7 +471,11 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
          //
         const Value & vB = *B_item.get_pointer_value();
         Bif_F12_TAKE::fill(item_shape, Z, vB, 0);
-        if (vB.is_member())   Z.set_member();
+        // only ⊃⊂S (a scalar B, Z is the item itself) can be a structured
+        // variable; (⍴B),item_shape of a non-scalar B is never a member
+        // table (Bugs38 #4)
+        if (vB.is_member() && Z.get_rank() == item_shape.get_rank())
+           Z.set_member();
       }
    else if (B_item.is_lval_cell())
       {
@@ -701,6 +715,13 @@ const Cell & cB = B.get_cravel(offset, cache);
                          *cB.get_pointer_value(), qio);
            }
 
+        // a cell without a target (an over-take position, or a
+        // placeholder for an item of an empty value): nothing below it can
+        // be assigned (Bugs41 #2)
+        //
+        if (cB.is_lval_cell() && cB.get_lval_value() == 0)
+           return Value::discarded_lval();
+
         if (cB.is_lval_cell())
            {
              // Note: this is a little tricky...
@@ -745,7 +766,7 @@ const Cell & cB = B.get_cravel(offset, cache);
    if (cB.is_lval_cell())   // selective assignment, e.g. (A⊃B) ← C
       {
         Cell * target = cB.get_lval_value();
-        Assert(target);
+        if (target == 0)   return Value::discarded_lval();   // Bugs41 #2
 
         if (target->is_pointer_cell())
            {
@@ -873,6 +894,10 @@ const Cell & cA = A.get_cravel(idx_A, cache);
                   RANK_ERROR;
                 }
 
+             // INDEX ERROR (not DOMAIN ERROR) for an integer beyond int64,
+             // as for the other forms of indexing (Bugs38 #104)
+             loop(r, len_A)   A.get_index_int(r);
+
              const Shape weights_B = B.get_shape().get_weights();
              const Shape A_as_shape(A, qio);
              ShapeItem offset = 0;
@@ -884,7 +909,7 @@ const Cell & cA = A.get_cravel(idx_A, cache);
                    if (ar < 0 || ar >= dim)
                       {
                         MORE_ERROR() << "A⊃B: A[" << (idx_A + qio) << "]["
-                                     << (r + qio) << "] = " << (ar + qio)
+                                     << (r + qio) << "] = " << A.get_near_int(r)
                                      << " is not a valid index for axis "
                                      << (r + qio) << " of B (expecting "
                                      << qio << "≤index<" << (dim + qio)
@@ -904,11 +929,11 @@ const Cell & cA = A.get_cravel(idx_A, cache);
                           << B.get_rank();
              RANK_ERROR;
            }
-        const APL_Integer a = cA.get_near_int() - qio;
+        const APL_Integer a = Cell::minus_IO(cValue::index_int(cA), qio);
         const ShapeItem dim = B.get_shape_item(0);
         if (a < 0 || a >= dim)
            {
-             MORE_ERROR() << "A⊃B: A = " << (a + qio)
+             MORE_ERROR() << "A⊃B: A = " << cValue::index_int(cA)
                           << " is not a valid index for B (expecting "
                           << qio << "≤A<" << (dim + qio) << ")"
                           << ArgCheck::index_io0_note(a, dim);

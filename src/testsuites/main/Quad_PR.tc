@@ -1,0 +1,63 @@
+⍝ Quad_PR.tc
+⍝ ----------------------------------
+
+      )ERASE FOO
+∇Z←FOO
+ ⍞←'ENTER NAME: '
+ Z←⍞
+∇
+
+
+      ⎕PR←' '
+      RESULT←FOO
+ENTER NAME: MCMILLAN
+
+      ρRESULT
+20
+      RESULT
+            MCMILLAN
+
+      ⎕PR←'⋆'
+      RESULT←FOO
+ENTER NAME: MCMILLAN
+
+      ρRESULT
+20
+      RESULT
+⋆⋆⋆⋆⋆⋆⋆⋆⋆⋆⋆⋆MCMILLAN
+
+⍝ overriding the prompt ----------------------------------
+
+      ⎕PR←' '
+      RESULT←FOO
+ENTER NAME: MCMILLAN
+
+      ρRESULT
+12
+      RESULT
+    MCMILLAN
+
+⍝ empty ⎕PR ----------------------------------
+
+      ⎕PR←''
+
+      RESULT←FOO
+ENTER NAME: MCMILLAN
+
+      ρRESULT
+20
+      RESULT
+ENTER NAME: MCMILLAN
+
+      RESULT←FOO
+ENTER NAME: MCMILLAN
+
+      ρRESULT
+14
+      RESULT
+ENTER MCMILLAN
+
+⍝ ==================================
+
+      ⎕PR←' '
+

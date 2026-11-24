@@ -1,0 +1,298 @@
+⍝ Partition.tc
+⍝ ----------------------------------
+
+      4 ⎕CR 1 1 2⊂'ABC'   ⍝ partition a string
+┏→━━━━━━━┓
+┃┏→━┓ ┏→┓┃
+┃┃AB┃ ┃C┃┃
+┃┗━━┛ ┗━┛┃
+┗ϵ━━━━━━━┛
+
+      4 ⎕CR 1 0 1⊂'ABC'   ⍝ partition and delete
+┏→━━━━━━┓
+┃┏→┓ ┏→┓┃
+┃┃A┃ ┃C┃┃
+┃┗━┛ ┗━┛┃
+┗ϵ━━━━━━┛
+
+      1 0 1⊂'ABCD'   ⍝ mismatch of argument lengths
+LENGTH ERROR+
+      1 0 1⊂'ABCD'
+      ^    ^
+
+      →
+
+      4⎕CR 1 1 2⊂'ABC'
+┏→━━━━━━━┓
+┃┏→━┓ ┏→┓┃
+┃┃AB┃ ┃C┃┃
+┃┗━━┛ ┗━┛┃
+┗ϵ━━━━━━━┛
+
+
+      4⎕CR 1 0 1⊂'ABC'
+┏→━━━━━━┓
+┃┏→┓ ┏→┓┃
+┃┃A┃ ┃C┃┃
+┃┗━┛ ┗━┛┃
+┗ϵ━━━━━━┛
+
+      1 0 1⊂'ABCD'
+LENGTH ERROR+
+      1 0 1⊂'ABCD'
+      ^    ^
+
+      →
+
+      4⎕CR 2 1 2⊂10 20 30
+┏→━━━━━━━━━━━┓
+┃┏→━━━━┓ ┏→━┓┃
+┃┃10 20┃ ┃30┃┃
+┃┗∼━━━━┛ ┗∼━┛┃
+┗ϵ━━━━━━━━━━━┛
+
+      OTB←'ONE' 'TWO' 'BUCKLE MY SHOE'
+      4⎕CR OTB
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━━━━━━━━━━━━┓┃
+┃┃ONE┃ ┃TWO┃ ┃BUCKLE MY SHOE┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4⎕CR 1 1 2⊂OTB
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━━━┓┃
+┃┃┏→━━┓ ┏→━━┓┃ ┃┏→━━━━━━━━━━━━━┓┃┃
+┃┃┃ONE┃ ┃TWO┃┃ ┃┃BUCKLE MY SHOE┃┃┃
+┃┃┗━━━┛ ┗━━━┛┃ ┃┗━━━━━━━━━━━━━━┛┃┃
+┃┗ϵ━━━━━━━━━━┛ ┗ϵ━━━━━━━━━━━━━━━┛┃
+┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      X←'  A STITCH  IN TIME   '
+      4⎕CR X
+┏→━━━━━━━━━━━━━━━━━━━━━┓
+┃  A STITCH  IN TIME   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4⎕CR (' '≠X)⊂X
+┏→━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→┓ ┏→━━━━━┓ ┏→━┓ ┏→━━━┓┃
+┃┃A┃ ┃STITCH┃ ┃IN┃ ┃TIME┃┃
+┃┗━┛ ┗━━━━━━┛ ┗━━┛ ┗━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4⎕CR (1+' '≠X)⊂X
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━┓ ┏→━┓ ┏→━━━━━━━┓ ┏→━━┓ ┏→━━━━━━┓┃
+┃┃  ┃ ┃A ┃ ┃STITCH  ┃ ┃IN ┃ ┃TIME   ┃┃
+┃┗━━┛ ┗━━┛ ┗━━━━━━━━┛ ┗━━━┛ ┗━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      4⎕CR (1+' '=X)⊂X
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━━━━━┓ ┏→━━━┓ ┏→━━━━┓ ┏→━━┓┃
+┃┃  A┃ ┃ STITCH┃ ┃  IN┃ ┃ TIME┃ ┃   ┃┃
+┃┗━━━┛ ┗━━━━━━━┛ ┗━━━━┛ ┗━━━━━┛ ┗━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      M←3 12ρ'1   10 3.1422  100 6.2833 1000 9.425'
+      4⎕CR M
+┏→━━━━━━━━━━━┓
+↓1   10 3.142┃
+┃2  100 6.283┃
+┃3 1000 9.425┃
+┗━━━━━━━━━━━━┛
+
+      ⊢P←(∼∧⌿' '=M)
+1 0 1 1 1 1 0 1 1 1 1 1
+      4⎕CR P ⊂ M
+┏→━━━━━━━━━━━━━━━━━┓
+↓┏→┓ ┏→━━━┓ ┏→━━━━┓┃
+┃┃1┃ ┃  10┃ ┃3.142┃┃
+┃┗━┛ ┗━━━━┛ ┗━━━━━┛┃
+┃┏→┓ ┏→━━━┓ ┏→━━━━┓┃
+┃┃2┃ ┃ 100┃ ┃6.283┃┃
+┃┗━┛ ┗━━━━┛ ┗━━━━━┛┃
+┃┏→┓ ┏→━━━┓ ┏→━━━━┓┃
+┃┃3┃ ┃1000┃ ┃9.425┃┃
+┃┗━┛ ┗━━━━┛ ┗━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━┛
+
+      ⍝ Regression
+
+      ⍝ Scalar L
+      ⍝ +/ 2</ 0, Lext is the number of partitions
+      ⍝
+      L←42 ◊ R←'abc'
+      Lext←(¯1↑⍴R)⍴L   ⍝ 42 42 42
+      PCnt← +/ 2 </ 0,Lext   ⍝ partition count = number of L↑
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      ((0 ≠ L)/R) ≡ (⊃,/L⊂R)
+1
+      8 ⎕CR Z
+┌→────┐
+│┌→──┐│
+││abc││
+│└───┘│
+└ϵ────┘
+
+      ⍝ same as above, but with Scalar L extended to (⍴R)⍴L
+      ⍝ result shall be the same.
+      ⍝
+      ⊢L←Lext
+42 42 42
+      PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      8 ⎕CR Z
+┌→────┐
+│┌→──┐│
+││abc││
+│└───┘│
+└ϵ────┘
+
+      ⍝ partition with axis
+      ⍝
+      L←1 0 1 0  ◊ R←4 4⍴⍳16   ⍝ ↑L ≠ 0
+      Z←L ⊂[1] R
+      8 ⎕CR Z
+┌→─────────────────┐
+↓┌→┐ ┌→┐  ┌→┐  ┌→┐ │
+││1│ │2│  │3│  │4│ │
+│└∼┘ └∼┘  └∼┘  └∼┘ │
+│┌→┐ ┌→─┐ ┌→─┐ ┌→─┐│
+││9│ │10│ │11│ │12││
+│└∼┘ └∼─┘ └∼─┘ └∼─┘│
+└ϵ─────────────────┘
+
+      L←0 1 0 1  ◊ R←4 4⍴⍳16   ⍝ ↑L = 0
+      Z←L ⊂[1] R
+      8 ⎕CR Z
+┌→──────────────────┐
+↓┌→┐  ┌→┐  ┌→┐  ┌→┐ │
+││5│  │6│  │7│  │8│ │
+│└∼┘  └∼┘  └∼┘  └∼┘ │
+│┌→─┐ ┌→─┐ ┌→─┐ ┌→─┐│
+││13│ │14│ │15│ │16││
+│└∼─┘ └∼─┘ └∼─┘ └∼─┘│
+└ϵ──────────────────┘
+
+
+      ⍝ Regression. Hudson Lacerda June 2, 2022
+
+      L←1 0 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+2
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+ac
+ac
+1
+
+      L←1 1 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+1
+      Z←L⊂R
+      (⍴⍴Z) ≡ (⍴⍴R)
+1
+      (⍴Z) ≡ ((¯1↓⍴R), PCnt)
+1
+      (≡Z) ≡ (1+≡R)
+1
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+abc
+abc
+1
+
+      L←0 0 1 0 ◊ R←'abcd'
+      ⊢PCnt← +/ 2 </ 0,L   ⍝ partition count = number of L↑
+1
+      Z←L⊂R
+      (⎕← (0≠L)/R )≡(⎕← ⊃,/Z )
+c
+c
+1
+
+      ⍝ regression (Blake McBride, Bugs28 #68, 2026-08-11): ⊂/⍬ gave 0
+      ⍝ (a bare numeric scalar) instead of an error -- unlike ∪/⍬, ∩/⍬,
+      ⍝ ⍳/⍬ and ⍷/⍬, which already correctly failed because their classes
+      ⍝ derive from NonscalarFunction. Bif_F12_PARTITION (⊂) instead
+      ⍝ derived from NonscalarFunction_default_identity, whose generic
+      ⍝ eval_identity_fun() treats a 0-length reduction axis as if ⊂ had
+      ⍝ the same kind of identity as ,/ or +/ -- but enclose has none.
+      ⍝ Now derives from NonscalarFunction like its siblings, so the base
+      ⍝ Function::eval_identity_fun() is reached instead.
+      ⍝
+      ⍝ Revised 2026-09-23: that base default used to DOMAIN_ERROR here,
+      ⍝ matching the LRM's own text ("an attempt to reduce an empty
+      ⍝ argument with a defined function generates a DOMAIN ERROR") and
+      ⍝ ISO 13751's Table 5 ("all others -- Signal domain-error"). Both
+      ⍝ get the error class wrong by this codebase's own convention
+      ⍝ (DOMAIN_ERROR is for bad ravel content, never a bad shape;
+      ⍝ LENGTH_ERROR is for a bad length when some other length at the
+      ⍝ same rank would work, which is exactly this case -- ⊂/1 2 3 or
+      ⍝ ⊂/,5 work fine, only the length-0 axis fails) -- now LENGTH_ERROR.
+      ⍝
+      Z←⊂/⍬
+LENGTH ERROR+
+      Z←⊂/⍬
+        ^
+      )MORE
+Function ⊂ has no identity function, needed to reduce along axis 0 of B (⍴B is 0), whose length there is 0
+      )SIC
+
+      ⍝ control: the rank-2 empty case already gave an error
+      ⍝
+      ⊂/3 0⍴0
+LENGTH ERROR+
+      ⊂/3 0⍴0
+      ^
+      )SIC
+
+      ⍝ control: ∪/⍬ (and ∩/⍬, ⍳/⍬, ⍷/⍬ the same way) were already right
+      ⍝
+      ]FILE_CTL SKIP_APL2   ⍝ ∪ ∩ ⍬ are GNU APL extensions
+      ∪/⍬
+LENGTH ERROR+
+      ∪/⍬
+      ^
+      )SIC
+
+      ⍝ regression: ,/0 0⍴0 (reducing along a 0-length axis whose OTHER
+      ⍝ axis is also 0, so enclosed_identity()'s per-position loop never
+      ⍝ runs) left Z with no explicit prototype at all, defaulting to a
+      ⍝ bare untyped scalar (≡Z 1, Z←0⍴0) instead of the identity item
+      ⍝ every real position would have gotten (≡Z 2, Z←0⍴⊂⍬).
+      ⍝
+      ]FILE_CTL NO_SKIP
+      Z←,/0 0⍴0
+      Z≡0⍴⊂⍬
+1
+
+      ⍝ ==================================
+
+      )SI
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

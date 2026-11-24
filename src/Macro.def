@@ -147,7 +147,7 @@ mac_def(Z__LO_EACH_B,
  "⍝ still correctly persists once the loop completes.\n"
  "⍝\n"
  "μ7←⍴μ6 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ9←μ10+⍴μ6←,μ6 ◊ μ1←μ9⍴0\n"
- "((⎕IO+μ8-μ10)⊃μ1)←μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←⊂μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
  "μ1←μ7⍴μ1\n")
 
 /// dyadic EACH with result, scalar A, scalar B
@@ -237,7 +237,7 @@ mac_def(  Z__vA_LO_EACH_vB,
  "⍝\n"
  "1 → (⍴μ2)≡⍴μ6 ◊ ⎕ES 5,2+(⍴⍴μ2)=⍴⍴μ6\n"
  "μ7←⍴μ6 ◊ μ10←⎕IO ◊ μ8←μ10 ◊ μ2←,μ2 ◊ μ9←μ10+⍴μ6←,μ6 ◊ μ1←μ9⍴0\n"
- "((⎕IO+μ8-μ10)⊃μ1)←((⎕IO+μ8-μ10)⊃μ2) μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
+ "((⎕IO+μ8-μ10)⊃μ1)←⊂((⎕IO+μ8-μ10)⊃μ2) μ3 (⎕IO+μ8-μ10)⊃μ6 ◊ 0 → μ9>μ8←μ8+1\n"
  "μ1←μ7⍴μ1\n")
 
 /// outer product
@@ -276,7 +276,7 @@ mac_def(  Z__A_LO_OUTER_B,
 /// inner product. caller has checked that the shapes of A and B fit
 //
 mac_def(  Z__A_LO_INNER_RO_B,
- "μ1←μ2 (μ3 Z__A_LO_INNER_RO_B μ4) μ6\n"
+ "μ1←μ2 (μ3 Z__A_LO_INNER_RO_B μ4) μ6;μ7\n"
  "⍝ called as Bif_OPER2_INNER::eval_ALRB(A, _LO, _RO, B)\n"
  "⍝\n"
  "⍝ ╔═══╤═══╤════════════════════════════════════════════════════════╗\n"
@@ -298,12 +298,18 @@ mac_def(  Z__A_LO_INNER_RO_B,
  "⍝ of forcing ⎕IO←1 so that those reduce to the simpler ρρμ2 / 1.\n"
  "⍝ The C++ caller has already checked that A's and B's shapes fit.\n"
  "⍝\n"
+ "⍝ μ7…: an item of Z is the item of the reduction μ3/, like for a\n"
+ "⍝ primitive RO (LRM: Z[I;J] ←→ LO/L[I;] RO R[;J]), not a nested\n"
+ "⍝ scalar one level deeper (Bugs40 #55). Only the nested scalars are\n"
+ "⍝ disclosed: the reduction of a non-scalar RO result (e.g. ⍺∘.×⍵)\n"
+ "⍝ is itself non-scalar and an item as is (Bugs41 #18).\n"
+ "⍝\n"
  "    3 → (⍴⍴μ2)=0 ◊ 2 → (⍴⍴μ6)=0\n"
- " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂[⎕IO]μ6 ◊ →0\n"
- " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂μ6      ◊ →0\n"
+ " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂[⎕IO]μ6 ◊ μ7←,(⍴¨⍴¨μ1)≡¨⊂,0 ◊ (μ7/,μ1)←↑¨μ7/,μ1 ◊ →0\n"
+ " μ1←μ3/¨ (⊂[⎕IO+(⍴⍴μ2)-1]μ2) ∘.μ4 ⊂μ6      ◊ μ7←,(⍴¨⍴¨μ1)≡¨⊂,0 ◊ (μ7/,μ1)←↑¨μ7/,μ1 ◊ →0\n"
  " 2 → (⍴⍴μ6)=0\n"
- " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂[⎕IO]μ6 ◊ →0\n"
- " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂μ6      ◊ →0\n")
+ " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂[⎕IO]μ6 ◊ μ7←,(⍴¨⍴¨μ1)≡¨⊂,0 ◊ (μ7/,μ1)←↑¨μ7/,μ1 ◊ →0\n"
+ " μ1←μ3/¨ (⊂μ2)               ∘.μ4 ⊂μ6      ◊ μ7←,(⍴¨⍴¨μ1)≡¨⊂,0 ◊ (μ7/,μ1)←↑¨μ7/,μ1 ◊ →0\n")
 
 /// monadic power with repeat count and no result
 //
@@ -767,12 +773,15 @@ mac_def(  Z__vA_LO_INNER_RO_vB,
  "⍝ ║μ6 │ B │                                       ║\n"
  "⍝ ╚═══╧═══╧═══════════════════════════════════════╝\n"
  "⍝\n"
- "μ1←μ3/(,μ2) μ4 ,μ6\n")
+ "⍝ the reduction is the (only) item of the scalar result: enclose a\n"
+ "⍝ non-scalar reduction, e.g. of ⍺∘.×⍵ (Bugs41 #48)\n"
+ "⍝\n"
+ "μ1←μ3/(,μ2) μ4 ,μ6 ◊ →(0=⍴⍴μ1)⍴0 ◊ μ1←⊂μ1\n")
 
 /// monadic EACH with ⍎
 //
 mac_def(Z__EXEC_EACH_B,
- "μ1← Z__EXEC_EACH_B μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16\n"
+ "μ1← Z__EXEC_EACH_B μ6;μ7;μ8;μ9;μ10;μ11;μ12;μ13;μ14;μ15;μ16;μ17\n"
  "⍝ called as Bif_OPER1_EACH::eval_B(B) -- ⍎¨B, i.e. LO is ⍎ itself\n"
  "⍝\n"
  "⍝ ╔═══╤═════╤════════════════════════════════════════════════════════╗\n"
@@ -793,15 +802,18 @@ mac_def(Z__EXEC_EACH_B,
  "⍝ ║μ14│  N3 │ count of elements that returned a value (RC 1 or 2)    ║\n"
  "⍝ ║μ15│  V3 │ count of elements that returned no value (RC 3)        ║\n"
  "⍝ ║μ16│N_max│ loop limit                                             ║\n"
+ "⍝ ║μ17│ ⎕IO0│ ⎕IO on entry: μ13 counts from it, the items of B are  ║\n"
+ "⍝ ║   │     │ indexed relative to it (an item may change ⎕IO, Bugs38 ║\n"
+ "⍝ ║   │     │ #90)                                                   ║\n"
  "⍝ ╚═══╧═════╧════════════════════════════════════════════════════════╝\n"
  "⍝ a branch (RC 4, 5) is a DOMAIN ERROR: ⍎ applied with an operator\n"
  "⍝ (LRM p.121, Bugs35 #52)\n"
  "⍝\n"
- " μ13←⎕IO ◊ μ8←⍴μ6 ◊ μ16←μ13+⍴μ6←,μ6 ◊ μ7←(⍴μ6)⍴0 ◊ μ15←μ14←⎕IO\n"
+ " μ17←μ13←⎕IO ◊ μ8←⍴μ6 ◊ μ16←μ13+⍴μ6←,μ6 ◊ μ7←(⍴μ6)⍴0 ◊ μ15←μ14←⎕IO\n"
  " μ12←1,2,2,3,4,5\n"
- " (μ9 μ10 μ11)←⎕EC ⊃μ6[μ13] ◊ μ12[⎕IO+μ9] → 1\n"
- " ((⊃μ11)[⎕IO;], ' in macro ⍎¨') ⎕ES ⊃μ10\n"
- " μ7[μ13]←⊂μ11 ◊ μ14←μ14+1 ◊ ¯2 → μ16>μ13←μ13+1 ◊ 4 → 1\n"
+ " (μ9 μ10 μ11)←⎕EC ⊃μ6[⎕IO+μ13-μ17] ◊ μ12[⎕IO+μ9] → 1\n"
+ " (⊃μ11) ⎕ES ⊃μ10   ⍝ ⎕EM-like: message, )MORE (Bugs40 #97)\n"
+ " μ7[⎕IO+μ13-μ17]←⊂μ11 ◊ μ14←μ14+1 ◊ ¯2 → μ16>μ13←μ13+1 ◊ 4 → 1\n"
  " μ15←μ15+1 ◊ ¯3 → μ16>μ13←μ13+1 ◊ 3 → 1\n"
  " 'DOMAIN ERROR: →N in macro ⍎¨' ⎕ES 5 4\n"
  " 'DOMAIN ERROR: → in macro ⍎¨'  ⎕ES 5 4\n"

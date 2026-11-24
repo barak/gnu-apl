@@ -118,8 +118,11 @@ CollatingCache::greater_vec(const ShapeItem & Za, const ShapeItem & Zb,
 {
 const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
-const ShapeItem * significance_a = &cache.significances_B[cache.comp_len * Za];
-const ShapeItem * significance_b = &cache.significances_B[cache.comp_len * Zb];
+// .data(), not &[]: significances_B is empty for empty rows (Bugs38 #33)
+const ShapeItem * significance_a = cache.significances_B.data()
+                                 + cache.comp_len * Za;
+const ShapeItem * significance_b = cache.significances_B.data()
+                                 + cache.comp_len * Zb;
 
 const sRank rank = cache.get_rank();
 
@@ -131,7 +134,8 @@ const sRank rank = cache.get_rank();
          if (const int diff = a.compare_axis(b, r))   return diff > 0;
        }
 
-   return significance_a > significance_b;
+   // equal rows: by index (the pointers were the same for empty rows)
+   return Za > Zb;
 }
 //────────────────────────────────────────────────────────────────────────────
 bool
@@ -140,8 +144,11 @@ CollatingCache::smaller_vec(const ShapeItem & Za, const ShapeItem & Zb,
 {
 const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
-const ShapeItem * significance_a = &cache.significances_B[cache.comp_len * Za];
-const ShapeItem * significance_b = &cache.significances_B[cache.comp_len * Zb];
+// .data(), not &[]: significances_B is empty for empty rows (Bugs38 #33)
+const ShapeItem * significance_a = cache.significances_B.data()
+                                 + cache.comp_len * Za;
+const ShapeItem * significance_b = cache.significances_B.data()
+                                 + cache.comp_len * Zb;
 
 const sRank rank = cache.get_rank();
 
@@ -158,7 +165,9 @@ const sRank rank = cache.get_rank();
    // *value* comparison above for a descending sort (⍒) is correct, but
    // inverting the tiebreak along with it is not -- ties must always break
    // ascending by index, matching greater_vec() (used by ⍋) just above.
-   return significance_a > significance_b;
+   // By index, not by the pointers, which are the same for empty rows
+   // (Bugs38 #33).
+   return Za > Zb;
 }
 //════════════════════════════════════════════════════════════════════════════
 Token

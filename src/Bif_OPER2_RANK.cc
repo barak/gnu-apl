@@ -80,6 +80,7 @@
  */
 
 #include "Bif_F12_TAKE_DROP.hh"
+#include "Bif_F12_PARTITION_PICK.hh"
 #include "Bif_OPER2_RANK.hh"
 #include "IntCell.hh"
 #include "Macro.hh"
@@ -470,6 +471,94 @@ const sRank rank_chunk_B = y123_to_chunk_B_rank(LO.get_function()->get_name(),
    return do_LyXB(LO, CLONE(&X, LOC), CLONE(pB, LOC), rank_chunk_B);
 }
 //────────────────────────────────────────────────────────────────────────────
+/// cell c of V, which consists of cells of shape \b cell_shape
+static Value_P
+rank_cell(const cValue & V, const Shape & cell_shape, ShapeItem c)
+{
+const ShapeItem len = cell_shape.get_volume();
+Value_P Z(cell_shape, LOC);
+Cell cache;
+   loop(l, len)   Z->next_ravel_Cell(V.get_cravel(c*len + l, cache));
+   if (len == 0)   Z->set_default(V, LOC);   // prototype
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+Token
+Bif_OPER2_RANK::fill_ALyB(const Function * LO, const cValue & y,
+                          const cValue * A, const cValue & B)
+{
+   // the ranks of the cells and the frames of A and B
+   //
+sRank rk_A = A ? A->get_rank() : 0;
+sRank rk_B = B.get_rank();
+   if (A)   y123_to_AB(&y, rk_A, rk_B);
+   else     rk_B = y123_to_chunk_B_rank(LO->get_name(), &y, B.get_rank());
+
+const Shape frame_B = B.get_shape().frame_shape(B.get_rank() - rk_B);
+const Shape cell_B  = B.get_shape().chunk_shape(rk_B);
+Shape frame_A, cell_A;
+   if (A)
+      {
+        frame_A = A->get_shape().frame_shape(A->get_rank() - rk_A);
+        cell_A  = A->get_shape().chunk_shape(rk_A);
+        if (frame_A.get_rank() && frame_B.get_rank() && frame_A != frame_B)
+           return LO->eval_fill_AB(*A, B);   // as ⍤ would fail
+      }
+
+const Shape & frame = (A && frame_B.get_rank() == 0) ? frame_A : frame_B;
+const ShapeItem count = frame.get_volume();
+
+   // LO's fill of every cell (or of the prototype cell if there is none)
+   //
+Value_P V(frame, LOC);
+Value_P Z1;
+   loop(c, count ? count : 1)
+      {
+        const ShapeItem cA = (A && frame_A.get_rank()) ? c : 0;
+        const ShapeItem cB = frame_B.get_rank() ? c : 0;
+        Value_P B1 = rank_cell(B, cell_B, count ? cB : 0);
+        const Token result = A
+            ? LO->eval_fill_AB(*rank_cell(*A, cell_A, count ? cA : 0), *B1)
+            : LO->eval_fill_B(*B1);
+        if (!result.is_apl_val())   return result;   // error
+        Z1 = result.get_apl_val();
+        if (count)   V->next_ravel_Value(Z1.get());
+      }
+
+   if (count == 0)   // empty frame: ⊃ frame⍴⊂Z1
+      {
+        Value_P EZ1(LOC);
+        Cell cache;
+        if (Z1->is_simple_scalar())   EZ1->next_ravel_Cell(Z1->get_cscalar(cache));
+        else                          EZ1->next_ravel_Pointer(Z1->clone(LOC).get());
+        EZ1->check_value(LOC);
+        V->set_default(*EZ1, LOC);
+      }
+   V->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Bif_F12_PICK::disclose(*V, true));
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+Bif_OPER2_RANK::disclose_empty(const Value & X, const Shape & shape_Z,
+                               const Value & Z1)
+{
+   // the empty frame shape_Z of results like Z1, combined with ⊃[X]: the
+   // shape of ⊃[X] shape_Z⍴⊂Z1 (also checking X like ⊃[X] does)
+   //
+Value_P EZ1(LOC);   // ⊂Z1 (which is Z1 itself for a simple scalar Z1)
+Cell cache;
+   if (Z1.is_simple_scalar())   EZ1->next_ravel_Cell(Z1.get_cscalar(cache));
+   else                         EZ1->next_ravel_Pointer(Z1.clone(LOC).get());
+   EZ1->check_value(LOC);
+
+Value_P V(shape_Z, LOC);   // shape_Z⍴⊂Z1 (empty)
+   V->set_default(*EZ1, LOC);
+   V->check_value(LOC);
+
+   return Bif_F12_PICK::disclose_with_axis(X, *V);
+}
+//────────────────────────────────────────────────────────────────────────────
 Token
 Bif_OPER2_RANK::do_ALyXB(Value_P A, sRank rank_chunk_A, Token & _LO,
                          Value_P X, Value_P B, sRank rank_chunk_B)
@@ -488,7 +577,9 @@ sRank frame_B_rank = B->get_rank() - rank_chunk_B;   // frame_B_rank is y9
 
    // if both high-ranks are 0 (i.e. high shapes are ⍬), then return A LO B.
    //
-   if (frame_A_rank == 0 && frame_B_rank == 0)   return LO->eval_AB(*A, *B);
+   // (with an axis X, the macro below does the final ⊃[X], Bugs38 #31)
+   if (frame_A_rank == 0 && frame_B_rank == 0 && !X)
+      return LO->eval_AB(*A, *B);
 
    /* Otherwise at least one of the frame ranks is > 0.
       split shapes of A1 and B1 into high (frame) and low (chunk) shapes.
@@ -564,6 +655,9 @@ const Shape shape_Z = frame_B_rank ? B->get_shape().frame_shape(frame_B_rank)
         // the prototype of (1 2 3)(+⍤1)0 3⍴0 is 0 (not 1 from 1 2 3+0 0 0),
         // as for 1∘.,0 3⍴0 or 1,¨0 3⍴0 (Blake McBride, Bugs32 #18).
         //
+        if (X)   // f⍤[X]: combine the results with ⊃[X] (Bugs38 #31)
+           return Token(TOK_APL_VALUE1, disclose_empty(*X, shape_Z, *Z1));
+
         Value_P Z(shape_Z + Z1->get_shape(), LOC);
         Z->set_default(*Z1, LOC);
         Z->check_value(LOC);
@@ -639,7 +733,8 @@ const sRank frame_B_rank = B->get_rank() - rank_chunk_B;
    // reporting DOMAIN ERROR etc. against the user's own expression the
    // way (LO¨)B and (LO⍣N)B already do for the same trivial case
    // (Blake McBride, Bugs26 #7).
-   if (frame_B_rank == 0)   return LO->eval_B(*B);
+   // (with an axis X, the macro below does the final ⊃[X], Bugs38 #31)
+   if (frame_B_rank == 0 && !X)   return LO->eval_B(*B);
 
 const Shape shape_Z = B->get_shape().frame_shape(frame_B_rank);
    if (shape_Z.is_empty())
@@ -687,6 +782,9 @@ const Shape chunk_shape_B = B->get_shape().chunk_shape(rank_chunk_B);
         // prototype from Z1 via set_default(), which only needs Z1's
         // TYPE, not its actual content.
         //
+        if (X)   // f⍤[X]: combine the results with ⊃[X] (Bugs38 #31)
+           return Token(TOK_APL_VALUE1, disclose_empty(*X, shape_Z, *Z1));
+
         Value_P Z(shape_Z + Z1->get_shape(), LOC);
         Z->set_default(*Z1, LOC);
         Z->check_value(LOC);
@@ -720,8 +818,11 @@ Value_P X5(5, LOC);
    if (!X)   X5->next_ravel_Int(-1);            // no X:  f ⍤ y B
    else if (X->is_simple_scalar())   // X → ,X
       {
+        // not get_near_int(): ⊃[X] reports a bad X, e.g. 1.5, as AXIS
+        // ERROR (Bugs38 #31)
         Value_P X1(1, LOC);
-        X1->next_ravel_Int(X->get_near_int(0));
+        Cell cache;
+        X1->next_ravel_Cell(X->get_cfirst(cache));
         X1->check_value(LOC);
         X5->next_ravel_Pointer(X1.get());   // with X: f ⍤[X] y B
       }

@@ -1,0 +1,160 @@
+⍝ Laminate.tc
+⍝ ----------------------------------
+
+      A←'FOR'
+      B←'AXE'
+      ⎕IO←1
+
+      Z←A,[.5]B
+      Z
+FOR
+AXE
+      ρZ
+2 3
+      ≡Z
+1
+
+
+      H←(1 2) (3 4)
+      K←'AB' 'CD'
+      Y←H,[.5]K
+      Y
+ 1 2  3 4 
+ AB   CD  
+      ρY
+2 2
+      ≡Y
+2
+
+      W←A,[1.1]B
+      W
+FA
+OX
+RE
+      ρW
+3 2
+      ≡W
+1
+
+
+      V←H,[1.1]K
+      V
+ 1 2  AB 
+ 3 4  CD 
+      ρV
+2 2
+      ≡V
+2
+
+      ⍝ Conformability ----------------------------------
+
+      Q←3 3ρ'STYHIMRED'
+      Q
+STY
+HIM
+RED
+
+      'A',[.1]Q
+AAA
+AAA
+AAA
+
+STY
+HIM
+RED
+
+      'A',[1.1]Q
+AAA
+STY
+
+AAA
+HIM
+
+AAA
+RED
+
+      'A',[2.1]Q
+AS
+AT
+AY
+
+AH
+AI
+AM
+
+AR
+AE
+AD
+
+      ⍝ Regression
+
+      A←4 3⍴'A'
+      B←4 3⍴'B'
+
+      ⎕IO←1
+      ⍴ A ,[¯0.5] B
+AXIS ERROR+
+      ⍴A,[¯0.5]B
+       ^^
+
+      ⍴A,[0.5]B
+2 4 3
+
+      ⍴ A ,[1.5] B
+4 2 3
+
+      ⍴ A ,[2.5] B
+4 3 2
+
+      ⍴ A ,[3.5] B
+AXIS ERROR+
+      ⍴A,[3.5]B
+       ^^
+
+      ⎕IO←0
+      ⍴ A ,[¯1.5] B
+AXIS ERROR+
+      ⍴A,[¯1.5]B
+       ^^
+
+      ⍴A,[¯0.5]B
+2 4 3
+
+      ⍴ A ,[0.5] B
+4 2 3
+
+      ⍴ A ,[1.5] B
+4 3 2
+
+      ⍴ A ,[2.5] B
+AXIS ERROR+
+      ⍴A,[2.5]B
+       ^^
+
+      )SIC
+      ⎕IO←1
+
+      ⍝ regression (Blake McBride, Bugs28 #66, Bugs27 #48 residual,
+      ⍝ 2026-08-11): a rank mismatch in A,[X]B (laminate) raised INDEX
+      ⍝ ERROR instead of RANK ERROR, even though the )MORE text itself
+      ⍝ already says "expecting ⍴⍴A = ⍴⍴B"; and laminate's own Z, when B
+      ⍝ is empty, always took its prototype from B instead of A (rank>=2),
+      ⍝ unlike plain catenate which already got this right for #48.
+      ⍝
+      Z←1 2 3,[0.5]2 3⍴0
+RANK ERROR+
+      Z←1 2 3,[0.5]2 3⍴0
+        ^    ^
+      )MORE
+A,[X]B: expecting ⍴⍴A = ⍴⍴B (or A or B a scalar); ⍴⍴A is 1, ⍴⍴B is 2
+
+      ⎕UCS ↑(0 3⍴'a'),[0.5]0 3⍴0
+32
+
+      ⍝ control: plain catenate was already right (Bugs27 #48)
+      ⍝
+      ⎕UCS ↑(0 3⍴'a'),0 3⍴0
+32
+
+      ⍝ ==================================
+

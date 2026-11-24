@@ -144,7 +144,7 @@ send_results_email()
    fi
 
    # ALL_PRIMITIVES_ERROR_N.apl reproducers (see run_all_primitives() and
-   # testcases/AllPrimitives.tc's ON_ERROR): attach them, if any, so the
+   # testsuites/extra/AllPrimitives.tc's ON_ERROR): attach them, if any, so the
    # nightly email is self-contained for reproducing a fault.
    #
    local attachments=(/tmp/ALL_PRIMITIVES_ERROR_*.apl)
@@ -211,7 +211,7 @@ run_all_primitives()
    if [ -x "$apl_bin" ]
    then
       # AllPrimitives.tc limits its own fuzz loop to CONTEXT.SECONDS (5s,
-      # see testcases/AllPrimitives.tc) but only checks the clock *between*
+      # see testsuites/extra/AllPrimitives.tc) but only checks the clock *between*
       # fuzz iterations; a single iteration that hangs (e.g. an interpreter
       # bug causing an infinite loop inside one primitive call) is never
       # caught by that internal check and can wedge the whole nightly
@@ -226,7 +226,7 @@ run_all_primitives()
       local watchdog_seconds=60   # generous multiple of CONTEXT.SECONDS=5
 
       ( cd "$ROOT_dir/src" && \
-        exec "$apl_bin" --id 1010 -T testcases/AllPrimitives.tc ) \
+        exec "$apl_bin" --id 1010 -T testsuites/extra/AllPrimitives.tc ) \
            > "$ALL_PRIMITIVES_LOG" 2>&1 &
       local apl_pid=$!
 
@@ -322,7 +322,7 @@ artifact "libapl.so (shared library)" "build/xxx" "libapl.so"
 artifact "libapl.a  (static library)" "build/xxx" "libapl.a"
 echo "</TABLE>"
 
-echo "<H3>AllPrimitives Fuzzer (testcases/AllPrimitives.tc)</H3>
+echo "<H3>AllPrimitives Fuzzer (testsuites/extra/AllPrimitives.tc)</H3>
 <PRE>${ALL_PRIMITIVES_SUMMARY:-(not run)}</PRE>"
 
 echo "<H3>Per-Configuration Timing</H3>
@@ -418,7 +418,7 @@ finish_config()
       } > "$TOP_LOG_dir/details-$1.html"
    elif [ "$2" = "test" ]
    then
-      local summ="$bdir/src/testcases/summary.log"
+      local summ="$bdir/src/testsuites/extra/summary.log"   # make test
       {
          echo "<H4>test $1: FAILED</H4>"
          echo "<PRE>"
@@ -426,7 +426,7 @@ finish_config()
             if [ -f "$summ" ]
             then
                # a failed testcase in summary.log, e.g.:
-               #   3   16.425 ms  (0 APL, 0 assert, 3 diff, 0 parse) testcases/Rank.tc
+               #   3   16.425 ms  (0 APL, 0 assert, 3 diff, 0 parse) testsuites/main/Rank.tc
                strip_ansi < "$summ" | awk '$1 ~ /^[0-9]+$/ && $1 > 0'
                local tc
                strip_ansi < "$summ" | awk '$1 ~ /^[0-9]+$/ && $1 > 0 { print $NF }' |
@@ -440,7 +440,7 @@ finish_config()
                      head -40
                done
             else
-               echo "(no testcases/summary.log: make test stopped early."
+               echo "(no testsuites/extra/summary.log: make test stopped early."
                echo " Its last lines were:)"
                tail -n 20 "$bdir/src/make_test.log" 2>/dev/null | strip_ansi
             fi
@@ -544,17 +544,26 @@ build_one()
 test_one()
 {
    echo "testing configuration \"$1\"..."
-   echo "  └─── see test results in: $VSRC_dir/testcases/summary.log"
+   echo "  └─── see test results in: $VSRC_dir/testsuites/extra/summary.log"
 
    local time_FROM=$(date +%s)
    local summ="$TOP_LOG_dir/summary.log"
    cd $VSRC_dir
-   # all testcases (make test runs testcases/*.tc), their helper and data
-   # files (e.g. APnnn_1011.*), and their library root testcases/libroot
-   # (make test runs ./apl --libroot testcases/libroot). Since the tree is a
-   # copy of the tarball content, these are exactly the distributed files.
+   # all testcases (make test runs the test suites in testsuites/, see
+   # src/testsuites/README), their helper and data files in testcases/ (e.g.
+   # APnnn_1011.*), and their library root testcases/libroot (make test runs
+   # ./apl --libroot testcases/libroot). Since the tree is a copy of the
+   # tarball content, these are exactly the distributed files.
    cp $ROOT_dir/src/testcases/* testcases/ 2>/dev/null  # (skips subdirs)
    cp -R $ROOT_dir/src/testcases/libroot testcases/     # needed by testcases
+   local suite
+   for suite in $ROOT_dir/src/testsuites/*/
+   do
+      suite=$(basename "$suite")
+      mkdir -p "testsuites/$suite"
+      cp "$ROOT_dir/src/testsuites/$suite/"*.tc \
+         "$ROOT_dir/src/testsuites/$suite/zzzz_selection" "testsuites/$suite/"
+   done
    make test > make_test.log 2>&1   # for finish_config()
    local make_result=$?
    local time_TO=$(date +%s)
@@ -685,6 +694,43 @@ build_asan()
       ASAN_OPTIONS="detect_leaks=0" test_one "asan" || failed="test"
    fi
    finish_config asan "$failed"
+}
+
+# build and test a 32-bit (-m32) variant on a 64-bit host. 32-bit platforms
+# (i386, armhf, ...) are still supported by Debian and others, and bugs that
+# only show with 32-bit int/long/pointer sizes (e.g. a printf format that
+# does not match a 64-bit argument) are invisible in the 64-bit builds.
+# Like build_asan, CXX/CC contain spaces and are therefore exported as
+# environment variables around build_one/test_one. The optional libraries
+# (GTK, SQL, PCRE, ...) are usually only installed for 64-bit, so ./configure
+# leaves them out, and testcases needing them skip themselves.
+#
+# Needs g++-multilib on the host; without it the configuration is skipped.
+#
+build_m32()
+{
+   local probe_dir=$(mktemp -d)
+   echo 'int main() { return 0; }' > "$probe_dir/m32.cc"
+   if ! g++ -m32 -o "$probe_dir/m32" "$probe_dir/m32.cc" > /dev/null 2>&1
+   then
+      rm -Rf "$probe_dir"
+      echo "    build m32: SKIPPED (g++ -m32 does not work here:" \
+           "install g++-multilib)" >> "$TOP_LOG_dir/summary.log"
+      return
+   fi
+   rm -Rf "$probe_dir"
+
+   echo "building configuration 'm32' (32-bit)"
+   VSRC_dir="$TOP_BUILD_dir/builddir_m32/src"
+   local failed=""
+   CXX="g++ -m32" CC="gcc -m32" \
+      build_one "m32" "$STD" "$VSRC_dir/apl" || failed="build"
+
+   if [ -z "$failed" ]
+   then
+      test_one "m32" || failed="test"
+   fi
+   finish_config m32 "$failed"
 }
 
 ###################################################################

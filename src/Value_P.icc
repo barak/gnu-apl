@@ -137,6 +137,11 @@ inline Value_P::Value_P(ShapeItem len, const char * loc)
 {
 const char * args = "ShapeItem len, const char * loc";
    value_p = 0;
+   if (Value::check_WS_FULL(args, len, loc))   // like Value_P(Shape) (Bugs39 #6)
+      {
+        MORE_ERROR() << "WS FULL detected by Value::check_WS_FULL()";
+        WS_FULL;
+      }
 
    try                           { value_p = new Value(len, loc);             }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
@@ -151,6 +156,12 @@ inline Value_P::Value_P(ShapeItem rows, ShapeItem cols, const char * loc)
 {
 const char * args = "ShapeItem rows, Shapeitem cols, const char * loc";
    value_p = 0;
+   if (rows > 0 && cols > 0 &&   // like Value_P(Shape) (Bugs39 #6)
+       (cols > LARGE_INT / rows || Value::check_WS_FULL(args, rows*cols, loc)))
+      {
+        MORE_ERROR() << "WS FULL detected by Value::check_WS_FULL()";
+        WS_FULL;
+      }
 
    try                           { value_p = new Value(rows, cols, loc);      }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
@@ -286,15 +297,6 @@ const char * args = "const Shape & shape, const char * loc";
    catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
    catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
-   value_p->increment_owner_count(loc);
-   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
-}
-//──────────────────────────────────────────────────────────────────────────
-inline Value_P::Value_P(const Shape & shape, uint64_t * bits, const char * loc)
-{
-   // cannot WS_FULL since bits were allocated beforehand
-   //
-   value_p = new Value(shape, bits, loc);
    value_p->increment_owner_count(loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }

@@ -1,0 +1,19 @@
+⍝ Format.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z character array; implicit ⎕PP
+      ⍝ inv: ⍴⍴Z ←→ ,1⌈⍴⍴B  (for simple B)
+      ⍝ GNU APL uses ⍕ for Format (APL2 uses ⊕)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      Z ← ⍕B
+      (⍴⍴Z) ≡ ,1⌈⍴⍴B
+1
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ⍕B
+      (⍴⍴Z) ≡ ,1⌈⍴⍴B
+1
+      ⍝ inv: ¯1↓⍴Z ←→ ¯1↓⍴B  (for simple numeric array)
+      (¯1↓⍴Z) ≡ ¯1↓⍴B
+1

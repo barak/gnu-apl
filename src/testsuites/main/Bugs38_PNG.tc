@@ -1,0 +1,127 @@
+⍝ Bugs38_PNG.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 ⎕PNG items (they need libpng).
+
+       ]NEXTFILE no-⎕PNG        ⍝ done if ⎕PNG is not available
+
+
+
+
+
+
+      ⍝ Bugs38 #57: ⎕PNG 'file' of a 2- or 4-bit image gives colors 0.0...1.0
+
+
+
+
+
+      I1←1 2 3⍴0 0.5 1 1 0.5 0
+
+
+
+
+
+      ('testcases/libroot/workspaces/B38_g2.png' 2) ⎕PNG I1
+
+
+
+
+
+      ⎕PP←6
+
+
+
+
+
+      ⎕PNG 'testcases/libroot/workspaces/B38_g2.png'
+0 0.333333 1
+1 0.333333 0
+
+
+
+      ('testcases/libroot/workspaces/B38_g4.png' 4) ⎕PNG I1
+
+
+
+
+
+      ⎕PNG 'testcases/libroot/workspaces/B38_g4.png'
+0 0.466667 1
+1 0.466667 0
+
+
+
+      ⎕PP←10
+
+
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B38_g2.png'
+0
+
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B38_g4.png'
+0
+
+
+
+
+      )SIC
+
+      ⍝ Bugs38 #129: A ⎕PNG B checks B before it creates the file; errno text
+
+
+
+
+
+      'testcases/libroot/workspaces/B38_neg.png' ⎕PNG 1 1 2⍴¯0.5 1.5
+DOMAIN ERROR+
+      'testcases/libroot/workspaces/B38_neg.png' ⎕PNG 1 1 2⍴¯0.5 1.5
+      ^                                          ^
+
+
+      )MORE
+A ⎕PNG B: color component ¯0.5 not in the range 0…1
+
+
+
+
+      'testcases/libroot/workspaces/B38_neg.png' ⎕PNG 1 1 2⍴1J1 0
+DOMAIN ERROR+
+      'testcases/libroot/workspaces/B38_neg.png' ⎕PNG 1 1 2⍴1J1 0
+      ^                                          ^
+
+
+      )MORE
+A ⎕PNG B: (,B)[1] is not a real number
+
+
+
+
+      ⎕FIO[19] 'testcases/libroot/workspaces/B38_neg.png'
+¯2
+
+
+
+
+      ⎕PNG 'testcases/libroot/workspaces/B38_nonexist.png'
+DOMAIN ERROR+
+      ⎕PNG 'testcases/libroot/workspaces/B38_nonexist.png'
+      ^
+
+
+      )MORE
+Cannot open file 'testcases/libroot/workspaces/B38_nonexist.png' in ⎕PNG B: No such file or directory
+
+
+
+
+      )SIC
+
+
+
+
+
