@@ -1,4 +1,4 @@
-gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
+gnu-apl (2.0+svn3908-1) unstable; urgency=medium
 
   * New upstream snapshot of SVN trunk r3908
   * Drop patches applied upstream, or replaced by upstream's own changes:
@@ -17,7 +17,7 @@ gnu-apl (2.0+svn3908-1) UNRELEASED; urgency=medium
   * Build-depend on libgsl-dev, enabling ⎕MX and the GSL-based extras
     of ⌹
 
- -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 22:54:09 +0000
+ -- Barak A. Pearlmutter <bap@debian.org>  Tue, 24 Nov 2026 23:23:47 +0000
 
 gnu-apl (2.0+svn3894-1) unstable; urgency=medium
 
