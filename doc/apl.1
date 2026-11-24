@@ -196,6 +196,8 @@ response from the interpreter. The output from the interpreter is
 compared with the expected output in the testcase file(s) and
 differences are marked. In addition a summary file is created that
 tells whether or not each of the testcases was successful.
+A testcase argument \fB@file\fR is a list of testcases:
+\fB-T @file\fR does the same as \fB--TL file\fR.
 .TP
 .B --TM mode
 test mode. This option how the interpreter shall behave when
@@ -242,6 +244,15 @@ Normally, when the interpreter is run with the `\fB-T\fR' option, then
 an existing summary.log file is overridden without notice.  This
 option causes new test results to be appended to a possibly
 existing summary.log instead of overriding it.
+.TP
+.B --TL file ...
+run lists of testcases (test suites): every \fIfile\fR contains the names
+of testcase files, one per line, relative to the directory of \fIfile\fR,
+or \fIfile\fR is a test suite directory that contains such a file named
+\fIzzzz_selection\fR. Every testcase file is run as if it were given with
+the `\fB-T\fR' option. Empty lines and lines starting with # or ⍝ are
+ignored. The files end at the next option or \fB--\fR. Since `\fB-T\fR' takes all remaining arguments as testcase
+files, \fB--TL\fR must be given before `\fB-T\fR'.
 .TP
 .B --tcp_port port
 redirect CIN/COUT/CERR to/from TCP port \fIport\fP. Implies \fB--noSV\fP

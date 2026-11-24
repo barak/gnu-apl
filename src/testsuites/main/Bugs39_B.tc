@@ -1,0 +1,683 @@
+⍝ Bugs39_B.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs39 severity B items (#20 - #52): wrong results and
+⍝ silent data loss (⎕MX items are in Bugs39_MX.tc, workspace items in
+⍝ Bugs39_Workspace.tc).
+
+
+
+
+      ⍝ Bugs39 #20: A!B with a negative integer A and a B next to 0 is 0
+
+
+
+
+      ¯1!¯1E¯14
+0
+
+
+
+
+      ¯8!¯1E¯14
+0
+
+
+
+
+      ¯1!1E¯20
+0
+
+
+
+
+      ¯3!1E¯17
+0
+
+
+
+
+      ¯1E19!¯1
+¯1
+
+
+
+
+      ⍝ Bugs39 #21: the locals of a lambda without a result are localized
+
+
+
+
+      A39←'global'
+
+
+
+
+      H39←{A39←⍵ ⋄ ;A39}
+
+
+
+
+      H39 5
+
+
+
+
+      A39
+global
+
+
+
+
+      )ERASE A39 H39
+
+
+
+
+      ⍝ Bugs39 #22: A f.g B with a length-1 inner axis and a non-scalar g
+
+
+
+
+      M39←2 1⍴5
+
+
+
+
+      M39+.,1 2 3
+11 11
+
+
+
+
+      (2 2⍴⍳4)+.,1 2⍴5 6
+ 8  9
+12 13
+
+
+
+
+      (⍳3)+.,1 3⍴⍳3
+7 8 9
+
+
+
+
+      M39+.×1 2 3
+30 30
+
+
+
+
+      )ERASE M39
+
+
+
+
+      ⍝ Bugs39 #23 #24 #55 #74 #101: ⎕FIO scanf
+
+
+
+
+      '%D' ⎕FIO[55] '12'
+12
+
+
+
+
+      '%u' ⎕FIO[55] '18446744073709551615'
+DOMAIN ERROR+
+      '%u' ⎕FIO[55]'18446744073709551615'
+      ^    ^
+
+
+
+
+      '%f' ⎕FIO[55] 'nancy'
+
+
+
+
+      '%d%f' ⎕FIO[55] '12 nan'
+12
+
+
+
+
+      '%Ť' ⎕FIO[55] '12 ab'
+DOMAIN ERROR+
+      '%Ť' ⎕FIO[55]'12 ab'
+      ^    ^
+
+
+
+
+      '%d %f %d' ⎕FIO[55] '¯12 ¯1.5 -7'
+¯12 ¯1.5 ¯7
+
+
+
+
+      ⍝ Bugs39 #28: ⎕RE group tree with POSIX classes, conditions, comments
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'[[:space:]()]*(a(x)?)b' ⎕RE ' ab'
+Z←2⍴' ab' (2⍴(1⍴'a') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)b(?(2)c|d)' ⎕RE 'abd'
+Z←2⍴'abd' (2⍴(1⍴'a') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)b # c (' ⎕RE['x'] 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (''))
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←('(?x)(a # )',(⎕UCS 10),' (b))') ⎕RE 'ab'
+Z←2⍴'ab' (2⍴'ab' (1⍴'b'))
+
+
+
+
+      )ERASE Z
+
+
+
+
+      ⍝ Bugs39 #34: A|B with a complex B that is a multiple of A is 0
+
+
+
+
+      1E¯5|1 0J1 0J¯1 ¯1
+0 0 0 0
+
+
+
+
+      1E¯5J1E¯5|1J1
+0
+
+
+
+
+      ⍝ Bugs39 #35: float GCD/LCM at ⎕CT←0
+
+
+
+
+      ⎕CT←0
+
+
+
+
+      1E¯9∨1E5
+1E¯9
+
+
+
+
+      1E¯5∧2.5E7
+25000000
+
+
+
+
+      1E¯9∨0.3
+1E¯9
+
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+      ⍝ Bugs39 #36: A!B where a Γ of the denominator overflows
+
+
+
+
+      ⎕PP←10
+
+
+
+
+      171!1E¯11
+5.850550713E¯14
+
+
+
+
+      171!¯0.5
+¯0.04311312886
+
+
+
+
+      200!0.5
+¯0.00009992306257
+
+
+
+
+      1000!1E¯11J1E¯11
+¯1E¯14J¯9.999999999E¯15
+
+
+
+
+      ⎕PP←10
+
+
+
+
+      ⍝ Bugs39 #37: complex ∨ and ∧ with a tiny real operand
+
+
+
+
+      1E¯11∨3J4
+1E¯11
+
+
+
+
+      1E¯11∧3J4
+3J4
+
+
+
+
+      ⍝ Bugs39 #38: catenate along an axis checks the length of the axis
+
+
+
+
+      X39←5E18 0⍴0
+
+
+
+
+      ⍴X39,[1]X39
+WS FULL+
+      ⍴X39,[1]X39
+       ^  ^
+
+
+
+
+      )ERASE X39
+
+
+
+
+      ⍝ Bugs39 #39: V←λ MV B is a VALUE ERROR and does not assign V
+
+
+
+
+      ⎕FX 'MV39 B' '⍝ no result'
+MV39
+
+
+
+
+      W39←{-⍵} MV39 5
+VALUE ERROR+
+      W39←{-⍵}MV39 5
+              ^
+
+
+
+
+      )SIC
+
+
+
+
+      ⎕NC 'W39'
+0
+
+
+
+
+      ⍝ Bugs39 #41 #93 #56: ⌈ and ⌊ return the selected argument
+
+
+
+
+      ⎕PP←17
+
+
+
+
+      9007199254740993⌈1.5
+9007199254740993
+
+
+
+
+      2|9007199254740993⌈1.5
+1
+
+
+
+
+      Y39←5J1E¯12
+
+
+
+
+      Y39⌈5
+5J9.9999999999999998E¯13
+
+
+
+
+      Y39⌊5
+5
+
+
+
+
+      P39←1J1 ◊ Q39←(1+0.9E¯13)+0J0.5 ◊ R39←(1+1.8E¯13)+0J¯1
+
+
+
+
+      V39←P39 Q39 R39 ◊ W39←Q39 R39 P39
+
+
+
+
+      V39[⍋V39]
+1J1 1.0000000000000899J0.5 1.0000000000001801J¯1
+
+
+
+
+      W39[⍋W39]
+1J1 1.0000000000000899J0.5 1.0000000000001801J¯1
+
+
+
+
+      ⌈/P39 Q39 R39
+1.0000000000001801J¯1
+
+
+
+
+      ⌈/Q39 R39 P39
+1.0000000000001801J¯1
+
+
+
+
+      )ERASE Y39 P39 Q39 R39 V39 W39
+
+
+
+
+      ⍝ Bugs39 #42: ⌊ and ⌈ of a large non-integer
+
+
+
+
+      X39←1E15÷3
+
+
+
+
+      ⌊X39
+333333333333333
+
+
+
+
+      ⌈X39
+333333333333333
+
+
+
+
+      ⌊10000000000000.25
+10000000000000
+
+
+
+
+      )ERASE X39
+
+
+
+
+      ⍝ Bugs39 #43: float LCM is commutative
+
+
+
+
+      0.3∧1E17
+1E17
+
+
+
+
+      1E17∧0.3∧1E17
+100000000000000000
+
+
+
+
+      ⎕PP←10
+
+
+
+
+      ⍝ Bugs39 #44: ⎕DLX branches on primary columns only
+
+
+
+
+      B39←(1 3⍴2 1 0)⍪6 3⍴0 1 1
+
+
+
+
+      ¯1 ⎕DLX B39
+ 2  3  4  5  6  7 
+
+
+
+
+      ¯1 ⎕DLX 1⌽B39
+ 2  3  4  5  6  7 
+
+
+
+
+      )ERASE B39
+
+
+
+
+      ⍝ Bugs39 #45: f¨ with a defined f returning a nested scalar
+
+
+
+
+      V39←(1 2)(3 4)
+
+
+
+
+      ≡{⊂⍵}¨V39
+3
+
+
+
+
+      ≡1 2 {⊂⍺,⍵}¨ 3 4
+3
+
+
+
+
+      )ERASE V39
+
+
+
+
+      ⍝ Bugs39 #46: replicate and expand with axis followed by a function
+
+
+
+
+      M39←2 3⍴⍳6
+
+
+
+
+      1 0 1/[1]⍳3
+1 3
+
+
+
+
+      1 0 1/[2]-M39
+¯1 ¯3
+¯4 ¯6
+
+
+
+
+      1 1 0 1\[2]-M39
+¯1 ¯2 0 ¯3
+¯4 ¯5 0 ¯6
+
+
+
+
+      )ERASE M39
+
+
+
+
+      ⍝ Bugs39 #47: ↑ in a selective specification selects the cells of the item
+
+
+
+
+      N39←(1 2 3)(4 5) ◊ (1↑↑N39)←9 ◊ N39
+ 9 2 3  4 5 
+
+
+
+
+      N39←(1 2 3)(4 5) ◊ (⌽↑N39)←7 8 9 ◊ N39
+ 9 8 7  4 5 
+
+
+
+
+      N39←(1 2 3)(4 5) ◊ (↑N39)←9 ◊ N39
+ 9  4 5 
+
+
+
+
+      )ERASE N39
+
+
+
+
+      ⍝ Bugs39 #48: ⎕FX of a body line with a rejected lambda returns its line
+
+
+
+
+      ⎕FX 'F48' 'A←1' 'B←{⍶}1'
+3
+
+
+
+
+      ⍝ Bugs39 #49: resuming a failed assignment re-runs it
+
+
+
+
+      ⎕FX 'Z←F49' 'V←1 2' 'V[5]←9' 'Z←''next line ran'''
+F49
+
+
+
+
+      F49
+INDEX ERROR+
+F49[2]  V[5]←9
+        ^   ^
+
+
+
+
+      →⍳0
+INDEX ERROR+
+F49[2]  V[5]←9
+        ^   ^
+
+
+
+
+      )SIC
+
+
+
+
+      W49←1 2 3 4
+
+
+
+
+      (2↑W49)←1 2 3
+LENGTH ERROR+
+      (2↑W49)←1 2 3
+      ^      ^
+
+
+
+
+      →⍳0
+LENGTH ERROR+
+      (2↑W49)←1 2 3
+      ^      ^
+
+
+
+
+      W49
+1 2 3 4
+
+
+
+
+      )SIC
+
+
+
+
+      )ERASE F49 W49
+
+
+
+
+      )SIC

@@ -235,6 +235,12 @@ public:
    /// @param y imaginary part of the argument
    static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
+   /// like gamma(), but return a non-finite result instead of a DOMAIN ERROR
+   static APL_Complex gamma_nothrow(APL_Float x, const APL_Float & y);
+
+   /// ln gamma(x + iy) (for x + iy whose gamma overflows)
+   static APL_Complex log_gamma(APL_Float x, APL_Float y);
+
    /// compute circle function \b fun
    /// @param Z uninitialised result cell to be filled in
    /// @param fun circle function selector (APL left argument to ○)
@@ -336,8 +342,13 @@ protected:
    static ErrorCode bif_power_ci(Cell * Z, APL_Complex a, APL_Integer b);
    static ErrorCode bif_power_cc(Cell * Z, APL_Complex a, APL_Complex b);
    static ErrorCode bif_logarithm_cc(Cell * Z, APL_Complex a, APL_Complex b);
-   static ErrorCode bif_maximum_cc(Cell * Z, APL_Complex a, APL_Complex b);
-   static ErrorCode bif_minimum_cc(Cell * Z, APL_Complex a, APL_Complex b);
+   /// return true if \b b is tolerantly equal to the non-zero Gaussian
+   /// integer \b N (Bugs40 #30)
+   static bool gaussian_near(APL_Complex b, double qct, APL_Complex & N);
+
+   /// Z←A⌈B (if max) or Z←A⌊B (if not) for a complex A or B
+   static ErrorCode max_min_cc(Cell * Z, const Cell & A, const Cell & B,
+                               bool max);
    static ErrorCode bif_residue_cc(Cell * Z, APL_Complex a, APL_Complex b);
    static ErrorCode bif_circle_fun_c(Cell * Z, APL_Integer fun, APL_Complex b);
    static ErrorCode bif_circle_fun_inverse_c(Cell * Z, APL_Integer fun,

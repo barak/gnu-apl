@@ -527,10 +527,11 @@ ShapeItem idxA = 0;
                          integer_B = false;
                     }
 
+               bool overflow = false;
                if (integer_A && integer_B)
                   {
-                    const bool overflow = decode_int(*Z, l_len_A, A, idxA,
-                                                     h_len_B, B, l, l_len_B);
+                    overflow = decode_int(*Z, l_len_A, A, idxA,
+                                          h_len_B, B, l, l_len_B);
                      if (!overflow)   continue;
 
                      // otherwise: compute as float
@@ -541,7 +542,7 @@ ShapeItem idxA = 0;
                                              h_len_B, B, l, l_len_B);
                else
                   decode_real(*Z, l_len_A, A, idxA,
-                                          h_len_B, B, l, l_len_B);
+                                          h_len_B, B, l, l_len_B, overflow);
              }
          idxA += l_len_A;
        }
@@ -616,14 +617,20 @@ APL_Integer weight = 1;
    // __builtin_{mul,add}_overflow report overflow of the exact int64_t
    // computation directly, so the float shadow is no longer needed.
    //
+   // An overflowed weight matters only if a non-zero digit meets it, e.g.
+   // not for the leading 0s of 10⊥0 0,18⍴9 (Bugs38 #42).
+   //
+bool weight_overflow = false;
    loop(l, len)
       {
         idxA -= dec_A;
         idxB -= dec_B;
 
         const APL_Integer vB = VB.get_near_int(idxB);
-        APL_Integer term;
-        if (__builtin_mul_overflow(weight, vB, &term))      return true;
+        if (weight_overflow && vB != 0)   return true;
+        APL_Integer term = 0;
+        if (!weight_overflow &&
+            __builtin_mul_overflow(weight, vB, &term))      return true;
         if (__builtin_add_overflow(value, term, &value))    return true;
 
         // weight is only needed for a further iteration -- e.g.
@@ -637,9 +644,11 @@ APL_Integer weight = 1;
         //
         if (l + 1 < len)
            {
-             if (__builtin_mul_overflow(weight, VA.get_near_int(idxA),
-                                         &weight))
-                return true;
+             const APL_Integer vA = VA.get_near_int(idxA);
+             if (vA == 0)   { weight = 0;   weight_overflow = false; }
+             else if (!weight_overflow &&
+                      __builtin_mul_overflow(weight, vA, &weight))
+                weight_overflow = true;
            }
       }
 
@@ -652,7 +661,7 @@ void
 Bif_F12_DECODE::decode_real(Value & Z, ShapeItem len_A,
                        cValue_R VA, ShapeItem idxA,
                        ShapeItem len_B, cValue_R VB, ShapeItem idxB,
-                       ShapeItem dB)
+                       ShapeItem dB, bool overflow)
 {
 const ShapeItem dec_A = len_A == 1 ? 0 : 1;
 const ShapeItem dec_B = len_B == 1 ? 0 : dB;
@@ -675,6 +684,10 @@ APL_Float weight = 1.0;
    // above (Bugs28 #42).
    //
    if (!isfinite(accu))   DOMAIN_ERROR;
-   Z.next_ravel_Number(accu);
+   // after an overflow of the exact integer computation, accu is a rounded
+   // float and must not pose as an exact integer (Bugs41 #27)
+   //
+   if (overflow)   Z.next_ravel_Float(accu);
+   else            Z.next_ravel_Number(accu);
 }
 //════════════════════════════════════════════════════════════════════════════

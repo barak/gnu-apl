@@ -1,0 +1,9 @@
+⍝ ZZZ7_Regression.tc
+⍝ ----------------------------------
+
+      ⍝ segfault in ⎕EA with error in right argument
+      ⍝ 
+
+      5 ⌊ ('4' ⎕EA '~¯3') + 2 × 1
+5
+

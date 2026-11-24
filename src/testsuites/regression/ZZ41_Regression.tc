@@ -1,0 +1,24 @@
+⍝ ZZ41_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+      ⍕'PI' ○1
+DOMAIN ERROR
+      ⍕'PI'○1
+       ^   ^
+
+
+      ⍕'PI' ○1
+DOMAIN ERROR
+      ⍕'PI'○1
+       ^   ^
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

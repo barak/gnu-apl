@@ -51,6 +51,13 @@ Bif_ROTATE::reverse(cValue_R B, sAxis axis)
 const Shape3 shape_B3(B.get_shape(), axis);
 
 Value_P Z(B.get_shape(), LOC);
+   if (Z->is_empty())   // nothing to permute (Bugs38 #11: the loops below
+      {                 // could run over e.g. 1E15 empty rows)
+        Z->set_default(B, LOC);
+        if (B.is_left_value())   Z->set_left_value();
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
 
 const ShapeItem ebytes = B.packed_bytes_per_item();
    if (ebytes > 0)   // packed non-bool: permute elements directly
@@ -135,6 +142,13 @@ const Shape shape_A2(shape_B3.h(), shape_B3.l());
 
 
 Value_P Z(B.get_shape(), LOC);
+   if (Z->is_empty())   // nothing to permute (Bugs38 #11: the loops below
+      {                 // could run over e.g. 1E15 empty rows)
+        Z->set_default(B, LOC);
+        if (B.is_left_value())   Z->set_left_value();
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
 
 const ShapeItem ebytes = B.packed_bytes_per_item();
    if (ebytes > 0)   // packed non-bool: permute elements directly

@@ -1,0 +1,30 @@
+⍝ ZZ21_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ no editor command allowed for new function
+      ⍝
+      ∇foo[⎕]∇
+DEFN ERROR+
+      ∇foo[⎕]∇
+             ^
+
+      )FNS
+
+      ⍝ prepend scalar
+      ⍝
+      4 ⎕CR '[',0 2⍴' '
+┏→━━┓
+⌽   ┃
+┗━━━┛
+
+⍝ ==================================
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

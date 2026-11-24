@@ -535,13 +535,9 @@ Token::get_function_axis() const
 
    if (get_tag() == TOK_FAXIS)   // axis is an integer
       {
-        const sAxis axis = get_int_val();
-        if (axis == -1)   // [ ]
-           {
-             MORE_ERROR() << "Invalid elided function axis [ ]";
-             AXIS_ERROR;
-           }
-        return IntScalar(axis, LOC);
+        // NOTE: [ ] is a TOK_AXIS without a value (see above), so a
+        // TOK_FAXIS of -1 is a genuine axis [¯1], e.g. ⎕FFT[¯1] (Bugs38 #95)
+        return IntScalar(get_int_val(), LOC);
       }
 
    // Bugs28 #100(d): Q1() is documented (Common.hh) to be for printouts

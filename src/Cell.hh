@@ -464,9 +464,11 @@ public:
    /// True iff value is near the integer 0 but not 0, e.g. 1E¯11. Such a
    /// value must not be snapped to 0 where a 0 changes the result (e.g.
    /// A!B, A∨B, A∧B; see Bugs31 #15 and Bugs37 #11).
-   bool is_snapped_to_0() const
-      { return is_near_int() && get_real_value() != 0.0 &&
-               nearbyint(get_real_value()) == 0.0; }
+   bool is_snapped_to_0() const   // also e.g. 0J1E¯11 (Bugs40 #28)
+      { return is_near_int() &&
+               (get_real_value() != 0.0 || get_imag_value() != 0.0) &&
+               nearbyint(get_real_value()) == 0.0 &&
+               nearbyint(get_imag_value()) == 0.0; }
 
    /// return true iff value is numeric and close to 1
    virtual bool is_near_one() const
@@ -715,6 +717,16 @@ public:
    /// @param A  real value to test
    /// @param qct  comparison tolerance (⎕CT)
    static bool integral_within(APL_Float A, double qct);
+
+   /// true iff the quotient \b Q (of a residue) is a non-zero integer up to
+   /// the rounding errors of its operands and of the division (Bugs38 #47)
+   /// @param Q  the quotient B÷A of A|B
+   static bool rounded_integral(APL_Float Q);
+
+   /// return \b value - \b qio (⎕IO) without a signed overflow: an index or
+   /// axis of ¯2⋆63 stays ¯2⋆63, which is out of range anyway (Bugs39 #73)
+   static APL_Integer minus_IO(APL_Integer value, APL_Integer qio)
+      { return value < INT64_MIN + qio ? INT64_MIN : value - qio; }
 
    /// true iff value is close to an int (within +- qct)
    static bool is_near_int(APL_Float value);

@@ -21,6 +21,7 @@
 /** @file
 */
 
+#include <limits>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
@@ -395,10 +396,9 @@ FloatCell::bif_maximum(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
    if (A->is_complex_cell())
-      return ComplexCell::bif_maximum_cc(Z, A->get_complex_value(),
-                                            APL_Complex(dfval(), 0));
+      return ComplexCell::max_min_cc(Z, *A, *this, true);
 
-   if (A->is_integer_cell() && Workspace::get_CT() == 0.0)
+   if (A->is_integer_cell())   // at any ⎕CT (Bugs39 #41)
       {
         // Bugs31 #8 (Blake McBride): A->get_real_value() below converts
         // A's exact int64 through double first, losing precision beyond
@@ -418,10 +418,9 @@ FloatCell::bif_minimum(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
    if (A->is_complex_cell())
-      return ComplexCell::bif_minimum_cc(Z, A->get_complex_value(),
-                                            APL_Complex(dfval(), 0));
+      return ComplexCell::max_min_cc(Z, *A, *this, false);
 
-   if (A->is_integer_cell() && Workspace::get_CT() == 0.0)
+   if (A->is_integer_cell())   // at any ⎕CT (Bugs39 #41)
       {
         // see FloatCell::bif_maximum() above (Bugs31 #8)
         //
@@ -719,6 +718,17 @@ FloatCell::bif_power_fi(Cell * Z, APL_Float a, APL_Integer b)
 {
    // a (float base) to the b (integer) power — preserves parity for negative a
    //
+
+   // -b below would overflow for the int64 minimum: use the (exact) double
+   // exponent instead (Bugs38 #44)
+   //
+   if (b == std::numeric_limits<APL_Integer>::min())
+      {
+        const APL_Float z = pow(a, APL_Float(b));
+        if (!isfinite(z))   return E_DOMAIN_ERROR;
+        return FloatCell::zF(Z, z);
+      }
+
 const bool invert_Z = b < 0;
    if (invert_Z)   b = -b;
 
@@ -815,9 +825,13 @@ FloatCell::bif_power_ff(Cell * Z, APL_Float a, APL_Float b)
         return isfinite(z) ? FloatCell::zF(Z, z) : E_DOMAIN_ERROR;
       }
 
-   // a < 0, b not an integer: complex result
+   // a < 0, b not an integer: complex result. a⋆b = (|a|⋆b) × ¯1⋆b, and
+   // ¯1⋆b depends only on 2|b, which fmod() computes exactly. The phase
+   // b×π of exp(b×ln a) has a rounding error proportional to b, e.g.
+   // ¯1⋆1E15+0.5 was 0.304J0.953 instead of 0J1 (Bugs38 #48).
    //
-const APL_Complex z = complex_power(APL_Complex(a, 0.0), b);
+const APL_Complex z = pow(-a, b) *
+                      complex_power(APL_Complex(-1.0, 0.0), fmod(b, 2.0));
    if (!isfinite(z.real()))   return E_DOMAIN_ERROR;
    if (!isfinite(z.imag()))   return E_DOMAIN_ERROR;
    return ComplexCell::zC(Z, z);
@@ -843,8 +857,16 @@ FloatCell::bif_logarithm_ff(Cell * Z, APL_Float a, APL_Float b)
    // that base tolerantly equal to 1 at all -- e.g. (1+1E¯11)⍟5 was
    // rejected even though (1+1E¯11)=1 is 0.
    //
+   // A base of 1 is valid only for B = 1, giving 1: A⍟B ←→ (⍟B)÷⍟A, and
+   // "if L is 1, R must also be 1" with the example 1⍟1 → 1 (APL2 LRM
+   // p. 171, Bugs38 #122). 0⍟0 stays DOMAIN ERROR (L and R nonzero).
+   //
    if (Cell::tolerantly_equal(a, 1.0, Workspace::get_CT()))
-      return E_DOMAIN_ERROR;
+      {
+        if (Cell::tolerantly_equal(b, 1.0, Workspace::get_CT()))
+           return IntCell::z1(Z);
+        return E_DOMAIN_ERROR;
+      }
    if (b == a)    return IntCell::z1(Z);
    if (b == 0.0)  return E_DOMAIN_ERROR;
 
@@ -894,6 +916,12 @@ const APL_Float quotient = P / Q;
      // (Blake McBride, Bugs22 #1 -- see Cell::integral_within()'s own
      // fix for the actual near-zero-quotient bug this guards against.)
      if ((qct != 0) && Cell::integral_within(quotient, qct))   return 0.0;
+
+     // integral_within() uses an absolute window, which is too narrow for
+     // a large quotient (1E¯5|3.0 and 1E¯5|¯1.0 were not 0 while 1E¯5|3
+     // and 1E¯5|¯1 were, Bugs38 #47). See Cell::rounded_integral().
+     //
+     if ((qct != 0) && Cell::rounded_integral(quotient))   return 0.0;
    }
 
 const APL_Float null(0.0);
@@ -1011,9 +1039,12 @@ const APL_Integer floor_candidate = bi - 1;
         const APL_Float D = bi - b;
         if (D >= (1.0 - Workspace::get_CT()))   --bi;
       }
-   else if (Cell::tolerantly_equal(b, APL_Float(floor_candidate),
+   else if ((b - floor_candidate) < (bi - b) &&   // the nearest integer
+            Cell::tolerantly_equal(b, APL_Float(floor_candidate),
                                     Workspace::get_CT()))
       {
+        // for a large b every non-integer is tolerantly equal to both
+        // neighbours: only the nearest one counts (Bugs39 #42)
         --bi;
       }
    return IntCell::zI(Z, bi);
@@ -1039,9 +1070,11 @@ const APL_Integer ceil_candidate = bi + 1;
         const APL_Float D = b - bi;
         if (D >= (1.0 - Workspace::get_CT()))   ++bi;
       }
-   else if (Cell::tolerantly_equal(b, APL_Float(ceil_candidate),
+   else if ((ceil_candidate - b) < (b - bi) &&   // the nearest integer
+            Cell::tolerantly_equal(b, APL_Float(ceil_candidate),
                                     Workspace::get_CT()))
       {
+        // see bif_ceiling_f() (Bugs39 #42)
         ++bi;
       }
    return IntCell::zI(Z, bi);
@@ -1154,10 +1187,14 @@ FloatCell::bif_within_quad_CT_f(Cell * Z, APL_Float b)
    if (b > LARGE_INT)   return E_DOMAIN_ERROR;
    if (b < SMALL_INT)   return E_DOMAIN_ERROR;
 
+   // <= and >=: an exact integer (e.g. 0.0, where max_diff is 0) is at
+   // distance 0 from itself. The result is an integer, like ⊤∨B
+   // (Bugs38 #54).
+   //
 const double max_diff = Workspace::get_CT() * fabs(b);
 const APL_Float val_dn = floor(b);
-   if (b < (val_dn + max_diff))   return FloatCell::zF(Z, val_dn);
+   if (b <= (val_dn + max_diff))   return IntCell::zI(Z, APL_Integer(val_dn));
 const APL_Float val_up = ceil(b);
-   if (b > (val_up - max_diff))   return FloatCell::zF(Z, val_up);
+   if (b >= (val_up - max_diff))   return IntCell::zI(Z, APL_Integer(val_up));
    return E_DOMAIN_ERROR;
 }

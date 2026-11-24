@@ -101,7 +101,11 @@ ShapeItem last_semi = -1;
       {
         for (ShapeItem t = last_semi; t < lambda_text.ssize(); ++t)
             header << lambda_text[t];
-        text.push_back(header);
+
+        // show blank-separated local names with semicolons, like in
+        // ∇-functions (the UserFunction constructor, Bugs35 #49)
+        //
+        text.push_back(UserFunction_header::canonical_locals(header));
 
         UCS_string new_text(lambda_text);
         new_text.resize(last_semi);
@@ -1184,6 +1188,40 @@ int endif_PC;
    out << " ENDIF@PC=" << endif_PC << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
+ShapeItem
+Executable::lambda_last_statement(const UCS_string & text)
+{
+   // return the start of the last statement of the lambda text (between
+   // { and }), i.e. after its last ◊ (and blanks), or 0. A ◊ in a string
+   // or in a nested lambda does not end a statement of this lambda: λ←
+   // was inserted there, e.g. into 'a⋄b' (Bugs40 #41).
+   //
+ShapeItem sols = 0;
+int level = 0;   // nested { ... }
+   for (ShapeItem t = 0; t < text.ssize(); ++t)
+       {
+         const Unicode uni = text[t];
+         if (uni == UNI_SINGLE_QUOTE ||
+             uni == UNI_DOUBLE_QUOTE ||
+             uni == UNI_LEFT_DAQ)
+            {
+              const ShapeItem end = text.string_end_pos(t, false);
+              if (end == -1)   break;   // malformed: no string end
+              t = end;
+              continue;
+            }
+
+         if      (uni == UNI_L_CURLY)   ++level;
+         else if (uni == UNI_R_CURLY)   --level;
+         else if (level == 0 && Avec::is_DIAMOND(uni))
+            {
+              sols = t + 1;
+              while (sols < text.ssize() && text[sols] <= UNI_SPACE)  ++sols;
+            }
+       }
+   return sols;
+}
+//────────────────────────────────────────────────────────────────────────────
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
@@ -1284,20 +1322,7 @@ out:
    // statement (= after the last ◊), or at the beginning if there is only
    // one statement
    //
-ShapeItem sols = 0;   // start-of-last-statement; assume no ◊.
-   rev_loop(j, lambda_text.size())
-      {
-        if (Avec::is_DIAMOND(lambda_text[j]))
-           {
-             sols = j + 1;
-             // currently unreachable (SIG_Z implies non-whitespace
-             // follows the last ◊), but bound defensively in case a
-             // future change to lambda parsing makes it reachable.
-             while (sols < lambda_text.ssize() &&
-                    lambda_text[sols] <= UNI_SPACE)   ++sols;
-             break;
-           }
-      }
+const ShapeItem sols = lambda_last_statement(lambda_text);
 
 UCS_string ret;
    loop(j, lambda_text.size())
@@ -1326,8 +1351,8 @@ static void
 throw_lambda_defn_error()
 {
 Error error(E_DEFN_ERROR, LOC);
-   if (StateIndicator * si = Workspace::SI_top())
-      StateIndicator::get_error(si) = error;
+   // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+   StateIndicator::get_error(Workspace::SI_top()) = error;
    throw error;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1350,21 +1375,35 @@ int level = 0;
       For a multi-statement lambda it is the last ◊ before lambda_body[bend].
     */
 ShapeItem insertion_point = b;
-   for (ShapeItem j = b; j < bend; ++j)
-       {
-         if (body[j].get_tag() == TOK_END)
-            {
-              // TOK_END indicates a multi-statement lambda. Move the
-              // insertion_point to the (beginning of) the next statement.
-              insertion_point = j + 1;
-            }
-       }
+   {
+     int lev = 0;   // nested { ... }: their ◊ are not ours (Bugs40 #41)
+     for (ShapeItem j = b; j < bend; ++j)
+         {
+           const TokenTag tag = body[j].get_tag();
+           if      (tag == TOK_L_CURLY)   ++lev;
+           else if (tag == TOK_R_CURLY)   --lev;
+           else if (tag == TOK_END && lev == 0)
+              {
+                // TOK_END indicates a multi-statement lambda. Move the
+                // insertion_point to the (beginning of) the next statement.
+                insertion_point = j + 1;
+              }
+         }
+   }
+
+   // a last statement that consists only of the local variables (e.g.
+   // {;A} or {⍵⋄;A}) is empty: no λ← (Bugs38 #111)
+   //
+   if (insertion_point < bend &&
+       body[insertion_point].get_tag() == TOK_SEMICOL)
+      insertion_point = bend;
 
    // at_stmt_start tracks whether the next token is statement-initial (true at
    // the very first token, and after every TOK_END).  A statement-initial
    // TOK_R_ARROW is a branch-as-statement (→N) which is illegal in a lambda.
    // A mid-statement TOK_R_ARROW is the supported dyadic form A→B.
    bool at_stmt_start = true;
+TokenClass prev_class = TC_END;   // the class of the token left of body[b]
 
    for (; b < bend; ++b)
        {
@@ -1401,12 +1440,25 @@ ShapeItem insertion_point = b;
               // When statement-initial it is a branch (→N) and must be
               // rejected.  When mid-statement it is the supported dyadic
               // form A→B (conditional branch with a value).
+              //
+              // Unless the token left of the → (prev_class, the body is not
+              // yet reversed here) can end a value (a value, a name, ⍺, ⍵,
+              // ...), ) or ], the → is a monadic branch used as a function
+              // argument, e.g. {1+→0} (Bugs38 #8).
               case TOK_R_ARROW:
-                   if (at_stmt_start)
-                      {
-                        MORE_ERROR() << "→ is not allowed in λ expression ";
-                        throw_lambda_defn_error();
-                      }
+                   {
+                     const bool left_value = !at_stmt_start &&
+                                             (prev_class == TC_VALUE    ||
+                                              prev_class == TC_SYMBOL   ||
+                                              prev_class == TC_R_PARENT ||
+                                              prev_class == TC_R_BRACK  ||
+                                              prev_class == TC_INDEX);
+                     if (!left_value)
+                        {
+                          MORE_ERROR() << "→ is not allowed in λ expression ";
+                          throw_lambda_defn_error();
+                        }
+                   }
                    break;
 
               // TOK_END marks a statement boundary inside a multi-statement
@@ -1428,6 +1480,7 @@ ShapeItem insertion_point = b;
               default: break;
             }
          at_stmt_start = (t.get_tag() == TOK_END);
+         prev_class = t.get_Class();
 
          const Function_PC pc_t = Function_PC(t.get_PC() - pc_L - 1);
          if (b == insertion_point)
@@ -1750,6 +1803,7 @@ Lambda_number lambda_num = LAMBDA_NUM_0;
              }
          Assert(end != -1);
          lambda_num = Lambda_number(lambda_num + 1);
+         lambda_error_pos = b;   // for a DEFN ERROR in this lambda (Bugs39 #48)
          b = setup_one_lambda(b, end, lambda_num);
        }
 
@@ -1766,6 +1820,8 @@ Lambda_number lambda_num = LAMBDA_NUM_0;
    Parser::match_par_bra(body, true);
    set_END_PCs();
 }
+//────────────────────────────────────────────────────────────────────────────
+ShapeItem Executable::lambda_error_pos = 0;
 //────────────────────────────────────────────────────────────────────────────
 void
 Executable::set_END_PCs()
@@ -1804,7 +1860,8 @@ const Fun_signature signature = compute_lambda_body(lambda_body, b, bend,
    /* strip off the trailing local variables.
 
       The function body ends with ENDL RETURN.
-      To strip off a local variable we have to:
+      To strip off a local variable we have to (for ;A B C: likewise, with
+      ENDL and RETURN moved to the ; and its right neighbour):
 
       body[-4]        body[-3]        body[-2]        body[-1] 
       ─────────────────────────────────────────────────────────────
@@ -1816,24 +1873,47 @@ const Fun_signature signature = compute_lambda_body(lambda_body, b, bend,
       ENDL            RETURN
     */
 vector<Symbol *> local_vars;   // collector for local variables
-   while (lambda_body.size() >= 4)
+   for (;;)
       {
-        const size_t semi = lambda_body.size() - 4;   // maybe ';' SYMBOL ?
-        if (lambda_body[semi]  .get_tag() != TOK_SEMICOL)   break;   // no
-        if (lambda_body[semi+1].get_Class() != TC_SYMBOL)   break;   // no
-        local_vars.push_back(lambda_body[semi + 1].get_sym_ptr());
+        // the tokens after the local names: ENDL RETURN, or RETURN_VOID
+        // for a lambda without a result, e.g. {A←⍵ ⋄ ;A}, whose body ends
+        // with ; SYMBOL RETURN_VOID (no ENDL), see compute_lambda_body().
+        // Its locals were not localized (Bugs39 #21).
+        //
+        const bool no_result = lambda_body.size() &&
+                               lambda_body.back().get_tag() == TOK_RETURN_VOID;
+        const size_t tail = no_result ? 1 : 2;
+        if (lambda_body.size() < tail + 2)   break;
+
+        // the names before the tail: ;A or, like in a ∇-header, ;A B C
+        // (Bugs39 #81)
+        //
+        size_t semi = lambda_body.size() - tail;
+        while (semi > 0 && lambda_body[semi - 1].get_Class() == TC_SYMBOL)
+              --semi;
+        if (semi == 0 || semi == lambda_body.size() - tail)   break;   // none
+        --semi;                                            // maybe ';' ?
+        if (lambda_body[semi].get_tag() != TOK_SEMICOL)   break;   // no
+
+        for (size_t n = lambda_body.size() - tail - 1; n > semi; --n)
+            local_vars.push_back(lambda_body[n].get_sym_ptr());
 
         // the local variables are moved from the lambda text to the
         // header. ENDL is the left end of the last statement (and keeps
-        // its PC), while RETURN (an empty statement) gets the PC of the ;
+        // its PC), while RETURN (an empty statement) resp. RETURN_VOID gets
+        // the PC of the ;
         //
         const Function_PC pc_semi = lambda_body[semi].get_PC();
-        const Token_loc endl(lambda_body[semi + 2].get_token(),
-                             lambda_body[semi + 2]);
-        const Token_loc ret(lambda_body[semi + 3].get_token(), pc_semi);
-        lambda_body[semi]    .copy(endl, LOC);
-        lambda_body[semi + 1].copy(ret, LOC);
-        lambda_body.resize(semi + 2);   // leave ENDL and RETURN_SYMBOL
+        const size_t ret_pos = lambda_body.size() - 1;
+        if (!no_result)
+           {
+             const Token_loc endl(lambda_body[ret_pos - 1].get_token(),
+                                  lambda_body[ret_pos - 1]);
+             lambda_body[semi++].copy(endl, LOC);
+           }
+        const Token_loc ret(lambda_body[ret_pos].get_token(), pc_semi);
+        lambda_body[semi].copy(ret, LOC);
+        lambda_body.resize(semi + 1);   // leave (ENDL) RETURN(_VOID)
       }
 
 const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
@@ -1898,9 +1978,24 @@ const ShapeItem last = tos.size();
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
-   // clear any errors that may have occurred before
+   // clear any errors that may have occurred before, so that an error of
+   // this fix can be detected below. A successful fix restores the error
+   // (of the caller of ⍎ or ⎕EC, e.g. one recorded by ⎕EA), see the end of
+   // this function (LRM p. 280: "The current value of ⎕ET is not
+   // affected", Bugs39 #69).
    //
-   if (Error * err = Workspace::get_error())   err->clear_error_code();
+Error caller_error(E_NO_ERROR, LOC);
+   if (Error * err = Workspace::get_error())
+      {
+        caller_error = *err;
+        err->clear_error_code();
+      }
+
+   // likewise for )MORE: a parse error of data must not show an older )MORE
+   // text (Bugs39 #91)
+   //
+const UCS_string caller_more = Workspace::more_error();
+   Workspace::more_error().clear();
 
 ExecuteList * fun = new ExecuteList(data, loc);
 
@@ -1967,6 +2062,9 @@ Function_PC end_PC = Function_PC_0;   // the PC of the end of data
       }
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
+
+   if (Error * err = Workspace::get_error())   *err = caller_error;
+   Workspace::more_error() = caller_more;
    return fun;
 }
 //════════════════════════════════════════════════════════════════════════════

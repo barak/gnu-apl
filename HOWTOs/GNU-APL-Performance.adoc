@@ -34,13 +34,14 @@ For example:
 
 ----
 cd src
-./apl -T testcases_3/*tc   # produce file gmon.out
+./apl --TL testsuites/main   # produce file gmon.out
 gprof ./apl gmon.out > profile   # produce file 'profile' from file gmon.out
 ----
 
-The example above profiles GNU APL over all testcases in directory
-*src/testcases_3*. It is up to the user to determine what is being profiled (a
-somewhat broad profile over all GNU APL primitives in the example above). To
+The example above profiles GNU APL over all testcases in the test suite
+*src/testsuites/main* (the testcases of make test3). It is up to the user
+to determine what is being profiled (a somewhat broad profile over all GNU
+APL primitives in the example above). To
 obtain a more narrow profile, say for specific APL primitives, you should:
 
 . Write an APL workspace (or a testcase file) that executes the function of

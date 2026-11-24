@@ -1,0 +1,45 @@
+⍝ ZZ24_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+]log 42
+
+∇TEST
+ '⎕ES "HELLO"' ⎕EA '3÷0'
+∇
+
+⎕CR 'TEST'
+TEST                    
+ '⎕ES "HELLO"' ⎕EA '3÷0'
+
+
+      TEST
+HELLO
+      TEST
+      ^
+
+      →
+
+]log 42 OFF
+
+⍝ ==================================
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+      )CLEAR
+CLEAR WS
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+

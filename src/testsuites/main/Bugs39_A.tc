@@ -1,0 +1,441 @@
+⍝ Bugs39_A.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs39 severity A items (#1 - #19): crashes, hangs,
+⍝ assertions, and session loss (⎕MX and workspace items are in
+⍝ Bugs39_MX.tc and Bugs39_Workspace.tc).
+
+
+
+
+      ⍝ Bugs39 #2: f⍤[X] on an empty frame with a scalar-valued f is AXIS ERROR
+
+
+
+
+      (+/⍤[1]1) 0 3⍴0
+AXIS ERROR+
+      (+/⍤[1]1)0 3⍴0
+      ^
+
+
+
+
+      (⊂⍤[1]0) 0⍴0
+AXIS ERROR+
+      (⊂⍤[1]0)0⍴0
+      ^
+
+
+
+
+      (0 3⍴0)(+.×⍤[1]1) 0 3⍴0
+AXIS ERROR+
+      (0 3⍴0)(+.×⍤[1]1)0 3⍴0
+      ^      ^
+
+
+
+
+      ⍝ Bugs39 #3: resuming a dangling-function SYNTAX ERROR repeats it
+
+
+
+
+      1+(+/)
+SYNTAX ERROR+
+      1+(+/)
+           ^
+
+
+
+
+      →⍬
+SYNTAX ERROR+
+      1+(+/)
+           ^
+
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs39 #4: no selective specification of a structured variable itself
+
+
+
+
+      S39.a←1 2 3 ◊ S39.b←'xy'
+
+
+
+
+      (1↑¨S39)←'z'
+DOMAIN ERROR+
+      (1↑¨S39)←'z'
+          ^   ^
+
+
+
+
+      (7 2⌷S39)←⊂'q'
+DOMAIN ERROR+
+      (7 2⌷S39)←⊂'q'
+           ^   ^
+
+
+
+
+      S39.b
+xy
+
+
+
+
+      (⊃S39.a)←7
+
+
+
+
+      S39.a
+7 7 7
+
+
+
+
+      )ERASE S39
+
+
+
+
+      ⍝ Bugs39 #5: a defined function left of → in a lambda is a SYNTAX ERROR
+
+
+
+
+      ⎕FX 'Z←F39 B' 'Z←B'
+F39
+
+
+
+
+      {F39→0}0
+SYNTAX ERROR+
+λ1[1]  λ←F39→0
+         ^   ^
+
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs39 #7: format by specification of an empty B is O(1)
+
+
+
+
+      ⍴5⍕0 1E15⍴0
+0 5000000000000000
+
+
+
+
+      ⍴5 2⍕1 0 1E15⍴0
+1 0 5000000000000000
+
+
+
+
+      ⍝ Bugs39 #8: scan of an empty B is O(1)
+
+
+
+
+      ⍴+⍀1E15 0⍴0
+1000000000000000 0
+
+
+
+
+      ⍴+\[2]1E7 1E7 0⍴0
+10000000 10000000 0
+
+
+
+
+      ⍝ Bugs39 #9: laminate of an empty B is O(1)
+
+
+
+
+      X39←1E15 0⍴0
+
+
+
+
+      ⍴X39,[1.5]X39
+1000000000000000 2 0
+
+
+
+
+      ⍴0,[2.5]1E7 1E7 0⍴0
+10000000 10000000 2 0
+
+
+
+
+      )ERASE X39
+
+
+
+
+      ⍝ Bugs39 #12: ⎕EC of a value of maximum depth returns an error result
+
+
+
+
+      V39←⊂⍣252⊢⊂1 2
+
+
+
+
+      R39←⎕EC 'V39'
+
+
+
+
+      2↑R39
+ 0  1 104 
+
+
+
+
+      ⍴⎕SI 1
+1
+
+
+
+
+      )ERASE V39 R39
+
+
+
+
+      ⍝ Bugs39 #13: Gaussian GCD/LCM beyond the double range end
+
+
+
+
+      1J2∨1.3E308J1.3E308
+1J2
+
+
+
+
+      1J2∧1.7E308J1.7E308
+1.7E308J1.7E308
+
+
+
+
+      1J2∨1E308J1E308
+1J2
+
+
+
+
+      ⍝ Bugs39 #14: ⎕DLX step rows are checked
+
+
+
+
+      (¯4 1) ⎕DLX 2 2⍴0 0 1 1
+DOMAIN ERROR+
+      ¯4 1 ⎕DLX 2 2⍴0 0 1 1
+      ^    ^
+
+
+
+
+      )MORE
+(¯4,R) ⎕DLX B: step row 1 has no 1 or 2
+
+
+
+
+      (¯4 1 2) ⎕DLX 3 4⍴1 1 0 0 1 0 1 0 0 0 0 1
+DOMAIN ERROR+
+      ¯4 1 2 ⎕DLX 3 4⍴1 1 0 0 1 0 1 0 0 0 0 1
+      ^      ^
+
+
+
+
+      )MORE
+(¯4,R) ⎕DLX B: step row 2 is not available (it was chosen or eliminated by an earlier step)
+
+
+
+
+      ⍝ Bugs39 #15: ⎕PLOT ASCII clips data outside the given range
+
+
+
+
+      A39←⊂'gui_driver: ASCII'
+
+
+
+
+      ⍴(A39,⊂'rangeY_max: 2') ⎕PLOT 1 2 3 4
+3 24 80
+
+
+
+
+      ⍴(A39,⊂'rangeX_min: 2') ⎕PLOT 1 2 3 4
+3 24 80
+
+
+
+
+      ⍝ Bugs39 #16: a huge ⎕PLOT ASCII canvas is WS FULL
+
+
+
+
+      Z39←('gui_driver: ASCII' 'terminal_rows: 65536' 'terminal_cols: 65537') ⎕PLOT 1 2 3 4
+WS FULL+
+      Z39←'gui_driver: ASCII' 'terminal_rows: 65536' 'terminal_cols: 65537' ⎕PLOT 1 2 3 4
+          ^                                                                 ^
+
+
+
+
+      )ERASE A39
+
+
+
+
+      ⍝ Bugs39 #17: the SI depth limit is restored when the SI was unwound
+
+
+
+
+      ⎕FX 'Z←R39 N' 'Z←R39 N+1'
+R39
+
+
+
+
+      ⎕SYL[1;2]←200
+
+
+
+
+      R39 1
+SYSTEM LIMIT (SI depth)+
+R39[1]  Z←R39 N+1
+          ^
+
+
+
+
+      )SIC
+
+
+
+
+      ⎕SYL[1;2]
+200
+
+
+
+
+      R39 1
+SYSTEM LIMIT (SI depth)+
+R39[1]  Z←R39 N+1
+          ^
+
+
+
+
+      )SIC
+
+
+
+
+      ⎕SYL[1;2]←100000
+
+
+
+
+      )ERASE R39
+
+
+
+
+      ⍝ Bugs39 #19: value parentheses at the right end of a statement are fine
+
+
+
+
+      ⎕FX 'Z←N39' 'Z←3 4'
+N39
+
+
+
+
+      X←1+(⍴N39) ◊ X
+3
+
+
+
+
+      (1↓N39)
+4
+
+
+
+
+      (N39[1])
+3
+
+
+
+
+      S39.m←5
+
+
+
+
+      1+(S39.m)
+6
+
+
+
+
+      (-⍣2 5)
+5
+
+
+
+
+      (⌽⍤0 1 'ABC')
+CBA
+
+
+
+
+      )ERASE X N39 S39
+
+
+
+
+      )SIC

@@ -943,21 +943,11 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                     // by one λ← on every )DUMP/)LOAD cycle. Find the
                     // same insertion point compute_lambda_body() used
                     // (after the last top-level ◊, or the very start if
-                    // none) and strip it back out here, mirroring that
-                    // function's own (deliberately simple, not string-
-                    // or brace-aware) ◊ scan exactly. See Bugs27 #37.
+                    // none) and strip it back out here, with the same
+                    // (string- and brace-aware) ◊ scan. See Bugs27 #37.
                     //
-                    ShapeItem sols = 0;
-                    for (ShapeItem j = body.size() - 1; j >= 0; --j)
-                        {
-                          if (Avec::is_DIAMOND(body[j]))
-                             {
-                               sols = j + 1;
-                               while (sols < body.ssize() &&
-                                      body[sols] <= UNI_SPACE)   ++sols;
-                               break;
-                             }
-                        }
+                    const ShapeItem sols =
+                          Executable::lambda_last_statement(body);  // Bugs40 #41
                     if (sols + 1 < body.ssize() &&
                         body[sols] == UNI_LAMBDA &&
                         body[sols + 1] == UNI_LEFT_ARROW)
@@ -967,6 +957,14 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                        }
 
                     res << body;
+
+                    // the local variables, like Symbol::dump() for )DUMP,
+                    // e.g. R←{A←⍵ ◊ A×2;A} (Bugs41 #35)
+                    //
+                    if (const UserFunction * uf = ufun.get_func_ufun())
+                       loop(l, uf->local_var_count())
+                           res << ";" << uf->get_local_var(l)->get_name();
+
                     res << (UNI_R_CURLY);
                     result.push_back(res);
                   }
@@ -1081,7 +1079,11 @@ int zero_count  = 0;
               ++nested_count;
               continue;
             }
-         if (cell.is_near_zero())
+         // exactly 0 (the ⍴0 fill), not near 0: 1E¯11 is a value of its
+         // own (Bugs40 #36)
+         //
+         if (cell.is_numeric() && cell.get_real_value() == 0.0 &&
+             (!cell.is_complex_cell() || cell.get_imag_value() == 0.0))
             {
               ++zero_count;
             }
@@ -1225,7 +1227,11 @@ UCS_string text;
         // which the doubling above does handle). Fall back to (⎕UCS n)
         // for those, same as for other characters that don't fit '...'.
         //
-        if (uni < ' ' || uni == 127 || Avec::is_single_quote(uni))
+        // also a character that UTF-8 cannot encode, e.g. a surrogate
+        // code point, which )LOAD would decode differently (Bugs38 #41)
+        //
+        if (uni < ' ' || uni == 127 || Avec::is_single_quote(uni) ||
+            !is_UTF8_encodable(uni))
            {
              return text << "(⎕UCS " << int(uni) << UNI_R_PARENT;
            }
@@ -1922,9 +1928,22 @@ Value_P Z(shape_Z, LOC);
                                    // cells at all for this b -- writing
                                    // one unconditionally overflows Z's
                                    // allocation by one cell.
+             // pad with the fill of the cell, e.g. ' ' for a character,
+             // like ⊃ does (Bugs38 #29)
              Z->next_ravel_Cell(cB);
-             loop(zz, (conformed_len - 1))   Z->next_ravel_0();
+             loop(zz, (conformed_len - 1))   Z->next_ravel_Proto(cB);
            }
+      }
+
+   // an empty Z gets the prototype of the first item of B, like ⊃ (e.g. ' '
+   // for (⍕⍤1)2 0⍴0, Bugs39 #85)
+   //
+   if (Z->is_empty() && len_B)
+      {
+        Cell cache;
+        const Cell & cB0 = B.get_cfirst(cache);
+        if (Value_P v = cB0.try_pointer_value())   Z->set_default(*v, LOC);
+        else                                       Z->set_default(cB0, LOC);
       }
 
    Z->check_value(LOC);
@@ -2630,6 +2649,13 @@ UCS_string sub_prefix = prefix;   sub_prefix << "────";
 }
 //────────────────────────────────────────────────────────────────────────────
 bool
+Quad_CR::is_UTF8_encodable(Unicode uni)
+{
+   if (uni >= 0xD800 && uni <= 0xDFFF)   return false;   // a surrogate
+   return uni >= 0 && uni <= 0x10FFFF;
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
 Quad_CR::is_plain_string(const cValue * value)
 {
    if (value->get_rank() != 1)   return false;   // not a vector
@@ -2643,6 +2669,7 @@ Quad_CR::is_plain_string(const cValue * value)
          if (uni < UNI_SPACE)           return false;   // control character
          if (uni == UNI_SINGLE_QUOTE)   return false;
          if (uni == UNI_DELETE)         return false;
+         if (!is_UTF8_encodable(uni))   return false;   // Bugs38 #41
 
          // the caller emits the string between " " without any escaping,
          // so both the delimiter and the escape introducer of "..."

@@ -32,6 +32,7 @@
 #endif   // HAVE_LOCALE_H
 
 #include "Quad_PNG.hh"
+#include "Workspace.hh"
 #include "Sys.hh"
 #include "Token.hh"
 
@@ -184,7 +185,12 @@ Quad_PNG::eval_AB(cValue_R A, cValue_R B) const
         // and could walk off B's actual ravel.
         if (B.get_rank() != 3)   RANK_ERROR;
 
-        const APL_Integer A1 = A.get_int_value(1);   // bit depth
+        const APL_Integer A1 = A.get_near_int(1);   // bit depth
+        if (A1 != int(A1))   // not truncated to int (Bugs39 #68)
+           {
+             MORE_ERROR() << "A ⎕PNG B: bad bit depth " << A1;
+             DOMAIN_ERROR;
+           }
         if (const Value_P A0 = A.try_pointer_value(0))   // probably file name
            {
              UCS_string filename_ucs(*A0);
@@ -224,7 +230,7 @@ Quad_PNG::eval_B(cValue_R B) const
         // scalar (integer) argument: window control and logging
         //
         Cell cache;
-        const APL_Integer B0 = B.get_cscalar(cache).get_int_value();
+        const APL_Integer B0 = B.get_cscalar(cache).get_near_int();   // Bugs39 #68
         Value_P Z = window_control(B0);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -387,14 +393,13 @@ Quad_PNG::read_PNG_file(const UTF8_string & filename1)
    // filename1 is the file to be read. It may or may not have a .png extension
    // If opening filename1 fails we try filename2 = filename1.png
    //
-int errno1 = 0;
 FileReader reader(filename1.c_str());
+const int errno1 = errno;   // why filename1 has failed (Bugs38 #129)
    if (!reader && !filename1.ends_with(".png"))
       {
          // .png file could not be openend and the filename did not have
          // the .png extension. Try again with .png appended,
-         // 
-         errno1 = errno;              // remember why filename1 has failed
+         //
          UTF8_string filename2(filename1);
          filename2 << ".png";
          new (&reader) FileReader(filename2.c_str());
@@ -549,21 +554,12 @@ Value_P Z(shape_Z, LOC);
                     const uint16_t value = color[0] << 8 | color[1];
                     Z->next_ravel_Float(int(value) / 65535.0);
                   }
-               else if (bit_depth == 8)
+               else if (bit_depth <= 8)
                   {
+                    // 1-, 2-, and 4-bit gray and palette samples were
+                    // expanded to 8 bits by libpng (see above), so they
+                    // are 0...255 like 8-bit samples (Bugs38 #57)
                     Z->next_ravel_Float(int(color[0]) / 255.0);
-                  }
-               else if (bit_depth == 4)
-                  {
-                    Z->next_ravel_Float(int(color[0]) / 15.0);
-                  }
-               else if (bit_depth == 2)
-                  {
-                    Z->next_ravel_Float(int(color[0]) / 3.0);
-                  }
-               else if (bit_depth == 1)
-                  {
-                    Z->next_ravel_Float(color[0] ? 1.0 : 0.0);
                   }
                else
                   {
@@ -650,6 +646,17 @@ int color_type;
         DOMAIN_ERROR;
       }
 
+   // libpng rejects a zero height or width (and one above its user limit
+   // of 1000000) only after the file was created (or truncated): check
+   // them first (Bugs39 #94)
+   //
+   if (height < 1 || height > 1000000 || width < 1 || width > 1000000)
+      {
+        MORE_ERROR() << "A ⎕PNG B: bad height (" << height << ") or width ("
+                     << width << ") in B (expecting 1...1000000).";
+        DOMAIN_ERROR;
+      }
+
 const bool palette_used = color_type & PNG_COLOR_MASK_PALETTE;   // 0x01
 const bool color_used   = color_type & PNG_COLOR_MASK_COLOR;     // 0x02
 const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
@@ -660,6 +667,26 @@ const bool alpha_used   = color_type & PNG_COLOR_MASK_ALPHA;     // 0x04
                      << ".";
         DOMAIN_ERROR;
       }
+
+   // check B before the output file is created (or truncated), so that an
+   // invalid B does not destroy an existing file (Bugs38 #129)
+   //
+   loop(b, B.element_count())
+       {
+         if (!B.is_real_cell(b))   // characters, complex, or nested
+            {
+              MORE_ERROR() << "A ⎕PNG B: (,B)[" << (b + Workspace::get_IO()) << "]"
+                              " is not a real number";
+              DOMAIN_ERROR;
+            }
+         const double val = B.get_real_value(b);
+         if (!(val >= 0.0 && val <= 1.0))
+            {
+              MORE_ERROR() << "A ⎕PNG B: color component " << val
+                           << " not in the range 0…1";
+              DOMAIN_ERROR;
+            }
+       }
 
 FileWriter writer(filename);
    if (!writer)

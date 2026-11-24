@@ -65,6 +65,11 @@ public:
    /// @param B         APL value to ravel
    static Token ravel(const Shape & new_shape, cValue_R B);
 
+   /// return len + 1, or throw WS FULL if that is too large
+   /// @param where arity-prefix for )MORE text, e.g. "A,B" or "A⍪B"
+   /// @param len  the length of an axis
+   static ShapeItem axis_plus_1(const char * where, ShapeItem len);
+
    /// Catenate A and B
    /// @param where arity-prefix for )MORE text, e.g. "A,B" or "A⍪B"
    /// @param A    left APL value

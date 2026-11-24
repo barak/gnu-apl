@@ -160,17 +160,28 @@ protected:
   /// @param col column to exclude
   static GSL_Matrix * genCofactor(GSL_Matrix * mtx, int row, int col);
 
+  /// replace the complex items with imaginary part 0 of \b Z by real ones
+  static void real_cells(Value & Z);
+
+  /// scale \b samples by their largest magnitude (for the correlation)
+  static void scale_samples(vector<double> & samples);
+
   /// return the determinant of \b mtx
   /// @param mtx square matrix whose determinant is to be computed
   static Dcomplex getDet(GSL_Matrix * mtx);
+
+  /// scale \b v to length 1; return false if v is 0 (or not finite)
+  static bool unit_vector(vector<Dcomplex> & v);
 
   /// return the magnitude of \b v
   /// @param v complex vector whose magnitude (Euclidean norm) is returned
   static Dcomplex magnitude(const vector<Dcomplex> & v);
 
-  /// normalize \b v to length 1
-  /// @param v real vector to normalize in-place
-  static void normalise(vector<double> & v);
+  /// return the Pearson correlation coefficient (clamped to ¯1...1)
+  /// @param cov the covariance of two sample sets
+  /// @param var1 the (non-zero) variance of the first sample set
+  /// @param var2 the (non-zero) variance of the second sample set
+  static double pearson(double cov, double var1, double var2);
 
   /// generate a matrix suitable for libgsl
   /// @param B APL matrix value to convert
@@ -221,18 +232,21 @@ protected:
   /// @param B APL integer scalar giving the size of the identity matrix
   static Value_P ident(const Value_P B);
 
-  //// return the monadic Covariance
+  //// return the monadic covariance (or correlation) matrix
   /// @param B APL matrix value (rows are observations)
-  static Value_P monadicCovariance(const Value_P B);
+  /// @param corr return the correlation instead of the covariance
+  static Value_P monadicCovariance(const Value_P B, bool corr);
 
   /// @param A left APL value (group labels or second data set)
   /// @param B right APL value (data vector or matrix)
   static Value_P histogram(const Value_P A, const Value_P B);
 
-  //// return the dyadic Covariance
-  /// @param A left APL data vector or matrix
-  /// @param B right APL data vector or matrix
-  static Value_P dyadicCovariance(const Value_P A, const Value_P B);
+  //// return the dyadic covariance (or correlation)
+  /// @param A left APL data vector
+  /// @param B right APL data vector
+  /// @param corr return the correlation instead of the covariance
+  static Value_P dyadicCovariance(const Value_P A, const Value_P B,
+                                  bool corr);
 
   /// return random numbers
   /// @param opt_A optional left argument specifying distribution parameters
@@ -249,6 +263,13 @@ protected:
   /// rather than literals, so an out-of-range axis like 104 correctly
   /// falls through to bad_subfun_number_ERROR() instead of being
   /// silently absorbed into an invalid distribution index.
+  /// return the subfunction number \b x as MX_ops, checking it first: a
+  /// number outside the enum is no MX_ops (UB, Bugs41 #59)
+  MX_ops to_MX_op(int64_t x) const
+     { if (x < 0 || x > 0xFFFF || !get_info_by_axis(uAxis(x)))
+          bad_subfun_number_ERROR(x);
+       return MX_ops(x); }
+
   static void remap_randoms_subfun(MX_ops & op, int & modifier)
      {
        if (op >= OP_RANDOMS_100 && op <= OP_RANDOMS_103)

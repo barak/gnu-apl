@@ -1,0 +1,1103 @@
+⍝ Bugs40_B.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs40 severity B items (#18 - #52): wrong results
+⍝ and silent data loss (workspace items are in Bugs40_Workspace.tc,
+⍝ ⎕MX and ⌹[X] items in Bugs40_MX.tc).
+
+
+
+
+      ⍝ Bugs40 #19: a nested member access S.b.c is not an inner product when a
+      ⍝ function b exists
+
+
+
+
+      CFG.data.size←3
+
+
+
+
+      ⎕FX 'Z←A data B' 'Z←A,B'
+data
+
+
+
+      CFG.data.size
+3
+
+
+
+      X←CFG.data.size ◊ X
+3
+
+
+
+      S19.b.c←6 ◊ ⎕FX 'Z←b' 'Z←99'
+b
+
+
+
+      S19.b.c
+6
+
+
+
+      X←1+S19.b.c ◊ X
+7
+
+
+
+      ⎕FX 'Z←G19' 'Z←S19.b.c'
+G19
+
+
+
+      G19
+6
+
+
+
+      +.data
+SYNTAX ERROR+
+      +.data
+        ^
+
+      )ERASE data b G19 CFG S19
+
+
+
+
+      ⍝ Bugs40 #20, #34: a parenthesis that holds a member access, a niladic
+      ⍝ function, or a stranded value operand is a value, also when nested
+
+
+
+
+      S20.n←'abc' ◊ S20.m←7 8 ◊ ⎕FX 'Z←NIL20' 'Z←4 5 6'
+NIL20
+
+
+
+      ((S20.n)[2 3])[1]
+b
+
+
+
+      (1↓(S20.n))[1]
+b
+
+
+
+      (1↓(-⍣2 (5 6 7)))[1]
+6
+
+
+
+      X←(1↓(S20.n))[1] ◊ X
+b
+
+
+
+      ((-NIL20)[1 2])[1]
+¯4
+
+
+
+      ((1↓NIL20)[1 2])[1]
+5
+
+
+
+      (1+(S20.m))
+8 9
+
+
+
+      (1+(1↓NIL20))
+6 7
+
+
+
+      (1+(⍴NIL20))
+4
+
+
+
+      (1+(-⍣2 5))
+6
+
+
+
+      (-(-⍣2 5))
+¯5
+
+
+
+      1+(2+(S20.m))
+10 11
+
+
+
+      (1+(⌽⍤0 1 'ABC'))
+DOMAIN ERROR
+      (1+(⌽⍤0 1 'ABC'))
+       ^^
+
+      (+/)[1]
+SYNTAX ERROR+
+      (+/)[1]
+          ^
+
+      )ERASE S20 NIL20
+
+
+
+
+      ⍝ Bugs40 #21: ⎕FIO[48] ends a numeric field like C's fscanf() (and like
+      ⍝ ⎕FIO[55]), the rest stays in the input
+
+
+
+
+      P←{H←⎕FIO[24] 'printf "',(2⊃⍵),'"' ◊ Z←(1⊃⍵) ⎕FIO[48] H ◊ Z⊣⎕FIO[25] H}
+
+
+
+
+      P '%f%f' '1.2.3'
+1.2 0.3
+
+
+
+      P '%o%d' '789'
+7 89
+
+
+
+      P '%i%s' '12abc'
+ 12 abc 
+
+
+
+      P '%i%d' '08 9'
+0 8
+
+
+
+      P '%x%s' '1x2'
+ 1 x2 
+
+
+
+      P '%f%s' '1e5e6'
+ 100000 e6 
+
+
+
+      P '%o%n' '789'
+7 1
+
+
+
+      P '%f%n' '1.2.3'
+1.2 3
+
+
+
+      P '%i%s' '0x1f z'
+ 31 z 
+
+
+
+      H←⎕FIO[24] 'printf "789"' ◊ '%o' ⎕FIO[48] H ◊ ⎕UCS ⎕FIO[8] H ◊ ⎕FIO[25] H
+7
+89
+0
+
+      ⍝ Bugs40 #22: A!B is a DOMAIN ERROR where the log-Γ fallback is inaccurate;
+      ⍝ a natural number A uses the (exact) product B×(B-1)×...÷!A
+
+
+
+
+      1E15!¯0.5
+DOMAIN ERROR
+      1E15!¯0.5
+      ^   ^
+
+      1E16!¯0.5
+DOMAIN ERROR
+      1E16!¯0.5
+      ^   ^
+
+      1E9!¯0.5
+DOMAIN ERROR
+      1000000000!¯0.5
+      ^         ^
+
+      1E15!1E15+0.5
+DOMAIN ERROR
+      1E15!1E15+0.5
+      ^   ^
+
+      0.5!1E15
+35682482.32
+
+
+
+      1!1E20J1E20
+1E20J1E20
+
+
+
+      1!1E7J1E7
+10000000J10000000
+
+
+
+      2!1E18J1E18
+0J1E36
+
+
+
+      0J1!1E15
+DOMAIN ERROR
+      0J1!1E15
+      ^  ^
+
+      1000!1E¯11J1E¯11
+¯1E¯14J¯9.999999999E¯15
+
+
+
+      171!¯0.5
+¯0.04311312886
+
+
+
+      ⍝ Bugs40 #23: the float GCD of two integral operands is exact
+
+
+
+
+      123456789∨1E19
+1
+
+
+
+      7193024087∨1E19
+1
+
+
+
+      1E19∧123456789
+1.23456789E27
+
+
+
+      5891807713∨1E20
+1
+
+
+
+      1E10∨1E30
+1E10
+
+
+
+      1E¯9∨1E5
+1E¯9
+
+
+
+      0.3∨1E5
+0.1
+
+
+
+      ⍝ Bugs40 #28: complex ∨ and ∧ with a tiny or fractional imaginary operand,
+      ⍝ or with a quotient beyond the double range
+
+
+
+
+      0J1E¯11∨3J4
+0J1E¯11
+
+
+
+      0J1E¯11∧3J4
+3J4
+
+
+
+      0J1E¯11∨3J0
+0J1E¯11
+
+
+
+      0J1E¯11∧0J3
+0J3
+
+
+
+      0J0.5∨1J1
+0J0.5
+
+
+
+      1E¯310∨3J4
+1E¯310
+
+
+
+      1E¯310∧3J4
+3J4
+
+
+
+      4.9E¯324∨0.5J0.5
+4.940656458E¯324
+
+
+
+      135J¯14 ∧ 155J34
+¯805J1448
+
+
+
+      ⍝ Bugs40 #29: %x, %X, and %o values ≥ 2⋆63 are a DOMAIN ERROR (like %u)
+
+
+
+
+      '%x' ⎕FIO[55] 'ffffffffffffffff'
+DOMAIN ERROR+
+      '%x' ⎕FIO[55]'ffffffffffffffff'
+      ^    ^
+
+      '%X' ⎕FIO[55] '8000000000000000'
+DOMAIN ERROR+
+      '%X' ⎕FIO[55]'8000000000000000'
+      ^    ^
+
+      '%o' ⎕FIO[55] '1777777777777777777777'
+DOMAIN ERROR+
+      '%o' ⎕FIO[55]'1777777777777777777777'
+      ^    ^
+
+      )MORE
+⎕FIO scanf: the number 1777777777777777777777 in B is out of range
+
+
+
+      '%x' ⎕FIO[55] '7fffffffffffffff'
+9223372036854775807
+
+
+
+      H←⎕FIO[24] 'printf ffffffffffffffff' ◊ '%x' ⎕FIO[48] H
+DOMAIN ERROR+
+      '%x' ⎕FIO[48]H
+      ^    ^
+
+      ⎕FIO[25] H
+0
+
+
+
+      ⍝ Bugs40 #30: complex ⌊ and ⌈ of a tolerantly Gaussian-integral argument,
+      ⍝ and of a zero imaginary part like the real path
+
+
+
+
+      Q←1÷1E¯5
+
+
+
+
+      ⌊Q+0J1
+100000J1
+
+
+
+      ⌈(-Q)+0J1
+¯100000J1
+
+
+
+      ⌊Q×0J1
+0J100000
+
+
+
+      ⌈1E15÷3J0
+333333333333333
+
+
+
+      ⌈3.000000000000001J2
+3J2
+
+
+
+      ⍝ Bugs40 #32: complex ∧ is commutative (the gcd is one operand up to a unit)
+
+
+
+
+      ⎕PP←17
+
+
+
+
+      1E¯11∧0J1
+0J1
+
+
+
+      0J1∧1E¯11
+0J1
+
+
+
+      1E¯11∧3J4
+3J4
+
+
+
+      ⎕PP←10
+
+
+
+
+      1E17J1E17∧1E¯11∧1E17J1E17
+1E17J1E17
+
+
+
+      ⍝ Bugs40 #33: resuming a failed A[I;J] read re-runs it
+
+
+
+
+      M←2 3⍴⍳6 ◊ V←1 2 3
+
+
+
+
+      ⎕FX 'Bugs40_F33' 'M[5;1]' '''next line ran'''
+Bugs40_F33
+
+
+
+      Bugs40_F33
+INDEX ERROR+
+Bugs40_F33[1]  M[5;1]
+               ^^
+
+      →⍳0
+INDEX ERROR+
+Bugs40_F33[1]  M[5;1]
+               ^^
+
+      )SIC
+
+
+
+
+      X←M[5;1]
+INDEX ERROR+
+      X←M[5;1]
+        ^^
+
+      →⍬
+INDEX ERROR+
+      X←M[5;1]
+        ^^
+
+      )SIC
+
+
+
+
+      -V[;1]
+RANK ERROR+
+      -V[;1]
+       ^^
+
+      →⍬
+RANK ERROR+
+      -V[;1]
+       ^^
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #35: complex tolerant equality of very large and very small numbers
+
+
+
+
+      1E154J1 = 1.9E154J1
+0
+
+
+
+      1E154J0 = 1.9E154J0
+0
+
+
+
+      1E154J1 < 1.9E154J1
+1
+
+
+
+      1E154J1 1.9E154J1 ⍳ 1.9E154J1
+2
+
+
+
+      A←1E¯160J1E¯160 ◊ A = A×1+1E¯15
+1
+
+
+
+      1J1E¯15 = 1J1E¯14
+1
+
+
+
+      ⍝ Bugs40 #38: indexed assignment into a packed array changes only the
+      ⍝ indexed items
+
+
+
+
+      V←12⍴9007199254740993 ⋄ V[1]←0.5 ⋄ V[2]-9007199254740992
+1
+
+
+
+      V←12⍴1.5 ⋄ V[1]←9007199254740993 ⋄ V[1]-9007199254740992
+1
+
+
+
+      V←12⍴1 0 ⋄ V[3]←1J1 ⋄ V[3]←1 ⋄ 26 ⎕CR V
+16 16 16 16 16 16 16 16 16 16 16 16
+
+
+
+      5 2⍕4↑V
+ 1.00  .00 1.00  .00
+
+
+
+      V←12⍴5 ⋄ V[2]←0.5 ⋄ 26 ⎕CR V
+16 32 16 16 16 16 16 16 16 16 16 16
+
+
+
+      ⍝ Bugs40 #39: a failed V[I]←B leaves V unchanged
+
+
+
+
+      V←1 2 3 ⋄ V[1 5]←9
+INDEX ERROR+
+      V[1 5]←9
+      ^     ^
+
+      V
+1 2 3
+
+
+
+      V←1 2 3 ⋄ V[1 2 'a']←7 8 9
+DOMAIN ERROR
+      V[1 2 'a']←7 8 9
+      ^         ^
+
+      V
+1 2 3
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #40: the fill function of dyadic ⍷, ~, and ? is the function itself
+
+
+
+
+      2↑(0⍴⊂1 2)⍷¨⊂1 2 3
+ 0 0 0  0 0 0 
+
+
+
+      ⍴¨2↑(0⍴⊂'ab')~¨⊂1
+ 2  2 
+
+
+
+      ' '=↑2↑(0⍴⊂'ab')~¨⊂1
+1 1
+
+
+
+      ⍴↑⍬∘.~⍳3
+1
+
+
+
+      ⍴↑⍬?¨⍬
+0
+
+
+
+      ⍴¨2↑(0⍴⊂2)⍷¨⊂'abc'
+ 3  3 
+
+
+
+      ⍝ Bugs40 #42, #43: an indexed (or parenthesized) value strands with the
+      ⍝ value right of it before a function is applied (LRM pp. 33-35)
+
+
+
+
+      V←3 8 9 ◊ W←4
+
+
+
+
+      V[1] 2 + 10
+13 12
+
+
+
+      V[1] W + 10
+13 14
+
+
+
+      V[1] 2 3 + 10
+13 12 13
+
+
+
+      X←V[1] 2 + 10 ◊ X
+13 12
+
+
+
+      'ab'[1] 'c' , 'd'
+acd
+
+
+
+      V[1] 2 ⍴ 5
+5 5
+5 5
+5 5
+
+      (1+2) 2 ⍴ 5
+5 5
+5 5
+5 5
+
+      +/[1] 2 3 ⍴ ⍳6
+5 7 9
+
+
+
+      ⍝ Bugs40 #44: an overflowing power of the int64 minimum is a DOMAIN ERROR
+
+
+
+
+      M←¯9223372036854775807-1
+
+
+
+
+      M⋆17
+DOMAIN ERROR
+      M⋆17
+      ^^
+
+      X←M⋆18
+DOMAIN ERROR
+      X←M⋆18
+        ^^
+
+      M⋆16
+2.743062034E303
+
+
+
+      ⍝ Bugs40 #45, #98: complex A|B keeps a genuine small residue, and is 0 for a
+      ⍝ quotient beyond 4.5E15 (like the real path)
+
+
+
+
+      0J10|0J10000000000001
+0J1
+
+
+
+      10|10000000000001J10
+1
+
+
+
+      1000J0|100000000000005J1
+5J1
+
+
+
+      0J1E¯11|1
+0
+
+
+
+      ⎕CT←0
+
+
+
+
+      0J10|0J10000000000001
+0J1
+
+
+
+      0J1E¯5|0J1E15
+0
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+      ⍝ Bugs40 #49: ⎕PLOT attribute values: ¯ is a minus sign, non-ASCII characters
+      ⍝ are not whitespace, malformed or out-of-range numbers are errors
+
+
+
+
+      ⍴('gui_driver: ASCII' 'rangeY_min: ¯5' 'rangeY_max: ¯6') ⎕PLOT 1 2 3
+DOMAIN ERROR+
+      ⍴'gui_driver: ASCII' 'rangeY_min: ¯5' 'rangeY_max: ¯6' ⎕PLOT 1 2 3
+       ^                                                     ^
+
+      )MORE
+empty Y range [¯5:¯6] in data B of A ⎕PLOT B
+
+
+
+      ⍴(⊂'gui_driver: λÄASCII') ⎕PLOT 1 2 3
+DOMAIN ERROR+
+      ⍴(⊂'gui_driver: λÄASCII')⎕PLOT 1 2 3
+       ^                       ^
+
+      )MORE
+A ⎕PLOT B: invalid gui_driver λÄASCII
+
+
+
+      ⍴('gui_driver: ASCII' 'terminal_cols: 4294967299') ⎕PLOT 1 2 3
+DOMAIN ERROR+
+      ⍴'gui_driver: ASCII' 'terminal_cols: 4294967299' ⎕PLOT 1 2 3
+       ^                                               ^
+
+      )MORE
+integer value out of range in ⎕PLOT attribute 'terminal_cols: 4294967299'
+
+
+
+      ⍴('gui_driver: ASCII' 'terminal_cols: 12abc') ⎕PLOT 1 2 3
+DOMAIN ERROR+
+      ⍴'gui_driver: ASCII' 'terminal_cols: 12abc' ⎕PLOT 1 2 3
+       ^                                          ^
+
+      )MORE
+bad integer value in ⎕PLOT attribute 'terminal_cols: 12abc'
+
+
+
+      ⍴('gui_driver: ASCII' 'line_width-1x: 2') ⎕PLOT 1 2 3
+DOMAIN ERROR+
+      ⍴'gui_driver: ASCII' 'line_width-1x: 2' ⎕PLOT 1 2 3
+       ^                                      ^
+
+      )MORE
+bad line number in ⎕PLOT attribute 'line_width-1x: 2'
+
+
+
+      ⍝ Bugs40 #50: A ⎕MAP B with an empty B does not change the values of A
+
+
+
+
+      V←'abc' 'xy'
+
+
+
+
+      A←1 2⍴0 V
+
+
+
+
+      Z←A ⎕MAP ⍬
+
+
+
+
+      2 ⎕TF 'V'
+V←2⍴'abc' 'xy'
+
+
+
+      A ⎕MAP 0 1
+  abc xy   1 
+
+
+
+      M←2 2⍴0 (1 2) 5 6
+
+
+
+
+      Z←(⊂M) ⎕MAP 7 (⊂⍬)
+
+
+
+
+      2 ⎕TF 'M'
+M←2 2⍴0 (1 2) 5 6
+
+
+
+      ⍝ Bugs40 #54: ⍋ ⍒ ⌈ ⌊ order complex values exactly (real part, then
+      ⍝ imaginary part), independent of the order of the items
+
+
+
+
+      ⎕PP←17
+
+
+
+
+      P54←1J5 ⋄ Q54←1J6 ⋄ R54←(1+1E¯14)+0J5
+
+
+
+
+      W←Q54 R54 P54
+
+
+
+
+      W[⍋W]
+1J5 1J6 1.00000000000001J5
+
+
+
+      W[⍒W]
+1.00000000000001J5 1J6 1J5
+
+
+
+      ⌈/P54 Q54 R54
+1.00000000000001J5
+
+
+
+      ⌈/Q54 R54 P54
+1.00000000000001J5
+
+
+
+      ⌊/R54 Q54 P54
+1J5
+
+
+
+      ⎕PP←10
+
+
+
+
+      ⍝ Bugs40 #55: A f.g B with a defined g has the depth of the primitive g
+
+
+
+
+      ≡(⊂1 2) +.× 1 2 3
+2
+
+
+
+      ≡(⊂1 2) +.{⍺×⍵} 1 2 3
+2
+
+
+
+      ≡5 ,.{⍺,⍵} 1 2 3
+2
+
+
+
+      ≡(1 1⍴5) ,.{⍺,⍵} 1 2 3
+2
+
+
+
+      (2 2⍴⍳4) +.{⍺×⍵} 2 2⍴⍳4
+ 7 10
+15 22
+
+
+
+
+
+      ⍝ Bugs40 #55: the fill function of a scalar function uses both ↑A and ↑B
+      ⍝ (LRM p. 56: Z←Sρ(↑A) fill fn (↑B)), also in f¨, ∘.f and f.g
+
+
+
+
+      N55←(1 2)(3 4)(5 6)
+
+
+
+
+      Z←(⊂1 2)×0⍴0 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴0)×⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴0)×¨⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴0)∘.×⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0 3⍴5)+.×N55 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←N55+.×3 0⍴5 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴⊂1 (2 3))×⊂4 5 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 (0 0))
+
+
+
+
+      Z←(⊂'ab')+0⍴⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(⍳0)⌈⍳0 ◊ 2 ⎕TF 'Z'
+Z←0⍴0
+
+
+
+
+      ⍝ Bugs40 #55: a function derived from primitives has the fill function of
+      ⍝ its operand, also if the operator is implemented by a macro (⍤); a
+      ⍝ defined operand (∇ or lambda) has the identity as fill function
+
+
+
+
+      Z←N55+.(×⍤0)3 0⍴5 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←N55+.(×¨)3 0⍴5 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←N55+.{⍺×⍵}3 0⍴5 ◊ 2 ⎕TF 'Z'
+Z←0⍴0
+
+
+
+
+      Z←N55+.({⍺×⍵}⍤0)3 0⍴5 ◊ 2 ⎕TF 'Z'
+Z←0⍴0
+
+
+
+
+      Z←(0⍴0)(×⍤0)¨⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴0)((×⍤0)¨)⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←(0⍴0)(×⍤0⍨)¨⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+
+      Z←⍬((×⍤0)¨)⍬ ◊ 2 ⎕TF 'Z'
+Z←0⍴0
+
+
+
+
+
+
+
+      )SIC
+

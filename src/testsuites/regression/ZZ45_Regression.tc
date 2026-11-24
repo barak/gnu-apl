@@ -1,0 +1,40 @@
+⍝ ZZ45_Regression.tc
+⍝ ----------------------------------
+
+
+      )CLEAR
+CLEAR WS
+
+      ⍝ simplified fault reported by Xtian on Nov. 6, 2016
+
+∇foo
+F←1 2 3
+F
+∇
+
+      foo
+1 2 3
+      )vars
+F
+      )erase F
+
+      foo
+1 2 3
+
+      )vars
+F
+      ⍝ where is G ? (in the TR G had disapperared)
+
+      )vars
+F
+
+      ⎕NC 'F'
+2
+      ⍴F
+3
+
+      )vars
+F
+      ⎕NC 'F'
+2
+

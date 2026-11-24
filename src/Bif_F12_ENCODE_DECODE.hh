@@ -129,11 +129,12 @@ protected:
                           ShapeItem len_B, cValue_R VB, ShapeItem idxB,
                           ShapeItem dB);
 
-   /// decode B according to len_A and cA (real A and B)
+   /// decode B according to len_A and cA (real A and B). \b overflow: the
+   /// exact integer computation overflowed, the result is then a float
    static void decode_real(Value & Z, ShapeItem len_A,
                            cValue_R VA, ShapeItem idxA,
                            ShapeItem len_B, cValue_R VB, ShapeItem idxB,
-                           ShapeItem dB);
+                           ShapeItem dB, bool overflow = false);
 };
 //════════════════════════════════════════════════════════════════════════════
 #endif // __BIF_F12_ENCODE_DECODE_HH_DEFINED__

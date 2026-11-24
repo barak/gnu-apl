@@ -34,6 +34,7 @@
 #include "Cmd_WS.hh"
 #include "Command.hh"
 #include "Common.hh"
+#include "InputFile.hh"
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "Security.hh"
@@ -185,7 +186,7 @@ const UCS_string wsname(U"CONTINUE");
    Workspace::wsid(out, wsname, LIB_NONE, false);     // )WSID CONTINUE
 const LibRef_name lib_name(wsname, false);
    Workspace::save_WS(out, lib_name, true);           // )SAVE
-   Command::cmd_OFF(0);                                        // )OFF
+   Command::cmd_OFF(0, true);                                  // )OFF
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -240,11 +241,9 @@ LibRef libref = LIB_NONE;   // default library reference number to copy from
         UCS_string_vector usv;
         loop(row, Command::copy_once_table.size())
             {
-              const UCS_string & src = Command::copy_once_table[row];
+              // the entries are the workspace file names (Bugs38 #20)
               UCS_string ws(UNI_SPACE);
-              ws << src.front();      // wsname
-              ws << UNI_SPACE;
-              ws << UCS_string(src, 2, src.size() - 2);
+              ws << Command::copy_once_table[row];
               ws << UNI_SPACE;
               usv.push_back(ws);
             }
@@ -279,19 +278,23 @@ const UCS_string wsname(args.front());
    //
    if (libref == LIB_NONE)   libref = LIB0;
 
-   // lib_wsname is the name in the copy_once_table. Use the file that
-   // wsname resolves to, so that e.g. ws and ws.xml are the same workspace
-   // (Bugs37 #79).
+   // lib_wsname is the name in the copy_once_table: the (full) file name
+   // that wsname resolves to, so that e.g. ws and ws.xml are the same
+   // workspace (Bugs37 #79), but d1/ws and d2/ws are not (Bugs38 #20).
    //
 LibRef_name lib_name(libref, wsname);
-const UTF8_string filename = LibPaths::get_filename(lib_name, true,
-                                                    ".xml", ".apl");
-const char * basename = strrchr(filename.c_str(), '/');
-const UTF8_string base_utf(basename ? basename + 1 : filename.c_str());
-const UCS_string file_ucs(base_utf);
-UCS_string lib_wsname(Unicode('0' + char(libref)));
-   lib_wsname << UNI_UNDERSCORE;
-   lib_wsname << file_ucs;
+UTF8_string filename = LibPaths::get_filename(lib_name, true,
+                                              ".xml", ".apl");
+
+   // the canonical name of an existing file, so that e.g. ./da/ws,
+   // ./da//ws, and ./da/../da/ws are the same workspace (Bugs39 #87)
+   //
+   if (char * real = realpath(filename.c_str(), 0))
+      {
+        filename = UTF8_string(real);
+        free(real);
+      }
+const UCS_string lib_wsname(filename);
 
    // silently return if wsname is already contained in the copy_once_table
    //
@@ -301,12 +304,10 @@ UCS_string lib_wsname(Unicode('0' + char(libref)));
    if (libref)   out << libref << " ";
    out << wsname << endl;
 
-   Workspace::copy_WS(out, CERR, lib_name, args, false);
-
    // add it to the table, but only if the workspace could be copied, so
-   // that a failed )COPY_ONCE can be retried (Bugs37 #79)
+   // that a failed )COPY_ONCE can be retried (Bugs37 #79, Bugs38 #114)
    //
-   if (access(filename.c_str(), R_OK) == 0)
+   if (Workspace::copy_WS(out, CERR, lib_name, args, false))
       Command::copy_once_table.push_back(lib_wsname);
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -514,6 +515,12 @@ UCS_string arg;   // ""
         lib = LibRef(args.front()[0] - '0');
         arg = args[1];   // ""
       }
-   Workspace::wsid(out, arg, lib, false);
+
+   // the )WSID at the end of a .apl file that is being )LOADed sets the
+   // WSID of the dumped workspace silently (Bugs41 #38)
+   //
+const InputFile * file = InputFile::current_file();
+const bool loading = file && file->copy_filter.loading;
+   Workspace::wsid(out, arg, lib, loading);
 }
 //════════════════════════════════════════════════════════════════════════════

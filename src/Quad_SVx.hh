@@ -131,6 +131,9 @@ protected:
 class Quad_SVQ : public QuadFunction, Quad_SVx
 {
 public:
+   /// overloaded Function::has_dyadic_form(): ⎕SVQ is monadic only
+   virtual bool has_dyadic_form() const   { return false; }   // Bugs40 #56
+
    /// Constructor.
    Quad_SVQ () : QuadFunction(TOK_Quad_SVQ) {}
 
@@ -156,6 +159,9 @@ protected:
 class Quad_SVR : public QuadFunction, Quad_SVx
 {
 public:
+   /// overloaded Function::has_dyadic_form(): ⎕SVR is monadic only
+   virtual bool has_dyadic_form() const   { return false; }   // Bugs40 #56
+
    /// Constructor.
    Quad_SVR() : QuadFunction(TOK_Quad_SVR) {}
 
@@ -174,6 +180,9 @@ protected:
 class Quad_SVS : public QuadFunction, Quad_SVx
 {
 public:
+   /// overloaded Function::has_dyadic_form(): ⎕SVS is monadic only
+   virtual bool has_dyadic_form() const   { return false; }   // Bugs40 #56
+
    /// Constructor.
    Quad_SVS() : QuadFunction(TOK_Quad_SVS) {}
 

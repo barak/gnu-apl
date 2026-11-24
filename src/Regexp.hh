@@ -38,7 +38,10 @@ public:
    /// @param code compiled PCRE2 pattern to execute
    /// @param B subject UCS string to match against
    /// @param start byte offset within B at which to start matching
-   RegexpMatch(pcre2_code * code, const UCS_string & B, PCRE2_SIZE start);
+   /// @param extra_options additional PCRE2 match options, e.g.
+   ///        PCRE2_NOTEMPTY_ATSTART | PCRE2_ANCHORED (Bugs38 #56)
+   RegexpMatch(pcre2_code * code, const UCS_string & B, PCRE2_SIZE start,
+               uint32_t extra_options = 0);
 
    /// destructor
    virtual ~RegexpMatch();
@@ -105,9 +108,21 @@ public:
    /// @param ec PCRE2 error code to describe
    static UCS_string pcre_error(int ec);
 
+   /// the innermost capturing group that contains group g (for each group
+   /// g), or an empty vector if unknown (Bugs38 #55)
+   const std::vector<int> & get_group_parents() const
+      { return group_parents; }
+
 protected:
+   /// compute group_parents from the (compiled) \b pattern
+   /// @param pattern the regular expression pattern string
+   void compute_group_parents(const UCS_string & pattern, int flags);
+
    /// compiled regular expression
    pcre2_code * code;
+
+   /// see get_group_parents()
+   std::vector<int> group_parents;
 };
 //════════════════════════════════════════════════════════════════════════════
 

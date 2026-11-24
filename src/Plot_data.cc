@@ -23,6 +23,51 @@
 
 #include "Plot_data.hh"
 
+//────────────────────────────────────────────────────────────────────────────
+/// return str with APL's ¯ replaced by -, and without trailing blanks
+static std::string
+plain_number(const char * str)
+{
+std::string ret;
+   for (const char * s = str; *s;)
+       {
+         if (s[0] == char(0xC2) && s[1] == char(0xAF))   // ¯
+            {
+              ret += '-';
+              s += 2;
+            }
+         else ret += *s++;
+       }
+   while (ret.size() && (unsigned char)(ret.back()) <= ' ')   ret.pop_back();
+   return ret;
+}
+//────────────────────────────────────────────────────────────────────────────
+int64_t
+Plot_data::integer_from_str(const char * str, int64_t lo, int64_t hi,
+                            const char * & error)
+{
+const std::string text = plain_number(str);
+char * end = 0;
+   errno = 0;
+const long long value = strtoll(text.c_str(), &end, 10);
+   error = 0;
+   if (end == text.c_str() || *end)       error = "bad integer value";
+   else if (errno == ERANGE || value < lo || value > hi)
+      error = "integer value out of range";
+   return error ? 0 : value;
+}
+//────────────────────────────────────────────────────────────────────────────
+double
+Plot_data::double_from_str(const char * str, const char * & error)
+{
+const std::string text = plain_number(str);
+char * end = 0;
+const double value = strtod(text.c_str(), &end);
+   error = 0;
+   if (end == text.c_str() || *end)   error = "bad numeric value";
+   else if (!isfinite(value))         error = "numeric value out of range";
+   return error ? 0.0 : value;
+}
 //════════════════════════════════════════════════════════════════════════════
 Color
 Plot_data::Color_from_str(const char * str, const char * & error)

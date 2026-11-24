@@ -1,0 +1,70 @@
+⍝ Bugs38_FFT.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs38 ⎕FFT items (they need FFTW).
+
+      ]NEXTFILE NO-⎕FFT   ⍝ done if ⎕FFT is not available (no FFTW)
+
+
+
+
+
+      ⍝ Bugs38 #95: ⎕FFT subfunctions with negative numbers by name, and ⎕FFT[¯1]
+
+
+
+
+
+      ⎕FFT.inverse_fft 0 1 0 0
+0.5 0J0.5 ¯0.5 0J¯0.5
+
+
+
+
+      ⎕FFT['inverse_fft'] 0 1 0 0
+0.5 0J0.5 ¯0.5 0J¯0.5
+
+
+
+
+      'hann_window' ⎕FFT 1 1 1
+0 1 0
+
+
+
+
+      ⎕FFT[¯1] 0 1 0 0
+0.5 0J0.5 ¯0.5 0J¯0.5
+
+
+
+
+      ⍝ Bugs38 #128: window functions of a single sample (weight 1)
+
+
+
+
+
+      ¯10 ⎕FFT 7
+7
+
+
+
+
+      ¯10 ⎕FFT ,7
+7
+
+
+
+
+      ⍴¯10 ⎕FFT 1 1⍴7
+1 1
+
+
+
+
+      )SIC
+
+
+
+
+

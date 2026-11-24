@@ -223,8 +223,13 @@ const char ch = traits_type::to_char_type(c);
    // next input line) and write the comparison result into the current
    // .tc.log file.
    //
-ofstream & report = IO_Files::get_current_testreport();
-   Assert(report.is_open());
+ofstream & testreport = IO_Files::get_current_testreport();
+
+   // the testcase may have no .tc.log (e.g. in a read-only directory): then
+   // compare anyway, but do not write the report (Bugs40 #79)
+   //
+static std::ostream no_report(0);   // discards everything
+std::ostream & report = testreport.is_open() ? testreport : no_report;
 
 const char * apl = aplout.c_str();   // the APL output
 UTF8_string ref;                     // the expected output (= the reference)
@@ -233,6 +238,10 @@ size_t diff_pos = 0;                 // the first mismatch
    IO_Files::read_file_line(ref, eof);
    if (eof)                // nothing in current_testfile
       {
+        // an output line without an expected line is a mismatch too: a
+        // testcase whose expected output is cut short passed (Bugs40 #76)
+        //
+        IO_Files::diff_error();
         report << "extra: " << apl << endl;
       }
    else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))

@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include <fstream>
+#include <set>
 #include <string.h>
 
 #include "DerivedFunction.hh"
@@ -198,6 +199,9 @@ public:
    /// write user-defined function \b fun
    /// @param fun function to serialise
    void save_Function(const Function & fun);
+
+   /// return true if \b fun is a lambda that no symbol holds (Bugs41 #23)
+   static bool is_anonymous_lambda(const Function * fun);
 
    /// write either the name and SI-level of user-defined function or the
    /// id of a system function. Return number of attribute= items written
@@ -375,7 +379,8 @@ public:
    /// far by the current )COPY, in response to a )COPY that failed
    /// part-way through; clears the snapshot list afterwards. Called by
    /// Workspace::copy_WS() when read_Workspace() throws.
-   void copy_restore_snapshots();
+   /// @param replaced the functions that were replaced by this )COPY
+   void copy_restore_snapshots(std::vector<const UserFunction *> & replaced);
 
    /// check compatibility information in the workspace and maybe warn the
    /// user
@@ -474,11 +479,14 @@ protected:
    struct _derived_todo
       {
         Function * cache;       ///< the new()-address of the function
-        cFunction_P * symptr;   ///< the address of a function * to be set
+        Symbol * symbol;        ///< the symbol to which the function is bound
+        int sym_level;          ///< the level in \b symbol
         Fid fid;                ///< the address of \b this derived function
         Fid LO_fid;             ///< the address of \b LO of this function
         Fid OPER_fid;           ///< the address of \b OPER of this function
         Fid RO_fid;             ///< the address of \b RO of this function
+        Vid LO_vid;             ///< the value \b LO of this function (if any)
+        Vid RO_vid;             ///< the value \b RO of this function (if any)
         Vid AXIS_vid;           ///< the AXIS of \b this function
         const char * loc;       ///< where \b this was initialized
       };
@@ -497,6 +505,8 @@ protected:
         NameClass nc;            ///< its top_of_stack()->get_NC() before )COPY
         Value_P value;           ///< valid iff nc == NC_VARIABLE
         cFunction_P function;    ///< valid iff nc == NC_FUNCTION/NC_OPERATOR
+        bool localized;          ///< the snapshot is of the global level 0
+                                 ///< (with the local levels set aside)
       };
 
    /// return true iff there is more data in the file
@@ -550,7 +560,8 @@ protected:
    /// remember symbol's current top-of-stack state before a )COPY
    /// overwrites it (no-op for )LOAD, i.e. unless copying is set).
    /// @param symbol the Symbol about to be overwritten by )COPY
-   void copy_snapshot_symbol(Symbol * symbol);
+   /// @param localized true if the local levels of symbol are set aside
+   void copy_snapshot_symbol(Symbol * symbol, bool localized);
 
    /// find attribute \b att_name and return: a pointer to its value if found,
    /// 0 if optional is true, and throw DOMAIN ERROR if optional is false.
@@ -591,6 +602,10 @@ protected:
    /// set \b current_char to next (UTF-8 encoded) char, return true if EOF
    bool get_uni();
 
+   /// set \b tok to the function \b fid or else to the value \b vid of an
+   /// operand of a derived function. Return false if there is neither.
+   bool derived_operand(Token & tok, Fid fid, Vid vid);
+
    /// instantiate the derived functions in \b derived_todos
    /// @param allocate true to allocate new derived functions, false to link them
    void instantiate_derived_functions(bool allocate);
@@ -611,6 +626,14 @@ protected:
    /// @param si state indicator entry that owns the derived function
    /// @param lev SI nesting level of the derived function
    void read_Derived(StateIndicator & si, int lev);
+
+   /// map \b fid to the anonymous lambda \b name in the body of the
+   /// current )SI entry (an operand of a derived function, Bugs41 #23)
+   void add_operand_lambda(Fid fid, const UTF8 * name);
+
+   /// read the <Function> of \b fid for \b symbol, which refers to it, but
+   /// whose own <Symbol> was not copied (Bugs41 #32). Return true on success
+   bool read_skipped_function(Fid fid, Symbol & symbol);
 
    /// read next Function element
    void read_Function();
@@ -713,6 +736,9 @@ protected:
    /// )COPY, for copy_restore_snapshots() to undo on failure.
    vector<_copy_snapshot> copy_snapshots;
 
+   /// read_lambda() has created the lambda of the current SI entry
+   bool SI_lambda_created;
+
    /// the current char
    Unicode current_char;
 
@@ -754,6 +780,41 @@ protected:
 
    /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
    std::vector<Vid> parents;
+
+   /// )COPY: sub_vids[vid] are the vids of the pointer cells of vid (from
+   /// the first pass), and copy_needed[vid] is true if vid is reachable
+   /// from a copied name (Bugs41 #33)
+   std::vector<std::vector<Vid>> sub_vids;
+   std::vector<bool> copy_needed;
+
+   /// compute copy_needed from vids_COPY and sub_vids
+   void compute_copy_needed();
+
+   /// ravel_read[vid] is true if the <Ravel> of vid was read (Bugs40 #13)
+   std::vector<bool> ravel_read;
+
+   /// the vid of the <Ravel> being read (Bugs40 #12)
+   Vid ravel_vid;
+
+   /// check that every value has got its <Ravel> (Bugs40 #13)
+   void check_all_ravels_read() const;
+
+   /// the names of the <Symbol>s read so far by read_SymbolTable(), to
+   /// detect a <Symbol> that occurs twice (Bugs41 #5)
+   std::set<UTF8_string> symbol_names_read;
+
+   /// throw a DOMAIN ERROR for a corrupt )SI in the file (Bugs40 #14)
+   static void corrupt_SI();
+
+   /// throw a DOMAIN ERROR for an end of file in \b element (Bugs41 #12)
+   static void eof_in(const char * element);
+
+   /// push levels onto \b symbol until it has level \b d
+   void push_levels(Symbol & symbol, int d);
+
+   /// release the function at the top of \b symbol, which is replaced
+   /// (Bugs40 #72)
+   void release_replaced_function(Symbol & symbol);
 
    /// true for )PCOPY, false for )COPY and )LOAD
    bool protection;

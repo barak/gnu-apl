@@ -357,6 +357,14 @@ public:
    /// @param stop true to set stop lines, false to set trace lines
    void set_trace_stop(const std::vector<Function_Line> & lines, bool stop);
 
+   /// delete \b ufun (or decrement its reference count if it is a lambda)
+   /// @param ufun the function to release (may be 0)
+   static void release(const UserFunction * ufun);
+
+   /// if non-zero: the functions replaced by fix() are not deleted but
+   /// collected here (by )COPY, which may need to restore them)
+   static std::vector<const UserFunction *> * deferred_deletes;
+
    /// create a user defined function according to \b data of length \b len
    /// in workspace \b w.
    /// @param text full source text of the function definition
@@ -376,10 +384,16 @@ public:
                              bool quiet = false,
                              bool honor_lock = true);
 
+   /// return the position of the ; if body[...end) ends with ;NAME...,
+   /// and -1 otherwise
+   static ShapeItem locals_start(const Token_string & body, ShapeItem end);
+
    /// (re-)create a lambda
    /// @param var symbol to which the lambda will be bound
    /// @param text source text of the lambda expression
-   static UserFunction * fix_lambda(Symbol & var, const UCS_string & text);
+   /// @param lambda_num the number of an anonymous lambda (e.g. 1 for λ1)
+   static UserFunction * fix_lambda(Symbol & var, const UCS_string & text,
+                                    Lambda_number lambda_num = LAMBDA_NUM_0);
 
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function

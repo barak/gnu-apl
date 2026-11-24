@@ -53,7 +53,7 @@ Quad_TF::eval_AB(cValue_R A, cValue_R B) const
    if (A.get_rank() > 0)         RANK_ERROR;
    if (A.element_count() != 1)   LENGTH_ERROR;
 
-const APL_Integer mode = A.get_int_value(0);
+const APL_Integer mode = A.get_near_int(0);
 const UCS_string symbol_name(B);
 
 Value_P Z;
@@ -61,7 +61,12 @@ Value_P Z;
    if (mode == 1)
       {
         const bool inverse = is_inverse(symbol_name);
-        if (inverse)   Z = tf1_inv(symbol_name);
+        if (inverse)
+           {
+             // an invalid transfer form gives '' (lrm p. 339, Bugs38 #85)
+             Z = tf1_inv(symbol_name);
+             if (!Z)   Z = Str0(LOC);
+           }
         else           Z = tf1(symbol_name);
       }
    else if (mode == 2)
@@ -83,6 +88,38 @@ Value_P Z;
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Quad_TF::safe_assign(Symbol & symbol, Value_P value, bool clone)
+{
+   // the assignment can fail, e.g. for a system variable with an invalid
+   // value like ⎕IO←7. Run it in safe execution mode (like ⎕EA) so that a
+   // failure is not displayed, and restore the error of the )SI entry
+   // afterwards (Bugs37 #48, Bugs38 #84, #85).
+   //
+StateIndicator * si = Workspace::SI_top();
+const int saved_depth = si ? si->get_safe_execution_depth() : 0;
+Error saved_error = si ? StateIndicator::get_error(si)
+                       : Error(E_NO_ERROR, LOC);
+   if (si)   si->set_safe_execution_depth();
+
+   try
+      {
+        symbol.assign(value, clone, LOC);
+      }
+   catch (Error &)
+      {
+        if (si)
+           {
+             si->restore_safe_execution_depth(saved_depth);
+             StateIndicator::get_error(si) = saved_error;
+           }
+        return false;
+      }
+
+   if (si)   si->restore_safe_execution_depth(saved_depth);
+   return true;
 }
 //────────────────────────────────────────────────────────────────────────────
 bool
@@ -640,6 +677,15 @@ Token_string tos;
         if (dynamic_cast<const RO_SystemVariable *>(tos[0].get_sym_ptr()))
            return UCS_string();
 
+        // likewise ⎕L, ⎕R, and ⎕X when their assignment would be ignored
+        // (Bugs38 #115)
+        //
+        if (const SystemVariable * sv =
+               dynamic_cast<const SystemVariable *>(tos[0].get_sym_ptr()))
+           {
+             if (sv->assign_ignored())   return UCS_string();
+           }
+
          // the assignment can fail, e.g. for a system variable with an
          // invalid value like ⎕IO←7. Then the transfer form is invalid
          // and Z is '' (lrm p. 339), so that )IN can continue with the
@@ -649,28 +695,13 @@ Token_string tos;
          // a failure is not displayed, and restore the error of the )SI
          // entry afterwards.
          //
-         StateIndicator * si = Workspace::SI_top();
-         const int saved_depth = si ? si->get_safe_execution_depth() : 0;
-         Error saved_error = si ? StateIndicator::get_error(si)
-                                : Error(E_NO_ERROR, LOC);
-         if (si)   si->set_safe_execution_depth();
-
-         try
+         if (!safe_assign(*tos[0].get_sym_ptr(), tos[2].get_apl_val(),
+                          true))
             {
-              tos[0].get_sym_ptr()->assign(tos[2].get_apl_val(), true, LOC);
-            }
-         catch (Error &)
-            {
-              if (si)
-                 {
-                   si->restore_safe_execution_depth(saved_depth);
-                   StateIndicator::get_error(si) = saved_error;
-                 }
               Log(LOG_Quad_TF)
                  CERR << "assignment failed in tf2_inverse()" << endl;
               return UCS_string();
             }
-         if (si)   si->restore_safe_execution_depth(saved_depth);
          Log(LOG_Quad_TF)   CERR << "valid inverse 2 ⎕TF" << endl;
          return tos[0].get_sym_ptr()->get_name();   // valid 2⎕TF
       }
@@ -1533,7 +1564,15 @@ const int data_chars = len - idx;
         new_val->check_value(LOC);
 
         if (symbol == 0)   symbol = Workspace::lookup_symbol(name);
-        const_cast<Symbol *>(symbol)->assign(new_val, false, LOC);
+
+        // an invalid value (e.g. for ⎕PR) makes the transfer form invalid
+        // (lrm p. 339, Bugs38 #85)
+        // an ignored ⎕L, ⎕R, or ⎕X assignment is invalid (Bugs39 #95)
+        if (const SystemVariable * sv =
+               dynamic_cast<const SystemVariable *>(symbol))
+           if (sv->assign_ignored())   return Str0(LOC);
+        if (!safe_assign(*const_cast<Symbol *>(symbol), new_val, false))
+           return Str0(LOC);
       }
    else if (mode == UNI_N)   // numeric array
       {
@@ -1592,7 +1631,14 @@ const int data_chars = len - idx;
 
         if (!symbol)   symbol = Workspace::lookup_symbol(name);
 
-        const_cast<Symbol *>(symbol)->assign(ZZ, false, LOC);
+        // an invalid value (e.g. ⎕IO←7) makes the transfer form invalid
+        // (lrm p. 339, Bugs38 #85)
+        // an ignored ⎕L, ⎕R, or ⎕X assignment is invalid (Bugs39 #95)
+        if (const SystemVariable * sv =
+               dynamic_cast<const SystemVariable *>(symbol))
+           if (sv->assign_ignored())   return Str0(LOC);
+        if (!safe_assign(*const_cast<Symbol *>(symbol), ZZ, false))
+           return Str0(LOC);
       }
    else Assert(0);   // since checked above
 

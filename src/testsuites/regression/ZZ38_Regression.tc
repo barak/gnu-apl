@@ -1,0 +1,28 @@
+⍝ ZZ38_Regression.tc
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      ⍎ '1',((100⍴'{⍺'),' + ',100⍴'⍵}'),'2'
+3
+
+
+      ]FILE_CTL NO_SKIP
+      '1',(10⍴'{⍺'),' + ',15⍴'⍵}','2'
+1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵}2⍵}2
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      ⍎ 1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵}2⍵}2
+DOMAIN ERROR+
+      ⍎1{⍺{⍺{⍺{⍺{⍺+⍵}2 ⍵}2 ⍵}2 ⍵}2 ⍵}2
+      ^
+
+      ]FILE_CTL NO_SKIP
+      ⍎ 1{⍺{⍺{⍺{⍺{⍺ + ⍵}2⍵}2⍵}2⍵
+Unbalanced left curly bracket+
+      ⍎1{⍺{⍺{⍺{⍺{⍺+⍵}2 ⍵}2 ⍵}2 ⍵
+        ^
+

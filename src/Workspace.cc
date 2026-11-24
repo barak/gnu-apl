@@ -26,6 +26,7 @@
 #include <sys/stat.h>
 
 #include <fstream>
+#include <map>
 
 using namespace std;
 
@@ -122,8 +123,28 @@ Workspace::push_SI(const Executable * fun, const char * loc)
 {
    Assert1(fun);
 
-   if (Quad_SYL::si_depth_limit && SI_top() &&
-       Quad_SYL::si_depth_limit <= SI_top()->get_level())
+   // restore the SI depth limit that was automatically cleared when it
+   // was reached (below), once the SI was unwound, e.g. by )SIC (Bugs39 #17)
+   //
+   if (Quad_SYL::si_depth_limit_cleared && Quad_SYL::si_depth_limit == 0 &&
+       (SI_top() == 0 ||
+        SI_top()->get_level() < Quad_SYL::si_depth_limit_cleared / 2))
+      {
+        Quad_SYL::si_depth_limit = Quad_SYL::si_depth_limit_cleared;
+        Quad_SYL::si_depth_limit_cleared = 0;
+        Quad_SYL::si_depth_backstop = 0;
+      }
+
+   // while the limit is cleared, a resumed (→⍬) runaway recursion is
+   // stopped again after as many further levels as the limit had, rather
+   // than running until the interpreter dies with std::bad_alloc (Bugs40 #6)
+   //
+const bool backstop = Quad_SYL::si_depth_limit == 0 && SI_top() &&
+                      Quad_SYL::si_depth_backstop &&
+                      Quad_SYL::si_depth_backstop <= SI_top()->get_level();
+
+   if (backstop || (Quad_SYL::si_depth_limit && SI_top() &&
+                    Quad_SYL::si_depth_limit <= SI_top()->get_level()))
       {
         MORE_ERROR() <<
 "the system limit on SI depth (as set in ⎕SYL["
@@ -131,8 +152,17 @@ Workspace::push_SI(const Executable * fun, const char * loc)
 << ";2]) was reached\n"
 "(and to avoid lock-up, this system limit in ⎕SYL was automatically cleared).";
 
-
-        Quad_SYL::si_depth_limit = 0;
+        // the limit is restored (see below) once the SI was unwound.
+        // Otherwise the next runaway recursion of the session ended the
+        // interpreter with std::bad_alloc (Bugs39 #17).
+        //
+        if (!backstop)
+           {
+             Quad_SYL::si_depth_limit_cleared = Quad_SYL::si_depth_limit;
+             Quad_SYL::si_depth_limit = 0;
+           }
+        Quad_SYL::si_depth_backstop = SI_top()->get_level() +
+                                      Quad_SYL::si_depth_limit_cleared;
 
         // Setting these flags alone (the old behaviour) is not enough: a
         // single statement recursing from inside itself (the common
@@ -144,8 +174,25 @@ Workspace::push_SI(const Executable * fun, const char * loc)
         // the recursion instead of only setting flags nothing reads
         // until a line boundary that is never reached. See Bugs27 #17.
         //
-        InterruptContext::set_attention_raised(LOC);
-        InterruptContext::set_interrupt_raised(LOC);
+        // Only throw: the flags that were also set here were never
+        // consumed if the push failed before a new SI entry existed (e.g.
+        // for an immediate-execution statement), so the next statement got
+        // a spurious INTERRUPT (Bugs38 #79).
+        //
+        // An immediate-execution statement that cannot be pushed is the
+        // failed statement: report it (as for a parse error) instead of
+        // the line of (and in the ⎕EM/⎕ET of) the suspended function on
+        // top of the SI (Bugs39 #61).
+        //
+        if (fun->get_parse_mode() == PM_STATEMENT_LIST)
+           {
+             Error error(E_SYS_LIMIT_SIDEPTH, LOC);
+             UCS_string line_2(Workspace::get_prompt());
+             const int margin = line_2.size();
+             line_2 << fun->get_text(0);
+             error.set_error_line_2(line_2, margin, margin);
+             throw error;
+           }
         LIMIT_ERROR_SIDEPTH;
       }
 
@@ -328,7 +375,12 @@ Workspace::immediate_execution(bool exit_on_error)
                         IO_Files::apl_error(LOC);
                       }
                  }
-              if (exit_on_error)   return Token(TOK_OFF);
+              // not for an (expected) error inside a running testcase,
+              // e.g. a DEFN ERROR of the ∇-editor: --TM 4 exits after a
+              // failed testcase (stop_after_failed_file(), Bugs41 #62)
+              //
+              if (exit_on_error && !InputFile::is_validating())
+                 return Token(TOK_OFF);
             }
          catch (const std::bad_alloc & e)
             {
@@ -727,12 +779,24 @@ const LibRef_name lib_name(UCS_ASCII_string("CLEAR WS"), true);
 void
 Workspace::clear_SI(ostream & out)
 {
+   // the SI depth limit, if it was cleared when it was reached (Bugs39 #17)
+   //
+   if (Quad_SYL::si_depth_limit_cleared && Quad_SYL::si_depth_limit == 0)
+      {
+        Quad_SYL::si_depth_limit = Quad_SYL::si_depth_limit_cleared;
+        Quad_SYL::si_depth_limit_cleared = 0;
+        Quad_SYL::si_depth_backstop = 0;
+      }
+
    // clear the SI (pops all localized symbols)
    while (SI_top())
       {
         SI_top()->escape();
         pop_SI(LOC);
       }
+
+   // also a parse error at top level (Bugs38 #70)
+   StateIndicator::top_level_error.clear_error_code();
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -852,6 +916,25 @@ Workspace::backup_existing_file(const char * filename)
    // 1. if file 'filename' does not exist then no backup is needed.
    //
    if (access(filename, F_OK) != 0)   return false;   // OK
+
+   // 1a. only a regular (writable) file is replaced. A directory (or a
+   //     read-only file) was silently renamed to .bak (Bugs39 #75)
+   //
+   {
+     struct stat st;
+     if (stat(filename, &st) == 0 && !S_ISREG(st.st_mode))
+        {
+          CERR << filename << " is a directory (or some other non-file), "
+                  "not a GNU APL workspace file" << endl;
+          return true;   // error
+        }
+     if (access(filename, W_OK) != 0)
+        {
+          CERR << "workspace file " << filename << " is not writable"
+               << endl;
+          return true;   // error
+        }
+   }
 
 UTF8_string backup_filename = filename;
    backup_filename << ".bak";
@@ -1081,6 +1164,10 @@ InputFile fam(filename, file, false, false, true, with_LX);
         fam.set_COPY();
         ++Bif_F1_EXECUTE::copy_pending;
       }
+   else                 // )LOAD: keep the session variables (Bugs38 #23)
+      {
+        fam.copy_filter.set_loading();
+      }
    InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1226,8 +1313,9 @@ const YMDhmsu time(gmt + 1000000*offset);
 "⍝ " << setw(36) << lib_name.get_name() << " ";
      get_v_Quad_TZ().print_timestamp(*sout, gmt)                 << " ⍝\n"
 "⍝                                                                    ⍝\n"
-" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n"
-           << endl;
+" ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝\n";
+
+     *sout << endl;
    }
 
 int function_count = 0;
@@ -1240,9 +1328,25 @@ int variable_count = 0;
 /// Read/Write System Variable
 #define ro_sv_def(x, _str, _txt)
 /// Read-Only System Variable
-#define rw_sv_def(x, _str, _txt) if (ID_ ## x != ID_Quad_SYL) \
+// ⎕L, ⎕R, and ⎕X belong to the SI, which is not dumped (Bugs38 #115)
+#define rw_sv_def(x, _str, _txt) if (ID_ ## x != ID_Quad_SYL &&   \
+                                     ID_ ## x != ID_Quad_L   &&   \
+                                     ID_ ## x != ID_Quad_R   &&   \
+                                     ID_ ## x != ID_Quad_X)       \
    { get_v_ ## x().dump(*sout);   ++variable_count; }
 #include "SystemVariable.def"
+
+   // the WSID, which )LOAD restores only if the lines above were loaded
+   // (and )COPY ignores, see InputFile::COPY_filter::check_filter()).
+   // Bugs41 #38.
+   //
+   if (!html && !is_CLEAR_WS())
+      {
+        outf << ")WSID ";
+        const LibRef lib = the_workspace.WS_id.get_libref();
+        if (lib != LIB_NONE)   outf << lib << " ";
+        outf << the_workspace.WS_id.get_name() << endl << endl;
+      }
 
    if (html)   outf << endl << "⍝ EOF </pre></body></html>" << endl;
    else        write_DUMP_checksum(outf, filename.c_str());
@@ -1306,7 +1410,10 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
 
         load_DUMP(out, filename, dump_fd, do_LX, silent, 0);   // closes dump_fd
 
-        // )DUMP files have no )WSID, so create one from the filename
+        // create a WSID from the filename. )DUMP writes a )WSID command
+        // near the end of the file, which restores the dumped WSID (like
+        // the wsid= of a .xml file) if the lines before it were loaded
+        // (Bugs41 #38). A file dumped by an older GNU APL has no )WSID.
         //
         // Start with the last path component, which may or may not start
         // with a slash
@@ -1377,6 +1484,7 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
              // the specific reason (e.g. a bad )SI stack, or a negative
              // shape item (Bugs32 #26)), if the reader gave one
              const UCS_string reason = Workspace::more_error();
+             repair_SI_levels();   // Bugs41 #16
              the_workspace.clear_WS(out, true);
              out << ")LOAD " << lib_name.get_name() << " failed: "
                  << Error::error_name(err.get_error_code()) << endl;
@@ -1397,6 +1505,7 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
              // so Cmd_WS::cmd_LOAD's own catch(std::bad_alloc&)/catch(...)
              // still run their usual reporting on top of this.
              //
+             repair_SI_levels();   // Bugs41 #16
              the_workspace.clear_WS(out, true);
              out << ")LOAD " << lib_name.get_name() << " failed" << endl;
              MORE_ERROR() << "workspace file " << filename
@@ -1408,11 +1517,55 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
 
    if (Workspace::get_LX().size())  quad_lx = Workspace::get_LX();
 }
+//────────────────────────────────────────────────────────────────────────────
+//────────────────────────────────────────────────────────────────────────────
+bool
+Workspace::repair_SI_levels()
+{
+   // count how often each symbol is popped when the )SI is cleared
+   //
+std::map<Symbol *, int> pops;
+   for (StateIndicator * si = SI_top(); si; si = si->get_parent())
+       {
+         const UserFunction * ufun = si->get_executable()->get_exec_ufun();
+         if (ufun == 0)   continue;
+
+         const UserFunction_header & header = ufun->get_header();
+         loop(l, header.get_label_count())   ++pops[header.get_label(l).sym];
+         loop(l, header.local_var_count())
+             ++pops[const_cast<Symbol *>(header.get_local_var(l))];
+         if (header.B())    ++pops[header.B()];
+         if (header.X())    ++pops[header.X()];
+         if (header.RO())   ++pops[header.RO()];
+         if (header.LO())   ++pops[header.LO()];
+         if (header.A())    ++pops[header.A()];
+         if (header.Z())    ++pops[header.Z()];
+       }
+
+bool missing = false;
+   for (std::map<Symbol *, int>::iterator p = pops.begin();
+        p != pops.end(); ++p)
+       {
+         Symbol & sym = *p->first;
+         while (sym.value_stack_size() <= p->second)   // base level + pops
+            {
+              const ShapeItem size = sym.value_stack_size();
+              sym.push();
+              if (sym.value_stack_size() == size)   break;   // e.g. ⎕LX
+              missing = true;
+            }
+       }
+
+   return missing;
+}
 //════════════════════════════════════════════════════════════════════════════
-void
+bool
 Workspace::copy_WS(ostream & out, ostream & err, const LibRef_name & lib_name,
                    UCS_string_vector & lib_ws_objects, bool protection)
 {
+   // return true unless the copy has failed (for )COPY_ONCE, Bugs38 #114).
+   // A )DUMPed .apl file is only queued here, so its result is not known.
+
    // )COPY WS_name                              WS_name /absolute or relative
    // )COPY libnum WS_name                       WS_name relative
    // )COPY WS_name objects...                   WS_name /absolute or relative
@@ -1433,18 +1586,18 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
         load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects,
                   protection);
         // load_DUMP closes dump_fd
-        return;
+        return true;
       }
 
    if (!in.is_open())   // case 3: open failed
       {
         CERR << ")COPY " << lib_name.get_name() << " (file " << filename
              << ") failed: " << strerror(errno) << endl;
-        return;
+        return false;
       }
 
    if (!in.is_valid_format())   // wrong format; diagnostic already
-      return;                  // printed by the constructor
+      return false;            // printed by the constructor
 
    // case 2: )SAVEd .xml file
    //
@@ -1462,6 +1615,29 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
    // read-only pass over the same file) can throw on the same corruption
    // too, so it is covered by the same try as read_Workspace() below.
    //
+   // The functions replaced by this )COPY are deleted only after it has
+   // succeeded, since a failing )COPY restores them (Bugs39 #10).
+   //
+   struct deferred_deletes
+      {
+        deferred_deletes()
+           { UserFunction::deferred_deletes = &replaced; }
+
+        ~deferred_deletes()
+           {
+             UserFunction::deferred_deletes = 0;
+             loop(r, replaced.size())   UserFunction::release(replaced[r]);
+           }
+
+        std::vector<const UserFunction *> replaced;
+      } replaced_functions;
+
+   // the error of a suspended function, which a refused )COPY must not
+   // change (Bugs41 #55)
+   //
+StateIndicator * si_top = Workspace::SI_top();
+const Error si_error = StateIndicator::get_error(si_top);
+
    try
       {
         in.read_vids();
@@ -1469,9 +1645,13 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
       }
    catch (Error & err)
       {
+        if (si_top == Workspace::SI_top())
+           StateIndicator::get_error(si_top) = si_error;
+
         // the specific reason, if the reader gave one (e.g. Bugs32 #26)
         const UCS_string reason = Workspace::more_error();
-        in.copy_restore_snapshots();
+        UserFunction::deferred_deletes = 0;
+        in.copy_restore_snapshots(replaced_functions.replaced);
         CERR << ")COPY " << lib_name.get_name() << " failed: "
              << Error::error_name(err.get_error_code()) << endl;
         UCS_string & more = MORE_ERROR();
@@ -1481,7 +1661,10 @@ XML_Loading_Archive in(out, err, filename.c_str(), dump_fd);
                 " already copied from it was restored to its"
                 " pre-)COPY state";
         if (reason.size())   more << UNI_LF << reason;
+        return false;
       }
+
+   return true;
 }
 //════════════════════════════════════════════════════════════════════════════
 void
@@ -1540,7 +1723,10 @@ UCS_string &
 MORE_ERROR()
 {
    Workspace::more_error().clear();
+   Workspace::more_is_info = false;   // the text of an error (Bugs41 #78)
    return Workspace::more_error();
 }
+//────────────────────────────────────────────────────────────────────────────
+bool Workspace::more_is_info = false;
 //════════════════════════════════════════════════════════════════════════════
 

@@ -1,0 +1,350 @@
+⍝ Bugs40_MX.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs40 ⌹[X] (polynomial) and ⎕MX items (the latter need
+⍝ libgsl and come last).
+
+
+
+
+      ⍝ Bugs40 #16: A ⌹[12] B with a term outside the order planes, or without
+      ⍝ the order plane of B
+
+
+
+
+      A←4 1⍴0 0 0 1 ◊ B←2 3⍴0 0 1 1 0 0
+
+
+
+
+      OA←-⎕IO-(⍴A)⍴⍳×/⍴A ◊ OB←-⎕IO-(⍴B)⍴⍳×/⍴B
+
+
+
+
+      ((2,⍴A)⍴(,A),,OA) ⌹[12] (2,⍴B)⍴(,B),,OB
+DOMAIN ERROR+
+      ((2,⍴A)⍴(,A),,OA)⌹[12](2,⍴B)⍴(,B),,OB
+      ^                ^
+
+      )MORE
+A ⌹[12] B: the order of a term of the division (with exponents 2 2) is not defined by the order planes of A and B
+
+
+
+      ((2,⍴A)⍴(,A),,OA) ⌹[12] 1 2 2⍴0 1 1 0
+LENGTH ERROR+
+      ((2,⍴A)⍴(,A),,OA)⌹[12]1 2 2⍴0 1 1 0
+      ^                ^
+
+      )MORE
+A ⌹.poly_divideN B : Bad shape of argument B (expecting ↑⍴B = 2, for B[1;...]=polynomial and B[2;...]=monomial order)
+
+
+
+      ⍝ Bugs40 #17: a zero polynomial A or B
+
+
+
+
+      (2 2⍴0) ⌹[10] 2 2⍴0 1 1 0
+0 0
+
+
+
+      (2 2⍴0 1 1 0) ⌹[10] 2 2⍴0
+DOMAIN ERROR+
+      (2 2⍴0 1 1 0)⌹[10]2 2⍴0
+      ^            ^
+
+      )MORE
+A ⌹.poly_divideN B : B is the zero polynomial
+
+
+
+      ⍝ Bugs40 #47: A ⌹[10] B with A smaller than B is the pair (0, A)
+
+
+
+
+      2 3 ⌹[10] 1 2 3
+ 0  2 3 
+
+
+
+      (2 2⍴0 1 2 0) ⌹[10] 2 2⍴0 1 1 0
+ 2   0 ¯1 
+
+
+
+      ⍝ Bugs40 #27: the polynomial subfunctions never store ∞, and do not treat
+      ⍝ coefficients below 1E¯10 as 0
+
+
+
+
+      1E200 ⌹[8] 1E200
+DOMAIN ERROR+
+      1E200⌹[8]1E200
+      ^    ^
+
+      )MORE
+A⌹[X]B: a result item exceeds the range of floating point numbers (overflow)
+
+
+
+      1 1E308 ⌹[9] 1 1E¯5
+DOMAIN ERROR+
+      1 1E308⌹[9]1 1E¯5
+      ^      ^
+
+      1E¯6 ⌹[8] 1E¯6
+1E¯12
+
+
+
+      1E¯11 1 ⌹[8] 1
+1E¯11 1
+
+
+
+      (1E¯12×1 1) ⌹[8] 1E12×1 1
+1 2 1
+
+
+
+      1E¯12 1E¯12 ⌹[8] 1 1
+1E¯12 2E¯12 1E¯12
+
+
+
+      11○1 1 ⌹[8] 1J1E¯11 1
+1E¯11 1E¯11 0
+
+
+
+      (1E¯12×1 2 1) ⌹[9] 1 1
+ 1E¯12 1E¯12  0 
+
+
+
+      1 3 3 1 ⌹[9] 1 1
+ 1 2 1  0 
+
+
+
+      (1E¯12×2 2⍴0 1 1 0) ⌹[10] 2 2⍴0 1 1 0
+ 1E¯12   0 
+
+
+
+      (3 3⍴0 0 1 0 2 0 1 0 0) ⌹[10] 2 2⍴0 1 1 0
+ 0 1   0 
+ 1 0     
+
+
+      ⍝ Bugs40 #48, #94: ⌹[11] (scan polynomial): a ¯ belongs to the next number
+      ⍝ only, malformed terms are a DOMAIN ERROR, coefficients ≥ 2⋆63 are floats
+
+
+
+
+      ⌹[11] ⌹[7] 1 ¯3
+1 ¯3
+
+
+
+      ⌹[11] '¯1 + 2x + 3x²'
+¯1 2 3
+
+
+
+      ⌹[11] '¯3J2'
+¯3J2
+
+
+
+      ⌹[11] '1J¯1x + 3'
+3 1J¯1
+
+
+
+      ⌹[11] '3x4'
+DOMAIN ERROR+
+      ⌹[11]'3x4'
+      ^
+
+      )MORE
+⌹[11]B: malformed term in polynomial B: 3x4
+
+
+
+      ⌹[11] 'J'
+DOMAIN ERROR+
+      ⌹[11]'J'
+      ^
+
+      ⌹[11] '-'
+DOMAIN ERROR+
+      ⌹[11]'-'
+      ^
+
+      ⌹[11] '1E19'
+1E19
+
+
+
+      ⍝ the ⎕MX items need libgsl: done if ⎕MX is not available (Bugs41 #63)
+      ⍝
+      ]NEXTFILE NO-GSL
+
+
+
+
+      ⍝ Bugs40 #18: the determinant with a pivot ≥ 2⋆1023
+
+
+
+
+      ⎕MX[1] 2 2⍴1E308 0 0 1E¯300
+100000000
+
+
+
+      ⎕MX[1] 2 2⍴9E307 0 0 1E¯300
+90000000
+
+
+
+      ⎕MX[1] 2 2⍴1E308 0 0 1
+1E308
+
+
+
+      ⎕MX[1] 2 2⍴1E308J1E308 0 0 1E¯300
+100000000J100000000
+
+
+
+      ⎕MX[1] 3 3⍴1E308 0 0 0 1E¯300 0 0 0 1
+100000000
+
+
+
+      ⎕MX[1] 2 2⍴1E308 1 0 1E¯300
+100000000
+
+
+
+      ⎕MX[2] 2 3⍴1E308 0 0 0 1E¯300 0
+0 0 100000000
+
+
+
+      ⎕MX[2] 2 3⍴1E308 0 0 0 1 0
+0 0 1E308
+
+
+
+      ⍝ Bugs40 #46: ⎕MX[9] (norm) of large and tiny vectors
+
+
+
+
+      ⎕MX[9] 3E200 4E200
+0.6 0.8
+
+
+
+      ⎕MX[9] 1E308 1E308
+0.7071067812 0.7071067812
+
+
+
+      ⎕MX[9] 3E¯200 4E¯200
+0.6 0.8
+
+
+
+      ⎕MX[9] 1E¯170 0
+1 0
+
+
+
+      ⎕MX[9] 3E200J4E200 0
+0.6J0.8 0
+
+
+
+      ⍝ Bugs40 #85: ⎕MX[12] histogram of subnormal samples
+
+
+
+
+      4 ⎕MX[12] 0 1 2 3 4
+1 1 1 2
+
+
+
+      4 ⎕MX[12] 0 5E¯324 1E¯323 1.5E¯323 2E¯323
+1 1 1 2
+
+
+
+      2 ⎕MX[12] 0 5E¯324 1E¯323
+1 2
+
+
+
+      4 ⎕MX[12] ¯5E¯324 0 5E¯324
+1 0 1 1
+
+
+
+      4 ⎕MX[12] 0 5E¯324 1E¯323 1.5E¯323
+1 1 1 1
+
+
+
+      4 ⎕MX[12] ¯1E¯320 0 1E¯320
+1 0 1 1
+
+
+
+      2 ⎕MX[12] 0 5E¯324
+1 1
+
+
+
+      3 ⎕MX[12] 1E¯323 1.5E¯323 2E¯323
+1 1 1
+
+
+
+      3 ⎕MX[12] 0 5E¯324 1.5E¯323
+1 1 1
+
+
+
+      4 ⎕MX[12] ¯1E308 0 1E308 1.7E308
+1 1 1 1
+
+
+
+      ⍝ Bugs40 #63 (from Bugs40_CD.tc): a ⎕MX subfunction number beyond int
+
+
+
+
+      ⎕MX[4294967297 0] 2 2⍴1 2 3 4
+DOMAIN ERROR+
+      ⎕MX[4294967297 0]2 2⍴1 2 3 4
+      ^
+
+      )MORE
+⎕MX[X] B: invalid subfunction number X (= 4294967297).
+See: ⎕MX '' or: ⎕MX ⍬ for a list of valid numbers.
+
+
+      )SIC
+

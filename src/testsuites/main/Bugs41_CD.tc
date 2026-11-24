@@ -1,0 +1,1219 @@
+⍝ Bugs41_CD.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs41 severity C and D items (#39 - #92): wrong errors,
+⍝ diagnostics, and minor items (workspace items are in Bugs41_Workspace.tc).
+
+
+
+
+      ⍝ Bugs41 #39: complex K!B for a natural K does not overflow in its partial
+      ⍝ products, and the log-Γ path has about 15 correct digits
+
+
+
+
+      ZZ39PP←⎕PP ◊ ⎕PP←12
+
+
+
+
+      900!1100J0.1
+9.88918712796E224J1.70030001678E224
+
+
+
+      1000!1100J0.1
+1.38246890803E144J3.37340153369E143
+
+
+
+      1001!1100J0.1
+1.38075081706E143J3.38384238039E142
+
+
+
+      1200!1300J0.5
+1.52930232763E151J5.11308150635E151
+
+
+
+      1000!1100J0
+1.42296717362E144
+
+
+
+      ⎕PP←ZZ39PP
+
+
+
+
+
+      ⍝ Bugs41 #40: ∧ of a near-real complex and a fractional real is A×B÷A∨B
+
+
+
+
+      ZZ40PP←⎕PP ◊ ⎕PP←12
+
+
+
+
+      1.5∨1J1E¯20
+0.5
+
+
+
+      1.5∧1J1E¯20
+3
+
+
+
+      0.5∧3J1E¯11
+3J1E¯11
+
+
+
+      3J1E¯11∧0.5
+3J1E¯11
+
+
+
+      6∧4J1E¯12
+12
+
+
+
+      ⎕PP←ZZ40PP
+
+
+
+
+
+      ⍝ Bugs41 #41: the fill of f⍤y applies f's fill to the cells (like ⍤ applies f)
+
+
+
+
+      Z←(⊂⍤0)¨0⍴⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+      Z←(+⌿⍤1)¨0⍴⊂2 3⍴0 ◊ ⍴↑Z
+2
+
+
+
+      Z←(,⍤0)¨0⍴⊂2 3⍴0 ◊ ⍴↑Z
+2 3 1
+
+
+
+      Z←⍬∘.(,⍤0)0⍴⊂2 3⍴0 ◊ ⍴↑Z
+2 3 2
+
+
+
+      Z←(0⍴⊂1 2)(,⍤0)¨⊂3 4 ◊ ⍴↑Z
+2 2
+
+
+
+      Z←(⊂⍤1)¨0⍴⊂2 3⍴0 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴(0 0 0) (0 0 0))
+
+
+
+
+      ⍝ Bugs41 #45: a parenthesized right operand of ⍤ is not merged with a
+      ⍝ parenthesized argument or through a second pair of parentheses
+
+
+
+
+      -⍤(0)(5)
+¯5
+
+
+
+      -⍤(0) (5)
+¯5
+
+
+
+      X←-⍤(0)(5) ◊ X
+¯5
+
+
+
+      -⍤((0)) 5
+¯5
+
+
+
+      V←1 2 3 ◊ -⍤(0)(V)
+¯1 ¯2 ¯3
+
+
+
+
+      ⍝ Bugs41 #46: the valence check also covers ⎕RE, f⍣g, ∘.g, and f.g
+
+
+
+
+      ⍴⎕RE¨''
+VALENCE ERROR+
+      ⍴⎕RE¨''
+       ^
+
+      ⍴(⎕TF⍣=)¨''
+VALENCE ERROR+
+      ⍴(⎕TF⍣=)¨''
+       ^
+
+      (⎕UCS⍣=)/5
+VALENCE ERROR+
+      (⎕UCS⍣=)/5
+      ^
+
+      ⍴⍬∘.(⎕UCS⍣=)⍬
+VALENCE ERROR+
+      ⍴⍬∘.(⎕UCS⍣=)⍬
+       ^^
+
+      ⍴⍬ (∘.⎕UCS)¨ ⍬
+VALENCE ERROR+
+      ⍴⍬(∘.⎕UCS)¨⍬
+       ^^
+
+      ⍴⍬ (+.⎕UCS)¨ ⍬
+VALENCE ERROR+
+      ⍴⍬(+.⎕UCS)¨⍬
+       ^^
+
+      ⍴⍬ (∘.+)¨ ⍬
+0
+
+
+
+      (⊂1 2) (+.×)¨ ⊂3 4
+11
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #47: a function derived by ¨ or ∘. has the fill function of its
+      ⍝ operand (LRM p. 110), also as the operand of ¨
+
+
+
+
+      ⍴(÷¨)¨⍬
+0
+
+
+
+      ⍴(⍟¨)¨⍬
+0
+
+
+
+      ⍴(-¨)¨''
+0
+
+
+
+      ⍴''(∘.+)¨''
+0
+
+
+
+      ⍴(0⍴⊂'ab')(+¨)¨⊂'cd'
+0
+
+
+
+      Z←(÷¨)¨0⍴⊂1 2 ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂2⍴0 0)
+
+
+
+      Z←(0⍴⊂1 2)(∘.×)¨⊂3 4 5 ◊ ⍴↑Z
+2 3
+
+
+
+
+      ⍝ Bugs41 #48: A f.g B with two vectors and a defined f or g is a scalar holding
+      ⍝ the reduction (like for a primitive g)
+
+
+
+
+      ⍴⍴1 2 3 +.{⍺∘.×⍵} 4 5 6
+0
+
+
+
+      ⍴⍴1 2 3 {⍺+⍵}.(∘.×) 4 5 6
+0
+
+
+
+      1 2 3 +.{⍺∘.×⍵} 4 5 6
+ 15 30 45 
+
+
+
+      ⍴⍴(1 2)(3 4) {⍺+⍵}.(∘.+) (5 6)(7 8)
+0
+
+
+
+      (1 2)(3 4) {⍺+⍵}.{⍺×⍵} (5 6)(7 8)
+ 26 44 
+
+
+
+
+      ⍝ Bugs41 #49: complex ⌈ ⌊ compare an integer beyond 2⋆53 exactly (like ⍋)
+
+
+
+
+      ZZ49PP←⎕PP ◊ ⎕PP←17
+
+
+
+
+      I←9007199254740993 ◊ C←9007199254740992J1
+
+
+
+
+      ⍋I C
+2 1
+
+
+
+      I⌈C
+9007199254740993
+
+
+
+      C⌈I
+9007199254740993
+
+
+
+      I⌊C
+9007199254740992J1
+
+
+
+      ⌈/I C
+9007199254740993
+
+
+
+      ⎕PP←ZZ49PP
+
+
+
+
+
+      ⍝ Bugs41 #50: ⎕FIO[48] reads C99 hex floats (and, if the C library does, 0b
+      ⍝ binary integers) like ⎕FIO[55]
+
+
+
+
+      P←{H←⎕FIO[24] 'printf "',(2⊃⍵),'"' ◊ Z←(1⊃⍵) ⎕FIO[48] H ◊ Z⊣⎕FIO[25] H}
+
+
+
+
+      P '%f%f' '0x1p3'
+8
+
+
+
+      P '%f%f' '0x1f z'
+31
+
+
+
+      P '%f' '0x1.8p1'
+3
+
+
+
+      (P '%i%s' '0b1 2')≡'%i%s' ⎕FIO[55] '0b1 2'
+1
+
+
+
+
+      ⍝ Bugs41 #51: a ⎕PLOT member attribute beyond the int range is a DOMAIN ERROR
+      ⍝ (like the string form), not taken modulo 2⋆32
+
+
+
+
+      PA.gui_driver←'ASCII' ◊ PA.terminal_rows←4294967303 ◊ PA.terminal_cols←20
+
+
+
+
+      Z←PA ⎕PLOT 1 2 3 4
+DOMAIN ERROR+
+      Z←PA ⎕PLOT 1 2 3 4
+        ^  ^
+
+      )MORE
+A ⎕PLOT B: integer value out of range in attribute A.terminal_rows
+
+
+
+      )SIC
+
+
+
+
+      )ERASE PA
+
+
+
+
+
+      ⍝ Bugs41 #52: resuming a VALUE ERROR of a member re-evaluates the statement
+
+
+
+
+      )ERASE Q
+
+
+
+
+      Q.a+4
+VALUE ERROR+
+      Q.a+4
+      ^
+
+      Q.a←3
+
+
+
+
+      →⍳0
+7
+
+
+
+      X←Q.b.c
+VALUE ERROR+
+      X←Q.b.c
+        ^
+
+      Q.b.c←7
+
+
+
+
+      →⍬
+
+
+
+
+      X
+7
+
+
+
+      Q.zz+4
+VALUE ERROR+
+      Q.zz+4
+      ^
+
+      Q.zz←3
+
+
+
+
+      →⍬
+7
+
+
+
+      ⎕FX 'Z←ZZ52F' 'Z←R52.a+4'
+ZZ52F
+
+
+
+      ZZ52F
+VALUE ERROR+
+ZZ52F[1]  Z←R52.a+4
+            ^
+
+      R52.a←3
+
+
+
+
+      →⍬
+7
+
+
+
+      )ERASE Q R52
+
+
+
+
+      ⍝ Bugs41 #53: resuming a VALUE ERROR of an indexed name left of a dyadic function
+
+
+
+
+      X53[1]+1
+VALUE ERROR+
+      X53[1]+1
+      ^
+
+      X53←5 6
+
+
+
+
+      →⍳0
+6
+
+
+
+      -V53[1]⌈9
+VALUE ERROR+
+      -V53[1]⌈9
+       ^
+
+      V53←5 6
+
+
+
+
+      →⍬
+¯9
+
+
+
+      QQ53[2]⊂1 2
+VALUE ERROR+
+      QQ53[2]⊂1 2
+      ^
+
+      QQ53←3 1
+
+
+
+
+      →⍬
+ 1 2 
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #56: a ∇-editor DEFN ERROR leaves the error of a suspended function
+      ⍝ alone (and shows the prompt, not PROMPT)
+
+
+
+
+      ⎕FX 'Z←ZZ56F B' 'Z←B÷0'
+ZZ56F
+
+
+
+      ZZ56F 1
+DOMAIN ERROR
+ZZ56F[1]  Z←B÷0
+            ^^
+
+      ∇FOO 2
+DEFN ERROR+
+      ∇FOO 2
+           ^
+
+      )SIS
+ZZ56F[1]  Z←B÷0
+            ^^
+*  ZZ56F 1
+   ^
+      ⎕EM
+DOMAIN ERROR   
+ZZ56F[1]  Z←B÷0
+            ^^ 
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #60: (∊F V)←X keeps the fill positions of an over-take or expand (and
+      ⍝ of ⊃) as non-storing positions, like (,F V)←X
+
+
+
+
+      V←1 2 3 ◊ (∊1 0 1 1\V)←10 20 30 40 ◊ V
+10 30 40
+
+
+
+      V←1 2 3 ◊ (∊1 0 1 1\V)←10 20 30 ◊ V
+LENGTH ERROR+
+      (ϵ1 0 1 1\V)←10 20 30
+      ^           ^
+
+      V←1 2 3 ◊ (∊5↑V)←10 20 30 40 50 ◊ V
+10 20 30
+
+
+
+      V←(1 2)(3 4 5) ◊ (∊⊃V)←10 20 30 40 50 60 ◊ V
+ 10 20  40 50 60 
+
+
+
+      V←(1 2 3)(4 5)(6) ◊ (∊⊃V)←9 ◊ V
+ 9 9 9  9 9  9 
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #64: for non-conforming items the fill of A+B, B+A, A+¨B, and A∘.+B
+      ⍝ is the item of the empty argument
+
+
+
+
+      A←0⍴⊂⍬ ◊ B←⊂1 2
+
+
+
+
+      Z←A+B ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂0⍴0)
+
+
+
+      Z←B+A ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂0⍴0)
+
+
+
+      Z←A+¨B ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂0⍴0)
+
+
+
+      Z←A∘.+B ◊ 2 ⎕TF 'Z'
+Z←0⍴(⊂0⍴0)
+
+
+
+      A←0⍴⊂0 3⍴0 ◊ B←⊂2 3⍴1 ◊ (A+B)≡A+¨B
+1
+
+
+
+
+      ⍝ Bugs41 #65: the valence check of f¨ explains itself in )MORE
+
+
+
+
+      /¨1 2
+VALENCE ERROR+
+      /¨1 2
+      ^
+
+      )MORE
+f¨ B: / has no monadic form
+
+
+
+      ⍬ ⎕UCS¨⍬
+VALENCE ERROR+
+      ⍬⎕UCS¨⍬
+      ^^
+
+      )MORE
+A f¨ B: ⎕UCS has no dyadic form
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #66: one + (after the error name) in nested ⍎¨ and in ⎕EC of ⍎¨
+
+
+
+
+      ⍎¨'1' '⍎¨''2'' ''1 2+1 2 3'''
+LENGTH ERROR+ in macro ⍎¨ in macro ⍎¨
+      ⍎¨'1' '⍎¨''2'' ''1 2+1 2 3'''
+      ^
+
+      (R E M)←⎕EC '⍎¨''2'' ''1 2+1 2 3''' ◊ E ◊ M[1;]
+5 3
+LENGTH ERROR+ in macro ⍎¨                                    
+
+
+      (R E M)←⎕EC '⍎¨''2'' ''(1 2''' ◊ E ◊ M[1;]
+2 2
+SYNTAX ERROR+ in macro ⍎¨  
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #67: ,[X] and ⍪[X] with an integral real part and a small imaginary
+      ⍝ part are an AXIS ERROR (like ⌽[X]), not a lamination
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+      ⍴M,[2J1.5E¯10]M
+AXIS ERROR+
+      ⍴M,[2J1.5E¯10]M
+       ^^
+
+      )MORE
+A,[X]B: X is not integral
+
+
+
+      ⍴,[2J1.5E¯10]M
+AXIS ERROR+
+      ⍴,[2J1.5E¯10]M
+       ^
+
+      ⍴M,[1J1E¯20]M
+4 3
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #68: complex A|B at ⎕CT←0 keeps an exact residue in a small component
+
+
+
+
+      ⎕CT←0
+
+
+
+
+      1|1000.5J5000000000000000
+0.5
+
+
+
+      0J1|5000000000000000J1000.5
+0J0.5
+
+
+
+      1|3000000000000000.5J3000000000000000.5
+¯0.5J0.5
+
+
+
+      0J1E¯5|0J1E15
+0
+
+
+
+      ⎕CT←1E¯13
+
+
+
+
+
+      ⍝ Bugs41 #70: a selective specification into a scalar variable does not search
+      ⍝ all values (it took about 19 ms per 1E7 cells in the workspace)
+
+
+
+
+      ⎕FX 'ZZ70 N;I;W' 'I←0 ◊ W←5' 'LP: (,W)←I ◊ →(N>I←I+1)/LP'
+ZZ70
+
+
+
+      ZZ70BIG←1E7⍴0.5
+
+
+
+
+      T←⎕AI[3] ◊ ZZ70 200 ◊ (⎕AI[3]-T)<1000
+1
+
+
+
+      )ERASE ZZ70BIG ZZ70
+
+
+
+
+
+      ⍝ Bugs41 #74: (∘.g)¨ and (f.g)¨ with a defined g are VALENCE ERRORs (dyadic only)
+
+
+
+
+      ⎕FX 'Z←A ZZ74D B' 'Z←A+B'
+ZZ74D
+
+
+
+      ⍴(∘.ZZ74D)¨⍬
+VALENCE ERROR+
+      ⍴(∘.ZZ74D)¨⍬
+       ^
+
+      ⍴(∘.{⍺×⍵})¨''
+VALENCE ERROR+
+      ⍴(∘.{⍺×⍵})¨''
+       ^
+
+      ⍴(+.ZZ74D)¨⍬
+VALENCE ERROR+
+      ⍴(+.ZZ74D)¨⍬
+       ^
+
+      ⍴({⍺+⍵}.×)¨0⍴⊂1 2
+VALENCE ERROR+
+      ⍴({⍺+⍵}.×)¨0⍴⊂1 2
+       ^
+
+      )SIC
+
+
+
+
+      ⍝ Bugs41 #75: a labelled line with f/⍤y is accepted by ⎕FX
+
+
+
+
+      ⎕FX 'Z←ZZ75F B' 'L:⌿⍤0 B'
+ZZ75F
+
+
+
+      ⎕FX 'Z←ZZ75H B' 'L:Z←+/⍤1 B'
+ZZ75H
+
+
+
+      ZZ75H 2 3⍴⍳6
+6 15
+
+
+
+
+      ⍝ Bugs41 #73: an error inside ⎕EC does not change ⎕ET (LRM p. 280)
+
+
+
+
+      (1
+Unbalanced left parenthesis+
+      (1
+      ^
+
+      ⎕ET
+2 2562
+
+
+
+      X←⎕EC 'QQQ' ◊ 2⊃X
+3 1
+
+
+
+      ⎕ET
+2 2562
+
+
+
+      X←⎕EC '⎕ES 5 7' ◊ 2⊃X
+5 7
+
+
+
+      ⎕ET
+2 2562
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #76: ⎕R after an error before the first reduction does not depend on
+      ⍝ the previous statement
+
+
+
+
+      7 ◊ ZZ76,0
+7
+VALUE ERROR+
+      ZZ76,0
+      ^
+      ⎕R
+VALUE ERROR+
+      ⎕R
+      ^
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #77: the )MORE of ,[X]B with a vector X shows X as written
+
+
+
+
+      M←2 3⍴⍳6 ◊ M3←2 3 4⍴⍳24 ◊ I←¯9223372036854775807-1
+
+
+
+
+      ,[2 1]M
+AXIS ERROR+
+      ,[2 1]M
+      ^
+
+      )MORE
+,[X]B: X = 2 1 is not ascending (expecting consecutive axes 1..2 listed low to high)
+
+
+
+      ,[1 3]M3
+AXIS ERROR+
+      ,[1 3]M3
+      ^
+
+      )MORE
+,[X]B: X = 1 3 is not contiguous (expecting consecutive axes 1..3)
+
+
+
+      ,[I,1]M
+AXIS ERROR+
+      ,[I,1]M
+      ^
+
+      )MORE
+,[X]B: X = ¯9223372036854775808 is not a valid axis of B (expecting 1≤X<3)
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #78: the )MORE text of a ⎕FX that returned a line number is not shown
+      ⍝ for a later VALUE ERROR (Offending symbol)
+
+
+
+
+      ⎕FX 'Z←ZZ78F B' 'Z←QQ78'
+ZZ78F
+
+
+
+      ZZ78F ⎕FX 'Z←G' 'Z←⍳¯1;2'
+VALUE ERROR+
+ZZ78F[1]  Z←QQ78
+            ^
+
+      )MORE
+Offending symbol: QQ78
+
+
+
+      )SIC
+
+
+
+
+      QQ78,⎕FX 'Z←G' 'Z←⍳¯1;2'
+VALUE ERROR+
+      QQ78,⎕FX 'Z←G' 'Z←⍳¯1;2'
+      ^
+
+      )MORE
+Offending symbol: QQ78
+
+
+
+      ⎕FX 'Z←G' 'Z←⍳¯1;2'
+2
+
+
+
+      )MORE
+Error in function body in function line [1] of:
+[0] Z←G
+[1] Z←⍳¯1;2
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #79: ⎕RE: a doubled }} in a {…} callout string does not end it
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(?C{x}})y})(b))' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴'ab' (1⍴'b'))
+
+
+
+
+      ⍝ Bugs41 #80: ⌹[11] reads integer coefficients exactly (not through a double)
+
+
+
+
+      ZZ80PP←⎕PP ◊ ⎕PP←20
+
+
+
+
+      ⌹[11] '9007199254740993'
+9007199254740993
+
+
+
+      ⌹[11] ⌹[7] 1 1234567890123456789
+1 1234567890123456789
+
+
+
+      ⌹[11] '¯9007199254740993'
+¯9007199254740993
+
+
+
+      ⎕PP←ZZ80PP
+
+
+
+
+
+      ⍝ Bugs41 #81: ⌹[11]: an imaginary part without a real part is malformed
+
+
+
+
+      ⌹[11] 'J4'
+DOMAIN ERROR+
+      ⌹[11]'J4'
+      ^
+
+      )MORE
+⌹[11]B: malformed term in polynomial B: J4
+
+
+
+      ⌹[11] '¯J4'
+DOMAIN ERROR+
+      ⌹[11]'¯J4'
+      ^
+
+      ⌹[11] '0J4x'
+0 0J4
+
+
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #82: A ⌹[11] B with a plain string A of several characters: A is one
+      ⍝ name if every name in B is A, otherwise A is a list of one-character names
+
+
+
+
+      'XY' ⌹[11] 'XY' ⌹[7] 2 3⍴⍳6
+1 2 3
+4 5 6
+
+
+      'xyz' ⌹[11] ⌹[7] 2 2 2⍴⍳8
+1 2
+3 4
+
+5 6
+7 8
+
+
+
+
+
+      ⍝ Bugs41 #84: 0○B and ¯4○B near |B| = 1 keep all digits
+
+
+
+
+      ZZ84PP←⎕PP ◊ ⎕PP←16
+
+
+
+
+      0○0.99999999
+0.0001414213562390603
+
+
+
+      ¯4○1.00000001
+0.0001414213561611208
+
+
+
+      ¯4○0.99999999
+0J0.0001414213562390603
+
+
+
+      ⎕PP←ZZ84PP
+
+
+
+
+
+      ⍝ Bugs41 #85: complex A÷B with a subnormal component in A is as exact as the
+      ⍝ real division
+
+
+
+
+      ZZ85PP←⎕PP ◊ ⎕PP←16
+
+
+
+
+      0J4.9E¯324÷1E¯300
+0J4.940656458412465E¯24
+
+
+
+      0J4.9E¯324÷0J1E¯300
+4.940656458412465E¯24
+
+
+
+      0J4.9E¯324÷1E¯310
+0J4.940656458412481E¯14
+
+
+
+      ⎕PP←ZZ85PP
+
+
+
+
+
+      ⍝ Bugs41 #88: )VARS from-to checks to also for a name that starts with from
+
+
+
+
+      )ERASE A B
+
+
+
+
+      Abc←1 ◊ Acd←2 ◊ Bx←3 ◊ Cde←4
+
+
+
+
+      )VARS A-Ab
+Abc
+
+
+
+      )VARS C-A
+
+
+
+
+      )VARS Ac-B
+Acd     Bx
+
+
+
+      )ERASE Abc Acd Bx Cde
+
+
+
+
+
+      )SIC
+
+
+
+

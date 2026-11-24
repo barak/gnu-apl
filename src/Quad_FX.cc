@@ -84,9 +84,12 @@ UTF8_string creator("⎕FX");
              }
              /* no break */
         case 1:   // format 2a.
-             eprops[0] = A.get_int_value(0);
-             if (eprops[0] < 0)   DOMAIN_ERROR;
-             if (eprops[0] > 1)   DOMAIN_ERROR;
+             {
+               // check before the narrowing to int (Bugs40 #63)
+               const APL_Integer ep = A.get_near_int(0);
+               if (ep < 0 || ep > 1)   DOMAIN_ERROR;
+               eprops[0] = ep;
+             }
              eprops[3] = eprops[2] = eprops[1] = eprops[0];
              break;
 
@@ -100,9 +103,9 @@ UTF8_string creator("⎕FX");
         case 4:   // format 2c.
              loop(e, 4)
                 {
-                  eprops[e] = A.get_int_value(e);
-                  if (eprops[e] < 0)   DOMAIN_ERROR;
-                  if (eprops[e] > 1)   DOMAIN_ERROR;
+                  const APL_Integer ep = A.get_near_int(e);   // Bugs40 #63
+                  if (ep < 0 || ep > 1)   DOMAIN_ERROR;
+                  eprops[e] = ep;
                 }
              break;
 
@@ -307,6 +310,10 @@ UserFunction * fun =
 
    if (fun == 0)   // UserFunction::fix() dailed
       {
+        // its )MORE text explains the result, but belongs to no error
+        // (Bugs41 #78)
+        //
+        Workspace::more_is_info = true;
         Value_P Z = IntScalar(error_line + Workspace::get_IO(), LOC);
         return Token(TOK_APL_VALUE1, Z);
       }

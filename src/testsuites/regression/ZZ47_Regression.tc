@@ -1,0 +1,26 @@
+
+      ⍝ Hans-Peter Sorge, Aug-16-2018
+
+∇qio_test
+ ⎕IO
+∇
+
+      ⎕IO←0
+      qio_test
+0
+      ⍎'qio_test'
+0
+      ⍎¨'qio_test' 'qio_test'
+0
+0
+
+      ⎕IO←1
+      qio_test
+1
+      ⍎'qio_test'
+1
+      ⍎¨'qio_test' 'qio_test'
+1
+1
+
+

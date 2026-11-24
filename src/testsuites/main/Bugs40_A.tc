@@ -1,0 +1,372 @@
+⍝ Bugs40_A.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs40 severity A items (#1 - #17): crashes, hangs,
+⍝ assertions, and session loss (workspace items are in
+⍝ Bugs40_Workspace.tc, ⌹[X] items in Bugs40_MX.tc).
+
+
+
+
+      ⍝ Bugs40 #1: a selective specification that makes a nested scalar item
+      ⍝ simple collapses the PointerCell of its parent (⊂9 ≡ 9)
+
+
+
+
+      N←(⊂⊂1 2) 5 ⋄ (1↑↑N)←9 ⋄ (N≡9 5) (≡N) (,N)
+ 1 1  9 5 
+
+
+
+      10 ⎕CR 'N'
+ N←9 5 
+
+
+
+      N←⊂⊂1 2 3 ⋄ (1↑↑N)←9 ⋄ (≡N) (N≡9)
+0 1
+
+
+
+      2 ⎕TF 'N'
+N←9
+
+
+
+      N←(⊂⊂1 2) 5 ⋄ (,↑N)←9 ⋄ N≡9 5
+1
+
+
+
+      N←(⊂⊂1 2) 5 ⋄ (⌽↑N)←9 ⋄ N≡9 5
+1
+
+
+
+      N←(⊂⊂1 2) 5 ⋄ (1↑⊃N)←9 ⋄ N≡9 5
+1
+
+
+
+      N←(⊂1 2 3)(4 5) ⋄ (↑↑N)←9 ⋄ N≡9(4 5)
+1
+
+
+
+      2 ⎕TF 'N'
+N←2⍴9 (4 5)
+
+
+
+      N←(⊂1 2 3)(4 5) ⋄ (⊃↑N)←9 ⋄ N≡9(4 5)
+1
+
+
+
+      N←(⊂⊂1 2 3) 5 ⋄ (1↑1⊃N)←9 ⋄ N≡9 5
+1
+
+
+
+      N←(⊂1 2 3)(4 5) ⋄ (1 ⍬⊃N)←9 ⋄ N≡9(4 5)
+1
+
+
+
+      N←(⊂1 2 3)(4 5) ⋄ (⊃1⊃N)←9 ⋄ N≡9(4 5)
+1
+
+
+
+      N←⊂⊂1 2 3 ⋄ (↑¨N)←9 ⋄ (N≡9) (≡N)
+1 0
+
+
+
+      N←⊂⊂1 2 3 ⋄ (⊃¨N)←9 ⋄ (N≡9) (≡N)
+1 0
+
+
+
+      N←⊂⊂1 2 3 ⋄ (,¨N)←9 ⋄ (N≡9) (≡N)
+1 0
+
+
+
+      2 ⎕TF 'N'
+N←9
+
+
+
+      Z←⊂⊂1 2 ⋄ (↑↑Z)←1 ⋄ (≡Z) (Z≡1) (Z,Z)
+ 0 1  1 1 
+
+
+
+      B←(⊂⊂1 2),5 ⋄ (↑↑B)←7 ⋄ B≡7 5
+1
+
+
+
+      2 ⎕TF 'B'
+B←7 5
+
+
+
+      V←(1 2)(3 4) ⋄ (↑⊃V)←9 ⋄ V
+ 9 2  3 4 
+
+
+
+      K←'RED' 'WHITE' 'BLUE' ⋄ (↑K)←'YELLOW' ⋄ K
+ YELLOW WHITE BLUE 
+
+
+
+      ⍝ Bugs40 #3: resuming a SYNTAX ERROR restarts the statement from its
+      ⍝ beginning (the tokens already read are dropped), also in a function
+
+
+
+
+      X←+⍣2
+SYNTAX ERROR+
+      X←+⍣2
+          ^
+
+      →⍬
+SYNTAX ERROR+
+      X←+⍣2
+          ^
+
+      X
+VALUE ERROR+
+      X
+      ^
+
+      )SIC
+
+
+
+
+      Y←'old'
+
+
+
+
+      Y←⌽⍤0
+SYNTAX ERROR+
+      Y←⌽⍤0
+          ^
+
+      →⍬
+SYNTAX ERROR+
+      Y←⌽⍤0
+          ^
+
+      Y
+old
+
+
+
+      )SIC
+
+
+
+
+      W←'old'
+
+
+
+
+      W←+⍣2 ⋄ 'second'
+SYNTAX ERROR+
+      W←+⍣2
+          ^
+
+      →⍬
+SYNTAX ERROR+
+      W←+⍣2
+          ^
+
+      W
+old
+
+
+
+      )SIC
+
+
+
+
+      ⎕FX 'Bugs40_F3' 'A←1' '1+(+/)' 'B←2'
+Bugs40_F3
+
+
+
+      Bugs40_F3
+SYNTAX ERROR+
+Bugs40_F3[2]  1+(+/)
+                   ^
+
+      →⍬
+SYNTAX ERROR+
+Bugs40_F3[2]  1+(+/)
+                   ^
+
+      →⍳0
+SYNTAX ERROR+
+Bugs40_F3[2]  1+(+/)
+                   ^
+
+      )SI
+Bugs40_F3[2]
+*
+
+
+      ⎕LC
+2
+
+
+
+      )SIC
+
+
+
+
+      {1+(+/)}0
+SYNTAX ERROR+
+λ1[1]  λ←1+(+/)
+              ^
+
+      →⍬
+SYNTAX ERROR+
+λ1[1]  λ←1+(+/)
+              ^
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #6: while the SI depth limit is cleared, a resumed runaway
+      ⍝ recursion stops again after as many further levels as the limit had
+
+
+
+
+      ⎕SYL[1;2]←20
+
+
+
+
+      ∇Bugs40_F6 N
+      Bugs40_F6 N+1
+      ∇
+
+
+
+
+      Bugs40_F6 1
+SYSTEM LIMIT (SI depth)+
+Bugs40_F6[1]  Bugs40_F6 N+1
+              ^
+
+      ⍴⎕LC
+20
+
+
+
+      ⎕SYL[1;2]
+0
+
+
+
+      →⍬
+SYSTEM LIMIT (SI depth)+
+Bugs40_F6[1]  Bugs40_F6 N+1
+              ^
+
+      ⍴⎕LC
+40
+
+
+
+      )SIC
+
+
+
+
+      ⎕SYL[1;2]
+20
+
+
+
+      ⎕SYL[1;2]←100000
+
+
+
+
+      ⍝ Bugs40 #9: a system function without a result as the operand of ⍣, /, \,
+      ⍝ or ∘. is a VALUE ERROR (except for the last iteration of ⍣)
+
+
+
+
+      (⎕ES⍣2) ''
+VALUE ERROR+
+      (⎕ES⍣2)''
+      ^
+
+      )MORE
+⎕ES⍣: ⎕ES returned no result
+
+
+
+      ⎕ES/ ⍬ ⍬
+VALUE ERROR+
+      ⎕ES/⍬ ⍬
+      ^
+
+      )MORE
+⎕ES returned no result (as the operand of / or \)
+
+
+
+      ⎕ES\ ⍬ ⍬
+VALUE ERROR+
+      ⎕ES\⍬ ⍬
+      ^
+
+      ⍬ ⍬ ∘.⎕ES ⍬ ⍬
+VALUE ERROR+
+      ⍬ ⍬∘.⎕ES⍬ ⍬
+      ^
+
+      )MORE
+∘.⎕ES: ⎕ES returned no result
+
+
+
+      X←⍬ ⍬ ∘.⎕ES ⍬ ⍬
+VALUE ERROR+
+      X←⍬ ⍬∘.⎕ES⍬ ⍬
+        ^
+
+      (⎕ES⍣1) ''
+
+
+
+
+      Z←(⎕ES⍣1) ''
+VALUE ERROR+
+      Z←(⎕ES⍣1)''
+        ^
+
+      )SIC
+
+
+
+
+      )SIC
+

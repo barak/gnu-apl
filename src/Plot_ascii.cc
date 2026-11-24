@@ -128,7 +128,7 @@ public:
    ASCII_canvas(int h, int w)
     : H(h),
       W(w),
-      points(new ASCII_Point[h*w + 1])
+      points(new ASCII_Point[size_t(h)*size_t(w) + 1])
       {}
 
    ~ASCII_canvas()
@@ -157,13 +157,13 @@ protected:
       {
          Assert(x >= 0);   Assert(x < W);
          Assert(y >= 0);   Assert(y < H);
-         ASCII_Point & point = points[x + y * W];
+         ASCII_Point & point = points[x + size_t(y) * W];
          point.uni = uni;
          point.color = color;
       }
 
    const ASCII_Point & get_point(int x, int y) const
-      { return points[x + y * W]; }
+      { return points[x + size_t(y) * W]; }
 };
 //════════════════════════════════════════════════════════════════════════════
 void
@@ -300,8 +300,11 @@ const VT100_color color = round_color(lp.get_point_color());
         const double  x = (Vx - min_X) * scale_X;
         const double  y = (Vy - min_Y) * scale_Y;
 
-        Assert(x >= 0.0);   Assert(x < W2);   // x fits into frame
-        Assert(y >= 0.0);   Assert(y < H2);   // y fits into frame
+        // a point outside a user-given range (rangeX_min etc.) is not
+        // drawn (Bugs39 #15). The negated tests also skip NaNs.
+        //
+        if (!(x >= 0.0 && x < W2))   continue;   // x outside the frame
+        if (!(y >= 0.0 && y < H2))   continue;   // y outside the frame
 
         // round z, round y, and mirror y
         //
@@ -401,6 +404,20 @@ const int W = w_props.get_terminal_cols();
    // worth of values converge before the canvas is built.
    //
    if (H < 3 || W < 3)   DOMAIN_ERROR;
+
+   // the canvas and the result (3×H×W) must fit into the workspace. The
+   // int product H×W overflowed for e.g. 65536×65537 (Bugs39 #16).
+   //
+   // (H×W ≤ (2⋆31)⋆2, so 3×H×W can overflow a ShapeItem: check first,
+   // Bugs40 #64)
+   //
+   if (ShapeItem(H) * W > LARGE_INT / 3 ||
+       Value::check_WS_FULL("do_plot_ASCII()", 3 * ShapeItem(H) * W, LOC))
+      {
+        MORE_ERROR() << "⎕PLOT: the ASCII canvas (terminal_rows × "
+                        "terminal_cols) is too large";
+        WS_FULL;
+      }
 
 ASCII_canvas ctx(H, W);
 

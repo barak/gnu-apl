@@ -83,7 +83,7 @@ make DESTDIR=%{buildroot} install
 %{_libdir}/apl/wslib5/
 
 %{_sysconfdir}/gnu-apl.d/parallel_thresholds
-%{_sysconfdir}/gnu-apl.d/preferences
+%config(noreplace) %{_sysconfdir}/gnu-apl.d/preferences
 %{_sysconfdir}/gnu-apl.d/keyboard1.txt
 
 %doc AUTHORS

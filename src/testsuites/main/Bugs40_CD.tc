@@ -1,0 +1,1383 @@
+⍝ Bugs40_CD.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs40 severity C and D items (#53 - #105): wrong
+⍝ errors, diagnostics, leaks, and minor items.
+
+
+
+
+      ⍝ Bugs40 #56: the valence of a monadic-only or dyadic-only system function
+      ⍝ is checked up front, also for empty arguments and derived operands
+
+
+
+
+      ⍴⍬∘.⎕UCS⍬
+VALENCE ERROR+
+      ⍴⍬∘.⎕UCS⍬
+       ^^
+
+      ⍴(0 3⍴0)+.⎕UCS 3 0⍴0
+VALENCE ERROR+
+      ⍴(0 3⍴0)+.⎕UCS 3 0⍴0
+       ^      ^
+
+      ⍴⍬∘.(⎕UCS⍨)⍬
+VALENCE ERROR+
+      ⍴⍬∘.(⎕UCS⍨)⍬
+       ^^
+
+      ⍴(⎕TF⍣1)¨''
+VALENCE ERROR+
+      ⍴(⎕TF⍣1)¨''
+       ^
+
+      ⍴⍬(⎕UCS⍣1)¨⍬
+VALENCE ERROR+
+      ⍴⍬(⎕UCS⍣1)¨⍬
+       ^^
+
+      ⎕UCS/5
+VALENCE ERROR+
+      ⎕UCS/5
+      ^
+
+      (⎕UCS⍨)/5
+VALENCE ERROR+
+      (⎕UCS⍨)/5
+      ^
+
+      ⍴⎕TF¨''
+VALENCE ERROR+
+      ⍴⎕TF¨''
+       ^
+
+      ⍴⎕UCS¨⍬
+0
+
+
+
+      ⍴⍬∘.⎕CR⍬
+0 0
+
+
+
+      ⍝ Bugs40 #57: the inverse ⎕TF of ⎕X with a constant axis ,[1] gives ''
+
+
+
+
+      ⎕FX 'Z←A FW B' 'Z←A,[1]B'
+FW
+
+
+
+      (2 2⍴7) FW 1 2 3
+LENGTH ERROR+
+FW[1]  Z←A,[1]B
+         ^^
+
+      ⍴2 ⎕TF '⎕X←1'
+0
+
+
+
+      ⍴1 ⎕TF 'N⎕X 0 1'
+0
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #58: (f ↑V)←C for an empty V is a no-op (V has no first item)
+      ⍝ if C conforms to f ↑V; the prototype of V stays typical
+
+
+
+
+      V←0⍴⊂1 2 3
+
+
+
+
+      (1↑↑V)←9
+
+
+
+
+      (↑V)←9
+
+
+
+
+      (↑V)←7 8
+
+
+
+
+      V≡0⍴⊂1 2 3
+1
+
+
+
+      ↑V
+0 0 0
+
+
+
+      (1↑↑V)←7 8
+LENGTH ERROR+
+      (1↑↑V)←7 8
+      ^     ^
+
+
+
+      E←''
+
+
+
+
+      (↑E)←'abc'
+
+
+
+
+      E≡''
+1
+
+
+
+      (1↑¨V)←9 ◊ (1↓¨V)←9 ◊ (1⊃¨V)←9 ◊ V≡0⍴⊂1 2 3
+1
+
+
+
+      W←,⊂1 2 3
+
+
+
+
+      (⍬↑¨W)←9 ◊ W≡,⊂1 2 3
+1
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #63: integer arguments that do not fit the C parameter are a
+      ⍝ DOMAIN ERROR (no truncation to int)
+
+
+
+
+      S←⎕FIO[32] 2
+
+
+
+
+      (4294967297 2 1) ⎕FIO[47] S
+DOMAIN ERROR+
+      4294967297 2 1 ⎕FIO[47]S
+      ^              ^
+
+      )MORE
+⎕FIO: the argument item 4294967297 is out of range (expecting ¯2147483648 to 2147483647)
+
+
+
+      ⎕FIO[4] S
+0
+
+
+
+      ⎕FIO[40] ⍬ ⍬ (,4294967296) 0
+DOMAIN ERROR
+      ⎕FIO[40]⍬ ⍬(,4294967296)0
+      ^
+
+      4294967297 ⎕FX 'Z←G7' 'Z←1'
+DOMAIN ERROR
+      4294967297 ⎕FX 'Z←G7' 'Z←1'
+      ^          ^
+
+      (2⋆32) ⎕FIO[20] 'B40_m1'
+DOMAIN ERROR+
+      (2⋆32)⎕FIO[20]'B40_m1'
+      ^     ^
+
+      )MORE
+⎕FIO: the argument item 4294967296 is out of range (expecting 0 to 4095)
+
+
+
+      ⎕FIO[32] 4294967298
+DOMAIN ERROR+
+      ⎕FIO[32]4294967298
+      ^
+
+      (1001+2⋆32) ⎕SVO 'Y'
+DOMAIN ERROR+
+      (1001+2⋆32)⎕SVO 'Y'
+      ^          ^
+
+      )MORE
+A ⎕SVO B: bad processor number 4294968297
+
+
+
+      ⍝ Bugs40 #64: a ⎕PLOT ASCII canvas near 2⋆31 × 2⋆31 is checked without overflow
+
+
+
+
+      Z←('gui_driver: ASCII' 'terminal_rows: 2147483647' 'terminal_cols: 2147483647') ⎕PLOT 1 2 3 4
+WS FULL+
+      Z←'gui_driver: ASCII' 'terminal_rows: 2147483647' 'terminal_cols: 2147483647' ⎕PLOT 1 2 3 4
+        ^                                                                           ^
+
+      )MORE
+⎕PLOT: the ASCII canvas (terminal_rows × terminal_cols) is too large
+
+
+
+      ⍝ Bugs40 #65: W←f(MV 5) with a function MV without result is a VALUE ERROR
+
+
+
+
+      ⎕FX 'MV B' '⍝ monadic, no result'
+MV
+
+
+
+      W←-(MV 5)
+VALUE ERROR+
+      W←-(MV 5)
+          ^
+
+      )MORE
+No assignment to result variable Z in e.g. ∇Z←... ?
+
+
+
+      W←{-⍵}(MV 5)
+VALUE ERROR+
+      W←{-⍵}(MV 5)
+             ^
+
+      Z←{⍵+7}(⌿5)
+SYNTAX ERROR+
+      Z←{⍵+7}(⌿5)
+             ^^
+
+      )MORE
+invalid expression in parentheses
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #66: an older parse error does not resurface in ⎕ET after a VALUE
+      ⍝ ERROR of an undefined name or a ⎕ES error
+
+
+
+
+      )SIC
+
+
+
+
+      (1
+Unbalanced left parenthesis+
+      (1
+      ^
+
+      QQQ66
+VALUE ERROR+
+      QQQ66
+      ^
+
+      →
+
+
+
+
+      ⎕ET
+0 0
+
+
+
+      (1
+Unbalanced left parenthesis+
+      (1
+      ^
+
+      ⎕FX 'F66' '⎕ES ''MINE'''
+F66
+
+
+
+      F66
+MINE
+      F66
+      ^
+
+      →
+
+
+
+
+      ⎕ET
+0 0
+
+
+
+      ⍝ Bugs40 #68: ⎕EC of a statement that cannot be fixed keeps the caller's ⎕ET
+
+
+
+
+      '5'⎕EA'1÷0' ⋄ X←⎕EC'(1 2' ⋄ ⎕ET
+5
+5 4
+
+
+      2⊃X
+2 2
+
+
+
+      '5'⎕EA'1÷0' ⋄ X←⎕EC'{→0}' ⋄ ⎕ET
+5
+5 4
+
+
+      ⍝ Bugs40 #67: A/B with a vector A that does not fit a long B is a LENGTH ERROR
+
+
+
+
+      ⍴0 1/0 1E15⍴0
+LENGTH ERROR+
+      ⍴0 1/0 1E15⍴0
+       ^  ^
+
+      ⍴1 2/[1]1E15 0⍴0
+LENGTH ERROR+
+      ⍴1 2/[1]1E15 0⍴0
+       ^  ^
+
+      ⍝ Bugs40 #70: ⎕RVAL accepts near-integers in all integer arguments
+
+
+
+
+      F←0.5×2
+
+
+
+
+      OLD←1 ⎕RVAL 0 0 (2×F)
+
+
+
+
+      ⍴⍴⎕RVAL 0
+2
+
+
+
+
+      OLD←1 ⎕RVAL OLD
+
+
+
+
+      ⍴⍴⎕RVAL 0
+0
+
+
+
+
+      ⍴⎕RVAL 1 (3×F)
+3
+
+
+
+
+      OLD←2 ⎕RVAL 2 3.5
+DOMAIN ERROR
+      OLD←2 ⎕RVAL 2 3.5
+          ^ ^
+
+
+
+
+      ⍝ Bugs40 #71: replicate and expand with axis as the operand of ¨
+
+
+
+
+      M←2 3⍴⍳6
+
+
+
+
+      1 0⌿[1]¨M M
+ 1 2 3     
+ 4 5 6     
+
+
+      2/[2]¨M M
+ 1 1 2 2 3 3   1 1 2 2 3 3 
+ 4 4 5 5 6 6   4 4 5 5 6 6 
+
+
+      1 0 1\[2]¨M M
+LENGTH ERROR+
+      1 0 1\[2]¨M M
+      ^    ^
+
+      +/[1]¨M M
+ 5 7 9  5 7 9 
+
+
+
+      ⍝ Bugs40 #74: parenthesized right operand of ⍤ / ⍣ followed by an argument
+
+
+
+
+      -⍤(0) 5
+¯5
+
+
+
+      -⍤(0) 1 2
+¯1 ¯2
+
+
+
+      ⌽⍤(1) 1 2 3
+3 2 1
+
+
+
+      {⍵,0}⍤(0) 1 2
+1 0
+2 0
+
+
+      ⌽⍤(1) 2 3⍴⍳6
+3 2 1
+6 5 4
+
+
+      ⌽⍤(0 1) 2 3⍴⍳6
+3 2 1
+6 5 4
+
+
+      10 +⍤(0) 1 2
+11 12
+
+
+
+      ×⍣(2) 3
+1
+
+
+
+      (1) 2 3⍴⍳6
+1 2 3
+4 5 6
+
+
+      V74←2 ◊ -⍣1 V74 ⌈ 5
+¯5
+
+
+
+      ⍝ Bugs40 #75: selective specification of an undefined name is a VALUE ERROR
+
+
+
+
+      (,W75)←5
+VALUE ERROR+
+      (,W75)←5
+        ^
+
+      )MORE
+selective specification of the undefined name W75
+
+
+
+      (1↑W75)←5
+VALUE ERROR+
+      (1↑W75)←5
+         ^
+
+      (⊃W75)←5
+VALUE ERROR+
+      (⊃W75)←5
+        ^
+
+      W75[1]←5
+VALUE ERROR+
+      W75[1]←5
+      ^
+
+      ⎕NC 'W75'
+0
+
+
+
+      ⍝ Bugs40 #84: 7 ⎕RVAL B with a shape item ≥ 2⋆31 (empty B)
+
+
+
+
+      7 ⎕RVAL 0 3000000000⍴0
+DOMAIN ERROR+
+      7 ⎕RVAL 0 3000000000⍴0
+      ^ ^
+
+      )MORE
+7 ⎕RVAL B: bad shape item 3000000000
+
+
+
+      7 ⎕RVAL 0 (2⋆31)⍴0
+DOMAIN ERROR+
+      7 ⎕RVAL 0(2⋆31)⍴0
+      ^ ^
+
+      B84←0 (¯1+2⋆31)⍴0 ◊ ∪(⊂⍳0),(⊂0 2147483647),⍴¨7 ⎕RVAL¨20⍴⊂B84
+    0 2147483647 
+
+
+
+      ⍝ Bugs40 #86: a near-real complex axis of A,[X]B / A⍪[X]B / ,[X]B
+
+
+
+
+      M86←2 3⍴⍳6
+
+
+
+
+      ⍴M86,[1J1E¯20]M86
+4 3
+
+
+
+      ⍴M86⍪[1J1E¯20]M86
+4 3
+
+
+
+      ⍴,[1.5J1E¯20]M86
+2 1 3
+
+
+
+      1 2,[0.5J1E¯20]3 4
+1 2
+3 4
+
+
+      ⍴M86,[1J1]M86
+AXIS ERROR+
+      ⍴M86,[1J1]M86
+       ^  ^
+
+      ⍴,[1.5J1]M86
+AXIS ERROR+
+      ⍴,[1.5J1]M86
+       ^
+
+      ⍝ Bugs40 #87: catenate of a lower-rank argument to an axis ≥ 9.2E18
+
+
+
+
+      ⍴(9200000000000000000 0⍴0)⍪0⍴0
+9200000000000000001 0
+
+
+
+      ⍴(9200000000000000000 0⍴0)⍪0
+9200000000000000001 0
+
+
+
+      ⍴(0 9200000000000000000⍴0),5
+0 9200000000000000001
+
+
+
+      ⍴(0 9223372036854775806⍴0),5
+0 9223372036854775807
+
+
+
+      ⍴(0 9223372036854775807⍴0),5
+WS FULL+
+      ⍴(0 9223372036854775807⍴0),5
+       ^                        ^
+
+      ⍝ Bugs40 #88: )MORE shows an index or axis of ¯2⋆63 as given (⎕IO=1)
+
+
+
+
+      V88←10 20 30 ◊ M88←2 3⍴⍳6 ◊ I88←¯9223372036854775807-1
+
+
+
+
+      V88[I88]←0
+INDEX ERROR+
+      V88[I88]←0
+      ^       ^
+
+      )MORE
+A[B]←C: B[1] = ¯9223372036854775808 is not a valid index for A (expecting 1≤index<4)
+
+
+
+      M88[I88;1]
+INDEX ERROR+
+      M88[I88;1]
+      ^  ^
+
+      )MORE
+A[B]: index ¯9223372036854775808 is not a valid index for axis 1 of A (expecting 1≤index<3); ⍴A is 2 3
+
+
+
+      V88[I88]
+INDEX ERROR+
+      V88[I88]
+      ^  ^
+
+      )MORE
+A[B]: B[1] = ¯9223372036854775808 is not a valid index for A (expecting 1≤index<4)
+
+
+
+      I88⊃V88
+INDEX ERROR+
+      I88⊃V88
+      ^  ^
+
+      )MORE
+A⊃B: A = ¯9223372036854775808 is not a valid index for B (expecting 1≤A<4)
+
+
+
+      (⊂1 I88)⊃M88
+INDEX ERROR+
+      (⊂1 I88)⊃M88
+      ^       ^
+
+      )MORE
+A⊃B: A[1][2] = ¯9223372036854775808 is not a valid index for axis 2 of B (expecting 1≤index<4)
+
+
+
+      ⌽[I88]M88
+AXIS ERROR+
+      ⌽[I88]M88
+      ^
+
+      )MORE
+⌽[X]B: X = ¯9223372036854775808 is not a valid axis (expecting 1≤X<3).
+
+
+
+      ⊂[I88]M88
+AXIS ERROR+
+      ⊂[I88]M88
+      ^
+
+      )MORE
+⊂[X]B: X[1] = ¯9223372036854775808 is not a valid axis (expecting 1≤X[1]<3).
+
+
+
+      ,[I88]M88
+AXIS ERROR+
+      ,[I88]M88
+      ^
+
+      )MORE
+,[X]B: X = ¯9223372036854775808 is not a valid axis of B (expecting 1≤X<3)
+
+
+
+      M88,[I88]M88
+AXIS ERROR+
+      M88,[I88]M88
+      ^  ^
+
+      )MORE
+A,[X]B: X = ¯9223372036854775808 is not a valid axis (expecting 1≤X<3)
+
+
+
+      I88 1⍉M88
+DOMAIN ERROR+
+      I88 1⍉M88
+      ^    ^
+
+      )MORE
+A⍉B: A[1] = ¯9223372036854775808 is not a valid axis of B (expecting 1≤A[1]<3)
+
+
+
+      1↑[I88]M88
+AXIS ERROR+
+      1↑[I88]M88
+      ^^
+
+      )MORE
+A↑[X]B: X[1] = ¯9223372036854775808 is not a valid axis (expecting 1≤X[1]<3).
+
+
+
+      B88←12⍴1 ◊ B88[I88]←1
+INDEX ERROR+
+      B88[I88]←1
+      ^       ^
+
+      )MORE
+A[B]←C: B[1] = ¯9223372036854775808 is not a valid index for A (expecting 1≤index<13)
+
+
+
+      ⍝ Bugs40 #89: ⎕RE group tree with (?n), backtracking verbs, callouts, \Q...\E in a class
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(?n)(?<o>a(?<i>x)?)b(c)' ⎕RE 'abc'
+Z←2⍴'abc' (2⍴(1⍴'a') (''))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(?n)(?<o>a(?<i>x)?)b(c)' ⎕RE 'axbc'
+Z←2⍴'axbc' (2⍴'ax' (1⍴'x'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)(*MARK:q(r)b' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (''))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)(*MARK:q(r)b' ⎕RE 'axb'
+Z←2⍴'axb' (2⍴'ax' (1⍴'x'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(x)?)(?C{q(r})b' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (''))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(b))' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴'ab' (1⍴'b'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(?C"x)")(b))' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴'ab' (1⍴'b'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a[\Q]\E)(?]?(b))' ⎕RE 'a)b'
+Z←2⍴'a)b' (2⍴'a)b' (1⍴'b'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(?C1)(b))' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴'ab' (1⍴'b'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(a(*pla:(b)))b' ⎕RE 'ab'
+Z←2⍴'ab' (2⍴(1⍴'a') (1⍴'b'))
+
+
+
+      2 ⎕TF 'Z'⊣Z←'(?n:(a)(?-n:(b)))' ⎕RE 'ab'
+Z←2⍴'ab' (1⍴'b')
+
+
+
+      ⍝ Bugs40 #90: a derived operand f/ f\ ∘.f with a monadic-only f is VALENCE ERROR
+
+
+
+
+      ⎕FX 'Z←M90 B' 'Z←-B'
+M90
+
+
+
+      (M90/)/5
+VALENCE ERROR+
+      (M90/)/5
+      ^
+
+      (M90\)/5
+VALENCE ERROR+
+      (M90\)/5
+      ^
+
+      (∘.M90)/5
+VALENCE ERROR+
+      (∘.M90)/5
+      ^
+
+      ⍴⍬∘.(M90/)⍬
+VALENCE ERROR+
+      ⍴⍬∘.(M90/)⍬
+       ^^
+
+      ⍴⍬∘.(M90⍀)⍬
+VALENCE ERROR+
+      ⍴⍬∘.(M90⍀)⍬
+       ^^
+
+      ⍴⍬∘.(∘.M90)⍬
+VALENCE ERROR+
+      ⍴⍬∘.(∘.M90)⍬
+       ^^
+
+      ⍴⍬∘.({-⍵}/)⍬
+VALENCE ERROR+
+      ⍴⍬∘.({-⍵}/)⍬
+       ^^
+
+      ⍴(0 3⍴0)+.(M90/)3 0⍴0
+VALENCE ERROR+
+      ⍴(0 3⍴0)+.(M90/)3 0⍴0
+       ^      ^
+
+      ⍴(0 3⍴0)(M90/).+3 0⍴0
+VALENCE ERROR+
+      ⍴(0 3⍴0)(M90/).+3 0⍴0
+       ^      ^
+
+      ⍴⍬(M90/)¨⍬
+VALENCE ERROR
+      ⍴⍬(M90/)¨⍬
+       ^^
+
+      ⍴1∘.(M90/)2
+VALENCE ERROR+
+      ⍴1∘.(M90/)2
+       ^^
+
+      ⍝ Bugs40 #91: Gaussian GCD/LCM whose intermediate quotient b÷a overflows
+
+
+
+
+      1J1∨1E308J1E308
+1J1
+
+
+
+      1J1∨9E307J9E307
+1J1
+
+
+
+      1J1∧9E307J9E307
+9E307J9E307
+
+
+
+      1J1∨8E307J8E307
+1J1
+
+
+
+      1J2∨9E307J9E307
+1J2
+
+
+
+      1J2∨1E308J1E308
+1J2
+
+
+
+      135J¯14 ∧ 155J34
+¯805J1448
+
+
+
+      3J4∨5J10
+¯1J2
+
+
+
+      ⍝ Bugs40 #92: a VALUE ERROR in a function or lambda shows no stale )MORE text
+
+
+
+
+      ⎕FX 'Z←H92' 'X←⎕FX ''Z←G92'' ''Z←⍳¯1;2''' 'Z←QQ92'
+H92
+
+
+
+      H92
+VALUE ERROR+
+H92[2]  Z←QQ92
+          ^
+
+      )MORE
+Offending symbol: QQ92
+
+
+
+      )SIC
+
+
+
+
+      {X←⎕FX 'Z←G92' 'Z←⍳¯1;2' ⋄ QQ92}0
+VALUE ERROR+
+λ1[1]  λ←QQ92
+         ^
+
+      )MORE
+Offending symbol: QQ92
+
+
+
+      )SIC
+
+
+
+
+      ⍝ Bugs40 #93: ⎕, ⍞, and λ are not lambda locals
+
+
+
+
+      A93←{⍵;⎕}
+SYNTAX ERROR+
+      A93←{⍵;⎕}
+            ^
+
+      B93←{⍵;⍞}
+SYNTAX ERROR+
+      B93←{⍵;⍞}
+            ^
+
+      C93←{⍵;λ}
+SYNTAX ERROR+
+      C93←{⍵;λ}
+            ^
+
+      {⍵;⎕IO}3
+3
+
+
+
+      {⎕←⍵+1 ⋄ ⍵}5
+6
+5
+
+
+      ⎕NC 'A93' 'B93' 'C93'
+0 0 0
+
+
+
+      ⍝ Bugs40 #95: (¯4,R) ⎕DLX B with a step row outside B
+
+
+
+
+      B95←3 4⍴1 1 0 0 1 0 1 0 0 0 0 1
+
+
+
+
+      (¯4 4) ⎕DLX B95
+DOMAIN ERROR+
+      ¯4 4 ⎕DLX B95
+      ^    ^
+
+      )MORE
+(¯4,R) ⎕DLX B: step row 4 is not a row of B (expecting 1≤R<4)
+
+
+
+      (¯4 0) ⎕DLX B95
+DOMAIN ERROR+
+      ¯4 0 ⎕DLX B95
+      ^    ^
+
+      )MORE
+(¯4,R) ⎕DLX B: step row 0 is not a row of B (expecting 1≤R<4)
+
+
+
+      ⎕IO←0
+
+
+
+
+      (¯4 3) ⎕DLX B95
+DOMAIN ERROR+
+      ¯4 3 ⎕DLX B95
+      ^    ^
+
+      )MORE
+(¯4,R) ⎕DLX B: step row 3 is not a row of B (expecting 0≤R<3)
+
+
+
+      ⎕IO←1
+
+
+
+
+      ⍝ Bugs40 #96: scan of an empty B keeps B's prototype
+
+
+
+
+      2 ⎕TF 'Z'⊣Z←+\0 3⍴' '
+Z←0 3⍴' '
+
+
+
+      2 ⎕TF 'Z'⊣Z←+⍀0 3⍴' '
+Z←0 3⍴' '
+
+
+
+      2 ⎕TF 'Z'⊣Z←⊢\0 3⍴⊂'ab'
+Z←0 3⍴(⊂2⍴'  ')
+
+
+
+      2 ⎕TF 'Z'⊣Z←⊢⍀0 3⍴⊂'ab'
+Z←0 3⍴(⊂2⍴'  ')
+
+
+
+      2 ⎕TF 'Z'⊣Z←,\0 1⍴⊂'ab'
+Z←0 1⍴(⊂2⍴'  ')
+
+
+
+      2 ⎕TF 'Z'⊣Z←,\0 3⍴⊂'ab'
+Z←0 3⍴(⊂2⍴'  ')
+
+
+
+      2 ⎕TF 'Z'⊣Z←,\[1]3 0⍴⊂'ab'
+Z←3 0⍴(⊂2⍴'  ')
+
+
+
+      2 ⎕TF 'Z'⊣Z←{⍺,⍵}\0 3⍴⊂'ab'
+Z←0 3⍴(⊂2⍴'  ')
+
+
+
+      ⍝ Bugs40 #97: ⍎¨ keeps the )MORE text of the failing item
+
+
+
+
+      ⍎¨'2' '1 2+1 2 3'
+LENGTH ERROR+ in macro ⍎¨
+      ⍎¨'2' '1 2+1 2 3'
+      ^
+
+      )MORE
+A+B: expecting ⍴A = ⍴B (or A or B a scalar); ⍴A is 2, ⍴B is 3
+
+
+
+      ⍎¨'1' '(1 2'
+SYNTAX ERROR+ in macro ⍎¨
+      ⍎¨'1' '(1 2'
+      ^
+
+      )MORE
+Unbalanced left parenthesis
+
+
+
+      ⍎¨'1' '÷0'
+DOMAIN ERROR in macro ⍎¨
+      ⍎¨'1' '÷0'
+      ^
+
+      )MORE
+NO )MORE ERROR INFO
+
+
+
+      ⍎¨'1' 'QQ97'
+VALUE ERROR in macro ⍎¨
+      ⍎¨'1' 'QQ97'
+      ^
+
+      )MORE
+NO )MORE ERROR INFO
+
+
+
+      ⍝ Bugs40 #99: overtake of a packed float or complex vector fills with the integer 0
+
+
+
+
+      Z←¯14↑12⍴1J1 ◊ 2 ⎕TF 'Z'
+Z←0 0 1J1 1J1 1J1 1J1 1J1 1J1 1J1 1J1 1J1 1J1 1J1 1J1
+
+
+
+      Z←14↑12⍴1.5 ◊ 2 ⎕TF 'Z'
+Z←1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 1.5 0 0
+
+
+
+      5 2⍕¯14↑12⍴1J1
+  .00  .00 1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00 
+      1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00 1.00J1.00
+
+
+      26 ⎕CR 14↑12⍴1.5
+32 32 32 32 32 32 32 32 32 32 32 32 16 16
+
+
+
+      26 ⎕CR ¯3↑12⍴1.5
+32 32 32
+
+
+
+      26 ⎕CR 3↑12⍴1J1
+64 64 64
+
+
+
+      ⍝ Bugs40 #100: a bare / ⌿ \ ⍀ left of ⍤ after ← ; ◊
+
+
+
+
+      V100←1 2 3
+
+
+
+
+      V100[1;⌿⍤0 1]
+SYNTAX ERROR+
+      V100[1;⌿⍤0 1]
+            ^^
+
+      )SIC
+
+
+
+
+      {⍵ ⋄ /⍤0 ⍵}1
+1
+SYNTAX ERROR
+λ1[1]  λ←/⍤0 ⍵
+       ^     ^
+      )SIC
+
+
+
+
+      {X←⌿⍤0 ⍵}1
+SYNTAX ERROR
+λ1[1]  λ←X←⌿⍤0 ⍵
+         ^     ^
+
+      )SIC
+
+
+
+
+      {⌿⍤0 ⍵}1
+SYNTAX ERROR
+λ1[1]  λ←⌿⍤0 ⍵
+       ^     ^
+
+      )SIC
+
+
+
+
+      ⎕FX 'Z←F100 B' 'Z←⌿⍤0 B'
+F100
+
+
+
+      F100 1
+SYNTAX ERROR
+F100[1]  Z←⌿⍤0 B
+         ^     ^
+
+      )SIC
+
+
+
+
+      ⎕FX 'Z←G100 B' 'Z←V100[⌿⍤0 B]'
+G100
+
+
+
+      X←⌿⍤0 1
+SYNTAX ERROR+
+      X←⌿⍤0 1
+          ^
+
+      +/⍤1 ⊢2 3⍴⍳6
+6 15
+
+
+
+      ⍝ Bugs40 #101: ⎕JSON \u escape with non-ASCII "hex digits"
+
+
+
+
+      ⎕JSON '"\u',(⎕UCS 304 304),'41"'
+DOMAIN ERROR+
+      ⎕JSON '"\u',(⎕UCS 304 304),'41"'
+      ^
+
+      ⎕JSON '"\u004',(⎕UCS 321),'"'
+DOMAIN ERROR+
+      ⎕JSON '"\u004',(⎕UCS 321),'"'
+      ^
+
+      ⎕JSON '"\u00',(⎕UCS 820 820),'"'
+DOMAIN ERROR+
+      ⎕JSON '"\u00',(⎕UCS 820 820),'"'
+      ^
+
+      ⎕JSON '"\u00G1"'
+DOMAIN ERROR+
+      ⎕JSON '"\u00G1"'
+      ^
+
+      ⎕JSON '"\','u0041\','u00e9\','u00C9"'
+AéÉ
+
+
+
+      ⍝ Bugs40 #73: a value right operand (literal or variable) binds stronger than
+      ⍝ a strand, so f⍣N A g B is f⍣N (A g B) (LRM p. 33)
+
+
+
+
+      V73←1 2 3 ◊ N73←1 ◊ M73←2 3⍴⍳6
+
+
+
+
+      ⎕FX 'Z←(F VOP73 N) B' 'Z←F N⍴B'
+VOP73
+
+
+
+      -⍣1 V73+1
+¯2 ¯3 ¯4
+
+
+
+      -⍣N73 V73+1
+¯2 ¯3 ¯4
+
+
+
+      -⍤0 V73+1
+¯2 ¯3 ¯4
+
+
+
+      ⌽⍤1 V73,9
+9 3 2 1
+
+
+
+      ⌽ VOP73 2 V73,9
+2 1
+
+
+
+      X73←-⍣N73 V73+1 ◊ X73
+¯2 ¯3 ¯4
+
+
+
+      V73 -⍣N73 V73+1
+¯1 ¯1 ¯1
+
+
+
+      -⍣N73 V73[1]+1
+¯2
+
+
+
+      -⍣1 M73+1
+¯2 ¯3 ¯4
+¯5 ¯6 ¯7
+
+
+      ⎕FX 'Z←FUN73' 'Z←-⍣N73 V73+1'
+FUN73
+
+
+
+      FUN73
+¯2 ¯3 ¯4
+
+
+
+      -⍣2 5
+5
+
+
+
+      -⍣N73 5
+¯5
+
+
+
+      )SIC
+

@@ -798,9 +798,12 @@ UCS_string::is_comment_or_label() const
 bool
 UCS_string::is_in_range(const UCS_string & from, const UCS_string & to) const
 {
+   // LRM p. 431: this ≥ from and (this ≤ to or this starts with to). A
+   // name that starts with from is ≥ from, but must still be checked
+   // against to, e.g. Acd in A-Ab (Bugs41 #88)
+   //
    if (from.size())   // from provided
       {
-         if (this->starts_with(from))          return true;
          if (this->compare(from) == COMP_LT)   return false;
       }
 
@@ -1260,6 +1263,7 @@ UCS_string ret;
                    {
                      if (s >= ssize() - 1)   break;
                      const int dig = at(s+1);
+                     if (dig <= 0 || dig > 0x7F)   break;   // Bugs40 #101
                      const char * pos = strchr(hex, dig);
                      if (pos == 0)   break;   // non-hex character
 
@@ -1767,9 +1771,13 @@ UCS_string
 UCS_string::from_int_to_fixed(int64_t value, int fract_digits)
 {
 UCS_string ret;
-   if (value < 0)   { ret << UNI_OVERBAR;   value = - value; }
+   // the magnitude in uint64_t: -value overflows for the int64 minimum
+   // (Bugs38 #92)
+   //
+uint64_t magnitude = value;
+   if (value < 0)   { ret << UNI_OVERBAR;   magnitude = 0 - magnitude; }
 
-   ret << from_uint(value);
+   ret << from_uint(magnitude);
 
    // fract_digits == 0 (integer format): no decimal point at all,
    // matching from_double_to_fixed()'s round_last_digit(), which

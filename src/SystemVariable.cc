@@ -69,6 +69,8 @@ UCS_string Quad_QUOTE::buffer;
 // realistic recursive program; users needing deeper recursion can still
 // raise or clear ⎕SYL[1;2] explicitly.
 ShapeItem Quad_SYL::si_depth_limit = 100000;
+ShapeItem Quad_SYL::si_depth_limit_cleared = 0;
+ShapeItem Quad_SYL::si_depth_backstop = 0;
 ShapeItem Quad_SYL::value_count_limit = 0;
 ShapeItem Quad_SYL::ravel_count_limit = 0;
 ShapeItem Quad_SYL::print_length_limit = 0;
@@ -264,6 +266,19 @@ APL_Float val = cell.get_real_value();
       }
 }
 //════════════════════════════════════════════════════════════════════════════
+/// return true if the SI has a function frame (then ⎕EM and ⎕ET are local
+/// to that frame and do not see the top-level error)
+static bool
+in_function_frame()
+{
+   for (const StateIndicator * si = Workspace::SI_top(); si;
+        si = si->get_parent())
+       {
+         if (si->get_parse_mode() == PM_FUNCTION)   return true;
+       }
+   return false;
+}
+//────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_EM::get_apl_value() const
 {
@@ -278,6 +293,11 @@ const Error * err = 0;
             }
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
+
+   // a parse error with an empty SI (Bugs38 #70)
+   if (err == 0 && !in_function_frame() &&
+       StateIndicator::top_level_error.get_error_code() != E_NO_ERROR)
+      err = &StateIndicator::top_level_error;
 
    if (err == 0)   // no SI entry with non-zero error code
       {
@@ -319,8 +339,11 @@ ErrorCode ec = E_NO_ERROR;
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 
-   Z->next_ravel_Int(Error::error_major(E_NO_ERROR));
-   Z->next_ravel_Int(Error::error_minor(E_NO_ERROR));
+   // a parse error with an empty SI (Bugs38 #70)
+   ec = in_function_frame() ? E_NO_ERROR
+                            : StateIndicator::top_level_error.get_error_code();
+   Z->next_ravel_Int(Error::error_major(ec));
+   Z->next_ravel_Int(Error::error_minor(ec));
 
 done:
    Z->check_value(LOC);
@@ -412,7 +435,7 @@ Unicode fc[6];
 
    loop(e, ec)
       {
-        const APL_Integer idx = X->get_near_int(e) - qio;
+        const APL_Integer idx = Cell::minus_IO(X->get_near_int(e), qio);
         // an out-of-range index used to be silently ignored here, unlike
         // a REFERENCE to the same index (⎕FC[7], say), which already
         // correctly gives INDEX ERROR -- an assignment must be at least
@@ -484,6 +507,19 @@ StateIndicator * si = Workspace::SI_top_fun();
    if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
    si->set_L(B);
+}
+//════════════════════════════════════════════════════════════════════════════
+bool
+SystemVariable::lrx_assign_ignored(char which)
+{
+   // the same conditions as in Quad_L::assign() (Bugs38 #115), and also
+   // StateIndicator::set_L(), set_R(), and set_X(), which do nothing if the
+   // failed function has no left argument (or axis), Bugs39 #95
+   //
+StateIndicator * si = Workspace::SI_top_fun();
+   if (si == 0)   return true;
+   if (StateIndicator::get_error(si).is_syntax_or_value_error())   return true;
+   return !si->has_LRX(which);
 }
 //════════════════════════════════════════════════════════════════════════════
 Value_P
@@ -579,7 +615,7 @@ UCS_string lx(*old);
 
    loop(e, ec)
       {
-        const APL_Integer idx = X->get_near_int(e) - qio;
+        const APL_Integer idx = Cell::minus_IO(X->get_near_int(e), qio);
         // Bugs28 #100(a): ⎕LX[idx]←B was silently ignored (empty inline
         // body); an out-of-range idx must be rejected just like it is
         // for a plain reference (⎕LX[idx]), matching the ⎕FC/⎕PS/⎕SYL
@@ -622,6 +658,13 @@ Quad_PR::Quad_PR()
 void
 Quad_PR::assign(Value_P B, bool clone, const char * loc)
 {
+   if (B->get_rank() > 1)   // LRM: scalar or vector (Bugs38 #116)
+      {
+        MORE_ERROR() << "⎕PR←B: B must be a scalar or vector; ⍴⍴B is "
+                     << B->get_rank();
+        RANK_ERROR;
+      }
+
 UCS_string ucs = B->get_UCS_ravel();
 
    if (ucs.size() > 1)   LENGTH_ERROR;
@@ -742,7 +785,7 @@ APL_Integer Z_quot = print_quotients;
 APL_Integer Z_style = style;
    loop(e, ec)
       {
-        const APL_Integer x = X->get_near_int(e) - qio;
+        const APL_Integer x = Cell::minus_IO(X->get_near_int(e), qio);
         const APL_Integer b = B->get_near_int(e);
 
         if (x == 0)   // display quotients
@@ -1056,7 +1099,7 @@ const APL_Integer qio = Workspace::get_IO();
    //
    loop(e, ec)
       {
-        const APL_Integer x = X->get_near_int(e) - qio;
+        const APL_Integer x = Cell::minus_IO(X->get_near_int(e), qio);
         switch(x)
            {
              case SYL_SI_DEPTH_LIMIT:
@@ -1075,154 +1118,200 @@ const APL_Integer qio = Workspace::get_IO();
         INDEX_ERROR;
       }
 
-   loop(e, ec)
-      {
-        const APL_Integer x = X->get_near_int(e) - qio;
-        const APL_Integer b = B->get_near_int(extend_B ? 0 : e);
-
-        if (x == SYL_SI_DEPTH_LIMIT)   // SI depth limit
-           {
-             const int depth = Workspace::SI_entry_count();
-             if (b && (b < (depth + 4)))   // limit too low
-                {
-                  MORE_ERROR() << "Bad SI depth limit " << b << " in ⎕SYL["
-                               << (x + qio) << ";" << (qio + 1)
-                               << "] (expecting 0 for no limit or at least "
-                               << (depth + 4) << ")";
-                  DOMAIN_ERROR;
-                }
-             si_depth_limit = b;
-           }
-        else if (x == SYL_VALUE_COUNT_LIMIT)   // value count limit
-           {
-             if (b && (b < APL_Integer(Value::value_count + 10)))    // too low
-                {
-                  MORE_ERROR() << "Bad value count limit " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting 0 for no limit"
-                                  " or at least "
-                               << (Value::value_count + 10) << ")";
-                  DOMAIN_ERROR;
-                }
-             value_count_limit = b;
-           }
-        else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
-           {
-             // ShapeItem, not int: limits ≥ 2⋆35 bytes wrapped (Bugs37 #49)
-             const ShapeItem cells = b / sizeof(Cell);
-             if (cells &&
-                 cells < APL_Integer(Value::total_ravel_count + 1000))
-                {
-                  MORE_ERROR() << "Bad ravel bytes limit " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting 0 for no limit"
-                                  " or at least "
-                               << ((Value::total_ravel_count + 1000)
-                                   * sizeof(Cell)) << ")";
-                  DOMAIN_ERROR;
-                }
-
-             ravel_count_limit = cells;
-           }
-        else if (x == SYL_CURRENT_CORES)   // number of cores
-           {
+   // the values are checked while assigning them. Restore the old limits
+   // if one of them fails, so that ⎕SYL[X;2]←B assigns all or nothing
+   // (Bugs38 #101).
+   //
+const ShapeItem   old_si_depth_limit     = si_depth_limit;
+const ShapeItem   old_si_depth_cleared   = si_depth_limit_cleared;  // Bugs41 #11
+const ShapeItem   old_si_depth_backstop  = si_depth_backstop;
+const ShapeItem   old_value_count_limit  = value_count_limit;
+const ShapeItem   old_ravel_count_limit  = ravel_count_limit;
+const ShapeItem   old_print_length_limit = print_length_limit;
+const ShapeItem   old_pack_min_length    = pack_min_length;
+const int64_t     old_WA_margin          = Quad_WA::WA_margin;
+const int         old_WA_scale           = Quad_WA::WA_scale;
 #if PARALLEL_ENABLED
-             if (CPU_pool::change_core_count(CoreCount(b), false))
-                {
-                  MORE_ERROR() << "Bad core count " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "]";
-                  DOMAIN_ERROR;
-                }
-#else
-             MORE_ERROR() << "⎕SYL[" << (x + qio) << ";" << (qio + 1)
-                          << "] (cores used) cannot be changed because "
-                             "PARALLEL_ENABLED was not ./configure'd";
-             DOMAIN_ERROR;
+const CoreCount   old_core_count = Thread_context::get_active_core_count();
 #endif
-           }
-        else if (x == SYL_PRINT_LIMIT)   // print length limit
-           {
-             // 0 means no limit, other values must be at least 1000
-             //
-             if (b < 0 || (b && b < 1000))
-                {
-                  MORE_ERROR() << "Bad print length limit " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting 0 for no "
-                                  "limit or at least 1000)";
-                  DOMAIN_ERROR;
-                }
-             print_length_limit = b;
-           }
-        else if (x == SYL_WA_MARGIN)   // ⎕WA safety margin
-           {
-             if (b < 1000000)
-                {
-                  MORE_ERROR() << "Bad ⎕WA safety margin " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting at least"
-                                  " 1000000 bytes)";
-                  DOMAIN_ERROR;
-                }
 
-             // a larger margin that makes the workspace full right away
-             // would make every subsequent statement (including the
-             // one lowering the margin again) a WS FULL. Bugs37 #5.
-             //
-             const int64_t old_margin = Quad_WA::WA_margin;
-             Quad_WA::WA_margin = b;
-             if (b > old_margin && Value::check_WS_FULL("⎕SYL", 0, LOC))
-                {
-                  Quad_WA::WA_margin = old_margin;
-                  MORE_ERROR() << "⎕WA safety margin " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] is too large (it"
-                                  " leaves no free workspace memory)";
-                  DOMAIN_ERROR;
-                }
-           }
-        else if (x == SYL_WA_SCALE)   // ⎕WA memory scale (45% - 200% %
-           {
-             if (b < 45 || b > 200)
-                {
-                  MORE_ERROR() << "Bad ⎕WA memory scale " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting 45-200 %)";
-                  DOMAIN_ERROR;
-                }
+   try
+      {
+      loop(e, ec)
+         {
+           const APL_Integer x = Cell::minus_IO(X->get_near_int(e), qio);
+           const APL_Integer b = B->get_near_int(extend_B ? 0 : e);
 
-             // same as for SYL_WA_MARGIN above, but for a smaller scale
-             //
-             const int old_scale = Quad_WA::WA_scale;
-             Quad_WA::WA_scale = b;
-             if (b < old_scale && Value::check_WS_FULL("⎕SYL", 0, LOC))
-                {
-                  Quad_WA::WA_scale = old_scale;
-                  MORE_ERROR() << "⎕WA memory scale " << b
-                               << "% in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] is too small (it"
-                                  " leaves no free workspace memory)";
-                  DOMAIN_ERROR;
-                }
-           }
-        else if (x == SYL_PACK_MIN_LENGTH)   // min. element count for packed ravels
-           {
-             if (b < 1)
-                {
-                  MORE_ERROR() << "Bad minimum packed length " << b
-                               << " in ⎕SYL[" << (x + qio) << ";"
-                               << (qio + 1) << "] (expecting at least 1)";
-                  DOMAIN_ERROR;
-                }
-             pack_min_length = b;
-           }
-        else
-           {
-             MORE_ERROR() << "Bad ⎕SYL index " << (x + qio)
-                          << " (not a writable limit)";
-             INDEX_ERROR;
-           }
+           if (x == SYL_SI_DEPTH_LIMIT)   // SI depth limit
+              {
+                const int depth = Workspace::SI_entry_count();
+                if (b && (b < (depth + 4)))   // limit too low
+                   {
+                     MORE_ERROR() << "Bad SI depth limit " << b << " in ⎕SYL["
+                                  << (x + qio) << ";" << (qio + 1)
+                                  << "] (expecting 0 for no limit or at least "
+                                  << (depth + 4) << ")";
+                     DOMAIN_ERROR;
+                   }
+                si_depth_limit = b;
+                si_depth_limit_cleared = 0;   // explicitly set (Bugs39 #17)
+                si_depth_backstop = 0;
+              }
+           else if (x == SYL_VALUE_COUNT_LIMIT)   // value count limit
+              {
+                if (b && (b < APL_Integer(Value::value_count + 10)))    // too low
+                   {
+                     MORE_ERROR() << "Bad value count limit " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting 0 for no limit"
+                                     " or at least "
+                                  << (Value::value_count + 10) << ")";
+                     DOMAIN_ERROR;
+                   }
+                value_count_limit = b;
+              }
+           else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
+              {
+                // ShapeItem, not int: limits ≥ 2⋆35 bytes wrapped (Bugs37 #49)
+                // ShapeItem(sizeof()): b / sizeof(Cell) converted a negative b
+                // to unsigned, and 1...23 bytes (0 cells) meant "no limit"
+                // (Bugs38 #69)
+                const ShapeItem cells = b / ShapeItem(sizeof(Cell));
+                if (b < 0 || (b && !cells) ||
+                    (cells && cells < APL_Integer(Value::total_ravel_count + 1000)))
+                   {
+                     MORE_ERROR() << "Bad ravel bytes limit " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting 0 for no limit"
+                                     " or at least "
+                                  << ((Value::total_ravel_count + 1000)
+                                      * sizeof(Cell)) << ")";
+                     DOMAIN_ERROR;
+                   }
+
+                ravel_count_limit = cells;
+              }
+           else if (x == SYL_CURRENT_CORES)   // number of cores
+              {
+   #if PARALLEL_ENABLED
+                if (CPU_pool::change_core_count(CoreCount(b), false))
+                   {
+                     MORE_ERROR() << "Bad core count " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "]";
+                     DOMAIN_ERROR;
+                   }
+   #else
+                MORE_ERROR() << "⎕SYL[" << (x + qio) << ";" << (qio + 1)
+                             << "] (cores used) cannot be changed because "
+                                "PARALLEL_ENABLED was not ./configure'd";
+                DOMAIN_ERROR;
+   #endif
+              }
+           else if (x == SYL_PRINT_LIMIT)   // print length limit
+              {
+                // 0 means no limit, other values must be at least 1000
+                //
+                if (b < 0 || (b && b < 1000))
+                   {
+                     MORE_ERROR() << "Bad print length limit " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting 0 for no "
+                                     "limit or at least 1000)";
+                     DOMAIN_ERROR;
+                   }
+                print_length_limit = b;
+              }
+           else if (x == SYL_WA_MARGIN)   // ⎕WA safety margin
+              {
+                if (b < 1000000)
+                   {
+                     MORE_ERROR() << "Bad ⎕WA safety margin " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting at least"
+                                     " 1000000 bytes)";
+                     DOMAIN_ERROR;
+                   }
+
+                // a larger margin that makes the workspace full right away
+                // would make every subsequent statement (including the
+                // one lowering the margin again) a WS FULL. Bugs37 #5.
+                // The new margin must leave room for the next statements,
+                // not merely 0 cells (Bugs38 #5).
+                //
+                const int64_t old_margin = Quad_WA::WA_margin;
+                Quad_WA::WA_margin = b;
+                if (b > old_margin &&
+                    Value::check_WS_FULL("⎕SYL", SYL_WA_RESERVE, LOC))
+                   {
+                     Quad_WA::WA_margin = old_margin;
+                     MORE_ERROR() << "⎕WA safety margin " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] is too large (it"
+                                     " leaves no free workspace memory)";
+                     DOMAIN_ERROR;
+                   }
+              }
+           else if (x == SYL_WA_SCALE)   // ⎕WA memory scale (45% - 200% %
+              {
+                if (b < 45 || b > 200)
+                   {
+                     MORE_ERROR() << "Bad ⎕WA memory scale " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting 45-200 %)";
+                     DOMAIN_ERROR;
+                   }
+
+                // same as for SYL_WA_MARGIN above, but for a smaller scale
+                //
+                const int old_scale = Quad_WA::WA_scale;
+                Quad_WA::WA_scale = b;
+                if (b < old_scale &&
+                    Value::check_WS_FULL("⎕SYL", SYL_WA_RESERVE, LOC))
+                   {
+                     Quad_WA::WA_scale = old_scale;
+                     MORE_ERROR() << "⎕WA memory scale " << b
+                                  << "% in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] is too small (it"
+                                     " leaves no free workspace memory)";
+                     DOMAIN_ERROR;
+                   }
+              }
+           else if (x == SYL_PACK_MIN_LENGTH)   // min. element count for packed ravels
+              {
+                if (b < 1)
+                   {
+                     MORE_ERROR() << "Bad minimum packed length " << b
+                                  << " in ⎕SYL[" << (x + qio) << ";"
+                                  << (qio + 1) << "] (expecting at least 1)";
+                     DOMAIN_ERROR;
+                   }
+                pack_min_length = b;
+              }
+           else
+              {
+                MORE_ERROR() << "Bad ⎕SYL index " << (x + qio)
+                             << " (not a writable limit)";
+                INDEX_ERROR;
+              }
+         }
+      }
+   catch (...)
+      {
+        si_depth_limit     = old_si_depth_limit;
+        si_depth_limit_cleared = old_si_depth_cleared;   // Bugs41 #11
+        si_depth_backstop  = old_si_depth_backstop;
+        value_count_limit  = old_value_count_limit;
+        ravel_count_limit  = old_ravel_count_limit;
+        print_length_limit = old_print_length_limit;
+        pack_min_length    = old_pack_min_length;
+        Quad_WA::WA_margin = old_WA_margin;
+        Quad_WA::WA_scale  = old_WA_scale;
+#if PARALLEL_ENABLED
+        if (Thread_context::get_active_core_count() != old_core_count)
+           CPU_pool::change_core_count(old_core_count, false);
+#endif
+        throw;
       }
 }
 //════════════════════════════════════════════════════════════════════════════

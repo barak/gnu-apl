@@ -120,7 +120,7 @@ FunctionGroup::subfun_to_axis(const UCS_string & subfun_name) const
            }
       }
 
-   return -1;   // not found (or no real FunctionGroup)
+   return SUBFUN_NOT_FOUND;   // not found (or no real FunctionGroup)
 }
 //────────────────────────────────────────────────────────────────────────────
 sAxis
@@ -146,7 +146,7 @@ FunctionGroup::value_to_subfun(const cValue & A_or_X) const
       {
         const UCS_string name(A_or_X);
         const sAxis axis = subfun_to_axis(name);
-        if (axis >= 0)   return axis;   // valid axis
+        if (axis != SUBFUN_NOT_FOUND)   return axis;   // valid (⎕FFT: < 0)
 
         const Fun_signature signature = Prefix::get_current_signature();
         const char * AX = signature & SIG_X ? "X" : "A";
@@ -187,8 +187,8 @@ FunctionGroup::list_functions(ostream & out) const
           "The syntax alternatives for " << group_name
        << " can be displayed with:\n\n";
 
-   COUT << "      " << group_name << " ⍬   ⍝ display the "
-        << " syntax alternatives for " << group_name << "\n\n";
+   out << "      " << group_name << " ⍬   ⍝ display the"   // Bugs38 #130
+       << " syntax alternatives for " << group_name << "\n\n";
 
    return Token();
 }
@@ -211,7 +211,7 @@ FunctionGroup::list_mappings(ostream & out) const
    out << get_legend(LET_MAP_SUFFIX);
 
    out  << "\nTo display a brief description of the functions:\n\n";
-   COUT << "      " << group_name << " ⍬   ⍝ display function descriptions\n\n";
+   out << "      " << group_name << " ''   ⍝ display function descriptions\n\n";   // Bugs38 #130
 
    return Token();
 }
@@ -236,7 +236,7 @@ FunctionGroup::bad_subfun_name_ERROR(const UCS_string sub_name) const
 }
 //────────────────────────────────────────────────────────────────────────────
 void
-FunctionGroup::bad_subfun_number_ERROR(int number) const
+FunctionGroup::bad_subfun_number_ERROR(APL_Integer number) const
 {
 const Fun_signature signature = Prefix::get_current_signature();
 const char * AX = signature & SIG_X ? "X" : "A";

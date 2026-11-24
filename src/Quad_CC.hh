@@ -259,7 +259,7 @@ public:
    static const CC_ASCII instance;
 
 protected:
-   virtual Shape get_shape() const          { return Shape(127); }
+   virtual Shape get_shape() const          { return Shape(128); }
    virtual const char * get_ravel() const   { return 0; }
    virtual bool contains(Unicode uni) const
       { return (0 <= uni && uni <= 127); }
@@ -339,7 +339,8 @@ protected:
                                                      "QRSTUVWXYZ234567="; }
    virtual bool contains(Unicode uni) const
       { return (UNI_A <= uni && uni <= UNI_Z) ||
-               strchr("234567=", int(uni)); }
+               (uni > 0 && uni < 128 &&   // strchr() sees the low byte only
+                strchr("234567=", int(uni))); }   // (Bugs38 #52)
 };
 //────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */
@@ -361,7 +362,8 @@ protected:
       { return (UNI_A <= uni && uni <= UNI_Z) ||
                (UNI_a <= uni && uni <= UNI_z) ||
                (UNI_0 <= uni && uni <= UNI_9) ||
-               strchr("+/=", int(uni)); }
+               (uni > 0 && uni < 128 &&   // strchr() sees the low byte only
+                strchr("+/=", int(uni))); }   // (Bugs38 #52)
 };
 //────────────────────────────────────────────────────────────────────────────
 /* character class ANYcase alphabetical chars (A-Z, a-z) */

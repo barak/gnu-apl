@@ -324,6 +324,13 @@ const uint8_t * ravel = data + 16 + 4*rank;
               //
               if (sub_vtype == 6)        // arithmetic progression vector
                  {
+                   if (sub_rank == 0)   // not handled by the scalar branch
+                      {
+                        MORE_ERROR() << "CDR nested APV (type 6) at offset "
+                                     << offset << " has rank 0";
+                        DOMAIN_ERROR;   // Bugs38 #10
+                      }
+
                    // an APV's body is { first, increment } (2 4-byte ints,
                    // 8 bytes total, matching CDR::fill()'s type 6 writer
                    // above and the count coming from the header's own
@@ -390,7 +397,21 @@ const uint8_t * ravel = data + 16 + 4*rank;
               CDR_string sub_cdr(sub_data, sub_cdr_len);
               Value_P sub_val = from_CDR(sub_cdr, LOC, nest_level + 1);
               Assert(sub_val);
-              Z->next_ravel_Pointer(sub_val.get());
+
+              // a (malformed) non-scalar-typed sub-record can decode to a
+              // simple scalar (e.g. a rank-0 nested record holding a
+              // scalar): store that scalar as an ordinary cell, since a
+              // PointerCell must not point to a simple scalar (Bugs38 #10)
+              //
+              if (sub_val->is_simple_scalar())
+                 {
+                   Cell cache;
+                   Z->next_ravel_Cell(sub_val->get_cscalar(cache));
+                 }
+              else
+                 {
+                   Z->next_ravel_Pointer(sub_val.get());
+                 }
             }
       }
    else
@@ -403,7 +424,6 @@ const uint8_t * ravel = data + 16 + 4*rank;
         // via e.g. a crafted 12 ⎕CR with CDR type 6 = CDR_PROG64, which
         // has no top-level handler here -- only as a CDR_NEST32 sub-item
         // type, a different code path entirely).
-        CERR << "Unsupported CDR type " << vtype << endl;
         MORE_ERROR() << "Unsupported/unhandled CDR type " << vtype;
         DOMAIN_ERROR;
       }

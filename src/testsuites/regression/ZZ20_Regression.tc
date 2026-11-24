@@ -1,0 +1,33 @@
+⍝ ZZ20_Regression
+⍝ ----------------------------------
+
+      ⍝ print line for ''
+      ⍝
+      )ERASE test
+∇test
+ '1'
+ ' '
+ '2'
+ ''
+ '3'
+∇
+      test
+1
+ 
+2
+
+3
+
+
+      ⍝ parse error on [ ] F B
+      ⍝
+      (⎕TS[4 5])[1]≥25
+0
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+

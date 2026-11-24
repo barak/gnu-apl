@@ -45,11 +45,9 @@ const ShapeItem ec_A = A.element_count();
         LENGTH_ERROR;
       }
 
-   // Bugs28 #100(r): A⍸B used to order genuinely complex numbers
-   // silently via Cell::compare()'s arbitrary real-then-imaginary
-   // fallback (e.g. 1J1 2⍸1 gave 0), unlike ⍋/⍒ (Bif_F12_SORT::sort()),
-   // which already rejects exactly this with the same can_be_compared()
-   // check used here.
+   // the same check as for ⍋/⍒ (Bif_F12_SORT::sort()). Complex numbers
+   // are ordered like by < (Bugs38 #124, which reverts the DOMAIN ERROR
+   // of Bugs28 #100(r)).
    //
    if (!A.can_be_compared())
       {

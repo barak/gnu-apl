@@ -59,6 +59,7 @@ Quad_MX Quad_MX::fun;
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_math.h>
 #include <gsl/gsl_eigen.h>
+#include <gsl/gsl_errno.h>
 
 //════════════════════════════════════════════════════════════════════════════
 const FunctionGroup::function_info Quad_MX::subfunction_infos[] =
@@ -117,13 +118,24 @@ int modifier = 0;
 
    if (X.is_int_scalar() || X.is_char_string())   // op only
       {
-        op = MX_ops(value_to_subfun(X));
+        op = to_MX_op(value_to_subfun(X));
       }
    else if (X.is_vector())                         // op and modifier
       {
+        // at most op and modifier, both (near-) integers (Bugs38 #127)
         const ShapeItem X_count = X.element_count();
-        op = MX_ops(X.get_int_value(0));
-        if (X_count > 1)   modifier = X.get_int_value(1);
+        if (X_count > 2)   LENGTH_ERROR;
+        // no narrowing to int (Bugs39 #68)
+        const APL_Integer x0 = X.get_near_int(0);
+        const APL_Integer x1 = X_count > 1 ? X.get_near_int(1) : 0;
+        if (x0 != int(x0))   bad_subfun_number_ERROR(x0);   // Bugs40 #63
+        if (x1 != int(x1))
+           {
+             MORE_ERROR() << "⎕MX[X] B: bad modifier X[2] (= " << x1 << ")";
+             DOMAIN_ERROR;
+           }
+        op = to_MX_op(x0);
+        modifier = x1;
       }
    else
       {
@@ -132,7 +144,8 @@ int modifier = 0;
       }
    remap_randoms_subfun(op, modifier);
 
-   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
+   // not subfun_count, which is not the largest subfunction (Bugs38 #127)
+   if (op < OP_LIST || !get_info_by_axis(op))   bad_subfun_number_ERROR(op);
 
 Value_P A_vp(static_cast<Value *>(const_cast<cValue *>(&A)), LOC);
 Value_P B_vp(static_cast<Value *>(const_cast<cValue *>(&B)), LOC);
@@ -148,7 +161,10 @@ Value_P Z;
       case OP_CROSS_PRODUCT:      Z = dyadicCrossProduct(A_vp, B_vp);   break;
       case OP_VECTOR_ANGLE:       Z = vectorAngle(A_vp, B_vp);          break;
       case OP_HOMOGENEOUS_MATRIX: Z = dyadicRotation(16, A_vp, B_vp);   break;
-      case OP_COVARIANCE:         Z = dyadicCovariance(A_vp, B_vp);     break;
+      case OP_COVARIANCE:         Z = dyadicCovariance(A_vp, B_vp, false);
+                                  break;
+      case OP_CORRELATION:        Z = dyadicCovariance(A_vp, B_vp, true);
+                                  break;
       case OP_HISTOGRAM:          Z = histogram(A_vp, B_vp);            break;
       case OP_RANDOMS:            Z = randoms(A_vp, B_vp, modifier);    break;
       case OP_PRINT:              Z = printit(A_vp, B_vp);              break;
@@ -158,6 +174,8 @@ Value_P Z;
     }
 
   Z->check_value(LOC);
+  Z->check_finite("A ⎕MX[X] B");   // Bugs39 #31
+  real_cells(*Z);          // Bugs39 #100
   return Token(TOK_APL_VALUE1, Z);
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -169,22 +187,34 @@ int modifier = 0;
 
   if (X.is_int_scalar() || X.is_char_string())   // op only
      {
-       op = MX_ops(value_to_subfun(X));
+       op = to_MX_op(value_to_subfun(X));
      }
   else if (X.is_vector())                         // op and modifier
      {
+       // at most op and modifier, both (near-) integers (Bugs38 #127)
        const ShapeItem X_count = X.element_count();
-       op = MX_ops(X.get_int_value(0));
-        if (X_count > 1)   modifier = X.get_int_value(1);
+        if (X_count > 2)   LENGTH_ERROR;
+        // no narrowing to int (Bugs39 #68)
+        const APL_Integer x0 = X.get_near_int(0);
+        const APL_Integer x1 = X_count > 1 ? X.get_near_int(1) : 0;
+        if (x0 != int(x0))   bad_subfun_number_ERROR(x0);   // Bugs40 #63
+        if (x1 != int(x1))
+           {
+             MORE_ERROR() << "⎕MX[X] B: bad modifier X[2] (= " << x1 << ")";
+             DOMAIN_ERROR;
+           }
+        op = to_MX_op(x0);
+        modifier = x1;
       }
    else
       {
         MORE_ERROR() << "⎕MX[X] B: integer or string X expected.";
-        SYNTAX_ERROR;
+        DOMAIN_ERROR;   // like A ⎕MX[X] B (Bugs38 #127)
       }
    remap_randoms_subfun(op, modifier);
 
-   if (op < OP_LIST || int(op) >= subfun_count)   bad_subfun_number_ERROR(op);
+   // not subfun_count, which is not the largest subfunction (Bugs38 #127)
+   if (op < OP_LIST || !get_info_by_axis(op))   bad_subfun_number_ERROR(op);
 
 Value_P opt_A;   // = 0
 Value_P B_vp(static_cast<Value *>(const_cast<cValue *>(&B)), LOC);
@@ -200,7 +230,8 @@ Value_P Z = Idx0_0(LOC);
              //v←v,⍉1 100⍴100 ⎕mx[12] 100000 ⎕mx[10 2] 1
         case OP_RANDOMS:            Z = randoms(opt_A, B_vp, modifier);     break;
         case OP_DETERMINANT:        Z = determinant(B_vp);                  break;
-        case OP_COVARIANCE:         Z = monadicCovariance(B_vp);            break;
+        case OP_COVARIANCE:         Z = monadicCovariance(B_vp, false);     break;
+        case OP_CORRELATION:        Z = monadicCovariance(B_vp, true);      break;
         case OP_NORM:               Z = norm(B_vp);                         break;
         case OP_EIGENVECTORS:       Z = eigenvectors(B_vp);                 break;
         case OP_EIGENVALUES:        Z = eigenvalues(B_vp);                  break;
@@ -212,6 +243,8 @@ Value_P Z = Idx0_0(LOC);
       }
 
   Z->check_value(LOC);
+  Z->check_finite("⎕MX[X] B");   // Bugs39 #31
+  real_cells(*Z);          // Bugs39 #100
   return Token(TOK_APL_VALUE1, Z);
 }
 
@@ -287,29 +320,184 @@ int rx = 0;
   return cf;
 }
 //────────────────────────────────────────────────────────────────────────────
+/// return z × 2⋆-e and add e to expo, where e is the exponent of the larger
+/// component of z (so that it cannot overflow like |z| can), Bugs40 #18
+static Quad_MX::Dcomplex
+scale_down(const Quad_MX::Dcomplex & z, long & expo)
+{
+const double m = max(fabs(z.real()), fabs(z.imag()));
+   if (m == 0.0 || !isfinite(m))   return z;
+
+int e = 0;
+   frexp(m, &e);
+   expo += e;
+   return Quad_MX::Dcomplex(ldexp(z.real(), -e), ldexp(z.imag(), -e));
+}
+//────────────────────────────────────────────────────────────────────────────
 Quad_MX::Dcomplex
 Quad_MX::getDet(GSL_Matrix * mtx)
 {
-   if (mtx->rows() == 1)   return mtx->val(0, 0);
+const int n = mtx->rows();
 
-   if (mtx->rows() == 2)
+   // the determinant of a 0×0 matrix is the empty product 1. It occurs as
+   // the cofactor in ⎕MX[2] 0 1⍴0 (Bugs39 #1).
+   //
+   if (n == 0)   return Dcomplex(1.0, 0.0);
+   if (n == 1)   return mtx->val(0, 0);
+
+   // If all items are (Gaussian) integers, then use Bareiss's fraction-free
+   // elimination: every minor that it computes is an integer, so the
+   // result is exact (Bugs38 #15) as long as the minors (bounded by
+   // Hadamard's bound, the product of the row norms) are below 2⋆53. If
+   // an intermediate result overflows, then fall back to the Gaussian
+   // elimination below.
+   //
+   // Otherwise use Gaussian elimination with partial pivoting and multiply
+   // the pivots with separate exponents, so that no intermediate product
+   // overflows or underflows unless the determinant itself does (Bareiss
+   // computed products like 1E160×1E160 and returned ∞J-nan- for a
+   // determinant of 1E20, Bugs39 #25).
+   //
+std::vector<Dcomplex> a(size_t(n) * n);
+bool integral = true;
+double log2_bound = 0.0;
+   loop(r, n)
       {
-        return (mtx->val(0, 0) * mtx->val(1, 1)) -   // diagonal
-               (mtx->val(0, 1) * mtx->val(1, 0));    // off-diagonal
+        double row_max = 0.0;   // scaled row norm (avoid overflow)
+        loop(c, n)
+           {
+             const Dcomplex v = mtx->val(r, c);
+             a[r*n + c] = v;
+             if (integral && (v.real() != nearbyint(v.real()) ||
+                              v.imag() != nearbyint(v.imag())))
+                integral = false;
+             const double av = abs(v);
+             if (row_max < av)   row_max = av;
+           }
+        if (row_max == 0.0)   return Dcomplex(0.0, 0.0);   // zero row
+
+        double sum = 0.0;
+        loop(c, n)   { const double q = abs(a[r*n + c]) / row_max;
+                       sum += q*q; }
+        log2_bound += log2(row_max) + 0.5*log2(sum);
       }
 
-Dcomplex det(0.0, 0.0);
-  for (int k = 0; k < mtx->rows(); k++)
+bool negate = false;
+   if (integral && log2_bound < 1000.0)   // Bareiss (exact)
       {
-        const int sign = k & 1 ? -1 : 1;
-        GSL_Matrix * cf = genCofactor(mtx, 0, k);
-        const Dcomplex id = getDet(cf);
-        delete cf;
-        if (sign > 0)   det += mtx->val(0, k) * id;
-        else            det -= mtx->val(0, k) * id;
+        const std::vector<Dcomplex> a0 = a;   // for the fallback
+        Dcomplex prev(1.0, 0.0);
+        for (int k = 0; k < n - 1; ++k)
+            {
+              int piv = k;
+              while (piv < n && a[piv*n + k] == Dcomplex(0.0, 0.0))   ++piv;
+              if (piv == n)   return Dcomplex(0.0, 0.0);
+              if (piv != k)
+                 {
+                   loop(c, n)   std::swap(a[k*n + c], a[piv*n + c]);
+                   negate = !negate;
+                 }
+
+              const Dcomplex akk = a[k*n + k];
+              for (int r = k + 1; r < n; ++r)
+                  {
+                    const Dcomplex ark = a[r*n + k];
+                    for (int c = k + 1; c < n; ++c)
+                        a[r*n + c] = (a[r*n + c] * akk - ark * a[k*n + c])
+                                   / prev;
+                  }
+              prev = akk;
+            }
+
+        const Dcomplex det = a[(n - 1)*n + (n - 1)];
+        if (isfinite(det.real()) && isfinite(det.imag()))
+           return negate ? -det : det;
+
+        a = a0;   // overflow: fall back to Gaussian elimination
+        negate = false;
       }
 
-  return det;
+   // Gaussian elimination: det = ± (mant × 2⋆expo)
+   //
+Dcomplex mant(1.0, 0.0);
+long expo = 0;
+
+   // scale every row by a power of 2 so that its largest entry is near 1
+   // (exactly, adding the exponent to expo): an elimination update of
+   // unscaled rows could overflow although the determinant does not, e.g.
+   // ⎕MX[1] 3 3⍴1 0 1E308 ¯1 1 1E308 0 1E¯300 0 (Bugs41 #83)
+   //
+   loop(r, n)
+      {
+        double row_max = 0.0;
+        loop(c, n)
+           {
+             const Dcomplex & x = a[r*n + c];
+             row_max = max(row_max, max(fabs(x.real()), fabs(x.imag())));
+           }
+        if (row_max == 0.0 || !isfinite(row_max))   continue;
+        int e;
+        frexp(row_max, &e);
+        loop(c, n)
+           {
+             Dcomplex & x = a[r*n + c];
+             x = Dcomplex(ldexp(x.real(), -e), ldexp(x.imag(), -e));
+           }
+        expo += e;
+      }
+
+   for (int k = 0; k < n; ++k)
+       {
+         // pivot: the largest |a[r;k]| in column k, rows k...
+         int piv = k;
+         for (int r = k + 1; r < n; ++r)
+             if (abs(a[r*n + k]) > abs(a[piv*n + k]))   piv = r;
+         if (a[piv*n + k] == Dcomplex(0.0, 0.0))   return Dcomplex(0.0, 0.0);
+         if (piv != k)
+            {
+              loop(c, n)   std::swap(a[k*n + c], a[piv*n + c]);
+              negate = !negate;
+            }
+
+         const Dcomplex akk = a[k*n + k];
+         for (int r = k + 1; r < n; ++r)
+             {
+               const Dcomplex f = a[r*n + k] / akk;
+               if (f == Dcomplex(0.0, 0.0))   continue;
+               for (int c = k + 1; c < n; ++c)   a[r*n + c] -= f * a[k*n + c];
+             }
+
+         // mant ← mant × akk, keeping |mant| near 1. The exponent is taken
+         // from the larger component (|akk| itself can overflow), and the
+         // components are scaled with ldexp(): for |akk| ≥ 2⋆1023,
+         // ldexp(1.0, 1024) is ∞, so akk ÷ ldexp(1.0, e) was 0 (Bugs40 #18)
+         //
+         mant *= scale_down(akk, expo);
+         mant  = scale_down(mant, expo);
+       }
+
+   if (expo >  2000)   expo =  2000;   // ∞ (ldexp() would overflow anyway)
+   if (expo < -2000)   expo = -2000;   // 0
+const Dcomplex det(ldexp(mant.real(), int(expo)), ldexp(mant.imag(), int(expo)));
+   return negate ? -det : det;
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+Quad_MX::unit_vector(vector<Dcomplex> & v)
+{
+double max_abs = 0.0;   // max. of |Re v[i]| and |Im v[i]|
+   loop(i, v.size())
+       {
+         if (max_abs < fabs(v[i].real()))   max_abs = fabs(v[i].real());
+         if (max_abs < fabs(v[i].imag()))   max_abs = fabs(v[i].imag());
+       }
+   if (max_abs == 0.0 || !isfinite(max_abs))   return false;
+
+double len = 0.0;   // the length of v ÷ max_abs (1 ≤ len ≤ √(2×⍴v))
+   loop(i, v.size())   { v[i] /= max_abs;   len += std::norm(v[i]); }
+   len = sqrt(len);
+   loop(i, v.size())   v[i] /= len;
+   return true;
 }
 //────────────────────────────────────────────────────────────────────────────
 Quad_MX::Dcomplex
@@ -323,21 +511,6 @@ Dcomplex rc(0.0, 0.0);
    // instead, which is always the correct non-negative real |v[i]|^2.
    loop(i, v.size())   rc += v[i] * conj(v[i]);
    return sqrt(rc);
-}
-//────────────────────────────────────────────────────────────────────────────
-void
-Quad_MX::normalise(vector<double> &v)
-{
-const double mean = gsl_stats_mean(v.data(), 1, v.size());
-const double sdev = gsl_stats_sd_m(v.data(), 1, v.size(), mean);
-   // sdev == 0 means every element already equals mean (e.g. an all-
-   // zero imaginary part of an otherwise real ⎕MX.covariance B), so
-   // v[c] - mean is 0 for every c regardless of what it would be
-   // divided by. Dividing by 0 anyway produced NaN (0.0/0.0), which
-   // later hit undefined behavior (int(NaN)) in UCS_string's float
-   // formatter and corrupted the printed output.
-   if (sdev == 0.0)   { loop(c, v.size())   v[c] = 0.0;   return; }
-   loop(c, v.size())   v[c] = (v[c] - mean) / sdev;
 }
 //────────────────────────────────────────────────────────────────────────────
 Quad_MX::GSL_Matrix *
@@ -378,6 +551,20 @@ Quad_MX::eigenvectors(Value_P B)
         RANK_ERROR;
       }
 
+   // GSL's gsl_eigen_nonsymmv() is real-only: a complex B lost its imaginary
+   // part (Bugs38 #61)
+   //
+   loop(b, B->element_count())
+      {
+        Cell cache;
+        const Cell & cell = B->get_cravel(b, cache);
+        if (cell.is_numeric() && cell.get_imag_value() != 0.0)
+           {
+             MORE_ERROR() << "⎕MX.eigenvector B: real matrix B expected.";
+             DOMAIN_ERROR;
+           }
+      }
+
 const ShapeItem rows = B->get_rows();
 const ShapeItem cols = B->get_cols();
     
@@ -414,6 +601,11 @@ gsl_matrix_view m = gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
 gsl_vector_complex * eval = gsl_vector_complex_alloc(mtx->rows());
 gsl_matrix_complex * evec = gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
 
+   // GSL's default error handler calls abort(), and a throwing handler
+   // (see GSL::set_GSL_error_handler()) would leak eval/evec/w: switch the
+   // handler off and check erc instead (Bugs38 #14).
+   //
+gsl_error_handler_t * old_handler = gsl_set_error_handler_off();
 gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(mtx->rows());
 int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
    gsl_eigen_nonsymmv_free(w);
@@ -421,14 +613,16 @@ int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
       {
         erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
       }
+   gsl_set_error_handler(old_handler);
 
    if (erc != GSL_SUCCESS)
      {
        delete mtx;
        gsl_vector_complex_free(eval);
        gsl_matrix_complex_free(evec);
-       MORE_ERROR() << "Eigensystem computation error.";
-       INTERNAL_ERROR;
+       MORE_ERROR() << "⎕MX[4] (eigenvectors): GSL error: "
+                    << gsl_strerror(erc);
+       DOMAIN_ERROR;
      }
 
    loop(c, mtx->cols())
@@ -466,9 +660,10 @@ const CellType B_celltype = B->deep_cell_types();
         return Idx0_0(LOC);
       }
 
-   if (!(B_celltype & CT_NUMERIC))
+   // all items numeric, before anything is written (Bugs38 #127)
+   if (!(B_celltype & CT_NUMERIC) || (B_celltype & ~CT_NUMERIC))
       {
-        MORE_ERROR() << "A ⎕MX.print B: B is nut numeric.";
+        MORE_ERROR() << "A ⎕MX.print B: B is not numeric.";
         DOMAIN_ERROR;
       }
 
@@ -641,6 +836,20 @@ Quad_MX::eigenvalues(Value_P B)
         MORE_ERROR() << "⎕MX.eigenvalue B: matrix B expected.";
         RANK_ERROR;
       }
+
+   // GSL's gsl_eigen_nonsymmv() is real-only: a complex B lost its imaginary
+   // part (Bugs38 #61)
+   //
+   loop(b, B->element_count())
+      {
+        Cell cache;
+        const Cell & cell = B->get_cravel(b, cache);
+        if (cell.is_numeric() && cell.get_imag_value() != 0.0)
+           {
+             MORE_ERROR() << "⎕MX.eigenvalue B: real matrix B expected.";
+             DOMAIN_ERROR;
+           }
+      }
     
 const ShapeItem rows = B->get_rows();
 const ShapeItem cols = B->get_cols();
@@ -678,6 +887,11 @@ gsl_matrix_view m = gsl_matrix_view_array(data, mtx->rows(), mtx->cols());
 gsl_vector_complex * eval = gsl_vector_complex_alloc(mtx->rows());
 gsl_matrix_complex * evec = gsl_matrix_complex_alloc(mtx->rows(), mtx->cols());
 
+   // GSL's default error handler calls abort(), and a throwing handler
+   // (see GSL::set_GSL_error_handler()) would leak eval/evec/w: switch the
+   // handler off and check erc instead (Bugs38 #14).
+   //
+gsl_error_handler_t * old_handler = gsl_set_error_handler_off();
 gsl_eigen_nonsymmv_workspace * w = gsl_eigen_nonsymmv_alloc(mtx->rows());
 int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
    gsl_eigen_nonsymmv_free(w);
@@ -685,14 +899,16 @@ int erc = gsl_eigen_nonsymmv(&m.matrix, eval, evec, w);
       {
         erc = gsl_eigen_nonsymmv_sort(eval, evec, GSL_EIGEN_SORT_ABS_DESC);
       }
+   gsl_set_error_handler(old_handler);
 
    if (erc != GSL_SUCCESS)
       {
         delete mtx;
         gsl_vector_complex_free(eval);
         gsl_matrix_complex_free(evec);
-        MORE_ERROR() << "Eigensystem computation error.";
-        INTERNAL_ERROR;
+        MORE_ERROR() << "⎕MX[5] (eigenvalues): GSL error: "
+                     << gsl_strerror(erc);
+        DOMAIN_ERROR;
       }
 
    loop(i, mtx->cols())
@@ -748,9 +964,19 @@ Quad_MX::determinant(Value_P B)
         LENGTH_ERROR;
       }
 
+   // the determinant of the empty matrix is the empty product 1 (Bugs38 #127)
+   if (B->get_rows() == 0)   return FloatScalar(1.0, LOC);
+
 GSL_Matrix * mtx = genMtx(B, false);
 const Dcomplex det = getDet(mtx);
   delete mtx;
+
+   if (!(isfinite(det.real()) && isfinite(det.imag())))   // Bugs39 #25
+      {
+        MORE_ERROR() << "⎕MX.determinant B: the determinant of B exceeds "
+                        "the range of floating point numbers.";
+        DOMAIN_ERROR;
+      }
 
   return det.imag() == 0.0 ? FloatScalar(det.real(), LOC)
                            : ComplexScalar(det.real(), det.imag(), LOC);
@@ -903,15 +1129,25 @@ vector<Dcomplex> Bv(A_count);
          Bv[a] = Dcomplex(Ba.get_real_value(), Ba.get_imag_value());
        }
 
-const Dcomplex Amag = magnitude(Av);
-const Dcomplex Bmag = magnitude(Bv);
-const Dcomplex mag = Amag * Bmag;
-   if (mag != Dcomplex(0.0, 0.0))
+   // the (real) angle acos(Re⟨A,B⟩÷|A||B|) of A and B as real vectors,
+   // i.e. with the Hermitian inner product like magnitude(), computed
+   // with Kahan's stable formula 2×atan2(‖a-b‖, ‖a+b‖) for the unit vectors
+   // a and b of A and B: acos() of a rounded cosine near 1 is noise, e.g.
+   // 2.1E¯8 for a vector and itself (Bugs38 #68).
+   //
+   // A and B are first scaled by their largest component, so that the
+   // result does not depend on their lengths (no overflow or underflow of
+   // the squares, Bugs39 #26).
+   //
+   if (unit_vector(Av) && unit_vector(Bv))
       {
-        Dcomplex dp(0.0, 0.0);
-        loop(i, Av.size())   dp += Av[i] * Bv[i];
-        const Dcomplex an = acos(dp/mag);
-        return ComplexScalar(an.real(), an.imag(), LOC);
+        double diff = 0.0, sum = 0.0;
+        loop(i, Av.size())
+           {
+             diff += std::norm(Av[i] - Bv[i]);
+             sum  += std::norm(Av[i] + Bv[i]);
+           }
+        return FloatScalar(2.0 * atan2(sqrt(diff), sqrt(sum)), LOC);
      }
 
    MORE_ERROR() << "Invalid vector(s) in ⎕MX.vector_angle.";
@@ -944,11 +1180,12 @@ Value_P Z(dim, dim, LOC);
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P
-Quad_MX::monadicCovariance(const Value_P B)
+Quad_MX::monadicCovariance(const Value_P B, bool corr)
 {
+const char * name = corr ? "⎕MX.correlation" : "⎕MX.covariance";
    if (B->get_rank() != 2)
       {
-        MORE_ERROR() << "⎕MX.covariance B: maxtrix B expected.";
+        MORE_ERROR() << name << " B: maxtrix B expected.";
         RANK_ERROR;
       }
 
@@ -956,9 +1193,17 @@ const ShapeItem rows = B->get_rows();
 const ShapeItem cols = B->get_cols();
 
    if (rows == 0)   return Idx0_0(LOC);   // empty result
+   if (cols < 2)   // the sample covariance divides by cols - 1 (Bugs38 #62)
+      {
+        MORE_ERROR() << name << " B: at least 2 samples (columns of"
+                        " B) expected.";
+        DOMAIN_ERROR;
+      }
 
 vector<vector<double> > Breals(rows);
 vector<vector<double> > Bimags(rows);
+bool real_used = false;   // some real part is non-zero
+bool imag_used = false;   // some imaginary part is non-zero
    loop(r, rows)
        {
          Breals[r].resize(cols);
@@ -970,37 +1215,126 @@ vector<vector<double> > Bimags(rows);
                const Cell & Bv = B->get_cravel(offset + c, cache);
                 Breals[r][c] = Bv.get_real_value();
                 Bimags[r][c] = Bv.get_imag_value();
+                if (Breals[r][c] != 0.0)   real_used = true;
+                if (Bimags[r][c] != 0.0)   imag_used = true;
              }
-         normalise(Breals[r]);
-         normalise(Bimags[r]);
        }
 
+   // the correlation does not change if a sample is scaled by a positive
+   // factor. Scale every sample by its largest magnitude, so that neither
+   // the (co-)variances nor their products overflow or underflow (Bugs39
+   // #30).
+   //
+   if (corr)   loop(r, rows)   { scale_samples(Breals[r]);
+                                 scale_samples(Bimags[r]); }
+
+   // the (co-)variances of the real and imaginary parts (Bugs38 #63:
+   // the covariance, not the correlation that the former normalization
+   // of each row produced). Z is symmetric, so only the upper half is
+   // computed.
+   //
+vector<double> real_cov(rows * rows);
+vector<double> imag_cov(rows * rows);
+   loop(r, rows)
+   for (ShapeItem c = r; c < rows; ++c)
+       {
+         real_cov[r*rows + c] = real_cov[c*rows + r] =
+             gsl_stats_covariance(Breals[r].data(), 1,
+                                  Breals[c].data(), 1, cols);
+         imag_cov[r*rows + c] = imag_cov[c*rows + r] =
+             gsl_stats_covariance(Bimags[r].data(), 1,
+                                  Bimags[c].data(), 1, cols);
+       }
+
+   if (corr)   // check that every used part of every row has a variance
+      {
+        // a part that is 0 everywhere (e.g. the imaginary part of real B)
+        // is ignored, unless B is 0 everywhere.
+        if (!imag_used)   real_used = true;
+        loop(r, rows)
+            {
+              const double rvar = real_cov[r*rows + r];
+              const double ivar = imag_cov[r*rows + r];
+              if ((real_used && !(rvar > 0.0)) ||
+                  (imag_used && !(ivar > 0.0)))
+                 {
+                   MORE_ERROR() << name << " B: the samples in row "
+                                << (r + Workspace::get_IO()) << " of B"
+                                   " have no variance (all equal).";
+                   DOMAIN_ERROR;
+                 }
+            }
+      }
+
 Value_P Z(rows, rows, LOC);
-  // Z is symmetric, therefore only the upper half is computed
-  // and copied to the lower half in the process
-  //
    loop(r, rows)
    loop(c, rows)
        {
-        if (c >= r)   // on or above diagonal: compute value
-           {
-             const double realcov =
-                          gsl_stats_covariance(Breals[r].data(), 1,
-                                               Breals[c].data(), 1, cols);
-             const double imagcov =
-                          gsl_stats_covariance(Bimags[r].data(), 1,
-                                               Bimags[c].data(), 1, cols);
-             Z->next_ravel_Complex(realcov, imagcov);
-           }
-        else   // below diagonal: copy from corresponding item above diagonal
-           {
-             Cell cache;
-             Z->next_ravel_Cell(Z->get_cravel(c * rows + r, cache));
-           }
+         double real = real_cov[r*rows + c];
+         double imag = imag_cov[r*rows + c];
+         if (corr)
+            {
+              const ShapeItem rr = r*rows + r;
+              const ShapeItem cc = c*rows + c;
+              real = !real_used ? 0.0 : r == c ? 1.0
+                   : pearson(real, real_cov[rr], real_cov[cc]);
+              imag = !imag_used ? 0.0 : r == c ? 1.0
+                   : pearson(imag, imag_cov[rr], imag_cov[cc]);
+            }
+         // not next_ravel_Number(), which would round e.g. a covariance
+         // of 1E¯12 to the integer 0 (Bugs39 #33)
+         if (imag == 0.0)   Z->next_ravel_Float(real);
+         else               Z->next_ravel_Complex(real, imag);
        }
 
    Z->check_value(LOC);
    return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_MX::real_cells(Value & Z)
+{
+   // store a complex result item with imaginary part 0 as a real number,
+   // like ⎕MX[1] and the covariance do, e.g. the identity matrix ⎕MX[6] 2
+   // (Bugs39 #100)
+   //
+   if (Z.is_packed())   return;   // no ComplexCells
+
+const ShapeItem count = Z.nz_element_count();
+   loop(z, count)
+       {
+         Cell & cell = Z.get_wravel(z);
+         if (cell.is_pointer_cell())
+            {
+              real_cells(*cell.get_pointer_value());
+            }
+         else if (cell.is_complex_cell() && cell.get_imag_value() == 0.0)
+            {
+              Z.set_ravel_Float(z, cell.get_real_value());
+            }
+       }
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Quad_MX::scale_samples(vector<double> & samples)
+{
+double max_abs = 0.0;
+   for (size_t s = 0; s < samples.size(); ++s)
+       if (max_abs < fabs(samples[s]))   max_abs = fabs(samples[s]);
+
+   if (max_abs == 0.0 || !isfinite(max_abs))   return;
+   for (size_t s = 0; s < samples.size(); ++s)   samples[s] /= max_abs;
+}
+//────────────────────────────────────────────────────────────────────────────
+double
+Quad_MX::pearson(double cov, double var1, double var2)
+{
+   // not sqrt(var1 * var2), which may overflow or underflow (Bugs39 #30)
+const double rho = cov / (sqrt(var1) * sqrt(var2));
+   // rounding may push rho slightly beyond ±1
+   if (rho >  1.0)   return  1.0;
+   if (rho < -1.0)   return -1.0;
+   return rho;
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P
@@ -1021,7 +1355,7 @@ const ShapeItem B_count = B->element_count();
         RANK_ERROR;
       }
 
-const int nr_buckets = A->get_sole_integer();
+const APL_Integer nr_buckets = A->get_sole_integer();   // not int: Bugs38 #94
    if (nr_buckets < 2)
       {
         MORE_ERROR() << "A ⎕MX.histogram B: too few buckets.";
@@ -1045,29 +1379,43 @@ double minv =  DBL_MAX;
          if (minv > val) minv = val;
        }
 
-const double incr = double(maxv - minv) / nr_buckets;
-vector<int> buckets(nr_buckets);
-int nr_bumps = 0;
+Value_P Z(nr_buckets, LOC);   // WS FULL for a huge A (before buckets)
+vector<ShapeItem> buckets(nr_buckets);
+
+   // halve the operands only if maxv - minv exceeds the double range
+   // (Bugs39 #29): halving loses the last bit of subnormal values, which
+   // moved them into the wrong bucket (Bugs40 #85)
+   //
+const bool halve = !isfinite(maxv - minv);
    loop(b, B_count)
        {   
          Cell cache;
          const Cell & Bb = B->get_cravel(b, cache);
-         double val = Bb.get_real_value();
-         double mark = minv + incr;
-         loop(bucket, nr_buckets - 1)
-             {
-               if (val < mark)
-                  {
-                    buckets[bucket]++;
-                    nr_bumps++;
-                    break;
-                  }
-             mark += incr;
-           }
-         buckets[nr_buckets - 1] = B_count - nr_bumps;
+         const double val = Bb.get_real_value();
+
+         // compute the bucket of val directly instead of accumulating the
+         // bucket edges (which accumulated rounding errors), and snap
+         // values that lie on an edge (up to rounding) onto that edge,
+         // so that the histogram is invariant under scaling (Bugs38 #94).
+         //
+         // The halves (see above) keep the differences finite also when
+         // maxv - minv exceeds the double range (Bugs39 #29). The snap tolerance is a
+         // few hundred ulps of q, i.e. rounding errors only, so that
+         // values clearly below an edge are not moved up (Bugs39 #27).
+         //
+         ShapeItem bucket = nr_buckets - 1;   // also if maxv == minv
+         if (maxv > minv)
+            {
+              double q = halve
+                       ? (val/2 - minv/2) / (maxv/2 - minv/2) * nr_buckets
+                       : (val - minv) / (maxv - minv) * nr_buckets;
+              const double edge = nearbyint(q);
+              if (fabs(q - edge) < 1E-13 * (1.0 + fabs(edge)))   q = edge;
+              if (q < double(nr_buckets - 1))   bucket = ShapeItem(q);
+            }
+         buckets[bucket]++;
        }
 
-Value_P Z(nr_buckets, LOC);
    loop(b, nr_buckets)
        {
          Z->next_ravel_Int(buckets[b]);
@@ -1077,24 +1425,30 @@ Value_P Z(nr_buckets, LOC);
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P
-Quad_MX::dyadicCovariance(const Value_P A, const Value_P B)
+Quad_MX::dyadicCovariance(const Value_P A, const Value_P B, bool corr)
 {
+const char * name = corr ? "A ⎕MX.correlation B" : "A ⎕MX.covariance B";
    if (!A->is_vector())
       {
-        MORE_ERROR() << "A ⎕MX.covariance B: vector A expected.";
+        MORE_ERROR() << name << ": vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << "A ⎕MX.covariance B: vector B expected.";
+        MORE_ERROR() << name << ": vector B expected.";
         RANK_ERROR;
       }
 
 const ShapeItem AB_count = A->element_count();
+   if (AB_count < 2)   // the sample covariance divides by AB_count - 1
+      {
+        MORE_ERROR() << name << ": at least 2 samples expected.";
+        DOMAIN_ERROR;   // Bugs38 #62
+      }
    if (AB_count != B->element_count())
       {
-        MORE_ERROR() << "A ⎕MX.covariance B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << name << ": ⍴A ≠ ⍴B.";
         LENGTH_ERROR;
       }
 
@@ -1102,6 +1456,8 @@ vector<double> Areals(AB_count);
 vector<double> Aimags(AB_count);
 vector<double> Breals(AB_count);
 vector<double> Bimags(AB_count);
+bool real_used = false;   // some real part is non-zero
+bool imag_used = false;   // some imaginary part is non-zero
    loop(ab, AB_count)
        {
          Cell cache_A, cache_B;
@@ -1111,20 +1467,53 @@ vector<double> Bimags(AB_count);
          Aimags[ab] = Av.get_imag_value();
          Breals[ab] = Bv.get_real_value();
          Bimags[ab] = Bv.get_imag_value();
+         if (Areals[ab] != 0.0 || Breals[ab] != 0.0)   real_used = true;
+         if (Aimags[ab] != 0.0 || Bimags[ab] != 0.0)   imag_used = true;
        }
 
-const double realcov =
+   if (corr)   // see monadicCovariance() (Bugs39 #30)
+      {
+        scale_samples(Areals);   scale_samples(Aimags);
+        scale_samples(Breals);   scale_samples(Bimags);
+      }
+
+double real =
     gsl_stats_covariance(Areals.data(), 1, Breals.data(), 1, AB_count);
-const double imagcov =
+double imag =
     gsl_stats_covariance(Aimags.data(), 1, Bimags.data(), 1, AB_count);
-  return imagcov == 0.0 ? FloatScalar(realcov, LOC) :
-                          ComplexScalar(realcov, imagcov, LOC);
+
+   if (corr)   // Bugs38 #63
+      {
+        // a part that is 0 everywhere (e.g. the imaginary part of real
+        // A and B) is ignored, unless A and B are 0 everywhere.
+        if (!imag_used)   real_used = true;
+        const double A_rvar = gsl_stats_variance(Areals.data(), 1, AB_count);
+        const double B_rvar = gsl_stats_variance(Breals.data(), 1, AB_count);
+        const double A_ivar = gsl_stats_variance(Aimags.data(), 1, AB_count);
+        const double B_ivar = gsl_stats_variance(Bimags.data(), 1, AB_count);
+        const char * novar = 0;
+        if      (real_used && !(A_rvar > 0.0))   novar = "A";
+        else if (real_used && !(B_rvar > 0.0))   novar = "B";
+        else if (imag_used && !(A_ivar > 0.0))   novar = "A";
+        else if (imag_used && !(B_ivar > 0.0))   novar = "B";
+        if (novar)
+           {
+             MORE_ERROR() << name << ": the samples in " << novar
+                          << " have no variance (all equal).";
+             DOMAIN_ERROR;
+           }
+
+        real = real_used ? pearson(real, A_rvar, B_rvar) : 0.0;
+        imag = imag_used ? pearson(imag, A_ivar, B_ivar) : 0.0;
+      }
+
+  return imag == 0.0 ? FloatScalar(real, LOC) : ComplexScalar(real, imag, LOC);
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P
 Quad_MX::randoms(Value_P opt_A, Value_P B, int dist)
 {
-int rcnt = 0;   // assume error
+APL_Integer rcnt = 0;   // assume error (not int: Bugs39 #68)
 
    if (!rng_initialised)
      {
@@ -1138,23 +1527,43 @@ int rcnt = 0;   // assume error
    if (rng_seed_set)
      {
        rgen.seed(rng_seed);
-       igen.seed(rng_seed);
+
+       // a different seed for the imaginary parts, otherwise they were
+       // equal to the real parts (Bugs38 #64)
+       std::seed_seq iseq{rng_seed, 6u, 7u, 8u, 9u, 10u};
+       igen.seed(iseq);
        rng_seed_set = false;   // re-seed on next call
      }
 
+   // A ⎕MX[10] B returns a vector of A items, ⎕MX[10] B a scalar (apl.texi
+   // "Randoms", Bugs38 #66). Monadic: B is a scalar (or, as before, a
+   // non-scalar whose first item is used).
+   //
    if (opt_A)   // optional A provided
       {
-        if (opt_A->is_scalar() && B->is_scalar())
-           rcnt = opt_A->get_sole_integer();
+        if (!opt_A->is_scalar() || !B->is_scalar())
+           {
+             MORE_ERROR() << "A ⎕MX[10] B: scalar A and B expected.";
+             RANK_ERROR;
+           }
+        rcnt = opt_A->get_sole_integer();
+        if (rcnt < 0)
+           {
+             MORE_ERROR() << "A ⎕MX[10] B: non-negative A expected.";
+             DOMAIN_ERROR;
+           }
       }
    else
       {
-        if (B->is_scalar() == 0)   rcnt = 1;
+        if (B->element_count() == 0)
+           {
+             MORE_ERROR() << "⎕MX[10] B: non-empty B expected.";
+             LENGTH_ERROR;
+           }
+        rcnt = 1;
       }
 
-   if (rcnt == 0)   RANK_ERROR;
-
-
+   if (rcnt == 0)   return Idx0(LOC);   // 0 ⎕MX[10] B
 
 Cell cache;
 const Cell & B0 = B->get_cfirst(cache);
@@ -1162,7 +1571,7 @@ const APL_Float B0_real = B0.get_real_value();
 const APL_Float B0_imag = B0.get_imag_value();
 
 Shape shape_Z;   // scalar
-   if (rcnt > 1)   shape_Z.add_shape_item(rcnt);
+   if (opt_A)   shape_Z.add_shape_item(rcnt);
 Value_P Z(shape_Z, LOC);
    loop(r, rcnt)
        {
@@ -1179,9 +1588,20 @@ Value_P Z(shape_Z, LOC);
                         break;
 
               case 1:   {
+                          // like the chi-squared and student-t cases below:
+                          // σ > 0, and no imaginary part for a real B (it
+                          // was exp(N(0,0)) = 1, Bugs38 #65)
+                          if (B0_real <= 0.0)
+                             {
+                               MORE_ERROR() << "⎕MX[10, 1] B: B (log-normal "
+                                               "σ) must be > 0.";
+                               DOMAIN_ERROR;
+                             }
                           lognormal_distribution<double> real_dist{0.0, B0_real};
-                          lognormal_distribution<double> imag_dist{0.0, B0_imag};
-                          yy = complex<double>(real_dist(rgen), imag_dist(igen));
+                          const double yim = (B0_imag > 0.0)
+                             ? lognormal_distribution<double>{0.0, B0_imag}(igen)
+                             : 0.0;
+                          yy = complex<double>(real_dist(rgen), yim);
                         }
                         break;
 
@@ -1245,34 +1665,26 @@ Quad_MX::norm(const Value_P B)
 {
 Value_P Z(B->get_shape(), LOC);
 const ShapeItem B_count = B->element_count();
-Dcomplex sum(0.0, 0.0);
+vector<Dcomplex> v;
+   v.reserve(B_count);
    loop(c, B_count)
        {
          Cell cache;
          const Cell & Bv = B->get_cravel(c, cache);
-         Dcomplex val(Bv.get_real_value(), Bv.get_imag_value());
-         // val*val is the complex SQUARE, not |val|^2 -- see magnitude()
-         // above for why that's wrong for a complex vector norm.
-         sum += val * conj(val);
+         v.push_back(Dcomplex(Bv.get_real_value(), Bv.get_imag_value()));
        }
 
-   sum = sqrt(sum);
-   if (sum == Dcomplex(0.0, 0.0))
+   // scaled by the largest component first (like ⎕MX[3]), so that Σ|b|²
+   // neither overflows (giving 0 0) nor underflows (giving the DOMAIN
+   // ERROR below) for large or tiny B (Bugs40 #46)
+   //
+   if (!unit_vector(v))
       {
         MORE_ERROR() << "⎕MX.norm B: B is the zero vector.";
         DOMAIN_ERROR;
       }
 
-   loop(b, B_count)
-       {
-         Cell cache;
-         const Cell & Bb = B->get_cravel(b, cache);
-         Dcomplex val(Bb.get_real_value(), Bb.get_imag_value());
-         val /= sum;
-
-         Z->next_ravel_Complex(val.real(), val.imag());
-       }
-
+   loop(b, B_count)   Z->next_ravel_Complex(v[b].real(), v[b].imag());
    return Z;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -1310,19 +1722,21 @@ const ShapeItem B_count   = B->element_count();
     
    if (!A->is_vector())
       {
-        MORE_ERROR() << "A ⎕MX.rotation_matrix B: vector A expected.";
+        MORE_ERROR() << "A ⎕MX.homogeneous_matrix B: vector A expected.";
         RANK_ERROR;
       }
 
    if (!B->is_vector())
       {
-        MORE_ERROR() << "A ⎕MX.rotation_matrix B: vector B expected.";
+        MORE_ERROR() << "A ⎕MX.homogeneous_matrix B: vector B expected.";
         RANK_ERROR;
       }
 
    if (A_count != 3 || B_count != 3)
       {
-        MORE_ERROR() << "A ⎕MX.rotation_matrix B: ⍴A ≠ ⍴B.";
+        MORE_ERROR() << "A ⎕MX."
+                     << (tp == 9 ? "rotation_matrix" : "homogeneous_matrix")
+                     << " B: 3-element vectors A and B expected.";
         LENGTH_ERROR;
       }
 
@@ -1384,10 +1798,22 @@ const Dcomplex t22 =  cosb * cosg;
         Z->next_ravel_Complex(t22.real(), t22.imag());
         Z->next_ravel_Complex(0.0,        0.0);
 
-        Cell cache0, cache1, cache2;
-        Z->next_ravel_Cell(A->get_cfirst(cache0));
-        Z->next_ravel_Cell(A->get_cravel(1, cache1));
-        Z->next_ravel_Cell(A->get_cravel(2, cache2));
+        // A is a displacement vector: numbers (not e.g. characters,
+        // Bugs38 #67), like every other ⎕MX argument
+        //
+        loop(a, 3)
+           {
+             Cell cache;
+             const Cell & cell = A->get_cravel(a, cache);
+             if (!cell.is_numeric())
+                {
+                  MORE_ERROR() << "A ⎕MX.homogeneous_matrix B: numeric A"
+                                  " expected.";
+                  DOMAIN_ERROR;
+                }
+             Z->next_ravel_Complex(cell.get_real_value(),
+                                   cell.get_imag_value());
+           }
         Z->next_ravel_Complex(1.0, 0.0);
       }
 

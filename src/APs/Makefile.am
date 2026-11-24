@@ -14,6 +14,13 @@ APserver_SOURCES = APserver.cc				\
 		Svar_DB_server.cc Svar_DB_server.hh	\
 		../Svar_record.cc ../Svar_record.hh
 
+# installation directories, expanded at make time (see configure.ac)
+AM_CPPFLAGS = -Dapl_DIR__bin='"$(bindir)"'             \
+              -Dapl_DIR__doc='"$(docdir)"'             \
+              -Dapl_DIR__sysconf='"$(sysconfdir)"'     \
+              -Dapl_DIR__pkglib='"$(pkglibdir)"'       \
+              -Dapl_DIR__pkgdata='"$(pkgdatadir)"'
+
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
 if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing

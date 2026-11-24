@@ -58,6 +58,7 @@
 #include "Common.hh"
 #include "Executable.hh"
 #include "IndexExpr.hh"
+#include "IO_Files.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
 #include "Parser.hh"
@@ -110,12 +111,17 @@ bool valid = arg.size() <= 3;
         return;
       }
 
-   cmd_OFF(arg.size() ? arg.atoi() : 0);
+   cmd_OFF(arg.size() ? arg.atoi() : 0, true, arg.size() != 0);
 }
 //────────────────────────────────────────────────────────────────────────────
 void
-Command::cmd_OFF(int exit_val)
+Command::cmd_OFF(int exit_val, bool by_OFF, bool explicit_code)
 {
+   // finish a test run that is ended by )OFF (Bugs40 #78), but not one that
+   // ends otherwise, e.g. after a crash (whose testcase was already
+   // reported, Bugs41 #42) or at the end of input
+   //
+   if (by_OFF)   exit_val = IO_Files::finish_tests(exit_val, explicit_code);
    COUT << endl;
    if (UserPreferences::uprefs.silence < NO_BANNER)
       {
@@ -237,9 +243,8 @@ Executable * statements = 0;
         bool plus = Workspace::more_error().size();   // assume + needed
         const char * error_name = Error::error_name(err.get_error_code());
         if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
-        if (Workspace::more_error().size() &&
-               Workspace::more_error().back() == UNI_PLUS)
-           plus = false; // dito.
+        // NOTE: the )MORE text may end with a + (e.g. a function name)
+        // which says nothing about the error name (Bugs38 #107)
 
         UERR << error_name;
         if (plus)   UERR << UNI_PLUS;
@@ -313,9 +318,21 @@ Executable * statements = 0;
 
 // statements->print(CERR);
 
-   // push a new context for the statements.
+   // push a new context for the statements. If that fails (the SI depth
+   // limit), then release them (Bugs38 #79).
    //
-   Workspace::push_SI(statements, LOC);
+   try           { Workspace::push_SI(statements, LOC); }
+   catch (Error & err)   // e.g. the SI depth limit, for this statement
+      {
+        delete statements;
+        if (err.get_error_code() != E_SYS_LIMIT_SIDEPTH)   throw;
+
+        // report it like an error of the statement (Bugs39 #61)
+        expression_failed = true;
+        err.print_EM(UERR, LOC);
+        return;
+      }
+   catch (...)   { delete statements;   throw; }
    finish_context();
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -834,6 +851,14 @@ const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
 
               if (eof) CERR << "EOF at " << LOC << endl;
 
+              if (IO_Files::abandon_input)   // testcase ended (Bugs39 #52)
+                 {
+                   IO_Files::abandon_input = false;
+                   multiline_status = MLS_APL_text;
+                   multiline_start = -1;   // not 0 (= line 1, Bugs41 #36)
+                   return;
+                 }
+
               multi_pos = line.multi_pos();
               if (multi_pos != -1)   // some triple
                  {
@@ -849,7 +874,7 @@ const UCS_string prompt = UCS_string(UNI_RIGHT_ARROW) + Workspace::get_prompt();
 
 const UCS_string suffix(line, multi_pos + 3);
 
-    multiline_start = 0;   // inform IO_Files.cc
+    multiline_start = -1;   // inform IO_Files.cc (not 0, Bugs41 #36)
 
    if (multi_literal)   // literal (not string)
       {

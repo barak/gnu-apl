@@ -106,7 +106,8 @@ Quad_JSON::eval_AB(cValue_R A, cValue_R B) const
 {
    if (A.get_rank() > 0)   RANK_ERROR;
 
-const int function_number = A.get_int_value(0);
+// APL_Integer, not int: e.g. 4294967298 was 2 (Bugs38 #87)
+const APL_Integer function_number = A.get_near_int(0);
    switch(function_number)
       {
         case 0:   // same as monadic ⎕JSON
@@ -593,18 +594,22 @@ Quad_JSON::decode_UUUU(const UCS_string & ucs_B, ShapeItem b)
    if (ucs_B[b++] != UNI_BACKSLASH)   return Invalid_Unicode;
    if (ucs_B[b++] != UNI_u)           return Invalid_Unicode;
 
-char cc[5];
-   cc[0] = ucs_B[b++];
-   cc[1] = ucs_B[b++];
-   cc[2] = ucs_B[b++];
-   cc[3] = ucs_B[b++];
-   cc[4] = 0;
+   // test the Unicode itself, not its low byte, e.g. U+0130 is not '0'
+   // (Bugs40 #101)
+   //
+int value = 0;
    loop(i, 4)
       {
-        if (!isxdigit(uint8_t(cc[i])))   return Invalid_Unicode;
+        const Unicode uni = ucs_B[b++];
+        int digit;
+        if      (uni >= '0' && uni <= '9')   digit = uni - '0';
+        else if (uni >= 'A' && uni <= 'F')   digit = uni - 'A' + 10;
+        else if (uni >= 'a' && uni <= 'f')   digit = uni - 'a' + 10;
+        else                                 return Invalid_Unicode;
+        value = value << 4 | digit;
       }
 
-   return Unicode(strtoll(cc, 0, 16));
+   return Unicode(value);
 }
 //────────────────────────────────────────────────────────────────────────────
 Value_P

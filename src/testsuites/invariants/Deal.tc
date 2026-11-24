@@ -1,0 +1,15 @@
+⍝ Deal.tc
+⍝ ═══════
+
+      ⎕IO←1
+
+      ⍝ Precond: A and B simple scalar nonneg integer; A≤B
+      ⍝ inv: ⍴Z ←→ ,A
+      ⍝ inv: ⍴⍴Z ←→ ,1
+      A ← 1+5∣|⎕RVAL 0                      ⍝ A in 1..6
+      B ← A+1+5∣|⎕RVAL 0                    ⍝ B > A
+      Z ← A?B
+      (⍴Z) ≡ ,A
+1
+      (⍴⍴Z) ≡ ,1
+1

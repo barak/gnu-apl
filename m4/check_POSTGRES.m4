@@ -30,14 +30,20 @@ apl_NYES($found_postgresql) && return   # no POSTGRESQL
     # POSTGRES is present. Check if it is usable (which is the final verdict).
     #
 AC_MSG_CHECKING([for PostgreSQL usability])
+   # link (not only compile): the header alone can be present without a
+   # usable library, e.g. in a -m32 build on a 64-bit host.
+   #
    saved_CPPFLAGS="$CPPFLAGS"
+   saved_LIBS="$LIBS"
    CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-   AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[@%:@include <libpq-fe.h>]],
-                     [[PGconn *db = PQconnectdbParams(0, 0, 1);]])],
-                     [apl_POSTGRES=yes],
-                     [apl_POSTGRES=no])
+   LIBS="$LIBS $POSTGRESQL_LDFLAGS"
+   AC_LINK_IFELSE([AC_LANG_PROGRAM([[@%:@include <libpq-fe.h>]],
+                  [[PGconn *db = PQconnectdbParams(0, 0, 1);]])],
+                  [apl_POSTGRES=yes],
+                  [apl_POSTGRES=no])
 
    CPPFLAGS="$saved_CPPFLAGS"
+   LIBS="$saved_LIBS"
 AC_MSG_RESULT($apl_POSTGRES)
 
 } }

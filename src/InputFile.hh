@@ -73,7 +73,8 @@ struct InputFile
         : where(WH_outside),
           in_matched(false),
           protection(false),
-          copying(false)
+          copying(false),
+          loading(false)
         {}
 
         /// add \b object to \b this object_filter
@@ -96,20 +97,42 @@ struct InputFile
         void set_copying()
            { copying = true; }
 
+        /// set the loading flag (from )LOAD of a .apl file)
+        void set_loading()
+           { loading = true; }
+
+        /// return \b true for the file of a )LOAD, )COPY, or )PCOPY
+        bool is_load_or_copy() const
+           { return copying || loading; }
+
         /// return \b true if check_filter() needs to be called at all, i.e.
         /// for )COPY and )PCOPY (but not )LOAD). Without an object filter
         /// and )PCOPY protection, check_filter() passes every line, but
         /// still replaces existing structured variables as a whole.
         bool is_active() const
-           { return copying || has_object_filter() || protection; }
+           { return copying || loading || has_object_filter() || protection; }
 
         /// check the current line and return true if the line is permitted by
         /// the object_filter. Also, update \b in_function and \b in_variable.
         /// @param line the UTF-8 source line to evaluate against the filter
         bool check_filter(const UTF8_string & line);
 
-        /// )COPY of function \b fun_name: expunge a variable of that name
-        static void replace_variable(const UCS_string & fun_name);
+        /// the kind of an object in a .apl file
+        enum Obj_kind
+           {
+             OBJ_FUNCTION,   ///< a defined function (∇...∇)
+             OBJ_VALUE,      ///< a (simple or nested) variable
+             OBJ_STRUCT,     ///< a structured variable
+             OBJ_LAMBDA      ///< a named lambda
+           };
+
+        /// )COPY of the object \b name of kind \b kind: prepare its global
+        /// symbol (e.g. expunge a function that a variable replaces) and
+        /// return true, or return false if it shall not be copied
+        static bool replace_object(const UCS_string & name, Obj_kind kind);
+
+        /// return true if \b name shall be copied according to object_filter
+        bool is_selected(const UCS_string & name) const;
 
         // where the current (and subsequent) line(s) are located
         enum
@@ -130,6 +153,21 @@ struct InputFile
 
         /// true for )COPY and )PCOPY (but not for )LOAD)
         bool copying;
+
+        /// true for )LOAD of a .apl file (it skips the session variables)
+        bool loading;
+
+        /// return the name of the system variable assigned by \b line,
+        /// e.g. ⎕PW for the )DUMP line ⎕PW←80, or an empty string
+        static UCS_string sysvar_assigned(const UCS_string & line);
+
+        /// return true iff )COPY may copy the system variable \b name (LRM
+        /// p. 423: only ⎕CT, ⎕FC, ⎕IO, ⎕LX, ⎕PP, ⎕PR, and ⎕RL)
+        static bool copyable_sysvar(const UCS_string & name);
+
+        /// return true iff \b name is a session variable (⎕PW, ⎕TZ, ⎕PS),
+        /// which )LOAD does not change
+        static bool session_sysvar(const UCS_string & name);
 
         /// the functions and variiables that shall be )COPIED
         UCS_string_vector object_filter;
@@ -229,6 +267,10 @@ struct InputFile
 
    /// the file name
    UTF8_string filename;
+
+   /// true for a testcase file (-T, --TL), false for an APL file (-f)
+   bool is_test() const
+      { return test; }
 
    /// a COPY_filter instance
    COPY_filter copy_filter;

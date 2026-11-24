@@ -102,11 +102,26 @@ transfer_context tctx(protection);
         loop(n, tctx.not_copied.size())   out << " " << tctx.not_copied[n];
         out << endl;
       }
+
+   // named objects that are not in the transfer file (LRM p. 466, Bugs41 #87)
+   //
+UCS_string_vector not_found;
+   loop(a, args.size())   // the file name was removed from args above
+       if (!tctx.found.contains(args[a]))   not_found.push_back(args[a]);
+   if (not_found.size())
+      {
+        out << "NOT FOUND:";
+        loop(n, not_found.size())   out << " " << not_found[n];
+        out << endl;
+      }
 }
 //════════════════════════════════════════════════════════════════════════════
 bool
 Cmd_IN::transfer_context::is_protected(const UCS_string & name) const
 {
+   // called for every object of the transfer file that is to be copied
+   if (!found.contains(name))   found.push_back(name);   // Bugs41 #87
+
    if (!protection || name.size() == 0)   return false;
 
 bool exists = true;   // system variables always exist
@@ -211,6 +226,14 @@ const char sub_type = record[1];
       }
 }
 //────────────────────────────────────────────────────────────────────────────
+bool
+Cmd_IN::transfer_context::valid_user_name(const UCS_string & name)
+{
+   if (name.size() == 0 || !Avec::is_first_symbol_char(name[0]))   return false;
+   loop(n, name.size())   if (!Avec::is_symbol_char(name[n]))      return false;
+   return true;
+}
+//────────────────────────────────────────────────────────────────────────────
 uint32_t
 Cmd_IN::transfer_context::get_nrs(UCS_string & name, Shape & shape) const
 {
@@ -277,6 +300,12 @@ Symbol * sym = 0;
       }
    else                            // user defined variable
       {
+        if (!valid_user_name(var_name))   // e.g. 1Y or A+B (Bugs38 #40)
+           {
+             CERR << ")IN: " << var_name
+                  << " is not a valid name (record skipped)" << endl;
+             return;
+           }
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
@@ -316,8 +345,13 @@ const ShapeItem ec = Z->element_count();
       }
    Z->check_value(LOC);
 
+   // an invalid value (e.g. ⎕IO←7) skips this record, like for A records
+   // (Bugs37 #48, Bugs38 #84)
+   //
    Assert(sym);
-   sym->assign(Z, false, LOC);
+   if (!Quad_TF::safe_assign(*sym, Z, false))
+      CERR << "ERROR: )IN: the value of " << sym->get_name()
+           << " in the transfer file is invalid (record skipped)" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -349,6 +383,12 @@ Symbol * sym = 0;
       }
    else                            // user defined variable
       {
+        if (!valid_user_name(var_name))   // e.g. 1Y or A+B (Bugs38 #40)
+           {
+             CERR << ")IN: " << var_name
+                  << " is not a valid name (record skipped)" << endl;
+             return;
+           }
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
@@ -381,8 +421,13 @@ ShapeItem padded = 0;
 
    Z->check_value(LOC);
 
+   // an invalid value (e.g. ⎕IO←7) skips this record, like for A records
+   // (Bugs37 #48, Bugs38 #84)
+   //
    Assert(sym);
-   sym->assign(Z, false, LOC);
+   if (!Quad_TF::safe_assign(*sym, Z, false))
+      CERR << "ERROR: )IN: the value of " << sym->get_name()
+           << " in the transfer file is invalid (record skipped)" << endl;
 }
 //────────────────────────────────────────────────────────────────────────────
 void

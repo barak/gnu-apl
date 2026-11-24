@@ -105,6 +105,13 @@ public:
    /// @param loc caller location for diagnostics
    void syntax_error(const char * loc);
 
+   /// set restart_PC to the start of the current statement, so that a
+   /// resume (→⍬ or →⍳0) restarts it
+   void set_restart_PC();
+
+   /// the work of reduce_D_V__()
+   void do_reduce_D_V__();
+
    /// release any DerivedFunction (e.g. from f⍨, f¨, f⍤y, f⍣N) still
    /// sitting in the FIFO, so a statement being abandoned by an error
    /// does not leak its DerivedFunctionCache slot (and whatever Value_P
@@ -402,8 +409,11 @@ protected:
    /// @param result the token returned by an eval_XXX() function
    void set_action(const Token & result);
 
-   /// read and resolve the token class left of [ ... ], PC is at ']'
-   bool is_value_bracket() const;
+   /// return true if [ ... ] with the ] at body[rbra] indexes a value
+   bool is_value_bracket(Prefix_PC rbra) const;
+
+   /// return true if body[pc], the token left of an index, is a value
+   bool is_indexed_value(Prefix_PC pc) const;
 
    /// return true if \b this prefix has a valid lookahead token
    int has_MISC() const
@@ -415,6 +425,15 @@ protected:
 
    /// return true if body[pc] is the right operand of a dyadic operator
    bool is_OPER2_left_of_RO(Prefix_PC pc) const;
+
+   /// return true if the value right operand body[pc] cannot contain B
+   bool is_entire_value_RO(Prefix_PC pc) const;
+
+   /// return true if the name body[pc] is a member, e.g. m in S.m
+   bool is_member_access(Prefix_PC pc) const;
+
+   /// return true if the ( ... ) ending at body[pc] is certainly a function
+   bool is_function_parenthesis(Prefix_PC pc) const;
 
    /// return the idx'th Token_loc (from put position)
    /// @param idx zero-based index from the left (APL order)
@@ -534,6 +553,10 @@ protected:
 #define P_(_name, _suffix, _idx, _prio, _misc, _len)
 #include "Prefix.def"
 
+   /// reduce phrases F C D B and F C D G (aliases, therefore not declared
+   /// by the generated Prefix.def), Bugs39 #71
+   void reduce_F_C_D_G();
+
    /// ⎕ES result helper
    static void handle_QUAD_ES_COM(const Token & result);
 
@@ -574,7 +597,8 @@ protected:
                                    ErrorCode ec_on_failure,
                                    const char * why,
                                    const UCS_string * b_line2 = 0,
-                                   int b_lcaret = -1, int b_rcaret = -1);
+                                   int b_lcaret = -1, int b_rcaret = -1,
+                                   const UCS_string * b_reason = 0);
 
    /// the StateIndicator that contains this parser
    StateIndicator & si;
@@ -608,6 +632,10 @@ protected:
    /// assignment state
    Assign_state assign_state;
 
+   /// the PC of the last ← read (to resume a failed selective
+   /// specification, Bugs39 #49)
+   Prefix_PC assign_PC;
+
    /// length of matched prefix (before calling a reduce_XXX() function)
    int prefix_len;
 
@@ -617,6 +645,11 @@ protected:
    /// true if ⎕EA or ⎕EB, called in the current statement, has delivered
    /// an escape (→ in B): the statement is abandoned (see reduce_body())
    bool escape_pending;
+
+   /// the start of the current statement if it failed with a SYNTAX ERROR
+   /// and shall be restarted from there when it is resumed (Bugs40 #3),
+   /// otherwise Prefix_PC_invalid
+   Prefix_PC restart_PC;
 
    /// the best (longest) phrase that matches the current stack,
    /// or 0 if no phrase matches (so the parser will SHIFT)

@@ -30,6 +30,7 @@
 #include "StateIndicator.hh"
 #include "UTF8_string.hh"
 #include "Workspace.hh"
+#include "Workspace.icc"
 
 // primitive function instance
 //
@@ -162,7 +163,21 @@ Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
         statement[0] == UNI_R_BRACK))   return execute_command(statement);
 
 ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
-   if (fun == 0)   SYNTAX_ERROR;
+   if (fun == 0)
+      {
+        // the class of the error that fix() caught, e.g. DEFN ERROR for
+        // {→0} (Bugs38 #73). A syntax error stays SYNTAX ERROR (2 2) like
+        // in ⎕EA (APL2 LRM, ⎕ES example); its specific reason is in )MORE.
+        //
+        if (const Error * werr = Workspace::get_error())
+           {
+             const ErrorCode ec = werr->get_error_code();
+             if (ec != E_NO_ERROR &&
+                 Error::error_major(ec) != Error::error_major(E_SYNTAX_ERROR))
+                throw_apl_error(ec, LOC);
+           }
+        SYNTAX_ERROR;
+      }
 
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
@@ -176,7 +191,8 @@ ExecuteList * fun = ExecuteList::fix(statement.no_pad(), LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   Workspace::push_SI(fun, LOC);
+   try   { Workspace::push_SI(fun, LOC); }   // e.g. the SI depth limit
+   catch (...)   { delete fun;   throw; }      // (Bugs38 #79)
 
    Log(LOG_StateIndicator__push_pop)
       {

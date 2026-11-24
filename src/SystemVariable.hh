@@ -49,6 +49,15 @@ public:
    Token get_token()
       { return Token(ID::get_token_tag(get_Id()), this); }
 
+   /// return true if an assignment to this variable would be ignored
+   /// (e.g. ⎕L without a function on the SI)
+   virtual bool assign_ignored() const
+      { return false; }
+
+   /// return true if an assignment to ⎕L, ⎕R, or ⎕X (\b which = 'L', 'R',
+   /// or 'X') would be ignored
+   static bool lrx_assign_ignored(char which);
+
    /// overloaded Symbol::print().
    /// @param out output stream to print to
    virtual ostream & print(ostream & out) const;
@@ -350,6 +359,10 @@ protected:
 class Quad_L : public NL_SystemVariable
 {
 public:
+   /// overloaded SystemVariable::assign_ignored()
+   virtual bool assign_ignored() const
+      { return lrx_assign_ignored('L'); }
+
    /// Constructor.
    Quad_L();
 
@@ -616,6 +629,10 @@ protected:
 class Quad_R : public NL_SystemVariable
 {
 public:
+   /// overloaded SystemVariable::assign_ignored()
+   virtual bool assign_ignored() const
+      { return lrx_assign_ignored('R'); }
+
    /// Constructor.
    Quad_R();
 
@@ -666,6 +683,15 @@ public:
    /// maximum depth of SI stack
    static ShapeItem si_depth_limit;
 
+   /// the SI depth limit that was automatically cleared when it was reached
+   /// (restored when the SI was unwound), or 0
+   static ShapeItem si_depth_limit_cleared;
+
+   /// while the SI depth limit is cleared: the SI depth at which a still
+   /// growing SI (e.g. a resumed runaway recursion) is stopped again, or 0
+   /// (Bugs40 #6)
+   static ShapeItem si_depth_backstop;
+
    /// maximum number of values
    static ShapeItem value_count_limit;
 
@@ -688,6 +714,11 @@ public:
 
         SYL_MAX                      ///< max. system limit value (excluding)
       };
+
+   /// the number of cells that a new ⎕WA margin or scale must leave free:
+   /// every statement needs 1000 cells for Workspace::push_SI(), plus its
+   /// values (Bugs38 #5)
+   enum { SYL_WA_RESERVE = 10000 };
 
 protected:
 };
@@ -778,6 +809,7 @@ protected:
    virtual void pop()
       {
         Symbol::pop();
+        if (value_stack.size() == 0)   return;   // see Bugs40 #11
         Cell cache;
         offset_seconds = int(lround(3600
                      * get_apl_value()->get_cscalar(cache).get_real_value()));
@@ -809,6 +841,10 @@ protected:
 class Quad_X : public NL_SystemVariable
 {
 public:
+   /// overloaded SystemVariable::assign_ignored()
+   virtual bool assign_ignored() const
+      { return lrx_assign_ignored('X'); }
+
    /// Constructor.
    Quad_X();
 

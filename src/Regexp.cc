@@ -35,7 +35,7 @@ PCRE2_UCHAR32 * buf = new PCRE2_UCHAR32[size];
 }
 //════════════════════════════════════════════════════════════════════════════
 RegexpMatch::RegexpMatch(pcre2_code * code, const UCS_string & B,
-                         PCRE2_SIZE start)
+                         PCRE2_SIZE start, uint32_t extra_options)
    : matched_B(B)
 {
    match_data = pcre2_match_data_create_from_pattern_32(code, NULL);
@@ -61,7 +61,7 @@ RegexpMatch::RegexpMatch(pcre2_code * code, const UCS_string & B,
    // GNU APL's Unicode is not restricted to legal Unicode scalars) is
    // still caught as a real PCRE2 error.
    //
-const uint32_t options = start ? PCRE2_NO_UTF_CHECK : 0;
+const uint32_t options = (start ? PCRE2_NO_UTF_CHECK : 0) | extra_options;
 
    // an empty B may have no buffer at all, but PCRE2 rejects a NULL
    // subject even with length 0 ("NULL argument passed", Bugs35 #57)
@@ -156,7 +156,11 @@ PCRE2_SIZE error_offset = -1;
                            &error_offset, 0);
    delete[] pattern_ucs;
 
-   if (code)   return;   // OK
+   if (code)   // OK
+      {
+        compute_group_parents(pattern, flags);
+        return;
+      }
 
    MORE_ERROR() << 
 "in (say) Z←A ⎕RE B: error when compiling the regular expression A.\n"
@@ -167,6 +171,246 @@ PCRE2_SIZE error_offset = -1;
    << UCS_string(pattern, error_offset) << "'";
 
    DOMAIN_ERROR;
+}
+//────────────────────────────────────────────────────────────────────────────
+void
+Regexp::compute_group_parents(const UCS_string & pattern, int flags)
+{
+   // the structure of the ⎕RE result is the structure of the capturing
+   // groups in the pattern (apl.texi "Complex Matches"), not of the spans
+   // of one match (Bugs38 #55). group_parents[g] is the innermost capturing
+   // group that contains group g (0 = the whole match).
+   //
+   // The scanner skips escapes, character classes (including POSIX items
+   // like [:space:]), comments (also # comments in extended mode, see
+   // (?x) and ⎕RE['x']), and the condition of a conditional group like
+   // (?(2)...|...), so that no ( or ) in them is taken for a group
+   // (Bugs39 #28). Likewise backtracking verbs like (*MARK:name), callouts
+   // like (?C"text"), and \Q...\E in a character class; with option n (no
+   // auto capture) a plain ( does not capture (Bugs40 #89).
+   //
+std::vector<int> parents(1, -1);   // group 0: the whole match
+std::vector<int> open;             // the groups of the open ( (or -1)
+std::vector<bool> open_extended;   // the extended mode outside each open (
+std::vector<bool> open_no_auto;    // the no-auto-capture mode outside it
+bool extended = (flags & PCRE2_EXTENDED) != 0;
+bool no_auto = (flags & PCRE2_NO_AUTO_CAPTURE) != 0;
+const ShapeItem len = pattern.size();
+   for (ShapeItem p = 0; p < len; ++p)
+       {
+         const Unicode uni = pattern[p];
+         if (uni == UNI_BACKSLASH)
+            {
+              if (p + 1 < len && pattern[p + 1] == UNI_Q)   // \Q ... \E
+                 {
+                   for (p += 2; p + 1 < len; ++p)
+                       if (pattern[p] == UNI_BACKSLASH &&
+                           pattern[p + 1] == UNI_E)   { ++p;   break; }
+                 }
+              else if (p + 1 < len && pattern[p + 1] == Unicode('c'))
+                 p += 2;   // \cX: a control character, e.g. \c(
+              else ++p;   // skip the escaped character
+              continue;
+            }
+
+         if (extended && uni == UNI_NUMBER_SIGN)   // # comment
+            {
+              while (p < len && pattern[p] != UNI_LF)   ++p;
+              continue;
+            }
+
+         if (uni == UNI_L_BRACK)   // character class [...]
+            {
+              ++p;
+              if (p < len && pattern[p] == UNI_CIRCUMFLEX)   ++p;
+              if (p < len && pattern[p] == UNI_R_BRACK)      ++p;   // []...]
+              for (; p < len && pattern[p] != UNI_R_BRACK; ++p)
+                  {
+                    if (pattern[p] == UNI_BACKSLASH && p + 1 < len &&
+                        pattern[p + 1] == UNI_Q)   // \Q ... \E in a class
+                       {
+                         for (p += 2; p < len; ++p)
+                             if (pattern[p] == UNI_BACKSLASH && p + 1 < len &&
+                                 pattern[p + 1] == UNI_E)   { ++p;   break; }
+                         continue;
+                       }
+                    if (pattern[p] == UNI_BACKSLASH)   { ++p;   continue; }
+                    if (pattern[p] == UNI_L_BRACK && p + 1 < len &&
+                        (pattern[p + 1] == UNI_COLON ||   // [:alpha:]
+                         pattern[p + 1] == UNI_FULLSTOP ||
+                         pattern[p + 1] == UNI_EQUAL))
+                       {
+                         const Unicode delim = pattern[p + 1];
+                         for (ShapeItem q = p + 2; q + 1 < len; ++q)
+                             {
+                               if (pattern[q] == delim &&
+                                   pattern[q + 1] == UNI_R_BRACK)
+                                  { p = q + 1;   break; }
+                             }
+                       }
+                  }
+              continue;
+            }
+
+         if (uni == UNI_L_PARENT)
+            {
+              const Unicode n1 = p + 1 < len ? pattern[p + 1] : Unicode_0;
+              const Unicode n2 = p + 2 < len ? pattern[p + 2] : Unicode_0;
+              const Unicode n3 = p + 3 < len ? pattern[p + 3] : Unicode_0;
+              if (n1 == UNI_QUESTION && n2 == UNI_NUMBER_SIGN)   // (?# ...)
+                 {
+                   while (p < len && pattern[p] != UNI_R_PARENT)   ++p;
+                   continue;
+                 }
+
+              // a backtracking verb or a start-of-pattern option, e.g.
+              // (*MARK:name), (*:name), (*UTF): no group, and its name may
+              // contain ( or ). The alpha assertions like (*pla:...) are
+              // lower case and contain a sub-pattern.
+              //
+              if (n1 == UNI_ASTERISK &&
+                  ((n2 >= 'A' && n2 <= 'Z') || n2 == UNI_COLON))
+                 {
+                   while (p < len && pattern[p] != UNI_R_PARENT)   ++p;
+                   continue;
+                 }
+
+              // a callout (?C), (?Cn), or (?C"text") with the delimiters
+              // " ' ` ^ % # $ (doubled inside the text) or {...}: no group
+              //
+              if (n1 == UNI_QUESTION && n2 == Unicode('C'))
+                 {
+                   ShapeItem q = p + 3;
+                   const Unicode d = q < len ? pattern[q] : Unicode_0;
+                   if (d == UNI_L_CURLY)   // a doubled }} is a } (Bugs41 #79)
+                      {
+                        for (++q; q < len; ++q)
+                            {
+                              if (pattern[q] != UNI_R_CURLY)   continue;
+                              if (q + 1 < len && pattern[q + 1] == UNI_R_CURLY)
+                                 ++q;
+                              else   { ++q;   break; }
+                            }
+                      }
+                   else if (d == UNI_DOUBLE_QUOTE || d == UNI_SINGLE_QUOTE ||
+                            d == Unicode('`') || d == UNI_CIRCUMFLEX ||
+                            d == Unicode('%') || d == UNI_NUMBER_SIGN ||
+                            d == Unicode('$'))
+                      {
+                        for (++q; q < len; ++q)
+                            {
+                              if (pattern[q] != d)   continue;
+                              if (q + 1 < len && pattern[q + 1] == d)   ++q;
+                              else   { ++q;   break; }
+                            }
+                      }
+                   while (q < len && pattern[q] != UNI_R_PARENT)   ++q;
+                   p = q;
+                   continue;
+                 }
+
+              // option settings, e.g. (?x) or (?i-x:...)
+              //
+              bool opt_extended = extended;
+              bool opt_no_auto = no_auto;
+              bool is_option = false;
+              ShapeItem opt_end = p + 2;
+              if (n1 == UNI_QUESTION)
+                 {
+                   bool negative = false;
+                   for (; opt_end < len; ++opt_end)
+                       {
+                         const Unicode o = pattern[opt_end];
+                         if (o == UNI_MINUS)   { negative = true;   continue; }
+                         if (o == Unicode('x'))
+                            { opt_extended = !negative;   continue; }
+                         if (o == Unicode('n'))
+                            { opt_no_auto = !negative;   continue; }
+                         if (o == UNI_CIRCUMFLEX)   { opt_extended = false;
+                                                      opt_no_auto = false;
+                                                      continue; }
+                         if ((o >= 'a' && o <= 'z') || (o >= 'A' && o <= 'Z'))
+                            continue;
+                         break;
+                       }
+                   is_option = opt_end > p + 2 && opt_end < len &&
+                               (pattern[opt_end] == UNI_R_PARENT ||
+                                pattern[opt_end] == UNI_COLON);
+                 }
+
+              if (is_option && pattern[opt_end] == UNI_R_PARENT)   // (?x)
+                 {
+                   extended = opt_extended;   // until the end of the group
+                   no_auto = opt_no_auto;
+                   p = opt_end;
+                   continue;
+                 }
+
+              bool capturing = n1 != UNI_QUESTION && n1 != UNI_ASTERISK &&
+                               !no_auto;
+              if (n1 == UNI_QUESTION)   // named groups capture
+                 {
+                   if (n2 == UNI_SINGLE_QUOTE)   capturing = true;
+                   if (n2 == UNI_P && n3 == UNI_LESS)   capturing = true;
+                   if (n2 == UNI_LESS && n3 != UNI_EQUAL &&
+                       n3 != UNI_EXCLAM)   capturing = true;
+                 }
+
+              open_extended.push_back(extended);
+              open_no_auto.push_back(no_auto);
+              if (capturing)
+                 {
+                   int parent = 0;
+                   for (ShapeItem o = ShapeItem(open.size()) - 1; o >= 0; --o)
+                       if (open[o] > 0)   { parent = open[o];   break; }
+                   open.push_back(parents.size());
+                   parents.push_back(parent);
+                 }
+              else
+                 {
+                   open.push_back(-1);
+                 }
+
+              if (is_option)   // (?x: ...)
+                 {
+                   extended = opt_extended;
+                   no_auto = opt_no_auto;
+                   p = opt_end;
+                 }
+              else if (n1 == UNI_QUESTION && n2 == UNI_L_PARENT)   // (?(
+                 {
+                   // the condition of a conditional group, e.g. (2), (<n>),
+                   // or (R): skip it. An assertion condition (?(?=...)...)
+                   // is an ordinary (non-capturing) group.
+                   //
+                   if (n3 != UNI_QUESTION && n3 != UNI_ASTERISK)
+                      {
+                        ShapeItem q = p + 3;
+                        while (q < len && pattern[q] != UNI_R_PARENT)   ++q;
+                        p = q;
+                      }
+                   else
+                      {
+                        p += 1;   // the next ++p is the condition's (
+                      }
+                 }
+              continue;
+            }
+
+         if (uni == UNI_R_PARENT && open.size())
+            {
+              open.pop_back();
+              extended = open_extended.back();
+              open_extended.pop_back();
+              no_auto = open_no_auto.back();
+              open_no_auto.pop_back();
+            }
+       }
+
+   // use the result only if it agrees with PCRE2 (e.g. not for (?|...),
+   // where several groups share a number)
+   //
+   if (int(parents.size()) == expression_count() + 1)   group_parents = parents;
 }
 //────────────────────────────────────────────────────────────────────────────
 Regexp::~Regexp()

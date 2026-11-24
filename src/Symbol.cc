@@ -125,6 +125,64 @@ Symbol::cant_be_defined() const
    return "bad name class";
 }
 //────────────────────────────────────────────────────────────────────────────
+bool
+Symbol::is_UTF8_text(const UCS_string & text)
+{
+   // like Quad_CR::is_UTF8_encodable(): no surrogate, at most U+10FFFF
+   loop(t, text.size())
+       {
+         const Unicode uni = text[t];
+         if (uni >= 0xD800 && uni <= 0xDFFF)   return false;
+         if (uni < 0 || uni > 0x10FFFF)        return false;
+
+         // a CR, which the reader of a .apl file ignores (Bugs41 #86)
+         if (uni == UNI_CR)                    return false;
+       }
+   return true;
+}
+//────────────────────────────────────────────────────────────────────────────
+UCS_string
+Symbol::CR10_text(const UCS_string & text)
+{
+   // an APL expression whose value is the string text, e.g. 'a',(⎕UCS 56000)
+   // for a character that cannot be written as UTF-8 or in a '...' string
+   // (like in Quad_CR::do_CR10_simple_cell()).
+   //
+UCS_string expr;
+int items = 0;        // number of items joined by ,
+bool quoted = false;   // inside '...'
+   loop(t, text.size())
+       {
+         const Unicode uni = text[t];
+         const bool plain = uni == UNI_SINGLE_QUOTE ||
+                            (uni >= ' ' && uni != 127 &&
+                             !Avec::is_single_quote(uni) &&
+                             !(uni >= 0xD800 && uni <= 0xDFFF) &&
+                             uni <= 0x10FFFF);
+         if (plain)
+            {
+              if (!quoted)
+                 {
+                   if (items++)   expr << ",";
+                   expr << "'";
+                   quoted = true;
+                 }
+              expr << uni;
+              if (uni == UNI_SINGLE_QUOTE)   expr << uni;   // ''
+            }
+         else
+            {
+              if (quoted)   { expr << "'";   quoted = false; }
+              if (items++)   expr << ",";
+              expr << "(⎕UCS " << int(uni) << ")";
+            }
+       }
+   if (quoted)        expr << "'";
+   if (items == 0)    return expr << "''";
+   if (items == 1 && text.size() == 1)   return UCS_string(UTF8_string(",")) << expr;
+   return expr;
+}
+//────────────────────────────────────────────────────────────────────────────
 void
 Symbol::dump(ostream & out) const
 {
@@ -168,8 +226,8 @@ const ValueStackItem & vs = value_stack[0];
         const UCS_string text = ufun->canonical(false);
         if (ufun->is_lambda())
            {
-             out << get_name();
-             out << "←{";
+             UCS_string lambda;   // NAME←{...}
+             lambda << get_name() << "←{";
              int t = 0;
              while (t < text.ssize())   // skip λ header
                 {
@@ -198,17 +256,8 @@ const ValueStackItem & vs = value_stack[0];
                    body << uni;
                 }
 
-             ShapeItem sols = 0;
-             for (ShapeItem j = body.size() - 1; j >= 0; --j)
-                 {
-                   if (Avec::is_DIAMOND(body[j]))
-                      {
-                        sols = j + 1;
-                        while (sols < body.ssize() &&
-                               body[sols] <= UNI_SPACE)   ++sols;
-                        break;
-                      }
-                 }
+             const ShapeItem sols =
+                   Executable::lambda_last_statement(body);   // Bugs40 #41
              if (sols + 1 < body.ssize() &&
                  body[sols] == UNI_LAMBDA &&
                  body[sols + 1] == UNI_LEFT_ARROW)
@@ -217,15 +266,40 @@ const ValueStackItem & vs = value_stack[0];
                   body.erase(sols);
                 }
 
-             out << body;
+             lambda << body;
 
              // append local variables
              //
              loop(l, ufun->local_var_count())
                  {
-                   out << ";" << ufun->get_local_var(l)->get_name();
+                   lambda << ";" << ufun->get_local_var(l)->get_name();
                  }
-             out << UNI_R_CURLY << endl;
+             lambda << UNI_R_CURLY;
+
+             // a character that cannot be written as UTF-8 (see below):
+             // write ⍎ of a string with ⎕UCS instead (Bugs39 #60)
+             //
+             if (is_UTF8_text(lambda))   out << lambda << endl;
+             else   out << "⍎" << CR10_text(lambda) << endl;
+           }
+        else if (!is_UTF8_text(text))
+           {
+             // a character that cannot be written as UTF-8 (e.g. a
+             // surrogate from ⎕UCS 56000) would change the function when
+             // it is )LOADed: write ⎕FX of strings with ⎕UCS instead, like
+             // a variable (Bugs39 #60)
+             //
+             UCS_string_vector lines;
+             text.to_vector(lines);
+             out << "0 0⍴";   // do not display the result of ⎕FX
+             if (ufun->get_exec_properties()[0])   out << "1 ";   // locked
+             out << "⎕FX";
+             if (lines.size() == 1)   out << " ,⊂";
+             loop(l, lines.size())
+                {
+                  out << " (" << CR10_text(lines[l]) << ")";
+                }
+             out << endl;
            }
         else
            {
@@ -976,7 +1050,7 @@ const ShapeItem max_idx = Z->element_count();
        B->is_scalar() &&     // B is a scalar, and
        Z->get_rank() == 1)   // Z is a vector
       {
-        const APL_Integer idx = X->get_near_int(0) - qio;
+        const APL_Integer idx = Cell::minus_IO(X->get_index_int(0), qio);
         if (idx >= 0 && idx < max_idx)   // idx is a valid index of Z
            {
              Cell cache;
@@ -1030,19 +1104,26 @@ ShapeItem idxB = 0;
            }
       }
 
+   // check all indices before the first item is assigned, so that a
+   // failed assignment leaves A unchanged, like A[I;J]←B (Bugs40 #39)
+   //
    loop(x, ec_X)
       {
-        const ShapeItem this_idxX = idxX;
-        const ShapeItem idx = X->get_near_int(idxX++) - qio;
+        const ShapeItem idx = Cell::minus_IO(X->get_index_int(x), qio);
         if (idx < 0 || idx >= max_idx)
            {
-             MORE_ERROR() << "A[B]←C: B[" << (this_idxX + qio) << "] = "
-                          << (idx + qio)
+             MORE_ERROR() << "A[B]←C: B[" << (x + qio) << "] = "
+                          << X->get_index_int(x)   // not idx + qio: Bugs40 #88
                           << " is not a valid index for A (expecting "
                           << qio << "≤index<" << (max_idx + qio) << ")"
                           << ArgCheck::index_io0_note(idx, max_idx);
              INDEX_ERROR;
            }
+      }
+
+   loop(x, ec_X)
+      {
+        const ShapeItem idx = Cell::minus_IO(X->get_index_int(idxX++), qio);
         Cell cache;
         const Cell & cB = B->get_cravel(idxB, cache);
         Z->assign_cell(idx, cB, LOC);
@@ -1456,6 +1537,19 @@ Symbol::pop()
 
 const ValueStackItem & vs = value_stack.back();
 
+   // a lambda bound by )LOAD with a reference (Bugs39 #89)
+   //
+   if (vs.get_owns_lambda() && (vs.get_NC() & NC_FUN_OPER) &&
+       vs.get_function())
+      {
+        const UserFunction * ufun = vs.get_function()->get_func_ufun();
+        value_stack.pop_back();
+        if (monitor_callback)   monitor_callback(*this, SEV_POPED);
+        if (ufun && ufun->is_lambda())
+           const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
+        return;
+      }
+
    if (get_NC() == NC_VARIABLE)
       {
         Log(LOG_SYMBOL_push_pop)
@@ -1505,6 +1599,22 @@ Symbol::pop_local()
              if (ufun && !ufun->is_lambda() &&
                  ufun->get_header().FUN() == this)
                 Workspace::add_expunged_function(ufun);
+
+             // a lambda bound to a local name (or to the result name, e.g.
+             // λ←⍶) by assign_named_lambda(), which took a reference:
+             // release it like expunge() does (Bugs38 #78, #81). Operands
+             // (⍶, ⍹, ...) are bound without a reference and popped by
+             // pop(), not by pop_local().
+             //
+             if (ufun && ufun->is_lambda())
+                {
+                  // pop() itself releases a reference taken by )LOAD
+                  const bool released = vs.get_owns_lambda();
+                  pop();
+                  if (!released)
+                     const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
+                  return;
+                }
            }
       }
 
@@ -1686,11 +1796,31 @@ Symbol::resolve_lv(const char * loc)
 
    if (value_stack.back().get_NC() == NC_VARIABLE)
       {
+        // the rows of a structured variable are its (hashed) member table.
+        // A selective specification of S itself, e.g. (f S)←B, could only
+        // corrupt it, no matter which cells f selects (names, unused rows,
+        // or the values of whatever members happen to be hashed there),
+        // so it is not allowed at all. The members of S can be assigned
+        // with S.member←B or selectively with (f S.member)←B (Bugs39 #4).
+        //
+        if (get_var_value()->is_member())   Value::throw_member_table_target();
+
         value_stack.back().isolate_deep(loc);
         Value_P Z = get_var_value();
         Value_P refs = Z->get_cellrefs(loc);
         refs->set_lval_whole_symbol(this);
         return Token(TOK_APL_VALUE1, refs);
+      }
+
+   // LRM: "If any functions appear in the selection expression, then the
+   // name being assigned must have a value", e.g. (,W)←5 with an undefined
+   // W is a VALUE ERROR, like W[1]←5 (Bugs40 #75)
+   //
+   if (value_stack.back().get_NC() == NC_UNUSED_USER_NAME)
+      {
+        MORE_ERROR() << "selective specification of the undefined name "
+                     << get_name();
+        throw_apl_error(E_VALUE_ERROR, loc);
       }
 
    MORE_ERROR() << "Symbol '" << get_name()

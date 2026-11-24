@@ -262,6 +262,10 @@ public:
    /// execute token in body...
    Token run();
 
+   /// return true if the failed function of this SI entry has a left
+   /// argument (which = 'L'), a right argument ('R'), or an axis ('X')
+   bool has_LRX(char which);
+
    /// change the left argument (if any) of a failed primitive
    void set_L(Value_P value);
 
@@ -282,10 +286,18 @@ public:
    /// error when )SI is empty
    static Error top_level_error;
 
+   /// \b this SI entry owns (a reference of) its lambda, e.g. after
+   /// )LOAD (Bugs38 #80)
+   void set_owns_lambda()
+      { owns_lambda = true; }
+
 protected:
 
    /// the user function that is being executed
    const Executable * executable;
+
+   /// true if this SI entry owns (a reference of) its (lambda) executable
+   bool owns_lambda;
 
    /** track ⎕EC calls. The first )SI entry that calls ⎕ES sets
        \b safe_execution_depth to 1 and every child )SI increments it.

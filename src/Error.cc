@@ -43,7 +43,9 @@ Error::Error(ErrorCode ec, const char * loc)
      print_loc(0)
 {
 const bool have_more = Workspace::more_error().size();
-   if (have_more && Workspace::more_error().back() != UNI_PLUS)
+   // check the error name, not the )MORE text, which may well end with
+   // e.g. the function name + (Bugs38 #107)
+   if (have_more && !strchr(error_name(error_code), UNI_PLUS))
       {
         SPRINTF(error_message_1, "%s%c", error_name(error_code), UNI_PLUS);
       }
@@ -87,6 +89,14 @@ Error::add_MORE_indicator(bool have_more)
 {
    if (have_more)   // )MORE info available
       {
+        // the + may also follow the error name, e.g. in the message
+        // SYNTAX ERROR+ in macro ⍎¨ (Bugs40 #97)
+        //
+        const char * name = error_name(error_code);
+        const size_t name_len = strlen(name);
+        if (name_len && !strncmp(error_message_1, name, name_len) &&
+            error_message_1[name_len] == UNI_PLUS)   return;
+
         const size_t len = strlen(error_message_1);
         if (len && error_message_1[len - 1] != UNI_PLUS &&
             len < sizeof(error_message_1) - 1)
@@ -174,7 +184,8 @@ Error::print(ostream & out, const char * loc) const
         else
            {
              out << error_name(error_code);
-             if (Workspace::more_error().back() != UNI_PLUS)   out << UNI_PLUS;
+             if (Workspace::more_error().size() &&             // Bugs38 #107
+                 !strchr(error_name(error_code), UNI_PLUS))   out << UNI_PLUS;
              out << endl;
            }
 
@@ -276,6 +287,17 @@ const int nchars = truncated ? truncate_utf8_boundary(error_message_2)
 void
 Error::update_error_info(StateIndicator * si)
 {
+   // an older parse error (without an SI entry) is superseded by this
+   // error, also after this error was cleared with → (Bugs39 #53). Here
+   // for every error, not only for those of throw_apl_error(), e.g. also
+   // the VALUE ERROR of an undefined name or a ⎕ES error (Bugs40 #66)
+   //
+   // But not an error inside ⎕EC or ⎕EA, which is caught and does not
+   // affect ⎕ET (LRM p. 280, Bugs41 #73)
+   //
+   if (si && si->get_safe_execution_depth() == 0)
+      StateIndicator::top_level_error.clear_error_code();
+
    /*
       construct lines 2 and 3 of the standard 3-line APL error message.
       Line 1 was already constructed in Error::Error(ErrorCode ec...).
@@ -568,7 +590,10 @@ StateIndicator * si = Workspace::SI_top();   // the current )SI entry
    code = maybe_convert_to_domain_error(code, si);
 
 Error error(code, loc);
-   if (si)   error.update_error_info(si);
+   if (si)
+      {
+        error.update_error_info(si);   // clears top_level_error
+      }
 
 const Error & eref = error;
    throw eref;
@@ -595,9 +620,12 @@ UTF8_string fun_name_utf(fun_name);
    SPRINTF(err.symbol_name, "%s", fun_name_utf.c_str());
 
 UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
-   SPRINTF(err.error_message_2, "PROMPT%s", cmd_utf.c_str());
+   // the prompt (6 blanks, not the placeholder PROMPT), and not stored in
+   // the error of the )SI entry on top, which is e.g. a suspended function
+   // that the ∇-editor has not executed (Bugs41 #56)
+   //
+   SPRINTF(err.error_message_2, "      %s", cmd_utf.c_str());
    eref.left_caret = 5 + cmd.size();   // last Unicode of error_message_2
-   if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
 }
 //────────────────────────────────────────────────────────────────────────────
@@ -635,8 +663,8 @@ Error error(code, loc);
    // is used instead, a few callers up) and clobber the message just
    // built above. The caller already prints this error itself.
    //
-   if (StateIndicator * si = Workspace::SI_top())
-      StateIndicator::get_error(si) = error;
+   // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+   StateIndicator::get_error(Workspace::SI_top()) = error;
 
 const Error & eref = error;
    throw eref;
@@ -680,8 +708,8 @@ const int margin = margined.size();
    // Bugs28 #93: see the other throw_parse_error() overload above --
    // store directly, not via the full update_error_info().
    //
-   if (StateIndicator * si = Workspace::SI_top())
-      StateIndicator::get_error(si) = error;
+   // with an empty SI: the top-level error, for ⎕EM and ⎕ET (Bugs38 #70)
+   StateIndicator::get_error(Workspace::SI_top()) = error;
 
 const Error & eref = error;
    throw eref;
@@ -707,7 +735,11 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
    // null-checked a few lines further down in this same function for
    // exactly this reason. An empty SI is trivially "not in ⎕ES", so
    // treat it the same as get_safe_execution_depth()==0.
-   if (Workspace::more_error().size() == 0 &&   // no )MORE info provided, and
+   // (a )MORE text that is only information, e.g. of a ⎕FX that returned a
+   // line number, belongs to no error, Bugs41 #78)
+   //
+   if ((Workspace::more_error().size() == 0 ||  // no )MORE info provided, and
+        Workspace::more_is_info) &&
        (!Workspace::SI_top() ||
         Workspace::SI_top()->get_safe_execution_depth() == 0))   // and not in ⎕ES
       {

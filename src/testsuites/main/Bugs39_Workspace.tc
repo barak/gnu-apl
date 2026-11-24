@@ -1,0 +1,1204 @@
+⍝ Bugs39_Workspace.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs39 items for )SAVE, )LOAD, )COPY, and )DUMP.
+
+
+
+
+      ⍝ Bugs39 #10: a failed )COPY restores the functions that it had replaced
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ∇Z←F39W B
+
+
+
+
+      Z←'file F'
+
+
+
+
+      ∇
+
+
+
+
+      V39W←1 2 3
+
+
+
+
+      )WSID B39W10
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B39W10.xml'
+
+
+
+
+      P←⍸'<Variable vid="'⍷D
+
+
+
+
+      D[P+15]←'9' ◊ D[P+16]←'9'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B39W10.xml'
+
+
+
+
+      N←D ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+
+      ∇Z←F39W B
+
+
+
+
+      Z←'old F'
+
+
+
+
+      ∇
+
+
+
+
+      )COPY B39W10
+
+
+
+
+      F39W 1
+old F
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+      )DROP B39W10
+³
+
+
+
+
+      ⍝ Bugs39 #87: )COPY_ONCE of the same file under another name
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      A87←'from file'
+
+
+
+
+      )WSID B39W87
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )COPY_ONCE B39W87.xml
+NEW )COPY_ONCE workspace: B39W87.xml
+³
+
+
+
+
+      A87←'changed'
+
+
+
+
+      )COPY_ONCE ./testcases/libroot/workspaces/B39W87.xml
+
+
+
+
+      )COPY_ONCE ./testcases/libroot/workspaces//B39W87.xml
+
+
+
+
+      A87
+changed
+
+
+
+
+      )DROP B39W87
+³
+
+
+
+
+      ⍝ Bugs39 #92: a truncated workspace is not recorded as copied
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      X←1
+
+
+
+
+      )WSID B39W92
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      D←⎕FIO[26] 'testcases/libroot/workspaces/B39W92.xml'
+
+
+
+
+      H←'w' ⎕FIO[3] 'testcases/libroot/workspaces/B39W92.xml'
+
+
+
+
+      N←(¯5↓D) ⎕FIO[7] H
+
+
+
+
+      ⎕FIO[4] H
+0
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )COPY_ONCE B39W92
+NEW )COPY_ONCE workspace: B39W92
+
+
+
+
+      )COPY_ONCE B39W92
+NEW )COPY_ONCE workspace: B39W92
+
+
+
+
+      )DROP B39W92
+³
+
+
+
+
+      ⍝ Bugs39 #40: no-result lambdas survive )SAVE and )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      G6←{⍺ ⋄ }
+
+
+
+
+      G7←{⍺+⍵ ⋄ ;A}
+
+
+
+
+      G2←{⍵ ⋄ }
+
+
+
+
+      )WSID B39W40
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )LOAD B39W40
+³
+
+
+
+
+      ⎕CR 'G6'
+⍺ λ1 ⍵
+⍺ ⋄   
+
+
+
+
+      ⎕CR 'G7'
+⍺ λ1 ⍵;A
+⍺+⍵ ⋄   
+
+
+
+
+      ⎕CR 'G2'
+λ1 ⍵
+⍵ ⋄ 
+
+
+
+
+      2 G7 3
+5
+
+
+
+
+      )DROP B39W40
+³
+
+
+
+
+      ⍝ Bugs39 #50: a locked function in a )DUMP file ends at ⍫
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      1 ⎕FX 'Z←LK X' 'Z←X+1'
+LK
+
+
+
+
+      A←1 2 3
+
+
+
+
+      )WSID B39W50
+WAS CLEAR WS
+
+
+
+
+      )DUMP
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )COPY B39W50 A
+³
+
+
+
+
+      ⎕NL 2 3
+A
+
+
+
+
+      )DROP B39W50.apl
+³
+
+
+
+
+      ⍝ Bugs39 #60: )DUMP of a function with a surrogate character
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←G' ('Z←''a',(⎕UCS 56000),'b''')
+G
+
+
+
+
+      )WSID B39W60
+WAS CLEAR WS
+
+
+
+
+      )DUMP
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W60
+³
+
+
+
+
+      ⎕UCS G
+97 56000 98
+
+
+
+
+      ⍝ the same for lambdas: )DUMP writes ⍎ of a string with ⎕UCS
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍎'L60←{''a',(⎕UCS 56000),'b'',⍵;A B}'
+
+
+
+
+      ⍎'M60←{⍺←''x'' ⋄ ⍺,''',(⎕UCS 56000),''',⍵}'
+
+
+
+
+      N60←{⍵+1}
+
+
+
+
+      )WSID B39W60
+WAS CLEAR WS
+
+
+
+
+      )DUMP
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W60
+³
+
+
+
+
+      ⎕UCS L60 'c'
+97 56000 98 99
+
+
+
+
+      ⎕UCS M60 'y'
+120 56000 121
+
+
+
+
+      N60 1
+2
+
+
+
+
+      ⎕UCS ∊⎕CR 'L60'
+955 8592 955 49 32 9077 59 65 59 66 955 8592 39 97 56000 98 39 44 9077 32
+
+
+
+
+      )DROP B39W60.apl
+³
+
+
+
+
+      ⍝ Bugs39 #51 #96: a named lambda on the )SI survives )SAVE and )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      L←{÷⍵}
+
+
+
+
+      F←{1÷⍵}
+
+
+
+
+      F 0
+DOMAIN ERROR
+F[1]  λ←1÷⍵
+        ^^
+
+
+
+
+      )WSID B39W96
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W96
+³
+
+
+
+
+      )SI
+F[1]
+*
+
+
+
+
+      )SIC
+
+
+
+
+      )DROP B39W96
+³
+
+
+
+
+      ⍝ Bugs39 #11: derived functions on the )SI survive )SAVE and )LOAD
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      V39←'a'
+
+
+
+
+      +/1 V39
+DOMAIN ERROR
+      +/1 V39
+      ^
+
+
+
+
+      )WSID B39W11
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W11
+³
+
+
+
+
+      )SI
+*
+
+
+
+
+      V39←2
+
+
+
+
+      →⎕LC
+DOMAIN ERROR
+      +/1 V39
+      ^
+
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+      )DROP B39W11
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⎕FX 'Z←F39 B' 'Z←B÷Q39'
+F39
+
+
+
+
+      ⎕FX 'Z←A G39 B' 'Z←A+B÷Q39'
+G39
+
+
+
+
+      Q39←0
+
+
+
+
+      (F39¨)¨(1 2)(3 4)
+DOMAIN ERROR
+F39[1]  Z←B÷Q39
+          ^^
+
+
+
+
+      1 2∘.G39 3 4
+DOMAIN ERROR
+G39[1]  Z←A+B÷Q39
+            ^^
+
+
+
+
+      G39/[1]2 2⍴⍳4
+DOMAIN ERROR
+G39[1]  Z←A+B÷Q39
+            ^^
+
+
+
+
+      (F39⍤0)1 2
+DOMAIN ERROR
+F39[1]  Z←B÷Q39
+          ^^
+
+
+
+
+      F39{⍶ ⍹ ⍵}F39 1 2
+DOMAIN ERROR
+F39[1]  Z←B÷Q39
+          ^^
+
+
+
+
+      {⍵×10}⍣(F39 2){⍵+1}3
+DOMAIN ERROR
+F39[1]  Z←B÷Q39
+          ^^
+
+
+
+
+      ⍎'F39¨1 2'
+DOMAIN ERROR
+F39[1]  Z←B÷Q39
+          ^^
+
+
+
+
+      )SI
+F39[1]
+**  
+*
+F39[1]
+*
+F39[1]
+λ1[1]
+*
+F39[1]
+*
+G39[1]
+*
+G39[1]
+*
+F39[1]
+*
+
+
+
+
+      )WSID B39W11
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W11
+³
+
+
+
+
+      )SI
+F39[1]
+**  
+*
+F39[1]
+*
+F39[1]
+λ1[1]
+*
+F39[1]
+*
+G39[1]
+*
+G39[1]
+*
+F39[1]
+*
+
+
+
+
+      Q39←2
+
+
+
+
+      →⎕LC
+0.5 1
+
+
+
+
+      →⎕LC
+40
+
+
+
+
+      →⎕LC
+0.25 0.5
+
+
+
+
+      →⎕LC
+0.5 1
+
+
+
+
+      →⎕LC
+2.5 4
+
+
+
+
+      →⎕LC
+2.5 3
+3.5 4
+
+
+
+
+      →⎕LC
+ 0.5 1  1.5 2 
+
+
+
+
+      )SI
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+      )DROP B39W11
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs39 #89: an operand lambda read by )LOAD is released
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      Q89←0
+
+
+
+
+      {⍺×⍵÷Q89}{⍵+⍶ 9}3
+DOMAIN ERROR
+λ1[1]  λ←⍺×⍵÷Q89
+           ^^
+
+
+
+
+
+      )WSID B39W89
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )LOAD B39W89
+³
+
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+      )DROP B39W89
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ∇Z←(F OP89) B;L
+
+
+
+
+       L←{⍵×2}
+
+
+
+
+       Z←L F B
+
+
+
+
+      ∇
+
+
+
+
+      Q89←0
+
+
+
+
+      {⍺+⍵÷Q89}OP89 3
+DOMAIN ERROR
+F[1]  λ←⍺+⍵÷Q89
+          ^^
+
+
+
+
+
+      )WSID B39W89
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )LOAD B39W89
+³
+
+
+
+
+      )SIC
+
+
+
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+
+
+
+      )DROP B39W89
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      ⍝ Bugs39 #81: lambda locals separated by blanks survive )SAVE, )LOAD,
+      ⍝ and )DUMP
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      F81←{A←⍵ ⋄ B←⍵ ;A B}
+
+
+
+
+      K81←{A←⍵ ⋄ ;A B}
+
+
+
+
+      )WSID B39W81
+WAS CLEAR WS
+
+
+
+
+      )SAVE
+³
+
+
+
+
+      )LOAD B39W81
+³
+
+
+
+
+      A←B←100
+
+
+
+
+      F81 5
+5
+
+
+
+
+      K81 6
+
+
+
+
+      A B
+100 100
+
+
+
+
+      )DUMP
+³
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )LOAD B39W81.apl
+³
+
+
+
+
+      A←B←100
+
+
+
+
+      F81 7
+7
+
+
+
+
+      A B
+100 100
+
+
+
+
+      )DROP B39W81
+³
+
+
+
+
+      )DROP B39W81.apl
+³
+
+
+
+
+      ⍝ Bugs39 #81 follow-up: older SVNs moved the local X of {... ; X}
+      ⍝ into the body and saved a ; without names. )LOAD ignores that ;
+      ⍝ (with a warning) instead of refusing the lambda
+
+
+
+
+      )LOAD LEGACY39
+³
+
+
+
+
+      ⎕CR 'Perm39'
+λ←⍺ λ1 ⍵                                 
+λ←⌽(X/⍨⍺=+/¨X←(⊂2⍴⍨⍵)⊤¨⍳2*⍵) {⍺/⍵}¨ ⊂⍳⍵ X
+
+
+
+
+      2 Perm39 5
+VALUE ERROR+
+Perm39[1]  λ←⌽(X/⍨⍺=+/¨X←(⊂2⍴⍨⍵)⊤¨⍳2⋆⍵){⍺/⍵}¨⊂⍳⍵ X
+                                                 ^
+
+
+
+
+      )SIC
+
+
+
+
+      )CLEAR
+CLEAR WS
+
+
+
+
+      )SIC

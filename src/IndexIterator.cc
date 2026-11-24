@@ -71,7 +71,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
    indices = new ShapeItem[count];
    loop(v, count)
       {
-        const ShapeItem idx = value->get_near_int(v) - qio;
+        const ShapeItem idx = Cell::minus_IO(value->get_index_int(v), qio);
 
         // idx and max_idx are both (signed) ShapeItem, so "idx >= max_idx"
         // alone is a signed comparison and does NOT catch a negative idx.
@@ -151,7 +151,7 @@ ShapeItem weight = 1;
               if (highest_it)   highest_it->set_upper(new_it);
               else              lowest_it = new_it;
 
-              weight *= sh_r;
+              weight = Shape::mul_wrap(weight, sh_r);   // Bugs38 #91
               highest_it = new_it;
             }
       }

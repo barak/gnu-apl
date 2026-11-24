@@ -1,0 +1,17 @@
+⍝ Shape.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z simple nonneg integer vector
+      ⍝ inv: ⍴Z ←→ ⍴⍴B   (shape of shape = 1-elem vector with rank)
+      ⍝ inv: ⍴⍴Z ←→ ,1   (shape is always a vector)
+      B ← ⎕RVAL 3 (2 3 4) (,0 1 0 0 0)
+      Z ← ⍴B
+      (⍴Z) ≡ ⍴⍴B
+1
+      (⍴⍴Z) ≡ ,1
+1
+      ⍝ Scalar: shape is empty vector
+      (⍴⎕RVAL 0) ≡ ⍳0
+1

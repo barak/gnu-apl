@@ -348,6 +348,9 @@ Value_P Z(sh_Z, LOC);
            }
         vname[vlen] = 0;
 
+        // like the APL name below: a valid first character (Bugs39 #84)
+        if (vlen && !Avec::is_first_symbol_char(Unicode(vname[0])))   bad_name = true;
+
         if (bad_name || vlen == 0)
            {
              Z->next_ravel_Int(NO_COUPLING);
@@ -361,16 +364,33 @@ Value_P Z(sh_Z, LOC);
         if (apl_var.size() == 0)
            {
              const ShapeItem cols = B.get_cols();
+             int words = 0;
+             bool in_word = false;
              loop(c, cols)
                 {
                   const Unicode uni = B.get_char_value(z*cols + c);
-                  if (uni == UNI_SPACE)
-                     {
-                       if (apl_var.size())   break;   // end of first name
-                       continue;                      // leading space
-                     }
-                  apl_var << uni;
+                  if (uni == UNI_SPACE)   { in_word = false;   continue; }
+                  if (!in_word)   { ++words;   in_word = true; }
+                  if (words == 1)   apl_var << uni;
                 }
+             if (words != 2)   apl_var.clear();   // e.g. 'x1 y z'
+           }
+
+        // the APL name must be a valid user name (not e.g. ⎕IO, S.m, ⍺,
+        // or 1x), like the surrogate name above (Bugs38 #7)
+        //
+        // λ and λN are the internal names of lambdas, not user names, e.g.
+        // λ←5 is a SYNTAX ERROR (Bugs39 #84)
+        //
+        bool bad_var = apl_var.size() == 0 ||
+                       !Avec::is_first_symbol_char(apl_var[0]) ||
+                       apl_var[0] == UNI_LAMBDA;
+        loop(v, apl_var.size())
+           if (!Avec::is_symbol_char(apl_var[v]))   bad_var = true;
+        if (bad_var)
+           {
+             Z->next_ravel_Int(NO_COUPLING);
+             continue;
            }
 
         // make sure current name class allows ⎕SVO
@@ -382,7 +402,14 @@ Value_P Z(sh_Z, LOC);
              continue;
            }
 
-        const AP_num proc = AP_num(A.get_int_value(a));
+        // no int truncation, e.g. 1001+2⋆32 shared with 1001 (Bugs40 #63)
+        const APL_Integer proc_A = A.get_near_int(a);
+        if (proc_A < 0 || proc_A > INT_MAX)
+           {
+             MORE_ERROR() << "A ⎕SVO B: bad processor number " << proc_A;
+             DOMAIN_ERROR;
+           }
+        const AP_num proc = AP_num(proc_A);
 
         ValueStackItem * vsp = sym->top_of_stack();
         Assert(vsp);
@@ -535,8 +562,13 @@ Value_P Z;
       }
    else                            // return variables offered by processor ↑B
       {
-        const AP_num proc = AP_num(B.get_int_value(0));
-        Z = get_variables(proc);
+        const APL_Integer proc_B = B.get_near_int(0);   // Bugs40 #63
+        if (proc_B < 0 || proc_B > INT_MAX)
+           {
+             MORE_ERROR() << "⎕SVQ B: bad processor number " << proc_B;
+             DOMAIN_ERROR;
+           }
+        Z = get_variables(AP_num(proc_B));
       }
 
    Z->check_value(LOC);

@@ -22,10 +22,12 @@
 /** @file
 */
 
+#include <unordered_set>
 #include "ArgCheck.hh"
 #include "ArrayIterator.hh"
 #include "Avec.hh"
 #include "Bif_F12_EQUIV.hh"
+#include "Bif_F12_TAKE_DROP.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "FloatCell.hh"
@@ -79,6 +81,7 @@ Bif_F12_WITHOUT Bif_F12_WITHOUT::fun;                // ∼ (monadic is scalar)
 
 const IntCell ScalarFunction::integer_0(0);
 const IntCell ScalarFunction::integer_1(1);
+const IntCell ScalarFunction::integer_m1(-1);
 const FloatCell ScalarFunction::float_min(-BIG_FLOAT);
 const FloatCell ScalarFunction::float_max(BIG_FLOAT);
 
@@ -138,9 +141,87 @@ ScalarFunction::do_eval_fill_AB(cValue_R A, cValue_R B) const
       given on p. 110/Figure 20 looks wrong.
     */
 
-   if (B.element_count() == 0)   return do_eval_fill_B(B);
-   if (A.element_count() == 0)   return do_eval_fill_B(A);
-   return do_eval_fill_B(A);
+   // lrm p. 56: Z←Sρ(↑A) fill fn (↑B) where S is the shape of the empty
+   // argument, and the fill function is applied to the items of ↑A and ↑B
+   // recursively. Both ↑A and ↑B contribute to the prototype of Z, e.g.
+   // (0⍴0)×⊂1 2 and (⊂1 2)×0⍴0 are both 0⍴⊂0 0 (Bugs40 #55).
+   //
+   if (A.is_empty() || B.is_empty())
+      {
+        const Shape & shape_Z = B.is_empty() ? B.get_shape() : A.get_shape();
+        Value_P Z1 = fill_items(*Bif_F12_TAKE::first(A),
+                                *Bif_F12_TAKE::first(B), A.is_empty());
+        Value_P Z(shape_Z, LOC);
+        Z->set_ravel_Value(0, Z1.get());
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   // A and B are the (non-empty) items ↑A and ↑B of the empty arguments,
+   // e.g. from A f¨B, A∘.f B, or A g.f B.
+   //
+   return Token(TOK_APL_VALUE1, fill_items(A, B, false));
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+ScalarFunction::fill_items(const cValue & A, const cValue & B, bool prefer_A)
+{
+   // the fill function (lrm p. 56) of the items A and B of the arguments of
+   // a dyadic scalar function: the structure of A f B with all simple
+   // scalars replaced by (numeric) 0.
+   //
+   if (A.is_simple_scalar() || B.is_simple_scalar())
+      {
+        Value_P Z = (A.is_simple_scalar() ? B : A).clone(LOC);
+        Z->check_value(LOC);
+        Z->to_type(/* force_numeric */ true);
+        Z->check_value(LOC);
+        return Z;
+      }
+
+   // both nested or non-scalar: pair the items (with scalar extension). If
+   // A and B do not conform (the non-empty case would fail) then use the
+   // item of the empty argument.
+   //
+const bool ext_A = A.element_count() == 1 && B.element_count() != 1;
+const bool ext_B = B.element_count() == 1 && !ext_A;
+   if (!ext_A && !ext_B && A.get_shape() != B.get_shape())
+      {
+        // the item of the empty argument (as for A f¨B and A∘.f B, whose
+        // empty item is an empty argument of f), so that A+B, B+A, and
+        // A+¨B agree (Bugs41 #64)
+        //
+        return prefer_A ? fill_items(A, *IntScalar(0, LOC), true)
+                        : fill_items(B, *IntScalar(0, LOC), false);
+      }
+
+   // set_ravel_Value(), not next_ravel_Value(): if the items are empty
+   // (e.g. for A←0⍴⊂⍬) then Z is empty and z = 0 is its prototype, which
+   // next_ravel_Value() cannot reach (Bugs41 #1).
+   //
+Value_P Z((ext_A ? B : A).get_shape(), LOC);
+   loop(z, Z->nz_element_count())
+      {
+        Value_P A1 = item_value(A, ext_A ? 0 : z);
+        Value_P B1 = item_value(B, ext_B ? 0 : z);
+        Value_P Z1 = fill_items(*A1, *B1, prefer_A);
+        Z->set_ravel_Value(z, Z1.get());
+      }
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+ScalarFunction::item_value(const cValue & B, ShapeItem b)
+{
+Cell cache;
+const Cell & cell = B.get_cravel(b, cache);
+   if (cell.is_pointer_cell())   return cell.get_pointer_value();
+
+Value_P Z(LOC);
+   Z->next_ravel_Cell(cell);
+   Z->check_value(LOC);
+   return Z;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -631,7 +712,7 @@ const ShapeItem len_X = X.element_count();
          // (near-integer); otherwise AXIS ERROR, not the DOMAIN ERROR
          // that a raw get_near_int() would throw for e.g. a character.
          if (!X.is_near_int(iX))           AXIS_ERROR;
-         APL_Integer i = X.get_near_int(iX) - qio;
+         APL_Integer i = Cell::minus_IO(X.get_near_int(iX), qio);
          if (i < 0)                        AXIS_ERROR;   // axis i too small
          if (i >= rank_A && i >= rank_B)   AXIS_ERROR;   // axis i too large
          if (axes_X & 1 << i)              AXIS_ERROR;   // axis i used twice
@@ -1345,7 +1426,6 @@ APL_Integer set_size = B.get_near_int(0);
    if (zlen > set_size)         DOMAIN_ERROR;
    if (zlen <  0)               DOMAIN_ERROR;
    if (set_size <  0)           DOMAIN_ERROR;
-   if (set_size > 0x7FFFFFFF)   DOMAIN_ERROR;
 
    // at this point, A and B are OK. We use a bitmap 'used' to keep track
    // of items alrady drawn.
@@ -1358,6 +1438,30 @@ Value_P Z(zlen, LOC);
    // McBride, Bugs14 #14d); operator new[] itself never returns 0 (it
    // throws std::bad_alloc), so the old null check was already dead
    // code (Bugs14 #14c).
+   //
+   // If A is small compared to B then remember the drawn items in a set
+   // rather than in a bitmap of B bits. Both draw the same sequence. This
+   // removes the former limit B < 2⋆31 (Bugs38 #123).
+   //
+   if (zlen < set_size / 16)
+      {
+        std::unordered_set<uint64_t> drawn;
+        drawn.reserve(zlen);
+        loop(z, zlen)
+            {
+              const uint64_t rnd = Workspace::get_RL(set_size);
+              if (!drawn.insert(rnd).second)   // already drawn: try again
+                 {
+                   --z;
+                   continue;
+                 }
+              Z->next_ravel_Int(rnd + Workspace::get_IO());
+            }
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   // here zlen ≥ set_size/16, so the bitmap is smaller than Z
    //
 vector<uint8_t> used((set_size + 7)/8, 0);
 
@@ -1393,7 +1497,7 @@ const ShapeItem count = B.nz_element_count();
             continue;
           }
 
-       if (!C.is_near_int())               return true;
+       if (!C.is_near_int64_t())           return true;   // Bugs38 #93
        if (C.get_checked_near_int() < 0)   return true;
       }
 

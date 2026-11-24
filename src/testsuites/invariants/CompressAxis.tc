@@ -1,0 +1,16 @@
+⍝ CompressAxis.tc
+⍝ ═══════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: LO Boolean; Z nonscalar
+      ⍝ inv: ¯1↓⍴Z ←→ ¯1↓⍴B  (along selected axis, others unchanged)
+      ⍝ inv: ⍴⍴Z ←→ ⍴⍴B
+      B ← ⎕RVAL 2 (4 5) (,0 1 0 0 0)
+      LO ← 2∣|⎕RVAL 1 (,4) (,0 1 0 0 0)     ⍝ compress along axis 1
+      Z ← LO/[1]B
+      (⍴⍴Z) ≡ ⍴⍴B
+1
+      ⍝ Axes other than selected are unchanged
+      ((⍴Z)[2]) ≡ (⍴B)[2]
+1

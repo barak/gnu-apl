@@ -102,8 +102,8 @@ public:
 
    /// clear the marked flag, i.e. record that this IndexExpr was found
    /// reachable from a live TOK_PINDEX/TOK_INDEX token (see
-   /// Prefix::unmark_all_values()).
-   void unmark() const   { marked = false; }
+   /// Prefix::unmark_all_values()), and the marked flags of its values.
+   void unmark() const;
 
    /// print stale IndexExprs, and return the number of stale IndexExprs.
    ///

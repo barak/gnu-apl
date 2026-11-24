@@ -1,0 +1,52 @@
+⍝ Oper_negative.tc
+⍝ ----------------------------------
+
+      ⍝ negative testing for operators
+      ⍝
+      )SIC
+      )ERASE A B LEFT RIGHT
+
+      ⎕←A←10×2 3⍴⍳6
+10 20 30
+40 50 60
+
+      ⎕←B←1000×2 3⍴⍳6
+1000 2000 3000
+4000 5000 6000
+
+
+      A +.× ⍉B
+140000 320000
+320000 770000
+
+      ]FILE_CTL SKIP_APL2   ⍝ lambdas are a GNU APL extension
+      A {⍺+⍵}.{⍺×⍵} ⍉B
+140000 320000
+320000 770000
+
+
+      ]FILE_CTL NO_SKIP
+      A +.× B
+LENGTH ERROR+
+      A+.×B
+      ^^
+
+      ⍝ A +.× B showing sub-arguments of each iteration
+      ⍝
+      LEFT←{(⍺+⍵)⊣⎕←'LEFT: ⍺=',(⍕⍺),', ⍵=',(⍕⍵)}
+      RIGHT←{(⍺×⍵)⊣⎕←'RIGHT: ⍺=',(⍕⍺),', ⍵=',(⍕⍵)}
+      A LEFT.RIGHT B
+LENGTH ERROR+
+      A LEFT.RIGHT B
+      ^ ^
+
+      )SIC
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      ⍝ ==================================
+

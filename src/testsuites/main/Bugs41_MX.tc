@@ -1,0 +1,63 @@
+⍝ Bugs41_MX.tc
+⍝ ----------------------------------
+⍝ Blake McBride's Bugs41 items for ⎕MX (needs libgsl).
+
+      ]NEXTFILE NO-GSL   ⍝ done if ⎕MX is not available (no GSL)
+
+
+
+
+      ⍝ Bugs41 #59: an out-of-range ⎕MX subfunction number is a DOMAIN ERROR (checked
+      ⍝ before it is used as a subfunction)
+
+
+
+
+      ⎕MX[¯1] 5
+DOMAIN ERROR+
+      ⎕MX[¯1]5
+      ^
+
+      ⎕MX[1000 0] 5
+DOMAIN ERROR+
+      ⎕MX[1000 0]5
+      ^
+
+      2 ⎕MX[¯1] 5
+DOMAIN ERROR+
+      2 ⎕MX[¯1]5
+      ^ ^
+
+      ⎕MX[¯2147483648] 5
+DOMAIN ERROR+
+      ⎕MX[¯2147483648]5
+      ^
+
+      )SIC
+
+
+
+
+
+      ⍝ Bugs41 #83: ⎕MX[1] scales the rows, so that an elimination step does not
+      ⍝ overflow when the determinant does not
+
+
+
+
+      ⎕MX[1] 3 3⍴1 0 1E308 ¯1 1 1E308 0 1E¯300 0
+¯200000000
+
+
+
+      ⎕MX[1] 3 3⍴1 0 1E307 ¯1 1 1E307 0 1E¯300 0
+¯20000000
+
+
+
+
+      )SIC
+
+
+
+

@@ -144,12 +144,18 @@ public:
    uRank get_rank() const
       { return rho_rho; }
 
+   /// a × b, wrapping around (in uint64_t) instead of the undefined
+   /// behaviour of a signed overflow: the partial products of an empty
+   /// shape can overflow, but are then never used as sizes (Bugs38 #91)
+   static ShapeItem mul_wrap(ShapeItem a, ShapeItem b)
+      { return ShapeItem(uint64_t(a) * uint64_t(b)); }
+
    /// return the product of all but the the last dimension, or 1 for scalars
    ShapeItem get_rows() const
       { if (rho_rho == 0)   return 1;   // scalar
         if (const ShapeItem cols = rho[rho_rho - 1])   return volume / cols;
         ShapeItem count = 1;
-        loop(r, rho_rho - 1)   count *= rho[r];
+        loop(r, rho_rho - 1)   count = mul_wrap(count, rho[r]);
         return count; }
 
    /// return the length of dimension \b r
@@ -183,8 +189,8 @@ public:
         for (sRank r = rho_rho - 1; r >= 0; --r)
            {
              ret.rho[r] = weight;
-             ret.volume *= weight;
-             weight *= rho[r];
+             ret.volume = mul_wrap(ret.volume, weight);
+             weight = mul_wrap(weight, rho[r]);
            }
         return ret;
       }
@@ -263,7 +269,7 @@ public:
 
    /// recompute volume (after changing a dimension of len 0)
    void recompute_volume()
-      { volume = 1;   loop(r, rho_rho)  volume *= rho[r]; }
+      { volume = 1;   loop(r, rho_rho)  volume = mul_wrap(volume, rho[r]); }
 
    /// set last dimension to \b sh
    /// @param sh new length for the last axis
@@ -275,7 +281,8 @@ public:
    /// @param sh new length for axis \b r
    void set_shape_item(sAxis r, ShapeItem sh)
       { Assert(r >= 0 && r < rho_rho);
-        if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
+        if (rho[r])   { volume /= rho[r];  rho[r] = sh;
+                        volume = mul_wrap(volume, rho[r]); }
         else          { rho[r] = sh;   recompute_volume();                 } }
 
    /// return the true volume (×/rho), throwing WS_FULL if it would
@@ -379,8 +386,10 @@ public:
    {
      loop(r, shape.get_rank())
         {
-          if      (r < axis)   rho[0] *= shape.get_shape_item(r);
-          else if (r > axis)   rho[2] *= shape.get_shape_item(r);
+          if      (r < axis)   rho[0] = mul_wrap(rho[0],
+                                                 shape.get_shape_item(r));
+          else if (r > axis)   rho[2] = mul_wrap(rho[2],
+                                                 shape.get_shape_item(r));
           else                 rho[1]  = shape.get_shape_item(r);
         }
    }

@@ -35,6 +35,22 @@ Monomial::get_order(const cValue & order) const
 Shape index;
    loop(e, expos.size())   index.add_shape_item(expos[e]);
 
+   // the order is defined for the monomials of the shape of order only.
+   // A division can produce intermediate terms outside of it, whose order
+   // was read from beyond the ravel of order (Bugs40 #16)
+   //
+   if (index.get_rank() != order.get_rank())   DOMAIN_ERROR;
+   loop(r, index.get_rank())
+      {
+        if (index.get_shape_item(r) >= order.get_shape_item(r))
+           {
+             MORE_ERROR() << "A ⌹[12] B: the order of a term of the division"
+                             " (with exponents " << index << ") is not"
+                             " defined by the order planes of A and B";
+             DOMAIN_ERROR;
+           }
+      }
+
 const ShapeItem offset = order.get_shape().ravel_pos(index);
    return order.get_int_value(offset);
 }
@@ -129,6 +145,14 @@ const Tokenizer::Int_or_Double id = Tokenizer::tokenize_real(src);
    else         // real part
       {
         set_real(got_overbar, term_sign, id.get_double());
+        if (!id.is_double)   // exact (Bugs41 #80)
+           {
+             const bool negative = (term_sign == '-') != got_overbar;
+             exact_int = true;
+             int_coefficient = negative ? -id.value.APL_int
+                                        :  id.value.APL_int;
+           }
+        else   exact_int = false;
       }
 }
 //════════════════════════════════════════════════════════════════════════════
@@ -234,7 +258,8 @@ Polynomial::Polynomial(const cValue & value)
        {
          Cell cache;
          const Cell & cell = value.get_cravel(v, cache);
-         if (cell.is_near_zero())   continue;
+         if (cell.get_real_value() == 0.0 &&   // exactly 0, not the absolute
+             cell.get_imag_value() == 0.0)   continue;   // 1E¯10 (Bugs40 #27)
 
          const Complex coeff(cell.get_real_value(),
                              cell.get_imag_value());
@@ -334,23 +359,23 @@ Value_P Z(shape_Z, LOC);
          // there could be multiple terms with the same exponents.
          // Add them up.
          //
-         if (!cell->is_near_zero())
-            {
-              coeff += Complex(cell->get_real_value(),
-                               cell->get_imag_value());
-            }
+         // the coefficients are stored as they are, not rounded with the
+         // absolute 1E¯10 (which made e.g. 1E¯12 a 0, Bugs40 #27)
+         //
+         coeff += Complex(cell->get_real_value(), cell->get_imag_value());
 
-         if (!Cell::is_near_zero(coeff.imag()))   // complex coeff
+         if (coeff.imag() != 0.0)   // complex coeff
             {
               new (cell) ComplexCell(coeff.real(), coeff.imag());
             }
-         else if (!Cell::is_near_int64_t(coeff.real()))
+         else if (coeff.real() != nearbyint(coeff.real()) ||
+                  fabs(coeff.real()) >= 9E18)
             {
               new (cell) FloatCell(coeff.real());
             }
-         else if (!Cell::is_near_zero(coeff.real()))
+         else
             {
-              new (cell) IntCell(Cell::near_int(coeff.real()));
+              new (cell) IntCell(APL_Integer(coeff.real()));
             }
        }
    Z->check_value(LOC);

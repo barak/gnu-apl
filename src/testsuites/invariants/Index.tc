@@ -1,0 +1,16 @@
+⍝ Index.tc
+⍝ ════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A scalar/vector nonneg int depth≤2; B any; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ ⊃,/⍴¨A
+      ⍝ inv: ⍴⍴Z ←→ ,+/∊⍴¨⍴¨A
+      B ← ⎕RVAL 3 (5 6 7) (,0 1 0 0 0)
+      I ← ⊂1+4∣|⎕RVAL 1 (,2) (,0 1 0 0 0)   ⍝ 2-element index for axis 1
+      J ← ⊂1+5∣|⎕RVAL 1 (,3) (,0 1 0 0 0)   ⍝ 3-element index for axis 2
+      K ← ⊂1+6∣|⎕RVAL 1 (,4) (,0 1 0 0 0)   ⍝ 4-element index for axis 3
+      ⍝ Use bracket index; ⍴Z = catenated shapes of index arrays
+      Z ← B[(⊃I);(⊃J);(⊃K)]
+      (⍴Z) ≡ (⍴⊃I),(⍴⊃J),⍴⊃K
+1

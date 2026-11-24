@@ -92,6 +92,8 @@ UserFunction::UserFunction(Fun_signature sig, Lambda_number lambda_num,
    error_line = -1;   // no error
    error_info = 0;
 }
+std::vector<const UserFunction *> * UserFunction::deferred_deletes = 0;
+
 //────────────────────────────────────────────────────────────────────────────
 UserFunction::~UserFunction()
 {
@@ -1090,8 +1092,24 @@ Function_PC end_PC = Function_PC_0;   // the PC of the end of the last line
             }
       }
 
+   // a lambda that is rejected (e.g. {→0}) is an error in its line, like
+   // any other error in a body line (it escaped ⎕FX and the ∇-editor
+   // before, Bugs39 #48)
+   //
+   try { setup_lambdas(); }
+   catch (const Error & err)
+      {
+        error_line = 1;
+        for (size_t l = 2; l < line_starts.size(); ++l)
+            {
+              if (lambda_error_pos < ShapeItem(line_starts[l]))   break;
+              error_line = l;
+            }
+        if (!error_info || !strcmp(error_info, "Unspecified"))
+           error_info = "bad lambda";
+        return;
+      }
    error_line = -1;   // OK
-   setup_lambdas();
 
    Log(LOG_UserFunction__fix)
       {
@@ -1443,10 +1461,11 @@ const UserFunction * old_ufun = 0;
    // reference counted: the body of the function that contains it still
    // refers to it (Bugs35 #47).
    //
-   if (old_ufun && old_ufun->is_lambda())
-      const_cast<UserFunction *>(old_ufun)->decrement_refcount(LOC);
-   else
-      delete old_ufun;
+   // During a )COPY, the old function is kept until the )COPY has
+   // succeeded, since a failing )COPY restores it (Bugs39 #10).
+   //
+   if (old_ufun && deferred_deletes)   deferred_deletes->push_back(old_ufun);
+   else                                release(old_ufun);
 
    // finally: bind function to symbol
    //
@@ -1462,9 +1481,38 @@ const UserFunction * old_ufun = 0;
 
    return ufun;
 }
+//────────────────────────────────────────────────────────────────────────────
+void
+UserFunction::release(const UserFunction * ufun)
+{
+   if (ufun == 0)   return;
+
+   // a lambda is reference counted: the body of the function that contains
+   // it may still refer to it (Bugs35 #47).
+   //
+   if (ufun->is_lambda())
+      const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
+   else
+      delete ufun;
+}
 //════════════════════════════════════════════════════════════════════════════
+ShapeItem
+UserFunction::locals_start(const Token_string & body, ShapeItem end)
+{
+   // if body[semi] ... body[end - 1] is ; NAME... (one or more names, e.g.
+   // ;A or, like in a ∇-header, ;A B, Bugs39 #81) then return semi.
+   // Otherwise return -1.
+   //
+ShapeItem semi = end;
+   while (semi > 0 && body[semi - 1].get_Class() == TC_SYMBOL)   --semi;
+   if (semi == end || semi == 0)                      return -1;   // no names
+   if (body[semi - 1].get_tag() != TOK_SEMICOL)       return -1;   // no ;
+   return semi - 1;
+}
+//────────────────────────────────────────────────────────────────────────────
 UserFunction *
-UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
+UserFunction::fix_lambda(Symbol & var, const UCS_string & text,
+                         Lambda_number lambda_num)
 {
    // NOTE: only called from Archive::read_Function(). extract the local
    //       vars the first line of text,
@@ -1490,7 +1538,13 @@ UserFunction::fix_lambda(Symbol & var, const UCS_string & text)
    //
 UCS_string header_text, lvars_text, comment, body_text;
 UCS_string * dest = &header_text;
-int signature = SIG_FUN | SIG_Z;
+
+   // a lambda without a result, e.g. {⍺ ⋄ }, is saved without λ← in its
+   // header, e.g. ⍺ λ1 ⍵ (Bugs39 #40)
+   //
+const bool has_result = text.size() > 1 && text[0] == UNI_LAMBDA &&
+                                           text[1] == UNI_LEFT_ARROW;
+int signature = has_result ? SIG_FUN | SIG_Z : SIG_FUN;
 
 
    loop(t, text.size())
@@ -1507,7 +1561,19 @@ int signature = SIG_FUN | SIG_Z;
               case UNI_NUMBER_SIGN:    dest = &comment;       break;
               case UNI_COMMENT:        dest = &comment;       break;
               case UNI_SPACE:
-                   if (dest == &lvars_text)   dest = &comment;
+                   // the locals may be separated by blanks, e.g. ;C D
+                   // (Bugs39 #81). Only a ⍝ or the end of the header
+                   // after the blanks start the comment.
+                   //
+                   if (dest == &lvars_text)
+                      {
+                        ShapeItem n = t + 1;
+                        while (n < text.ssize() && text[n] == UNI_SPACE)  ++n;
+                        if (n >= text.ssize()               ||
+                            text[n] == UNI_LF               ||
+                            text[n] == UNI_COMMENT          ||
+                            text[n] == UNI_NUMBER_SIGN)   dest = &comment;
+                      }
                    break;
 
               case UNI_LF:   // end of header
@@ -1522,7 +1588,50 @@ int signature = SIG_FUN | SIG_Z;
 
    lvars_text.remove_trailing_whitespaces();
    body_text.remove_trailing_whitespaces();
+
    body_text << comment;
+
+   // older SVNs (before Bugs39 #81) treated the blank in e.g. ; X as the
+   // start of a comment: )LOAD then moved X to the end of the body and
+   // kept a ; without names, which a later )SAVE wrote into the header.
+   // Ignore that ; (as those SVNs did), but tell the user, since the end
+   // of the body may now contain the former local variable names.
+   //
+   {
+     bool names = false;
+     loop(l, lvars_text.size())
+        if (lvars_text[l] != UNI_SEMICOLON && lvars_text[l] != UNI_SPACE)
+           names = true;
+     if (lvars_text.size() && !names)
+        {
+          CERR << "WARNING: lambda " << var.get_name()
+               << " has a ; without local variable names (from an older"
+                  " )SAVE). Please check the end of its body: "
+               << body_text << endl;
+          lvars_text.clear();
+        }
+   }
+
+   // the lambda number, e.g. 1 in λ←λ1 ⍵ or ⍺ λ1 ⍵ (Bugs39 #40: was λ0)
+   //
+   if (lambda_num == LAMBDA_NUM_0)
+      {
+        loop(h, header_text.size())
+           {
+             if (header_text[h] != UNI_LAMBDA)   continue;
+             int num = 0;
+             bool digits = false;
+             bool too_large = false;   // no int overflow (Bugs40 #61)
+             for (ShapeItem d = h + 1; d < header_text.ssize() &&
+                  header_text[d] >= '0' && header_text[d] <= '9'; ++d)
+                 {
+                   if (num > 100000000)   too_large = true;
+                   else                   num = 10*num + (header_text[d] - '0');
+                   digits = true;
+                 }
+             if (digits && !too_large)   lambda_num = Lambda_number(num);
+           }
+      }
 
    // append lvars_text to body (as in e.g. { ... ;C;D }. This will also
    // parse the lvars_text needed below.
@@ -1552,7 +1661,8 @@ Function_PC end_PC = Function_PC_0;   // the end of body_text
       }
 
 Function_PC last_statement = Function_PC(-1);
-   for (int b = body.size() - 1; b; --b)
+   // b ≥ 0: also a diamond at body[0], e.g. {⋄⍵+1} (Bugs38 #38)
+   for (int b = body.size() - 1; b >= 0; --b)
        {
          if (body[b].get_tag() == TOK_DIAMOND)
             {
@@ -1561,6 +1671,7 @@ Function_PC last_statement = Function_PC(-1);
             }
        }
 
+   if (has_result)
    {
      body.insert_2(last_statement);
      Token ret_lambda(TOK_RETURN_SYMBOL, &Workspace::get_v_LAMBDA());
@@ -1571,10 +1682,10 @@ Function_PC last_statement = Function_PC(-1);
      // since they are removed from the lambda text.
      //
      Function_PC pc_end = end_PC;
-     for (ShapeItem b = body.ssize() - 2; b >= 0; b -= 2)
+     for (ShapeItem b = body.ssize();;)
          {
-           if (body[b].get_tag() != TOK_SEMICOL)          break;
-           if (body[b + 1].get_Class() != TC_SYMBOL)      break;
+           b = locals_start(body, b);
+           if (b < 0)   break;
            pc_end = body[b].get_PC();
          }
      body[last_statement + 1].copy(Token_loc(ret_lambda, pc_end), LOC);
@@ -1582,19 +1693,28 @@ Function_PC last_statement = Function_PC(-1);
    }
 
 vector<Symbol *> local_vars;
-   while (body.size() >= 2)
+Function_PC pc_void = end_PC;   // the PC of RETURN_VOID (if any)
+   for (;;)
       {
-        const Token & Tsem = body[body.size() - 2];
-        const Token & Tsym = body[body.size() - 1];
-        if (Tsem.get_tag() == TOK_SEMICOL && Tsym.get_Class() == TC_SYMBOL)
-           {
-             local_vars.push_back(Tsym.get_sym_ptr());
-             body.resize(body.size() - 2);
-           }
-        else break;
+        const ShapeItem semi = locals_start(body, body.ssize());
+        if (semi < 0)   break;
+
+        for (ShapeItem n = body.ssize() - 1; n > semi; --n)
+            local_vars.push_back(body[n].get_sym_ptr());
+        pc_void = body[semi].get_PC();
+        body.resize(semi);
       }
 
-   return new UserFunction(Fun_signature(signature), LAMBDA_NUM_0,
+   // a lambda without a result ends with RETURN_VOID, like in
+   // Executable::compute_lambda_body()
+   //
+   if (!has_result)
+      {
+        Token ret_void(TOK_RETURN_VOID);
+        body.push_back(Token_loc(ret_void, pc_void));
+      }
+
+   return new UserFunction(Fun_signature(signature), lambda_num,
                                          body_text, body, local_vars);
 }
 //────────────────────────────────────────────────────────────────────────────

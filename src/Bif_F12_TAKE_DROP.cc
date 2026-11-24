@@ -115,7 +115,7 @@ const AxesBitmap axes_X = X.to_bitmap("A↑[X]B", B.get_rank());
 Shape sh_take = B.get_shape();   // start with ⍴B
    loop(x, len_X)                 // for exery axis X[x] in X
       {
-        const APL_Integer axis = X.get_near_int(x) - qio;
+        const APL_Integer axis = Cell::minus_IO(X.get_near_int(x), qio);
         const APL_Integer alen = A.get_near_int(x);
         sh_take.set_shape_item(axis, alen);
       }
@@ -162,12 +162,15 @@ Value_P Z(ravel_A1.abs(), LOC);
       }
    else
       {
-        // 1D packed fast path for numeric types (fill element is 0)
+        // 1D packed fast path for numeric types (fill element is 0). The
+        // fill item is the IntCell 0 (B's prototype), so a float or complex
+        // B can use it only without fill items (Bugs40 #99)
         const ShapeItem bpi   = B.packed_bytes_per_item();
         const RavelType rtype = B.get_ravel_type();
         const bool zero_fill  = rtype == RPT_INT64
-                             || rtype == RPT_FLOAT64
-                             || rtype == RPT_COMPLEX;
+                             || ((rtype == RPT_FLOAT64 ||
+                                  rtype == RPT_COMPLEX) &&
+                                 Z->element_count() <= B.element_count());
         if (ravel_A1.get_rank() == 1 && B.get_rank() == 1
             && bpi > 0 && zero_fill && axes == 0)
            {
@@ -251,6 +254,54 @@ const Cell & first_B = B.get_cfirst(cache);
    if (Value_P sub = first_B.try_pointer_value())   // first item is nested
       {
         return CLONE_P(sub, LOC);
+      }
+
+   // (↑B)←C (or (f ↑B)←C) with an empty B: B has no first item, so the
+   // assignment is a no-op (like (,B)←C). Writing into the prototype of B
+   // made it atypical (Bugs40 #58). Return ↑B with placeholder LvalCells
+   // (no target), so that (f ↑B)←C still checks that C conforms to f ↑B.
+   // An unbroken (↑B)←C (which replaces the first item wholesale) is
+   // marked as the pick slot; Value::assign_cellrefs() ignores it.
+   //
+   if (B.element_count() == 0 && first_B.is_lval_cell())
+      {
+        Cell * proto = first_B.get_lval_value();
+        Value_P Z = (proto && proto->is_pointer_cell())
+                  ? Value_P(proto->get_pointer_value()->get_shape(), LOC)
+                  : Value_P(LOC);
+        loop(z, Z->nz_element_count())
+            new (&Z->get_wravel(z)) LvalCell(0, 0);
+        Z->set_left_value();
+        if (proto && first_B.get_cell_owner())
+           Z->set_lval_pick_slot(proto, first_B.get_cell_owner());
+        Z->check_value(LOC);
+        return Z;
+      }
+
+   // (↑B)←C where the first cell of B has no target (an over-take position,
+   // or a placeholder of the empty-B case above, e.g. (↑↑V)←7 8 for an
+   // empty V): wholesale like the nested case below, but discarded
+   // (Bugs41 #2)
+   //
+   if (B.element_count() && first_B.is_lval_cell() &&
+       first_B.get_lval_value() == 0)   return Value::discarded_lval();
+
+   // (f ↑B)←V with a nested first item: like Bif_F12_PICK::pick(), return
+   // the cellrefs of that item (so that an outer selector f selects its
+   // cells), marked as the pick slot (so that an unbroken (↑B)←V replaces
+   // the item wholesale), Bugs39 #47
+   //
+   if (first_B.is_lval_cell())
+      {
+        Cell * target = first_B.get_lval_value();
+        Value * owner = first_B.get_cell_owner();
+        if (target && owner && target->is_pointer_cell())
+           {
+             Value_P subval = target->get_pointer_value();
+             Value_P subrefs = subval->get_cellrefs(LOC);
+             subrefs->set_lval_pick_slot(target, owner);
+             return subrefs;
+           }
       }
 
    if (B.element_count() ||      // the normal case,         e.g. Z ← ↑ 1 2 3
@@ -477,7 +528,7 @@ Shape ravel_A(B.get_shape());
    loop(r, len_X)
        {
          const APL_Integer a = A.get_near_int(r);
-         const APL_Integer x = X.get_near_int(r) - qio;
+         const APL_Integer x = Cell::minus_IO(X.get_near_int(r), qio);
 
          const ShapeItem amax = B.get_shape_item(x);
          if      (a >= amax)   ravel_A.set_shape_item(x, 0);

@@ -1,0 +1,14 @@
+⍝ Enlist.tc
+⍝ ═════════
+
+      ⎕IO←1
+
+      ⍝ Precond: Z simple vector
+      ⍝ inv: ⍴⍴Z ←→ ,1  (result is always a vector)
+      ⍝ inv: ,B ←→ ∊B   (for simple array, ravel = enlist)
+      B ← ⎕RVAL 2 (3 4) (,0 1 0 0 0)
+      Z ← ∊B
+      (⍴⍴Z) ≡ ,1
+1
+      (,B) ≡ ∊B
+1

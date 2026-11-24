@@ -1,0 +1,40 @@
+⍝ Roll.tc
+⍝ ----------------------------------
+
+      ⎕IO←1
+      ⎕RL←444444
+      ⎕RL
+444444
+
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      ?10
+7
+
+      ⎕RL
+8993512298281341499
+
+      ?10 10 10 10 10 10
+8 1 2 5 6 1
+
+
+      ]FILE_CTL NO_SKIP
+      ⎕IO←0
+      ⎕RL←444444
+      ⎕RL
+444444
+
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters
+      ?10
+6
+
+      ⎕RL
+8993512298281341499
+
+      ?10 10 10 10 10 10
+7 0 1 4 5 0
+
+      ]FILE_CTL NO_SKIP
+      ⎕IO←1
+
+      ⍝ ==================================
+

@@ -1,0 +1,150 @@
+⍝ Index_Of.tc
+⍝ ----------------------------------
+
+      ⎕IO←1
+      8 4 2 7 3ι3 8 4
+5 1 2
+
+      'SPORT'ι'TOP'
+5 3 2
+
+      ⎕IO←0
+      8 4 2 7 3ι3 8 4
+4 0 1
+
+      'SPORT'ι'TOP'
+4 2 1
+
+      ⎕IO←1
+      A←(2 3) (ι0) 'ME'
+      Aι'ME' (ι0)
+3 2
+
+      ⍝ extended Index of
+       ⊢A←10 10⍴⍳100
+ 1  2  3  4  5  6  7  8  9  10
+11 12 13 14 15 16 17 18 19  20
+21 22 23 24 25 26 27 28 29  30
+31 32 33 34 35 36 37 38 39  40
+41 42 43 44 45 46 47 48 49  50
+51 52 53 54 55 56 57 58 59  60
+61 62 63 64 65 66 67 68 69  70
+71 72 73 74 75 76 77 78 79  80
+81 82 83 84 85 86 87 88 89  90
+91 92 93 94 95 96 97 98 99 100
+
+       A[3;3]←⊂'SUB'
+      4 ⎕CR A ⍳ 13 4 ¯5 'SUB'
+┏→━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏⊖┓ ┏→━━┓┃
+┃┃2 3┃ ┃1 4┃ ┃0┃ ┃3 3┃┃
+┃┗∼━━┛ ┗∼━━┛ ┗━┛ ┗∼━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━┛
+
+      ⎕IO←0
+      4 ⎕CR A ⍳ 13 4 ¯5 'SUB'
+┏→━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏⊖┓ ┏→━━┓┃
+┃┃1 2┃ ┃0 3┃ ┃0┃ ┃2 2┃┃
+┃┗∼━━┛ ┗∼━━┛ ┗━┛ ┗∼━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ Item not found ----------------------------------
+
+      ⎕IO←1
+      8 9 5ι2 5 8
+4 3 1
+
+      L←'OH' 'NO' 'I'
+      Lι'NO' 'ON'
+2 4
+
+      'OHNOI'ι'NO' 'ON'
+6 6
+
+      'WIZARD'ι'OZ'
+7 3
+
+      6 7 4ι4 7 (ι0)
+3 2 4
+
+      ⍝ Item recurs ----------------------------------
+
+      5 5 8 8 9ι8 9 5
+3 5 1
+
+      'BANANA'ι'BANANA'
+1 2 3 2 3 2
+
+      ⍝ large B
+
+      ⎕RL←42
+      ]FILE_CTL SKIP_APL2   ⍝ random numbers differ between interpreters; ⍳ with a vector argument is a GNU APL extension
+      (⍳100) ⍳ ?10 10⍴100
+69 71 81 91 39 33  15 18 44 95
+56 29 83 88  9 18  60 51 81 51
+10 85 50 71 24 25  43 64 88 95
+26 47 24 33 14 53  87 56  7 85
+26 46 75  9 89 78  29 67 80 12
+59 33 87 56 12 75  66 88 17  3
+16  3 93 98 24 84  71 47 38 42
+65 91 54 60 47 94  42 73 30 53
+95 42 72 90 47 20 100 20 44 60
+86 40 30 95 99 38  60 86  1 45
+
+      ⍝ generalized index
+      ⍳2 2
+ 1 1  1 2 
+ 2 1  2 2 
+
+      4 ⎕CR ⍳2 0
+┏⊖━━━━┓
+↓┏→━━┓┃
+┃┃0 0┃┃
+┃┗∼━━┛┃
+┃┏→━━┓┃
+┃┃0 0┃┃
+┃┗∼━━┛┃
+┗ϵ━━━━┛
+
+      4 ⎕CR ⍳0 2
+┏→━━━━━━━━━━┓
+⌽┏→━━┓ ┏→━━┓┃
+┃┃0 0┃ ┃0 0┃┃
+┃┗∼━━┛ ┗∼━━┛┃
+┗ϵ━━━━━━━━━━┛
+
+
+      ⍝ Regression ----------------------------------
+
+      ]FILE_CTL NO_SKIP
+      A←⌽⍳64 ◊ B←⍳6 ◊ B≡A[A⍳B]
+1
+
+      A←64?64 ◊ B←⍳6 ⋄ B≡A[A⍳B]
+1
+
+      A←3×⍳64 ◊ B←⍳6 ⋄ B≡A[A⍳B]
+INDEX ERROR+
+      B≡A[A⍳B]
+        ^^
+      )SIC
+
+      A←⎕IO+64|3×⍳64 ⋄ B←⍳6 ⋄ B≡A[A⍳B]
+1
+
+      ⍝ Regression (Blake McBride, LanguageVariances.md #7, 2026-08-10):
+      ⍝ ⍳ (Index Of) is not one of the axis-taking functions in
+      ⍝ apl2lrm.txt Figure 7 (p.45), so an axis on it must give AXIS
+      ⍝ ERROR per the manual's "Conditions for Axis Specification" --
+      ⍝ Function::phrase_error()'s generic "phrase not implemented"
+      ⍝ fallback used to always throw VALENCE ERROR regardless of
+      ⍝ whether the missing capability was specifically axis support.
+      ⍝
+      M←2 3⍴⍳6
+      M⍳[1]2
+AXIS ERROR+
+      M⍳[1]2
+      ^^
+
+

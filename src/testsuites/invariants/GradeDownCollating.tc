@@ -1,0 +1,15 @@
+⍝ GradeDownCollating.tc
+⍝ ═════════════════════
+
+      ⎕IO←1
+
+      ⍝ Precond: A nonempty nonscalar char; B nonscalar char; implicit ⎕IO
+      ⍝ inv: ⍴Z ←→ 1↑⍴B
+      ⍝ inv: ⍴⍴Z ←→ ,1
+      A ← 'ABCDEFGHIJ'
+      B ← ⎕RVAL 2 (3 4) (,1 0 0 0 0)
+      Z ← A⍒B
+      (⍴Z) ≡ 1↑⍴B
+1
+      (⍴⍴Z) ≡ ,1
+1

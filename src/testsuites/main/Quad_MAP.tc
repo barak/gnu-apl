@@ -1,0 +1,104 @@
+
+      ⍝ the map A
+
+      ⊢A←5 2⍴'eEwWaAzZ92'
+eE
+wW
+aA
+zZ
+92
+
+      ⍝ the value B being mapped
+      ⊢B←'Halloween'
+Halloween
+
+      ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+      ⍝ replace scalar 'a' with vector 1 2 3
+      A←5 2⍴'eEwWaAzZ92' ◊ A[3;2]←⊂1 2 3
+      A
+ e  E     
+ w  W     
+ a  1 2 3 
+ z  Z     
+ 9  2     
+
+      ⍝ the result
+      4 ⎕CR A ⎕MAP B
+┏→━━━━━━━━━━━━━━━━┓
+┃H ┏→━━━━┓ lloWEEn┃
+┃  ┃1 2 3┃        ┃
+┃  ┗∼━━━━┛        ┃
+┗ϵ━━━━━━━━━━━━━━━━┛
+
+      ⍝ replace scalar vector 1 2 3 with scalar 'A'
+      A←5 2⍴'eEwWaAzZ92' ◊ A[3;1]←⊂1 2 3
+      4 ⎕CR A
+┏→━━━━━━━━┓
+↓e       E┃
+┃w       W┃
+┃┏→━━━━┓ A┃
+┃┃1 2 3┃  ┃
+┃┗∼━━━━┛  ┃
+┃z       Z┃
+┃9       2┃
+┗ϵ━━━━━━━━┛
+
+      B←'Halloween' ◊ B[2]←⊂1 2 3
+      4 ⎕CR B
+┏→━━━━━━━━━━━━━━━━┓
+┃H ┏→━━━━┓ lloween┃
+┃  ┃1 2 3┃        ┃
+┃  ┗∼━━━━┛        ┃
+┗ϵ━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR A ⎕MAP B
+┏→━━━━━━━━┓
+┃HAlloWEEn┃
+┗━━━━━━━━━┛
+
+      ⍝ non-unique key column (DOMAIN ERROR)
+      ⊢A←5 2⍴'eEwWeEzZ92'
+eE
+wW
+eE
+zZ
+92
+
+      A ⎕MAP B
+DOMAIN ERROR+
+      A ⎕MAP B
+      ^ ^
+
+      )MORE
+Duplicate keys (e.g. A[1] and A[3]) in 'A ⎕MAP B'
+
+      ⍝ recursive
+      ⍝
+      A←5 2⍴'eEwWaAzZ92'
+      B←'Hal' 'low' 'een'
+      4 ⎕CR A ⎕MAP B
+┏→━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
+┃┃Hal┃ ┃low┃ ┃een┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━┛
+
+      4 ⎕CR (⊂A) ⎕MAP B
+┏→━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
+┃┃HAl┃ ┃loW┃ ┃EEn┃┃
+┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━┛
+
+      )SIC
+      )ERASE A B
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

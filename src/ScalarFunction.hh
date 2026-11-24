@@ -90,6 +90,13 @@ protected:
    /// @param B right argument APL value
    Token do_eval_fill_AB(cValue_R A, cValue_R B) const;
 
+   /// the fill function (lrm p. 56) of the items A and B
+   static Value_P fill_items(const cValue & A, const cValue & B,
+                             bool prefer_A);
+
+   /// item b of B as a value
+   static Value_P item_value(const cValue & B, ShapeItem b);
+
    /// A helper function for eval_fill_B().
    /// @param B right argument APL value
    Token do_eval_fill_B(cValue_R B) const;
@@ -182,6 +189,10 @@ protected:
 
    /// 1 (for eval_scalar_identity_fun)
    static const IntCell integer_1;
+
+   /// the integer ¯1 (all 64 bits set, the identity of ⊤∧ and ⊤=,
+   /// Bugs38 #53)
+   static const IntCell integer_m1;
 
    /// parallel eval_scalar_AB
    static Thread_context::PoolFunction PF_scalar_AB;
@@ -339,13 +350,17 @@ protected:
 // DEF_VV_Z2Z: complex×complex → complex.
 // inc=0: scalar (pA[0]=re, pA[1]=im); inc=1: N-element array.
 // RE_EXPR/IM_EXPR use doubles _ar,_ai (A re/im) and _br,_bi (B re/im).
+// A non-finite result is a DOMAIN ERROR, like in the per-cell path
+// (ComplexCell::bif_add_cc() etc., Bugs38 #43).
 #define DEF_VV_Z2Z(NAME, RE_EXPR, IM_EXPR)                                \
    static void NAME(double * pZ, const double * pA, int incA,             \
                     const double * pB, int incB, ShapeItem N)             \
    { for (ShapeItem _i = 0; _i < N; ++_i)                                 \
         { const double _ar = pA[2*_i*incA], _ai = pA[2*_i*incA + 1];     \
           const double _br = pB[2*_i*incB], _bi = pB[2*_i*incB + 1];     \
-          pZ[2*_i] = (RE_EXPR); pZ[2*_i + 1] = (IM_EXPR); } }
+          pZ[2*_i] = (RE_EXPR); pZ[2*_i + 1] = (IM_EXPR);                 \
+          if (!isfinite(pZ[2*_i]) || !isfinite(pZ[2*_i + 1]))             \
+             DOMAIN_ERROR; } }
 
 // DEF_V_Z2Z: complex → complex. RE_EXPR/IM_EXPR use doubles _br,_bi.
 #define DEF_V_Z2Z(NAME, RE_EXPR, IM_EXPR)                                 \
@@ -528,7 +543,7 @@ protected:
    /// @param B right argument APL value
    /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, integer_1); }
+      { return eval_scalar_identity_fun(B, axis, integer_m1); }
 
    /// overloaded Function::eval_AXB().
    /// @param A left argument APL value
@@ -567,7 +582,7 @@ protected:
    /// @param B right argument APL value
    /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, integer_1); }
+      { return eval_scalar_identity_fun(B, axis, integer_0); }
 
    /// overloaded Function::eval_AXB().
    /// @param A left argument APL value
@@ -710,7 +725,7 @@ protected:
    /// @param B right argument APL value
    /// @param axis axis along which the identity is applied
    virtual Token eval_identity_fun(cValue_R B, sAxis axis) const
-      { return eval_scalar_identity_fun(B, axis, integer_1); }
+      { return eval_scalar_identity_fun(B, axis, integer_m1); }
 
    /// overloaded Function::eval_AXB().
    /// @param A left argument APL value
@@ -967,6 +982,14 @@ public:
    {}
 
    static Bif_F2_FIND  fun;         ///< Built-in function.
+
+   /// the dyadic form is not a scalar function: its fill function is the
+   /// function itself (LRM Figure 20, Bugs40 #40)
+   virtual bool is_scalar_dyadic() const   { return false; }
+
+   /// overloaded ScalarFunction::eval_fill_AB()
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const
+      { return eval_AB(A, B); }
 
    /// overloaded ScalarFunction::may_parallel()
    virtual bool may_parallel() const   { return false; }
@@ -1305,6 +1328,14 @@ public:
 
    static Bif_F12_ROLL  fun;        ///< Built-in function.
 
+   /// the dyadic form is not a scalar function: its fill function is the
+   /// function itself (LRM Figure 20, Bugs40 #40)
+   virtual bool is_scalar_dyadic() const   { return false; }
+
+   /// overloaded ScalarFunction::eval_fill_AB()
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const
+      { return eval_AB(A, B); }
+
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(cValue_R B) const;
@@ -1337,6 +1368,14 @@ public:
    {}
 
    static Bif_F12_WITHOUT  fun;     ///< Built-in function.
+
+   /// the dyadic form is not a scalar function: its fill function is the
+   /// function itself (LRM Figure 20, Bugs40 #40)
+   virtual bool is_scalar_dyadic() const   { return false; }
+
+   /// overloaded ScalarFunction::eval_fill_AB()
+   virtual Token eval_fill_AB(cValue_R A, cValue_R B) const
+      { return eval_AB(A, B); }
 
    /// Compute A without B.
    /// overloaded Function::eval_AB().

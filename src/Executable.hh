@@ -44,6 +44,10 @@ class UserFunction;
 class Executable
 {
 public:
+   /// return the start of the last statement of lambda \b text (after
+   /// its last top-level ◊), or 0 (Bugs40 #41)
+   static ShapeItem lambda_last_statement(const UCS_string & text);
+
    /// constructor
    /// @param ucs source text of the executable
    /// @param multi_line true if the source spans multiple lines
@@ -303,6 +307,10 @@ protected:
    ErrorCode parse_body_line(Function_Line line, const Token_string & tos,
                              Function_PC end_PC, bool trace,
                              const char * loc);
+
+   /// the body position of the { of the lambda that setup_lambdas() is
+   /// currently setting up (for the line of a DEFN ERROR, Bugs39 #48)
+   static ShapeItem lambda_error_pos;
 
    /// recursively extract all lambda expressions from body and store
    /// them in lambdas

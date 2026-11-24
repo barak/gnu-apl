@@ -780,7 +780,7 @@ const time_t now = time(0);
    for (const Tar_member & member : members)
        {
          // the size field has 11 octal digits, i.e. less than 8 GiB
-         if (member.content.size() > 077777777777UL)   { ok = false;   break; }
+         if (member.content.size() > 077777777777ULL)   { ok = false;   break; }
 
          // a POSIX ustar header (see 'info tar', "Standard")
          //
@@ -791,11 +791,15 @@ const time_t now = time(0);
          snprintf(header + 100,   8, "%07o", 0644);              // mode
          snprintf(header + 108,   8, "%07o", 0);                 // uid
          snprintf(header + 116,   8, "%07o", 0);                 // gid
-         snprintf(header + 124,  12, "%011lo",
-                  static_cast<unsigned long>(member.content.size())
-                  & 077777777777UL);                             // size
-         snprintf(header + 136,  12, "%011lo",
-                  static_cast<unsigned long>(now) & 077777777777UL);   // mtime
+         // unsigned long long (not unsigned long): 077777777777 does not
+         // fit into a 32-bit unsigned long
+         //
+         snprintf(header + 124,  12, "%011llo",
+                  static_cast<unsigned long long>(member.content.size())
+                  & 077777777777ULL);                            // size
+         snprintf(header + 136,  12, "%011llo",
+                  static_cast<unsigned long long>(now)
+                  & 077777777777ULL);                            // mtime
          memset(header + 148, ' ', 8);                           // chksum
          header[156] = '0';                                      // typeflag
          memcpy(header + 257, "ustar", 6);                       // magic

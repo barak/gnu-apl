@@ -1,0 +1,13 @@
+⍝ Negative.tc
+⍝ ═══════════
+
+      ⎕IO←1
+
+      ⍝ Precond: B and Z numeric
+      ⍝ inv: -B ←→ 0-B   (monadic minus = subtract from zero)
+      B ← ⎕RVAL 1 (,5) (,0 1 0 0 0)
+      (-B) ≡ 0-B
+1
+      B ← ⎕RVAL 2 (3 4) (,0 0 1 0 0)
+      (-B) ≡ 0-B
+1

@@ -233,6 +233,12 @@ const string driver_attr = w_props->get_gui_driver();
              DOMAIN_ERROR;
            }
 
+   // every plot window posts expose_sema exactly once (when it is shown, or
+   // when it could not be created), so the waits below must not post it
+   // again "for the next window": the next start_GUI() would then return
+   // before its own window was created, and an error of that window (e.g.
+   // no X-server) was lost (Bugs40 #83).
+   //
    if (driver == PltDrv_GTK)
       {
 #if apl_GTK3 && apl_X11
@@ -242,7 +248,6 @@ const string driver_attr = w_props->get_gui_driver();
         //
         plot_main_GTK(w_props, handle);
         sem_wait_safe_I(expose_sema, "the GTK plot window to be shown");
-        sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver GTK loaded." << endl;
         return;
 #else   // not apl_GTK3
@@ -273,7 +278,6 @@ const string driver_attr = w_props->get_gui_driver();
              DOMAIN_ERROR;
            }
         sem_wait_safe_I(expose_sema, "the XCB plot window to be shown");
-        sem_post(expose_sema);   // for the next window (if any)
 
         // plot_main_XCB() could not start (e.g. no X-server): it recorded
         // the reason in w_props (Bugs16 #1) instead of throwing across the
@@ -306,7 +310,6 @@ const string driver_attr = w_props->get_gui_driver();
         //
         plot_main_WIN32(w_props, handle);
         sem_wait_safe_I(expose_sema, "the WIN32 plot window to be shown");
-        sem_post(expose_sema);   // for the next window (if any)
         Log(LOG_Quad_PLOT)   CERR << "Plot driver WIN32 loaded." << endl;
         return;
 #else   // not MINGW_SRC
@@ -414,7 +417,7 @@ Quad_PLOT::eval_B(cValue_R B) const
         // scalar (integer) argument: window control and logging
         //
         Cell cache;
-        const APL_Integer B0 = B.get_cscalar(cache).get_int_value();
+        const APL_Integer B0 = B.get_cscalar(cache).get_near_int();   // Bugs40 #70
         Value_P Z = window_control(B0);
         return Token(TOK_APL_VALUE1, Z);
       }

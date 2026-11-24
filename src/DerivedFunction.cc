@@ -21,8 +21,16 @@
 /** @file
 */
 
+#include "Bif_OPER1_COMMUTE.hh"
 #include "Bif_OPER1_EACH.hh"
+#include "Bif_OPER1_REDUCE.hh"
+#include "Bif_OPER1_SCAN.hh"
+#include "Bif_OPER2_INNER.hh"
+#include "Bif_OPER2_OUTER.hh"
+#include "Bif_OPER2_POWER.hh"
+#include "Bif_OPER2_RANK.hh"
 #include "Common.hh"
+#include "QuadFunction.hh"
 #include "DerivedFunction.hh"
 #include "Id.hh"
 #include "Output.hh"
@@ -66,17 +74,59 @@ DerivedFunction::get_selectivity() const
 bool
 DerivedFunction::has_monadic_form() const
 {
-   if (oper == &Bif_OPER1_EACH::fun)
-      return get_LO() ? get_LO()->has_monadic_form() : true;
+   // A∘.g B and A f.g B are dyadic only (Bugs41 #46)
+   //
+   if (oper == &Bif_OPER2_OUTER::fun || oper == &Bif_OPER2_INNER::fun)
+      return false;
+
+cFunction_P LO = get_LO();
+   if (!LO)   return true;
+
+   // f¨, f⍣N, f⍣g, and f⍤y B call f monadically; f⍨ B, f/ B etc.
+   // dyadically (Bugs40 #56, f⍣g: Bugs41 #46)
+   //
+   if (oper == &Bif_OPER1_EACH::fun  ||
+       oper == &Bif_OPER2_RANK::fun  ||
+       oper == &Bif_OPER2_POWER::fun)
+      return LO->has_monadic_form();
+
+   if (is_dyadic_LO_oper())   return LO->has_dyadic_form();
    return true;
 }
 //────────────────────────────────────────────────────────────────────────────
 bool
 DerivedFunction::has_dyadic_form() const
 {
-   if (oper == &Bif_OPER1_EACH::fun)
-      return get_LO() ? get_LO()->has_dyadic_form() : true;
+   // A∘.g B and A f.g B call g (and f) dyadically (Bugs41 #46)
+   //
+   if (oper == &Bif_OPER2_OUTER::fun || oper == &Bif_OPER2_INNER::fun)
+      {
+        cFunction_P LO = get_LO();
+        cFunction_P RO = get_RO();
+        return (!LO || LO->has_dyadic_form()) &&
+               (!RO || RO->has_dyadic_form());
+      }
+
+cFunction_P LO = get_LO();
+   if (!LO)   return true;
+
+   if (oper == &Bif_OPER1_EACH::fun  ||
+       oper == &Bif_OPER2_RANK::fun  ||
+       oper == &Bif_OPER2_POWER::fun ||   // also f⍣g (Bugs41 #46)
+       is_dyadic_LO_oper())
+      return LO->has_dyadic_form();
+
    return true;
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+DerivedFunction::is_dyadic_LO_oper() const
+{
+   // f⍨ and the reductions and scans call f dyadically in both forms
+   //
+   return oper == &Bif_OPER1_COMMUTE::fun ||
+          oper == &Bif_OPER1_REDUCE::fun  || oper == &Bif_OPER1_REDUCE1::fun ||
+          oper == &Bif_OPER1_SCAN::fun    || oper == &Bif_OPER1_SCAN1::fun;
 }
 //════════════════════════════════════════════════════════════════════════════
 UCS_string
@@ -111,6 +161,57 @@ DerivedFunction::has_result() const
    if (!oper->has_result())   return false;   // unlikely
    if (left_arg.is_function())   return left_arg.get_function()->has_result();
    return true;   // operator bound to left value
+}
+//────────────────────────────────────────────────────────────────────────────
+int
+DerivedFunction::get_fun_valence() const
+{
+   // every derived function is a TOK_FUN2, but e.g. the function derived
+   // from a monadic-only defined operator, or f¨ for a monadic-only f is
+   // monadic (Bugs38 #105)
+   //
+   if (oper->get_func_ufun())   return oper->get_fun_valence();
+   if (oper == &Bif_OPER1_EACH::fun && left_arg.is_function())
+      return left_arg.get_function()->get_fun_valence();
+
+   // f⍨, f⍤y, and f⍣n call f dyadically when called dyadically (f⍨ even
+   // when called monadically), and f.g calls g dyadically: a monadic-only
+   // f (resp. g) makes them monadic (Bugs39 #97). Likewise f/ f⌿ f\ f⍀
+   // and ∘.g, which call f (resp. g) dyadically in every form (Bugs40 #90)
+   //
+   switch(oper->get_Id())
+      {
+        case ID_OPER1_COMMUTE:
+        case ID_OPER2_RANK:
+        case ID_OPER2_POWER:
+        case ID_OPER1_REDUCE:
+        case ID_OPER1_REDUCE1:
+        case ID_OPER1_SCAN:
+        case ID_OPER1_SCAN1:
+             if (left_arg.is_function())
+                return min(2, left_arg.get_function()->get_fun_valence());
+             break;
+
+        case ID_OPER2_OUTER:
+             if (right_arg.is_function())
+                return min(2, right_arg.get_function()->get_fun_valence());
+             break;
+
+        case ID_OPER2_INNER:
+             {
+               int valence = 2;
+               if (left_arg.is_function())
+                  valence = min(valence,
+                                left_arg.get_function()->get_fun_valence());
+               if (right_arg.is_function())
+                  valence = min(valence,
+                                right_arg.get_function()->get_fun_valence());
+               return valence;
+             }
+
+        default: break;
+      }
+   return 2;   // ambivalent or dyadic
 }
 //────────────────────────────────────────────────────────────────────────────
 void
@@ -370,8 +471,67 @@ DerivedFunction::eval_fill_AB(cValue_R A, cValue_R B) const
    // interaction for real is a separate, deeper piece of work. See
    // Bugs27 #28.
    //
-   if (may_push_SI())   return Function::eval_fill_AB(A, B);
+   // a chain that contains a system function is not executed, e.g. for
+   // ⎕ES⍨¨'' (see QuadFunction::eval_fill_AB(), Bugs39 #90)
+   //
+   if (contains_system_function())   return Token(TOK_APL_VALUE1,
+                                                  CLONE(&B, LOC));
+
+   // a defined operator or operand: the identity (LRM Figure 20), like
+   // UserFunction::eval_fill_AB()
+   //
+   if (contains_defined())   return Token(TOK_APL_VALUE1, CLONE(&B, LOC));
+
+   // A f¨ B and A∘.g B: the fill of f resp. g for every (pair of) items
+   // (LRM p. 110, Bugs41 #47)
+   //
+   if (oper == &Bif_OPER1_EACH::fun && left_arg.is_function())
+      return Token(TOK_APL_VALUE1,
+                   each_outer_fill(left_arg.get_function(), false, &A, B));
+   if (oper == &Bif_OPER2_OUTER::fun && right_arg.is_function())
+      return Token(TOK_APL_VALUE1,
+                   each_outer_fill(right_arg.get_function(), true, &A, B));
+
+   // only primitive operators and functions, but implemented by a macro
+   // (e.g. ×⍤0): like f¨ and ∘.f (LRM p. 110), the fill function of the
+   // operand, so that the macro remains invisible (Bugs40 #55)
+   //
+   if (may_push_SI())
+      {
+        // ⍤ applies its operand to the cells (Bugs41 #41)
+        //
+        if (oper == &Bif_OPER2_RANK::fun && left_arg.is_function() &&
+            right_arg.is_apl_val())
+           return Bif_OPER2_RANK::fill_ALyB(left_arg.get_function(),
+                                            *right_arg.get_apl_val(), &A, B);
+
+        if (const Function * fun = fill_operand())
+           return (oper == &Bif_OPER1_COMMUTE::fun) ? fun->eval_fill_AB(B, A)
+                                                     : fun->eval_fill_AB(A, B);
+        return Function::eval_fill_AB(A, B);
+      }
    return eval_AB(A, B);
+}
+//────────────────────────────────────────────────────────────────────────────
+bool
+DerivedFunction::contains_system_function() const
+{
+   if (dynamic_cast<const QuadFunction *>(oper))   return true;
+
+const Token * operands[] = { &left_arg, &right_arg };
+   loop(o, 2)
+      {
+        const Token & tok = *operands[o];
+        if (!tok.is_function())   continue;
+        const Function * fun = tok.get_function();
+        if (dynamic_cast<const QuadFunction *>(fun))   return true;
+        if (const DerivedFunction * dfun =
+                  dynamic_cast<const DerivedFunction *>(fun))
+           {
+             if (dfun->contains_system_function())   return true;
+           }
+      }
+   return false;
 }
 //────────────────────────────────────────────────────────────────────────────
 Token
@@ -379,8 +539,88 @@ DerivedFunction::eval_fill_B(cValue_R B) const
 {
    // see eval_fill_AB() above for the may_push_SI() guard's rationale.
    //
-   if (may_push_SI())   return Function::eval_fill_B(B);
+   if (contains_system_function())   return Token(TOK_APL_VALUE1,
+                                                  CLONE(&B, LOC));
+   if (contains_defined())   return Token(TOK_APL_VALUE1, CLONE(&B, LOC));
+
+   // f¨ B: the fill of f for every item (LRM p. 110, Bugs41 #47)
+   //
+   if (oper == &Bif_OPER1_EACH::fun && left_arg.is_function())
+      return Token(TOK_APL_VALUE1,
+                   each_outer_fill(left_arg.get_function(), false, 0, B));
+
+   if (may_push_SI())
+      {
+        // ⍤ applies its operand to the cells (Bugs41 #41)
+        //
+        if (oper == &Bif_OPER2_RANK::fun && left_arg.is_function() &&
+            right_arg.is_apl_val())
+           return Bif_OPER2_RANK::fill_ALyB(left_arg.get_function(),
+                                            *right_arg.get_apl_val(), 0, B);
+
+        if (const Function * fun = fill_operand())
+           return (oper == &Bif_OPER1_COMMUTE::fun) ? fun->eval_fill_AB(B, B)
+                                                     : fun->eval_fill_B(B);
+        return Function::eval_fill_B(B);
+      }
    return eval_B(B);
+}
+//────────────────────────────────────────────────────────────────────────────
+/// item i of V as a value
+static Value_P
+fill_item(const cValue & V, ShapeItem i)
+{
+Cell cache;
+const Cell & cell = V.get_cravel(i, cache);
+   if (cell.is_pointer_cell())   return cell.get_pointer_value();
+Value_P Z(LOC);
+   Z->next_ravel_Cell(cell);
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+Value_P
+DerivedFunction::each_outer_fill(const Function * fun, bool outer,
+                                 const cValue * A, const cValue & B)
+{
+   // the shape of the result: that of B (or of the non-scalar A) for f¨,
+   // and (⍴A),⍴B for ∘.g
+   //
+Shape shape_Z = B.get_shape();
+   if (outer)                                   shape_Z = A->get_shape() + B.get_shape();
+   else if (A && B.is_scalar() && !A->is_scalar())   shape_Z = A->get_shape();
+
+const ShapeItem len_B = B.element_count();
+const ShapeItem count = shape_Z.get_volume();
+Value_P Z(shape_Z, LOC);
+   loop(z, count ? count : 1)   // at least the prototype
+      {
+        ShapeItem a = 0, b = 0;
+        if (outer)                          { a = z / (len_B ? len_B : 1);
+                                              b = z % (len_B ? len_B : 1); }
+        else if (A && !A->is_scalar())      { a = z;   b = B.is_scalar() ? 0 : z; }
+        else                                { b = z; }
+        if (count == 0)   a = b = 0;   // the prototypes
+
+        Value_P B1 = fill_item(B, b);
+        const Token tok = A ? fun->eval_fill_AB(*fill_item(*A, a), *B1)
+                            : fun->eval_fill_B(*B1);
+        if (!tok.is_apl_val())   DOMAIN_ERROR;
+        Z->set_ravel_Value(z, tok.get_apl_val().get());
+      }
+   Z->check_value(LOC);
+   return Z;
+}
+//────────────────────────────────────────────────────────────────────────────
+const Function *
+DerivedFunction::fill_operand() const
+{
+   // the function operand whose fill function is the fill function of this
+   // (primitive) derived function: LO, or else RO.
+   //
+   if (left_arg .is_function())   return left_arg .get_function();
+   if (right_arg.is_function())   return right_arg.get_function();
+   return 0;
 }
 //════════════════════════════════════════════════════════════════════════════
 // DerivedFunctionCache's constructor, destructor, get(), reserve_slot(),

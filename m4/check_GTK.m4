@@ -28,9 +28,8 @@ fi
 
    # user allows GTK...
 
-   # check for pkg-config
-AC_PATH_PROG(PKG_CONFIG, pkg-config, no)   # locate pkg-config
-if apl_NO($PKG_CONFIG); then               # pkg-config missing
+   # check for pkg-config (located in configure.ac)
+if test -z "$PKG_CONFIG"; then             # pkg-config missing
    AC_MSG_CHECKING([for pkg-config (GTK prerequisite)])
    AC_MSG_RESULT([no])
    return

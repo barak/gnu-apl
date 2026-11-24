@@ -777,14 +777,15 @@ make -C src clean all</code>
 <pre>
 
 <code>cd src
-./apl -T testcases_3/*tc   # produce file gmon.out
+./apl --TL testsuites/main   # produce file gmon.out
 gprof ./apl gmon.out &gt; profile   # produce file 'profile' from file gmon.out</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The example above profiles GNU APL over all testcases in directory
-<strong>src/testcases_3</strong>. It is up to the user to determine what is being profiled (a
-somewhat broad profile over all GNU APL primitives in the example above). To
+<div class="paragraph"><p>The example above profiles GNU APL over all testcases in the test suite
+<strong>src/testsuites/main</strong> (the testcases of make test3). It is up to the user
+to determine what is being profiled (a somewhat broad profile over all GNU
+APL primitives in the example above). To
 obtain a more narrow profile, say for specific APL primitives, you should:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -1090,7 +1091,7 @@ benchmarking of some scalar APL functions.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2026-09-19 18:15:43 CEST
+ 2026-11-04 19:24:46 CET
 </div>
 </div>
 </body>

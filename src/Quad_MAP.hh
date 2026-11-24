@@ -31,6 +31,9 @@
 class Quad_MAP : public QuadFunction
 {
 public:
+   /// overloaded Function::has_monadic_form(): ⎕MAP is dyadic only
+   virtual bool has_monadic_form() const   { return false; }   // Bugs40 #56
+
    /// Constructor.
    Quad_MAP()
       : QuadFunction(TOK_Quad_MAP)

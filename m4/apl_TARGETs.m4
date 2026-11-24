@@ -98,12 +98,7 @@ AC_ARG_WITH( [python],
 
 if apl_YES($apl_TARGET_PYTHON); then
    AC_DEFINE([apl_TARGET_PYTHON], [1], [Define if building lib_gnu_apl.so])
-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
-    if apl_NNO($PKG_CONFIG); then             # we have pkg-config
-       if $PKG_CONFIG --exists python3; then   # and pkg-config knows python3
-            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
-       fi
-   fi
+   # PYTHON_CFLAGS is set in configure.ac, after pkg-config is located
 fi
 AM_CONDITIONAL(apl_TARGET_PYTHON, apl_YES($apl_TARGET_PYTHON))
 AC_MSG_RESULT([$apl_TARGET_PYTHON])

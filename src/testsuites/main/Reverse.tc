@@ -1,0 +1,46 @@
+⍝ Reverse.tc
+⍝ ----------------------------------
+
+      A←'DESSERTS'
+      ⌽A
+STRESSED
+
+
+      B←(1 2) (3 4) (5 6)
+      ⌽B
+ 5 6  3 4  1 2 
+
+
+      C←3 5ρ'EMIT REGALTIDE '
+      C
+EMIT 
+REGAL
+TIDE 
+
+      ⌽C
+ TIME
+LAGER
+ EDIT
+
+      ⍝ selective spec ----------------------------------
+
+      D←3 4ρι12
+      D
+1  2  3  4
+5  6  7  8
+9 10 11 12
+
+      (⌽D)←3 4ρ'STOPSPINODER'
+      D
+POTS
+NIPS
+REDO
+
+
+      ⊖C
+TIDE 
+REGAL
+EMIT 
+
+      ⍝ ==================================
+

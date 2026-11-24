@@ -1,0 +1,41 @@
+⍝ AAA2.tc
+⍝ ----------------------------------
+
+      ⍝ FUNCTION RETURN VALUE
+
+      )ERASE FOO
+∇Z←FOO
+ Z←'FOO-RESULT'
+∇
+
+      FOO
+FOO-RESULT
+
+      X←FOO
+      X
+FOO-RESULT
+
+      ⍎'FOO'
+FOO-RESULT
+
+      Y←⍎'FOO'
+      Y
+FOO-RESULT
+
+      )ERASE FOO
+
+      ⍝ ----------------------------------
+
+      )ERASE FOO
+∇Z←FOO B
+ Z←+/B
+∇
+
+      Q←FOO 1 9 3
+      Q
+13
+
+
+      ⍝ ==================================
+
+
